@@ -7,7 +7,7 @@ import { Layout as DashboardLayout } from "src/layouts/dashboard/layout";
 const Page = () => (
   <>
     <Head>
-      <title>Settings | Devias Kit</title>
+      <title>Settings | Thapar HMS</title>
     </Head>
     <Box
       component="main"
@@ -16,7 +16,7 @@ const Page = () => (
         py: 8,
       }}
     >
-      <Container maxWidth="lg">
+      <Container maxWidth="xl">
         <Stack spacing={3}>
           <Typography variant="h4">Update Password</Typography>
           {/* <SettingsNotifications /> */}

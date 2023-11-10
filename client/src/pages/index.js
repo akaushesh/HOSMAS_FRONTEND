@@ -9,6 +9,7 @@ import { OverviewSales } from "src/sections/overview/overview-sales";
 import { OverviewTasksProgress } from "src/sections/overview/overview-tasks-progress";
 import { OverviewTotalCustomers } from "src/sections/overview/overview-total-customers";
 import { OverviewTotalProfit } from "src/sections/overview/overview-total-profit";
+import { AccountProfileDetails } from "src/sections/account/account-profile-details";
 import { OverviewTraffic } from "src/sections/overview/overview-traffic";
 import { Fragment } from "react";
 
@@ -27,7 +28,7 @@ const Page = () => (
       }}
     >
       <Container maxWidth="xl">
-        <Typography variant="h3" sx={{ mb: 3 }}>
+        <Typography variant="h3" sx={{ mb: 3 }} paddingLeft={2}>
           Hi, Gunjeev Singh!
         </Typography>
 
@@ -49,8 +50,8 @@ const Page = () => (
           <Grid xs={12} sm={6} lg={3}>
             <OverviewTotalProfit sx={{ height: "100%" }} value="$15k" />
           </Grid> */}
-          <Grid xs={12} lg={8}>
-            <OverviewSales
+          <Grid xs={12} lg={8} alignSelf={"center"}>
+            {/* <OverviewSales
               chartSeries={[
                 {
                   name: "This year",
@@ -62,16 +63,28 @@ const Page = () => (
                 },
               ]}
               sx={{ height: "100%" }}
-            />
+            /> */}
+            <AccountProfileDetails />
           </Grid>
           <Grid xs={12} md={6} lg={4}>
-            <OverviewTraffic
+            {/* <OverviewTraffic
               chartSeries={[63, 15, 22]}
               labels={["Desktop", "Tablet", "Phone"]}
               sx={{ height: "100%" }}
-            />
+            /> */}
+            <Grid>
+              <OverviewBudget difference={12} positive sx={{ height: "100%" }} value="$24k" />
+            </Grid>
+            <Grid>
+              <OverviewTotalCustomers
+                difference={16}
+                positive={false}
+                sx={{ height: "100%" }}
+                value="1.6k"
+              />
+            </Grid>
           </Grid>
-          <Grid xs={12} md={6} lg={4}>
+          {/* <Grid xs={12} md={6} lg={4}>
             <OverviewLatestProducts
               products={[
                 {
@@ -174,7 +187,7 @@ const Page = () => (
               ]}
               sx={{ height: "100%" }}
             />
-          </Grid>
+          </Grid> */}
         </Grid>
       </Container>
     </Box>
