@@ -73,7 +73,7 @@ const Page = () => (
               sx={{ height: "100%" }}
             /> */}
             <Grid>
-              <OverviewBudget difference={12} positive sx={{ height: "100%" }} value="$24k" />
+              <OverviewBudget sx={{ height: "100%" }} />
             </Grid>
             <Grid>
               <OverviewTotalCustomers

@@ -17,11 +17,27 @@ import { Logo } from "src/components/logo";
 import { Scrollbar } from "src/components/scrollbar";
 import { items } from "./config";
 import { SideNavItem } from "./side-nav-item";
+import LogoutIcon from "@mui/icons-material/Logout";
+import { useRouter } from "next/router";
+import { useAuth } from "src/hooks/use-auth";
+import { useCallback } from "react";
 
 export const SideNav = (props) => {
   const { open, onClose } = props;
   const pathname = usePathname();
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
+
+  const router = useRouter();
+  const auth = useAuth();
+
+  const handleSignOut = useCallback(() => {
+    auth.signOut();
+    router.push("/auth/login");
+  }, [onClose, auth, router]);
+
+  // const handleSignOut = () => {
+  //   console.log("Signing Out");
+  // };
 
   const content = (
     <Scrollbar
@@ -112,6 +128,15 @@ export const SideNav = (props) => {
                 />
               );
             })}
+            <SideNavItem
+              icon={
+                <SvgIcon fontSize="small">
+                  <LogoutIcon />
+                </SvgIcon>
+              }
+              title={"Logout"}
+              onClick={handleSignOut}
+            />
           </Stack>
         </Box>
       </Box>
