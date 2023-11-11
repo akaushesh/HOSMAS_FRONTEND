@@ -1,21 +1,15 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
 from .managers import UserManager
-from allotment.models import Group
 
-
-GENDER_CHOICES = (
-    (1,'MALE'),
-    (2,'FEMALE')
-)
+# Create your models here.
 
 
 # Students different model, because admins are not students
 
 class User(AbstractBaseUser):
     email = models.EmailField(unique=True)
-    
-    
+
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
@@ -42,19 +36,3 @@ class User(AbstractBaseUser):
     
     def __str__(self):
         return self.email
-    
-
-
-    
-class Student (models.Model):
-    
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='student')
-    name = models.CharField(max_length=100, null=False, blank=False)
-    rollno = models.CharField(max_length=12, unique=True, null=False, blank=False)
-    branch = models.CharField(max_length=50, null=False, blank=False)
-    gender = models.PositiveSmallIntegerField(choices=GENDER_CHOICES, default=1)
-    cg = models.FloatField(null=False, blank=False)
-    group = models.ForeignKey('allotment.Group', null=True, blank = True, on_delete=models.SET_NULL, related_name='members')    
-    
-    def __str__(self):
-        return self.name
