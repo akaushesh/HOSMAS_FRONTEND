@@ -3,7 +3,7 @@ from rest_framework import serializers
 from .models import Invitation, Student, Group
 
 
-class InvitationsReveivedSerializer(ModelSerializer):
+class InvitationsReceivedSerializer(ModelSerializer):
       group_leader_name = SerializerMethodField()
       group_leader_rollno = SerializerMethodField()
 

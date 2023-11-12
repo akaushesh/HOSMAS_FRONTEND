@@ -8,7 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from .permissions import IsStudent, IsGroupLeader, IsGroupMember
 
 from .models import Student, Group, Invitation
-from .serializers import InvitationsReveivedSerializer, InvitationsSentSerializer, StudentSerializer, GroupSerializer, StudentProfileSerializer
+from .serializers import InvitationsReceivedSerializer, InvitationsSentSerializer, StudentSerializer, GroupSerializer, StudentProfileSerializer
 
 # Create your views here.
 
@@ -28,7 +28,7 @@ class SearchStudentView(APIView):
       def post(self, request):
             resultant = Student.objects.filter(rollno=request.data.get('rollno')).first()
             if resultant is None:
-                  return Request(status=status.HTTP_404_NOT_FOUND)
+                  return Response(status=status.HTTP_404_NOT_FOUND)
             
             student = request.user.student
             try:
@@ -59,7 +59,7 @@ class SendInvitationView(APIView):
                   group.save()
 
             if invitee.group is not None:
-                  if invite.group.id==group.id:
+                  if invitee.group.id==group.id:
                         return Response({"detail": "This student is already part of your group"}, status=status.HTTP_403_FORBIDDEN)
                   return Response({"detail": "This student is already part of some another group"}, status=status.HTTP_403_FORBIDDEN)
 
@@ -168,7 +168,7 @@ class TranferGroupLeadershipView(APIView):
       def post(self, request):
             newleader = Student.objects.filter(rollno=request.data.get('rollno')).first()
             if newleader is None:
-                  return Request(status=status.HTTP_400_BAD_REQUEST)
+                  return Response(status=status.HTTP_400_BAD_REQUEST)
             
             student = request.user.student
             group = student.group
