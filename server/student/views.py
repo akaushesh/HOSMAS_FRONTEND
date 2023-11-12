@@ -23,7 +23,7 @@ class ProfileView(APIView):
 
 
 class SearchStudentView(APIView):
-      permission_classes = [IsAuthenticated & IsStudent & ~IsGroupMember]
+      permission_classes = [IsAuthenticated & IsStudent & IsGroupLeader & ~IsGroupMember]
 
       def post(self, request):
             resultant = Student.objects.filter(rollno=request.data.get('rollno')).first()
@@ -31,6 +31,9 @@ class SearchStudentView(APIView):
                   return Response(status=status.HTTP_404_NOT_FOUND)
             
             student = request.user.student
+            if resultant==student:
+                  return Response(status=status.HTTP_412_PRECONDITION_FAILED)
+
             try:
                   _ = resultant.leader_of_group
                   return Response(status=status.HTTP_412_PRECONDITION_FAILED)
@@ -38,12 +41,15 @@ class SearchStudentView(APIView):
                   if resultant.group is not None or resultant.batch!=student.batch or resultant.gender!=student.gender:
                         return Response(status=status.HTTP_412_PRECONDITION_FAILED)
 
+            if Invitation.objects.filter(for_group=student.leader_of_group, to=resultant).exists():
+                  return Response(status=status.HTTP_412_PRECONDITION_FAILED)
+
             serializer = StudentSerializer(resultant)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class SendInvitationView(APIView):
-      permission_classes = [IsAuthenticated & IsStudent & ~IsGroupMember]
+      permission_classes = [IsAuthenticated & IsStudent & IsGroupLeader & ~IsGroupMember]
 
       def post(self, request):
             invitee = Student.objects.filter(rollno=request.data.get("rollno")).first()
@@ -51,12 +57,7 @@ class SendInvitationView(APIView):
                   return Response({"detail": "Invalid Roll Number"}, status=status.HTTP_400_BAD_REQUEST)
 
             student = request.user.student
-
-            try:
-                  group = student.leader_of_group
-            except ObjectDoesNotExist:
-                  group = Group(cg=student.cg, leader=student)
-                  group.save()
+            group = student.leader_of_group
 
             if invitee.group is not None:
                   if invitee.group.id==group.id:
@@ -81,10 +82,10 @@ class InvitationsSentView(APIView):
       permission_classes = [IsAuthenticated & IsStudent & IsGroupLeader & ~IsGroupMember]
 
       def get(self, request):
-            group = request.user.leader_of_group
-            
+            group = request.user.student.leader_of_group
+
             queryset = Invitation.objects.filter(for_group=group)
-            
+
             serializer = InvitationsSentSerializer(queryset, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -92,7 +93,7 @@ class InvitationsSentView(APIView):
 class WithdrawInvitationView(APIView):
       permission_classes = [IsAuthenticated & IsStudent & IsGroupLeader & ~IsGroupMember]
 
-      def post(self, request):
+      def delete(self, request):
             invitation = Invitation.objects.filter(id=request.data.get('id')).first()
             if invitation is None:
                   return Response({"detail": "Invitation not found"}, status=status.HTTP_404_NOT_FOUND)
@@ -132,17 +133,27 @@ class AcceptInvitationView(APIView):
 
             invitation.delete()
 
-            updatedcg = student.cg
+            updatedcg = group.leader.cg
             cnt = 1
-            for member in group.members:
+            for member in group.members.all():
                   updatedcg += member.cg
                   cnt += 1
             updatedcg /= cnt
-            group.cg = updatedcg
+            group.cg = round(updatedcg, 2)
             group.save()
 
             #TODO: send mail to group leader and all group members
 
+            return Response(status=status.HTTP_200_OK)
+
+
+class CreateGroupView(APIView):
+      permission_classes = [IsAuthenticated & IsStudent & ~IsGroupLeader & ~IsGroupMember]
+
+      def patch(self, request):
+            student = request.user.student
+            group = Group(leader=student, cg=student.cg)
+            group.save()
             return Response(status=status.HTTP_200_OK)
 
 
@@ -171,11 +182,11 @@ class TranferGroupLeadershipView(APIView):
                   return Response(status=status.HTTP_400_BAD_REQUEST)
             
             student = request.user.student
-            group = student.group
+            group = student.leader_of_group
 
-            if newleader.group is not None and newleader.group!=group:
-                  return Response({'detail': 'You\'re can only tranfer ownership to one of your group member'}, status=status.HTTP_400_BAD_REQUEST)
-            
+            if newleader.group is None or newleader.group!=group:
+                  return Response({'detail': 'You can only tranfer ownership to one of your group member'}, status=status.HTTP_400_BAD_REQUEST)
+
             newleader.group = None
             newleader.save()
 
@@ -188,8 +199,20 @@ class TranferGroupLeadershipView(APIView):
 class LeaveGroupView(APIView):
       permission_classes = [IsAuthenticated & IsStudent & ~IsGroupLeader & IsGroupMember]
 
-      def get(self, request):
+      def patch(self, request):
             student = request.user.student
             student.group = None
             student.save()
+            return Response(status=status.HTTP_200_OK)
+
+
+class DeleteGroupView(APIView):
+      permission_classes = [IsAuthenticated & IsStudent & IsGroupLeader]
+
+      def delete(self, request):
+            group = request.user.student.leader_of_group
+            if group.members.count() > 0:
+                  return Response(status=status.HTTP_400_BAD_REQUEST)
+            
+            group.delete()
             return Response(status=status.HTTP_200_OK)

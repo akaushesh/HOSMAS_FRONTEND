@@ -12,10 +12,10 @@ class InvitationsReceivedSerializer(ModelSerializer):
             fields = ('id', 'group_leader_name', 'group_leader_rollno')
 
       def get_group_leader_name(self, obj):
-            return obj.group.leader.name
+            return obj.for_group.leader.name
 
       def get_group_leader_rollno(self, obj):
-            return obj.group.leader.rollno
+            return obj.for_group.leader.rollno
 
 
 class InvitationsSentSerializer(ModelSerializer):
@@ -59,6 +59,11 @@ class StudentProfileSerializer(ModelSerializer):
             read_only = True,
             slug_field = 'name'
       )
+      gender = SerializerMethodField()
+
       class Meta:
             model = Student
             fields = ['name', 'rollno', 'cg', 'gender', 'batch']
+      
+      def get_gender(self, obj):
+            return 'Female' if obj.gender=='F' else 'Male'

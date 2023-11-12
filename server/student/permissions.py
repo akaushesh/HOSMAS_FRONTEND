@@ -9,18 +9,14 @@ class IsStudent(BasePermission):
 
 
 class IsGroupLeader(BasePermission):
-      code = status.HTTP_412_PRECONDITION_FAILED
-
       def has_permission(self, request, view):
             try:
-                  _ = request.user.leader_of_group
+                  _ = request.user.student.leader_of_group
                   return True
             except ObjectDoesNotExist:
                   return False
 
 
 class IsGroupMember(BasePermission):
-      code = status.HTTP_412_PRECONDITION_FAILED
-
       def has_permission(self, request, view):
-            return request.user.group is not None
+            return request.user.student.group is not None
