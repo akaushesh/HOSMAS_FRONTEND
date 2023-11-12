@@ -3,9 +3,11 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import { useState } from "react";
-import { Button, Card, CardContent, FormHelperText, Grid } from "@mui/material";
+import { Button, Card, CardContent, CardHeader, FormHelperText, Grid } from "@mui/material";
 
-export const PreferenceForm = () => {
+export const PreferenceForm = (props) => {
+  const { sx } = props;
+
   const handleSubmit = (event) => {
     event.preventDefault();
 
@@ -25,7 +27,7 @@ export const PreferenceForm = () => {
     });
   };
 
-  const options = ["A", "B", "C", "D", "O", "M", "P", "Q", "R"];
+  const options = ["A", "B", "C", "D", ""];
   const [preferences, setPreferences] = useState(() =>
     Array.from({ length: options.length }, () => "")
   );
@@ -33,38 +35,37 @@ export const PreferenceForm = () => {
   console.log(preferences);
 
   return (
-    <Card sx={{ maxWidth: 400 }}>
-      <CardContent>
-        <form onSubmit={handleSubmit}>
-          <Grid container>
-            {options.map((_, index) => (
-              <Grid item xs={12} key={index}>
-                <FormControl required variant="filled" sx={{ m: 1, minWidth: 300 }}>
-                  <InputLabel id={`${index + 1}`}>Preference {index + 1}</InputLabel>
-                  <Select
-                    name={`Preference ${index}`}
-                    value={preferences[index]}
-                    onChange={handleChange}
-                  >
-                    <MenuItem value="">
-                      <em>None</em>
+    <Card sx={sx}>
+      <CardHeader title="Preference List" />
+      <form onSubmit={handleSubmit}>
+        <Grid container justifyContent="center" alignItems="center">
+          {options.map((_, index) => (
+            <Grid container justifyContent="center" alignItems="center" key={index}>
+              <FormControl required variant="filled" sx={{ m: 1, minWidth: 300 }}>
+                <InputLabel id={`${index + 1}`}>Preference {index + 1}</InputLabel>
+                <Select
+                  name={`Preference ${index}`}
+                  value={preferences[index]}
+                  onChange={handleChange}
+                >
+                  <MenuItem value="">
+                    <em>None</em>
+                  </MenuItem>
+                  {options.map((option, index) => (
+                    <MenuItem key={index} value={option}>
+                      {option}
                     </MenuItem>
-                    {options.map((option, index) => (
-                      <MenuItem key={index} value={option}>
-                        {option}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-            ))}
-            <Button variant="contained" sx={{ m: 2, minWidth: 300 }} type="submit">
-              Submit
-            </Button>
-            <FormHelperText error>{error}</FormHelperText>
-          </Grid>
-        </form>
-      </CardContent>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+          ))}
+          <Button variant="contained" sx={{ m: 1, minWidth: 300 }} type="submit">
+            Submit
+          </Button>
+          <FormHelperText error>{error}</FormHelperText>
+        </Grid>
+      </form>
     </Card>
   );
 };

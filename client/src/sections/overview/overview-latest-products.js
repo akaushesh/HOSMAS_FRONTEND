@@ -1,7 +1,10 @@
-import { formatDistanceToNow } from 'date-fns';
-import PropTypes from 'prop-types';
-import ArrowRightIcon from '@heroicons/react/24/solid/ArrowRightIcon';
-import EllipsisVerticalIcon from '@heroicons/react/24/solid/EllipsisVerticalIcon';
+import { formatDistanceToNow } from "date-fns";
+import PropTypes from "prop-types";
+import ArrowRightIcon from "@heroicons/react/24/solid/ArrowRightIcon";
+import ArrowLeftIcon from "@heroicons/react/24/solid/ArrowLeftIcon";
+import EllipsisVerticalIcon from "@heroicons/react/24/solid/EllipsisVerticalIcon";
+import CheckRoundedIcon from "@mui/icons-material/CheckRounded";
+import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import {
   Box,
   Button,
@@ -14,60 +17,47 @@ import {
   ListItem,
   ListItemAvatar,
   ListItemText,
-  SvgIcon
-} from '@mui/material';
+  SvgIcon,
+} from "@mui/material";
+import { Stack } from "@mui/system";
+import { useState } from "react";
 
 export const OverviewLatestProducts = (props) => {
   const { products = [], sx } = props;
 
+  const [limit, setLimit] = useState(4);
+
+  const OnClickHandler = () => {
+    if (limit === 4) setLimit(100);
+    else setLimit(4);
+  };
+
+  const finalProducts = products.slice(0, limit);
+
   return (
     <Card sx={sx}>
-      <CardHeader title="Latest Products" />
+      <CardHeader title="Group Requests" />
       <List>
-        {products.map((product, index) => {
-          const hasDivider = index < products.length - 1;
+        {finalProducts.map((product, index) => {
+          const hasDivider = index < finalProducts.length - 1;
           const ago = formatDistanceToNow(product.updatedAt);
 
           return (
-            <ListItem
-              divider={hasDivider}
-              key={product.id}
-            >
-              <ListItemAvatar>
-                {
-                  product.image
-                    ? (
-                      <Box
-                        component="img"
-                        src={product.image}
-                        sx={{
-                          borderRadius: 1,
-                          height: 48,
-                          width: 48
-                        }}
-                      />
-                    )
-                    : (
-                      <Box
-                        sx={{
-                          borderRadius: 1,
-                          backgroundColor: 'neutral.200',
-                          height: 48,
-                          width: 48
-                        }}
-                      />
-                    )
-                }
-              </ListItemAvatar>
+            <ListItem divider={hasDivider} key={product.id}>
               <ListItemText
                 primary={product.name}
-                primaryTypographyProps={{ variant: 'subtitle1' }}
-                secondary={`Updated ${ago} ago`}
-                secondaryTypographyProps={{ variant: 'body2' }}
+                primaryTypographyProps={{ variant: "subtitle1" }}
+                secondary={`${ago} ago`}
+                secondaryTypographyProps={{ variant: "body2" }}
               />
               <IconButton edge="end">
                 <SvgIcon>
-                  <EllipsisVerticalIcon />
+                  <CheckRoundedIcon />
+                </SvgIcon>
+              </IconButton>
+              <IconButton edge="end" sx={{ marginLeft: 2 }}>
+                <SvgIcon>
+                  <CloseRoundedIcon />
                 </SvgIcon>
               </IconButton>
             </ListItem>
@@ -75,18 +65,19 @@ export const OverviewLatestProducts = (props) => {
         })}
       </List>
       <Divider />
-      <CardActions sx={{ justifyContent: 'flex-end' }}>
+      <CardActions sx={{ justifyContent: "flex-end" }}>
         <Button
           color="inherit"
-          endIcon={(
+          onClick={OnClickHandler}
+          endIcon={
             <SvgIcon fontSize="small">
-              <ArrowRightIcon />
+              {limit === 4 ? <ArrowRightIcon /> : <ArrowLeftIcon />}
             </SvgIcon>
-          )}
+          }
           size="small"
           variant="text"
         >
-          View all
+          {limit === 4 ? "View all" : "View Less"}
         </Button>
       </CardActions>
     </Card>
@@ -95,5 +86,5 @@ export const OverviewLatestProducts = (props) => {
 
 OverviewLatestProducts.propTypes = {
   products: PropTypes.array,
-  sx: PropTypes.object
+  sx: PropTypes.object,
 };

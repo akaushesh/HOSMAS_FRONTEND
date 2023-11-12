@@ -33,14 +33,6 @@ export const OverviewTotalCustomers = (props) => {
           </Avatar>
         </Stack>
         <Stack alignItems="center" direction="row" spacing={2} sx={{ mt: 2 }}>
-          {/* <Stack alignItems="center" direction="row" spacing={0.5}>
-              <SvgIcon color={positive ? "success" : "error"} fontSize="small">
-                {positive ? <ArrowUpIcon /> : <ArrowDownIcon />}
-              </SvgIcon>
-              <Typography color={positive ? "success.main" : "error.main"} variant="body2">
-                {difference}%
-              </Typography>
-            </Stack> */}
           <Typography color={preferenceFilled ? "success.main" : "error.main"} variant="caption">
             {preferenceFilled ? "Preferences have been filled" : "Preferences have not been filled"}
           </Typography>
