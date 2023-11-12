@@ -6,9 +6,9 @@ import { Avatar, Card, CardContent, Stack, SvgIcon, Typography } from "@mui/mate
 import { useState } from "react";
 
 export const OverviewTotalCustomers = (props) => {
-  const { difference, positive = false, sx } = props;
-  const memberCount = useState(0);
-  const preferenceFilled = useState(false);
+  const { difference, sx } = props;
+  const [memberCount, setMemberCount] = useState(0);
+  const [preferenceFilled, setPreferenceFilled] = useState(false);
 
   return (
     <Card sx={sx}>
@@ -18,9 +18,7 @@ export const OverviewTotalCustomers = (props) => {
             <Typography color="text.secondary" variant="overline">
               Your Group
             </Typography>
-            <Typography variant="h4">
-              {memberCount[0] ? `${memberCount[0]} people` : "None"}
-            </Typography>
+            <Typography variant="h4">{memberCount ? `${memberCount} people` : "None"}</Typography>
           </Stack>
           <Avatar
             sx={{
@@ -34,9 +32,8 @@ export const OverviewTotalCustomers = (props) => {
             </SvgIcon>
           </Avatar>
         </Stack>
-        {difference && (
-          <Stack alignItems="center" direction="row" spacing={2} sx={{ mt: 2 }}>
-            {/* <Stack alignItems="center" direction="row" spacing={0.5}>
+        <Stack alignItems="center" direction="row" spacing={2} sx={{ mt: 2 }}>
+          {/* <Stack alignItems="center" direction="row" spacing={0.5}>
               <SvgIcon color={positive ? "success" : "error"} fontSize="small">
                 {positive ? <ArrowUpIcon /> : <ArrowDownIcon />}
               </SvgIcon>
@@ -44,16 +41,10 @@ export const OverviewTotalCustomers = (props) => {
                 {difference}%
               </Typography>
             </Stack> */}
-            <Typography
-              color={preferenceFilled[0] ? "success.main" : "error.main"}
-              variant="caption"
-            >
-              {preferenceFilled[0]
-                ? "Preferences have been filled"
-                : "Preferences have not been filled"}
-            </Typography>
-          </Stack>
-        )}
+          <Typography color={preferenceFilled ? "success.main" : "error.main"} variant="caption">
+            {preferenceFilled ? "Preferences have been filled" : "Preferences have not been filled"}
+          </Typography>
+        </Stack>
       </CardContent>
     </Card>
   );
