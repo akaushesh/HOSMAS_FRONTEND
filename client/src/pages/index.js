@@ -18,7 +18,7 @@ const now = new Date();
 const Page = () => (
   <Fragment>
     <Head>
-      <title>Overview | Devias Kit</title>
+      <title>Profile | Thapar Hostel Management System</title>
     </Head>
     <Box
       component="main"
@@ -76,12 +76,7 @@ const Page = () => (
               <OverviewBudget sx={{ height: "100%" }} />
             </Grid>
             <Grid>
-              <OverviewTotalCustomers
-                difference={16}
-                positive={false}
-                sx={{ height: "100%" }}
-                value="1.6k"
-              />
+              <OverviewTotalCustomers sx={{ height: "100%" }} />
             </Grid>
           </Grid>
           {/* <Grid xs={12} md={6} lg={4}>

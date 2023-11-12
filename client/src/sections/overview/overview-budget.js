@@ -8,7 +8,7 @@ import { useState } from "react";
 
 export const OverviewBudget = (props) => {
   const { sx } = props;
-  const allottedHostel = useState("M");
+  const [allottedHostel, setAllottedHostel] = useState("M");
 
   return (
     <Card sx={sx}>
@@ -19,7 +19,7 @@ export const OverviewBudget = (props) => {
               Allotted Hostel
             </Typography>
             <Typography variant="h4">
-              {allottedHostel[0] === "" ? "None" : `Hostel ${allottedHostel[0]}`}
+              {allottedHostel === "" ? "None" : `Hostel ${allottedHostel[0]}`}
             </Typography>
           </Stack>
           <Avatar
@@ -44,8 +44,8 @@ export const OverviewBudget = (props) => {
                 {difference}%
               </Typography>
             </Stack> */}
-          <Typography color={allottedHostel[0] ? "success.main" : "error.main"} variant="caption">
-            {allottedHostel[0]
+          <Typography color={allottedHostel ? "success.main" : "error.main"} variant="caption">
+            {allottedHostel
               ? "Hostel allottment has been completed"
               : "Hostels have not been allotted yet"}
           </Typography>
