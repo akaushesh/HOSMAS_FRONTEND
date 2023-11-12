@@ -9,7 +9,7 @@ class IsStudent(BasePermission):
 
 
 class IsGroupLeader(BasePermission):
-      def has_permission(self, request, view):
+      def has_permission(self, request):
             try:
                   _ = request.user.student.leader_of_group
                   return True
