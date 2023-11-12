@@ -1,4 +1,4 @@
-import { Autocomplete, Button, Card, TextField } from "@mui/material";
+import { Autocomplete, Button, Card, CircularProgress, Grid, TextField } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import { Stack } from "@mui/system";
 import { useState } from "react";
@@ -12,30 +12,35 @@ function sleep(duration) {
 }
 
 export const CustomersSearch = () => {
-  const [enrollmentNumbers, setEnrollmentNumbers] = useState([]);
+  const [enrollmentNumber, setEnrollmentNumber] = useState("");
   const [option, setOption] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [infoText, setInfoText] = useState("Enter complete enrollment number");
 
   const onSubmitHandler = (event) => {
     event.preventDefault();
-    console.log(enrollmentNumbers);
+    console.log(enrollmentNumber);
   };
 
-  const onSelectChangeHandler = (e) => {
-    setEnrollmentNumbers((prevState) => [...prevState, e.target.value]);
-    console.log(e.target.value);
-    console.log(enrollmentNumbers);
+  const onSelectChangeHandler = (event, value) => {
+    console.log(value);
+    setEnrollmentNumber(value.enrollmentNumber);
   };
 
   const onTextFieldChangeHandler = (e) => {
-    if (e.target.value.length !== 9) return;
+    if (e.target.value.length !== 9) {
+      if (option.size !== 0) {
+        setOption([]);
+        return;
+      }
+      return;
+    }
 
-    console.log(e.target.value.length);
     setLoading(true);
     (async () => {
       await sleep(1e3);
       setLoading(false);
-      setOption([{ enrollmentNumber: e.target.value, name: "Aditya Parmar" }]);
+      setOption([{ enrollmentNumber: 102103500, name: "Aditya Parmar" }]);
     })();
   };
 
@@ -45,28 +50,31 @@ export const CustomersSearch = () => {
   return (
     <Card sx={{ p: 2 }}>
       <form onSubmit={onSubmitHandler}>
-        <Stack direction="row" alignItems="center" spacing={-7}>
+        <Stack direction="row" alignItems="center">
           <Autocomplete
-            multiple
-            limitTags={100}
             id="enrollment-number-tags"
             loading={loading}
             options={option}
             onChange={onSelectChangeHandler}
             getOptionLabel={(option) => {
+              if (!option) return "";
               return option.name;
             }}
             filterOptions={(x) => x}
-            defaultValue={[]}
+            loadingText={<CircularProgress />}
+            noOptionsText={infoText}
+            defaultValue=""
+            isOptionEqualToValue={() => true}
             renderInput={(params) => (
               <TextField
                 {...params}
                 label="Add member"
                 placeholder="Enrollment Number"
                 onChange={onTextFieldChangeHandler}
+                value={enrollmentNumber}
               />
             )}
-            sx={{ width: "500px" }}
+            sx={{ width: "600px" }}
           />
           <Button type="submit">
             <SendIcon color="primary" />

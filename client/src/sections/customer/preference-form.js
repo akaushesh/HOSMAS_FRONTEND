@@ -32,7 +32,6 @@ export const PreferenceForm = (props) => {
     Array.from({ length: options.length }, () => "")
   );
   const [error, setError] = useState("");
-  console.log(preferences);
 
   return (
     <Card sx={sx}>
