@@ -23,7 +23,7 @@ export const CustomersSearch = () => {
   };
 
   const onSelectChangeHandler = (event, value) => {
-    console.log(value);
+    if (!value) return;
     setEnrollmentNumber(value.enrollmentNumber);
   };
 
@@ -44,9 +44,6 @@ export const CustomersSearch = () => {
     })();
   };
 
-  // const [open, setOpen] = useState(false);
-  // const [options, setOptions] = useState([]);
-
   return (
     <Card sx={{ p: 2 }}>
       <form onSubmit={onSubmitHandler}>
@@ -61,7 +58,19 @@ export const CustomersSearch = () => {
               return option.name;
             }}
             filterOptions={(x) => x}
-            loadingText={<CircularProgress />}
+            loadingText={
+              <Grid
+                container
+                direction="column"
+                alignItems="center"
+                justifyContent="center"
+                style={{ height: "auto" }}
+              >
+                <Grid item xs={3}>
+                  <CircularProgress size={16} />
+                </Grid>
+              </Grid>
+            }
             noOptionsText={infoText}
             defaultValue=""
             isOptionEqualToValue={() => true}
