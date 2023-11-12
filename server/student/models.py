@@ -3,8 +3,8 @@ from django.db import models
 # Create your models here.
 
 GENDER_CHOICES = (
-      ('M', 'Male'),
-      ('F', 'Female')
+    ('M', 'Male'),
+    ('F', 'Female')
 )
 
 
@@ -42,8 +42,9 @@ class Batch(models.Model):
 
 
 class Invitation(models.Model):
-      to = models.ForeignKey('student.Student',  on_delete=models.CASCADE, related_name='invitations')
-      for_group = models.ForeignKey('student.Group', on_delete=models.CASCADE, related_name='invitations')
+    to = models.ForeignKey('student.Student',  on_delete=models.CASCADE, related_name='invitations')
+    for_group = models.ForeignKey('student.Group', on_delete=models.CASCADE, related_name='invitations')
+    time = models.DateTimeField(auto_now_add=True, blank=True)
 
-      def __str__(self):
-            return f"{self.for_group.id}-{self.to.name}"
+    def __str__(self):
+        return f"{self.for_group.id}-{self.to.name}"
