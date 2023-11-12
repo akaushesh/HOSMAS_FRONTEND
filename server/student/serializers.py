@@ -1,6 +1,6 @@
 from rest_framework.serializers import ModelSerializer, SerializerMethodField, SlugRelatedField
 from rest_framework import serializers
-from .models import Invitation, Student
+from .models import Invitation, Student, Group
 
 
 class InvitationsReveivedSerializer(ModelSerializer):
