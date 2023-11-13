@@ -30,7 +30,7 @@ class getAvailableChoices(APIView):
             data.append(room_detail)
         return Response(data, status=status.HTTP_200_OK)
 
-class CreatePreference (APIView):
+class createPreference (APIView):
     permission_classes = [IsAuthenticated & IsStudent & ~IsGroupMember]
     
     def post(self, request):
@@ -69,4 +69,16 @@ class CreatePreference (APIView):
                 
         return Response({'status':'success'},status=status.HTTP_200_OK)
                 
+class deletePreferences(APIView):
+    permission_classes = [IsAuthenticated & IsStudent & ~IsGroupMember]
     
+    def delete(self, request):
+        stud = request.user.student
+        group = stud.leader_of_group
+        
+        p = Preference.objects.filter(group = group)
+        if (p is not None):
+            for q in p:
+                q.delete()
+        
+        return Response({'status':'success'},status=status.HTTP_200_OK)
