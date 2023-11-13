@@ -73,6 +73,22 @@ class createPreference (APIView):
                 
         return Response({'status':'success','data':serializer.data},status=status.HTTP_200_OK)
                 
+
+class getPreferences(APIView):
+    permission_classes = [IsAuthenticated & IsStudent]
+    
+    def get(self, request):
+        stud = request.user.student
+        group = stud.leader_of_group
+        
+        p = Preference.objects.filter(group = group).order_by('priority')
+        if (p is None):
+            return Response({'error':'No preferences found'},status=status.HTTP_404_NOT_FOUND)
+        
+        serializer = PreferenceSerializer(p, many=True)
+        return Response({'status':'success','data':serializer.data}, status.HTTP_200_OK)
+            
+
 class deletePreferences(APIView):
     permission_classes = [IsAuthenticated & IsStudent & ~IsGroupMember]
     
@@ -86,3 +102,5 @@ class deletePreferences(APIView):
                 q.delete()
         
         return Response({'status':'success'},status=status.HTTP_200_OK)
+    
+    
