@@ -26,9 +26,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', cast=bool, default=False)
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ['api.hosmas.ccstiet.com', '127.0.0.1', 'localhost']
 
 
 # Application definition
@@ -159,3 +159,23 @@ CORS_ORIGIN_ALLOW_ALL = True
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15), 
 }
+
+if config('FILE_LOGGING', cast=bool, default=False):
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'handlers': {
+            'file': {
+                'level': 'WARNING',
+                'class': 'logging.FileHandler',
+                'filename': os.path.join(BASE_DIR, 'logs/error.log'),
+            },
+        },
+        'loggers': {
+            'django': {
+                'handlers': ['file'],
+                'level': 'WARNING',
+                'propagate': True,
+            },
+        },
+    }
