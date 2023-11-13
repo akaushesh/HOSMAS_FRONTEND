@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  hosmasapi:
+    image: ccs/hosmas
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    volumes:
+      - ./static/:/app/static/
+      - ./logs/:/app/logs/
+    network_mode: "host"
