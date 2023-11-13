@@ -10,6 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 from student.permissions import IsStudent, IsGroupLeader, IsGroupMember
 from .models import *
 from student.models import *
+from .serializers import *
 
 class getAvailableChoices(APIView):
     permission_classes = [IsAuthenticated & IsStudent]
@@ -52,7 +53,7 @@ class createPreference (APIView):
             legalChoices.append(choice.room_type.id)
         
         used = []
-        
+        createdPreferences = []
         
         p = Preference.objects.filter(group = group)
         if (p is not None):
@@ -64,15 +65,18 @@ class createPreference (APIView):
                 return Response({"detail": "Invalid Preference"}, status=status.HTTP_400_BAD_REQUEST)
             else:
                 room = RoomType.objects.get(id = int(value))
-                Preference.objects.create(room_type_choice = room, group = group, priority = key )
+                p = Preference(room_type_choice = room, group = group, priority = key )
+                p.save()
                 used.append(value)
+                createdPreferences.append(p)   
+        serializer = PreferenceSerializer(createdPreferences, many=True)
                 
-        return Response({'status':'success'},status=status.HTTP_200_OK)
+        return Response({'status':'success','data':serializer.data},status=status.HTTP_200_OK)
                 
 class deletePreferences(APIView):
     permission_classes = [IsAuthenticated & IsStudent & ~IsGroupMember]
     
-    def delete(self, request):
+    def post(self, request):
         stud = request.user.student
         group = stud.leader_of_group
         
