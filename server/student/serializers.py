@@ -60,10 +60,18 @@ class StudentProfileSerializer(ModelSerializer):
             slug_field = 'name'
       )
       gender = SerializerMethodField()
+      role = SerializerMethodField()
 
       class Meta:
             model = Student
-            fields = ['name', 'rollno', 'cg', 'gender', 'batch']
+            fields = ['name', 'rollno', 'cg', 'gender', 'batch', 'role']
       
       def get_gender(self, obj):
             return 'Female' if obj.gender=='F' else 'Male'
+      
+      def get_role(self, obj):
+            try:
+                  _ = obj.leader_of_group
+                  return 'leader'
+            except:
+                  return 'member' if obj.group is not None else 'unregistered'
