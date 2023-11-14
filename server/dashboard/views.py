@@ -9,13 +9,13 @@ from .permissions import IsAdmin
 from preference.models import Hostel, RoomType, RoomTypeChoice
 from student.models import Batch
 
-from .serializers import HostelSerializer, RoomTypeSerializer, RoomTypeChoiceSerializer, BatchSerializer
+from .serializers import HostelSerializer, HostelSingleSerializer, RoomTypeSerializer, RoomTypeChoiceSerializer, BatchSerializer
 from datetime import datetime
 
 # Create your views here.
 
 
-class CreateItemView(APIView):
+class CreateObjectView(APIView):
       permission_classes = [IsAuthenticated & IsAdmin]
 
       def post(self, request, model):
@@ -25,8 +25,6 @@ class CreateItemView(APIView):
                   serializer = RoomTypeSerializer(data=request.data)
             elif model=='choice':
                   serializer = RoomTypeChoiceSerializer(data=request.data)
-            elif model=='batch':
-                  serializer = BatchSerializer(data=request.data)
             else:
                   return Response(status=status.HTTP_404_NOT_FOUND)
             
@@ -37,29 +35,16 @@ class CreateItemView(APIView):
             return Response(status=status.HTTP_201_CREATED)
 
 
-class ReadAllItemsView(APIView):
+class AllHostelsView(APIView):
       permission_classes = [IsAuthenticated & IsAdmin]
 
-      def get(self, request, model):
-            if model=='hostel':
-                  queryset = Hostel.objects.all()
-                  serializer = HostelSerializer(queryset, many=True)
-            elif model=='roomtype':
-                  queryset = RoomType.objects.all()
-                  serializer = RoomTypeSerializer(queryset, many=True)
-            elif model=='choice':
-                  queryset = RoomTypeChoice.objects.all()
-                  serializer = RoomTypeChoiceSerializer(queryset, many=True)
-            elif model=='batch':
-                  queryset = Batch.objects.all()
-                  serializer = BatchSerializer(queryset, many=True)
-            else:
-                  return Response(status=status.HTTP_404_NOT_FOUND)
-
+      def get(self, request):
+            queryset = Hostel.objects.all()
+            serializer = HostelSerializer(queryset, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class ReadItemView(APIView):
+class GetObjectView(APIView):
       permission_classes = [IsAuthenticated & IsAdmin]
       
       def get(self, request, model, id):
@@ -67,29 +52,18 @@ class ReadItemView(APIView):
                   instance = Hostel.objects.filter(id=id).first()
                   if instance is None:
                         return Response(status=status.HTTP_404_NOT_FOUND)
-                  serializer = HostelSerializer(instance)
+                  serializer = HostelSingleSerializer(instance)
             elif model=='roomtype':
                   instance = RoomType.objects.filter(id=id).first()
                   if instance is None:
                         return Response(status=status.HTTP_404_NOT_FOUND)
                   serializer = RoomTypeSerializer(instance)
-            elif model=='choice':
-                  instance = RoomTypeChoice.objects.filter(id=id).first()
-                  if instance is None:
-                        return Response(status=status.HTTP_404_NOT_FOUND)
-                  serializer = RoomTypeChoiceSerializer(instance)
-            elif model=='batch':
-                  instance = Batch.objects.filter(id=id).first()
-                  if instance is None:
-                        return Response(status=status.HTTP_404_NOT_FOUND)
-                  serializer = BatchSerializer(instance)
             else:
-                  return Response(status=status.HTTP_404_NOT_FOUND)
-
+                  return Response(status.HTTP_404_NOT_FOUND)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class UpdateItemView(APIView):
+class UpdateObjectView(APIView):
       permission_classes = [IsAuthenticated & IsAdmin]
 
       def put(self, request, model, id):
@@ -108,11 +82,6 @@ class UpdateItemView(APIView):
                   if instance is None:
                         return Response(status=status.HTTP_404_NOT_FOUND)
                   serializer = RoomTypeChoiceSerializer(instance, request.data)
-            elif model=='batch':
-                  instance = Batch.objects.filter(id=id).first()
-                  if instance is None:
-                        return Response(status=status.HTTP_404_NOT_FOUND)
-                  serializer = BatchSerializer(instance, request.data)
             else:
                   return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -123,7 +92,7 @@ class UpdateItemView(APIView):
             return Response(status=status.HTTP_200_OK)
 
 
-class DeleteItemView(APIView):
+class DeleteObjectView(APIView):
       permission_classes = [IsAuthenticated & IsAdmin]
 
       def delete(self, request, model):
@@ -137,8 +106,6 @@ class DeleteItemView(APIView):
                   instance = RoomType.objects.filter(id=id).first()
             elif model=='choice':
                   instance = RoomTypeChoice.objects.filter(id=id).first()
-            elif model=='batch':
-                  instance = Batch.objects.filter(id=id).first()
             else:
                   return Response(status=status.HTTP_404_NOT_FOUND)
 

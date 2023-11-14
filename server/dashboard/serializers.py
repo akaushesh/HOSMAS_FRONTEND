@@ -4,29 +4,61 @@ from student.models import Batch
 
 
 class HostelSerializer(ModelSerializer):
-      room_types = SlugRelatedField(
-            slug_field='name',
-            read_only=True,
-            many=True
-      )
+      # Serializer for representing data of all hostels
+      available_to = SerializerMethodField()
+      allotment_enabled_for = SerializerMethodField()
 
       class Meta:
             model = Hostel
-            fields = ['id', 'name', 'room_types']
+            fields = ['id', 'name', 'gender', 'available_to', 'allotment_enabled_for']
+
+      def get_available_to(self, obj):
+            list = []
+            for room_type in obj.room_types.all():
+                  for choice in room_type.choices.all():
+                        list.append(choice.batch.name)
+            return list
+      
+      def get_allotment_enabled_for(self, obj):
+            list = []
+            for room_type in obj.room_types.all():
+                  if room_type.is_allotment_enabled:
+                        for choice in room_type.choices.all():
+                              list.append(choice.batch.name)
+            return list
 
 
 class RoomTypeSerializer(ModelSerializer):
-      hostel_name = SerializerMethodField()
+      available_to = SerializerMethodField()
 
       class Meta:
             model = RoomType
-            fields = ['id', 'name', 'hostel_name', 'hostel']
+            fields = ['id', 'name', 'hostel', 'room_size', 'rooms_count', 'is_allotment_enabled', 'available_to']
             extra_kwargs = {
                   'hostel': {'write_only': True}
             }
       
-      def get_hostel_name(self, obj):
-            return obj.hostel.name
+      def get_available_to(self, obj):
+            list = []
+            for choice in obj.choices.all():
+                  list.append(choice.batch.name)
+            return list
+
+
+class HostelSingleSerializer(ModelSerializer):
+      # Serializer for representing data of single hostel
+      room_types = RoomTypeSerializer(read_only=True, many=True)
+      capacity = SerializerMethodField()
+
+      class Meta:
+            model = Hostel
+            fields = ['id', 'name', 'gender', 'caretaker_email', 'caretaker_name', 'room_types', 'capacity']
+      
+      def get_capacity(self, obj):
+            cnt = 0
+            for roomtype in obj.room_types.all():
+                  cnt += roomtype.room_size * roomtype.rooms_count
+            return cnt
 
 
 class RoomTypeChoiceSerializer(ModelSerializer):
