@@ -20,3 +20,8 @@ class IsGroupLeader(BasePermission):
 class IsGroupMember(BasePermission):
       def has_permission(self, request, view):
             return request.user.student.group is not None
+
+
+class IsPreferenceFillingLive(BasePermission):
+      def has_permission(self, request, view):
+            return request.user.student.batch.is_preference_filling_live

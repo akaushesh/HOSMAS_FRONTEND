@@ -1,9 +1,14 @@
 from django.contrib import admin
 from .models import *
 
-# Register your models here.
 
-admin.site.register(Hostel)
-admin.site.register(RoomType)
+class HostelAdmin(admin.ModelAdmin):
+    list_display = ('id','name')
+    
+class RoomTypeAdmin(admin.ModelAdmin):
+    list_display = ('id','name','hostel')
+
+admin.site.register(Hostel,HostelAdmin)
+admin.site.register(RoomType,RoomTypeAdmin)
 admin.site.register(RoomTypeChoice)
 admin.site.register(Preference)

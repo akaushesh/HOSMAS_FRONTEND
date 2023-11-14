@@ -36,6 +36,7 @@ class Group (models.Model):
 
 class Batch(models.Model):
     name = models.CharField(max_length=50, unique=True, null=False, blank=False)
+    is_preference_filling_live = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name

@@ -48,10 +48,14 @@ class GroupStudentSerializer(ModelSerializer):
 class GroupSerializer(ModelSerializer):
       leader = GroupStudentSerializer(read_only=True)
       members = GroupStudentSerializer(read_only=True, many=True)
+      role = SerializerMethodField()
 
       class Meta:
             model = Group
-            fields = ['leader', 'members', 'cg']
+            fields = ['leader', 'members', 'cg', 'role']
+      
+      def get_role(self, obj):
+            return 'leader' if self.context.get('student')==obj.leader else 'member'
 
 
 class StudentProfileSerializer(ModelSerializer):
@@ -60,10 +64,18 @@ class StudentProfileSerializer(ModelSerializer):
             slug_field = 'name'
       )
       gender = SerializerMethodField()
+      role = SerializerMethodField()
 
       class Meta:
             model = Student
-            fields = ['name', 'rollno', 'cg', 'gender', 'batch']
+            fields = ['name', 'rollno', 'cg', 'gender', 'batch', 'role']
       
       def get_gender(self, obj):
             return 'Female' if obj.gender=='F' else 'Male'
+      
+      def get_role(self, obj):
+            try:
+                  _ = obj.leader_of_group
+                  return 'leader'
+            except:
+                  return 'member' if obj.group is not None else 'unregistered'
