@@ -7,11 +7,12 @@ from rest_framework.permissions import IsAuthenticated
 
 from .permissions import IsAdmin
 from preference.models import Hostel, RoomType, RoomTypeChoice
-from student.models import Batch
+from student.models import Batch, Student, Group
 
 from .serializers import HostelSerializer, HostelSingleSerializer, RoomTypeSerializer, RoomTypeChoiceSerializer, BatchSerializer
 from datetime import datetime
-
+from django.core.paginator import Paginator
+from student.serializers import StudentSerializer, GroupSerializer
 # Create your views here.
 
 
@@ -138,3 +139,53 @@ class ImportStudentsView(APIView):
             #TODO: Add students to database
 
             return Response(status=status.HTTP_202_ACCEPTED)
+
+
+class getStudents(APIView):
+      permission_classes = [IsAuthenticated & IsAdmin]
+      
+      def get(self, request):
+            roll = request.data.get('roll_no')
+            students_per_page = 3
+            if roll is not None:
+                  students_list = Student.objects.filter(rollno__startswith = roll)
+            else:
+                  students_list = Student.objects.all()
+            p = Paginator(students_list, students_per_page)
+            
+            page_number = request.data.get('page')
+            if page_number is None:
+                  page_number = 1
+            page_number = int(page_number)
+            total_pages = p.num_pages
+            if (page_number>total_pages or page_number<1):
+                  return Response({'error':'Page does not exist'}, status.HTTP_400_BAD_REQUEST)
+            
+            students = p.page(page_number)
+            serializer = StudentSerializer(students, many=True)
+            
+            return Response({'status':'success', 'data':serializer.data, 'total_pages':total_pages}, status.HTTP_200_OK)
+
+
+class getGroups(APIView):
+      permission_classes = [IsAuthenticated & IsAdmin]
+      
+      def get(self, request):
+            # roll = request.data.get('roll_no')
+            groups_per_page = 3
+            
+            groups_list = Group.objects.all()
+            p = Paginator(groups_list, groups_per_page)
+            
+            page_number = request.data.get('page')
+            if page_number is None:
+                  page_number = 1
+            page_number = int(page_number)
+            total_pages = p.num_pages
+            if (page_number>total_pages or page_number<1):
+                  return Response({'error':'Page does not exist'}, status.HTTP_400_BAD_REQUEST)
+            
+            groups = p.page(page_number)
+            serializer = GroupSerializer(groups, many=True)
+            
+            return Response({'status':'success', 'data':serializer.data, 'total_pages':total_pages}, status.HTTP_200_OK)

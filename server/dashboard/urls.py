@@ -7,5 +7,7 @@ urlpatterns = [
       path('<slug:model>/create/', views.CreateObjectView.as_view(), name='create_object'),
       path('<slug:model>/update/<int:id>/', views.UpdateObjectView.as_view(), name='update_object'),
       path('<slug:model>/delete/', views.DeleteObjectView.as_view(), name='delete_object'),
-      path('import-students/', views.ImportStudentsView.as_view(), name='import_students')
+      path('import-students/', views.ImportStudentsView.as_view(), name='import_students'),
+      path('getStudents/', views.getStudents.as_view()),
+      path('getGroups/', views.getGroups.as_view()),
 ]

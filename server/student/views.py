@@ -217,3 +217,10 @@ class LeaveGroupView(APIView):
             student.group = None
             student.save()
             return Response(status=status.HTTP_200_OK)
+
+
+      
+            
+            
+            
+            
