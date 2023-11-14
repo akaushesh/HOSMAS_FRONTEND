@@ -159,12 +159,12 @@ class getStudents(APIView):
             page_number = int(page_number)
             total_pages = p.num_pages
             if (page_number>total_pages or page_number<1):
-                  return Response({'error':'Page does not exist'}, status.HTTP_400_BAD_REQUEST)
+                  return Response({'error':'Page does not exist'}, status=status.HTTP_400_BAD_REQUEST)
             
             students = p.page(page_number)
             serializer = StudentSerializer(students, many=True)
             
-            return Response({'status':'success', 'data':serializer.data, 'total_pages':total_pages}, status.HTTP_200_OK)
+            return Response({'status':'success', 'data':serializer.data, 'total_pages':total_pages}, status=status.HTTP_200_OK)
 
 
 class getGroups(APIView):
@@ -183,9 +183,9 @@ class getGroups(APIView):
             page_number = int(page_number)
             total_pages = p.num_pages
             if (page_number>total_pages or page_number<1):
-                  return Response({'error':'Page does not exist'}, status.HTTP_400_BAD_REQUEST)
+                  return Response({'error':'Page does not exist'}, status=status.HTTP_400_BAD_REQUEST)
             
             groups = p.page(page_number)
             serializer = GroupSerializer(groups, many=True)
             
-            return Response({'status':'success', 'data':serializer.data, 'total_pages':total_pages}, status.HTTP_200_OK)
+            return Response({'status':'success', 'data':serializer.data, 'total_pages':total_pages}, status=status.HTTP_200_OK)

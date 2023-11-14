@@ -7,7 +7,7 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from student.permissions import IsStudent, IsGroupLeader, IsGroupMember
+from student.permissions import *
 from .models import *
 from student.models import *
 from .serializers import *
@@ -24,7 +24,7 @@ class getAvailableChoices(APIView):
         data = []
         for choice in roomTypeChoices:
             room_detail = {
-                'room_id' : choice.room_type.id,
+                'choice_id' : choice.id,
                 'room_name' : choice.room_type.name,
                 'room_hostel' : choice.room_type.hostel.name
             }
@@ -45,12 +45,18 @@ class createPreference (APIView):
             
         group = stud.leader_of_group
         
+        group.retain = False
+        group.save()
+        
         legalChoices = []
+        roomChoices = []
         
         roomTypeChoices = RoomTypeChoice.objects.filter(Q(batch=batch) & Q(gender=gender))
         
         for choice in roomTypeChoices:
-            legalChoices.append(choice.room_type.id)
+            legalChoices.append(choice.id)
+            roomChoices.append(choice.room_type.id)
+        
         
         used = []
         createdPreferences = []
@@ -64,8 +70,8 @@ class createPreference (APIView):
             if (value in used) or (int(value) not in legalChoices):
                 return Response({"detail": "Invalid Preference"}, status=status.HTTP_400_BAD_REQUEST)
             else:
-                room = RoomType.objects.get(id = int(value))
-                p = Preference(room_type_choice = room, group = group, priority = key )
+                room_type_choice = RoomTypeChoice.objects.get(id = int(value))
+                p = Preference(room_type_choice = room_type_choice, group = group, priority = key )
                 p.save()
                 used.append(value)
                 createdPreferences.append(p)   
@@ -73,6 +79,52 @@ class createPreference (APIView):
                 
         return Response({'status':'success','data':serializer.data},status=status.HTTP_200_OK)
                 
+                
+class Retain(APIView):
+    permission_classes = [IsAuthenticated & IsStudent & IsPreferenceFillingLive & ~IsGroupMember & IsRetainAllowed]
+    
+    def post(self, request):
+        data = request.data
+        stud = request.user.student
+        batch = stud.batch
+        gender = stud.gender
+        
+        if (not IsGroupLeader.has_permission(self,request)):
+            Group.objects.create(leader = stud, cg = stud.cg)
+            
+        group = stud.leader_of_group
+        
+        legalChoices = []
+        roomChoices = []
+        
+        roomTypeChoices = RoomTypeChoice.objects.filter(Q(batch=batch) & Q(gender=gender))
+        
+        for choice in roomTypeChoices:
+            legalChoices.append(choice.id)
+            roomChoices.append(choice.room_type.id)
+            
+        p = Preference.objects.filter(group = group)
+        if (p is not None):
+            for q in p:
+                q.delete()
+        
+        lead_curr = group.leader.current_room
+        if (lead_curr is None or lead_curr.id not in roomChoices):
+            return Response({'error':group.leader.name + 'is unable to retain'}, status=status.HTTP_400_BAD_REQUEST)
+        members = group.members
+        
+        for member in members:
+            member_curr = member.current_room
+            if (member_curr is None or member_curr.id not in roomChoices):
+                return Response({'error':member.name + 'is unable to retain'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        group.retain = True
+        group.save()
+        
+        return Response({'status':'success'},status=status.HTTP_200_OK)
+            
+        
+    
 
 class getPreferences(APIView):
     permission_classes = [IsAuthenticated & IsStudent]

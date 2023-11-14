@@ -36,7 +36,7 @@ class RoomTypeChoice(models.Model):
 
 
 class Preference(models.Model):
-    room_type_choice = models.ForeignKey('preference.RoomType', on_delete=models.CASCADE, related_name='preferences')
+    room_type_choice = models.ForeignKey('preference.RoomTypeChoice', on_delete=models.CASCADE, related_name='preferences')
     group = models.ForeignKey('student.Group', on_delete=models.CASCADE, related_name='preferences')
     priority = models.SmallIntegerField()
 

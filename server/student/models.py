@@ -21,6 +21,8 @@ class Student (models.Model):
     group = models.ForeignKey('student.Group', null=True, blank = True, on_delete=models.SET_NULL, related_name='members')    
 
     batch = models.ForeignKey('student.Batch', on_delete=models.CASCADE, related_name='students')
+    
+    current_room = models.ForeignKey('preference.RoomType', on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
       return self.name
@@ -29,6 +31,7 @@ class Student (models.Model):
 class Group (models.Model):
     leader = models.OneToOneField('student.Student', on_delete=models.CASCADE, related_name='leader_of_group')
     cg = models.FloatField(null=False, blank=False)
+    retain = models.BooleanField(default=False)
 
     def __str__(self):
         return self.leader.name
@@ -37,6 +40,7 @@ class Group (models.Model):
 class Batch(models.Model):
     name = models.CharField(max_length=50, unique=True, null=False, blank=False)
     is_preference_filling_live = models.BooleanField(default=False)
+    is_retain_allowed = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name

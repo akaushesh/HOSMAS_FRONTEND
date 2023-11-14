@@ -25,3 +25,7 @@ class IsGroupMember(BasePermission):
 class IsPreferenceFillingLive(BasePermission):
       def has_permission(self, request, view):
             return request.user.student.batch.is_preference_filling_live
+      
+class IsRetainAllowed(BasePermission):
+      def has_permission(self, request, view):
+            return request.user.student.batch.is_retain_allowed
