@@ -5,43 +5,54 @@ import { OverviewBudget } from "src/sections/overview/overview-budget";
 import { OverviewTotalCustomers } from "src/sections/overview/overview-total-customers";
 import { AccountProfileDetails } from "src/sections/account/account-profile-details";
 import { Fragment } from "react";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 
-const now = new Date();
+const Page = () => {
+  const { data, isLoading } = useQuery({
+    queryFn: () => {
+      return axios.get("https://catfact.ninja/fact");
+    },
+    queryKey: ["cat-fact"],
+    // refetchInterval: 2000,
+  });
+  // console.log(data?.data?.fact);
 
-const Page = () => (
-  <Fragment>
-    <Head>
-      <title>Profile | Thapar Hostel Management System</title>
-    </Head>
-    <Box
-      component="main"
-      sx={{
-        flexGrow: 1,
-        py: 8,
-      }}
-    >
-      <Container maxWidth="xl">
-        <Typography variant="h3" sx={{ mb: 3 }} paddingLeft={2}>
-          Hi, Gunjeev Singh!
-        </Typography>
+  return (
+    <Fragment>
+      <Head>
+        <title>Profile | Thapar Hostel Management System</title>
+      </Head>
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          py: 8,
+        }}
+      >
+        <Container maxWidth="xl">
+          <Typography variant="h3" sx={{ mb: 3 }} paddingLeft={2}>
+            Hi, Gunjeev Singh!
+          </Typography>
 
-        <Grid container spacing={3}>
-          <Grid item xs={12} lg={8} alignSelf={"center"}>
-            <AccountProfileDetails />
-          </Grid>
-          <Grid item xs={12} lg={4}>
-            <Grid>
-              <OverviewBudget sx={{ height: "100%" }} />
+          <Grid container spacing={3}>
+            <Grid item xs={12} lg={8} alignSelf={"center"}>
+              <AccountProfileDetails />
             </Grid>
-            <Grid>
-              <OverviewTotalCustomers sx={{ height: "100%" }} />
+            <Grid item xs={12} lg={4}>
+              <Grid>
+                <OverviewBudget sx={{ height: "100%" }} />
+              </Grid>
+              <Grid>
+                <OverviewTotalCustomers sx={{ height: "100%" }} />
+              </Grid>
             </Grid>
           </Grid>
-        </Grid>
-      </Container>
-    </Box>
-  </Fragment>
-);
+        </Container>
+      </Box>
+    </Fragment>
+  );
+};
 
 Page.getLayout = (page) => <DashboardLayout>{page}</DashboardLayout>;
 

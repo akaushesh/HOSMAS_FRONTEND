@@ -27,7 +27,7 @@ export const PreferenceForm = (props) => {
     });
   };
 
-  const options = ["A", "B", "C", "D", ""];
+  const options = ["A", "B", "C", "D", "M", "N"];
   const [preferences, setPreferences] = useState(() =>
     Array.from({ length: options.length }, () => "")
   );
