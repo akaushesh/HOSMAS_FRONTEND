@@ -13,15 +13,15 @@ class Hostel(models.Model):
 
 class RoomType(models.Model):
     name = models.CharField(max_length=200)
-    hostel = models.ForeignKey('preference.Hostel', on_delete=models.RESTRICT, related_name='room_types')
+    hostel = models.ForeignKey('preference.Hostel', on_delete=models.CASCADE, related_name='room_types')
 
     def __str__(self):
         return self.name
 
 
 class RoomTypeChoice(models.Model):
-    room_type = models.ForeignKey('preference.RoomType', on_delete=models.RESTRICT, related_name='choices')
-    batch = models.ForeignKey('student.Batch', on_delete=models.RESTRICT, related_name='choices')
+    room_type = models.ForeignKey('preference.RoomType', on_delete=models.CASCADE, related_name='choices')
+    batch = models.ForeignKey('student.Batch', on_delete=models.CASCADE, related_name='choices')
     capacity = models.PositiveIntegerField()
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
 
@@ -30,8 +30,8 @@ class RoomTypeChoice(models.Model):
 
 
 class Preference(models.Model):
-    room_type_choice = models.ForeignKey('preference.RoomType', on_delete=models.RESTRICT, related_name='preferences')
-    group = models.ForeignKey('student.Group', on_delete=models.RESTRICT, related_name='preferences')
+    room_type_choice = models.ForeignKey('preference.RoomType', on_delete=models.CASCADE, related_name='preferences')
+    group = models.ForeignKey('student.Group', on_delete=models.CASCADE, related_name='preferences')
     priority = models.SmallIntegerField()
 
     def __str__(self):
