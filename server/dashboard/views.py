@@ -1,4 +1,6 @@
 from django.core.files.storage import default_storage
+from django.core.paginator import Paginator
+from django.db.models import Count
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -6,13 +8,15 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
 from .permissions import IsAdmin
-from preference.models import Hostel, RoomType, RoomTypeChoice
-from student.models import Batch, Student, Group
 
-from .serializers import HostelSerializer, HostelSingleSerializer, RoomTypeSerializer, RoomTypeChoiceSerializer, BatchSerializer
-from datetime import datetime
-from django.core.paginator import Paginator
+from preference.models import Hostel, RoomType, RoomTypeChoice
+from student.models import Batch, Section, Student, Group
+
+from .serializers import HostelSerializer, HostelSingleSerializer, RoomTypeSerializer, RoomTypeChoiceSerializer, RoomTypeOptionSerializer, BatchSerializer, SectionSerializer
 from student.serializers import StudentSerializer, GroupSerializer
+
+from datetime import datetime
+
 # Create your views here.
 
 
@@ -21,7 +25,7 @@ class CreateObjectView(APIView):
 
       def post(self, request, model):
             if model=='hostel':
-                  serializer = HostelSerializer(data=request.data)
+                  serializer = HostelSingleSerializer(data=request.data)
             elif model=='roomtype':
                   serializer = RoomTypeSerializer(data=request.data)
             elif model=='choice':
@@ -36,12 +40,32 @@ class CreateObjectView(APIView):
             return Response(status=status.HTTP_201_CREATED)
 
 
-class AllHostelsView(APIView):
+class GetMultipleObjectsView(APIView):
       permission_classes = [IsAuthenticated & IsAdmin]
 
-      def get(self, request):
-            queryset = Hostel.objects.all()
-            serializer = HostelSerializer(queryset, many=True)
+      def get(self, request, model):
+            if model=='hostel':
+                  queryset = Hostel.objects.all()
+                  serializer = HostelSerializer(queryset, many=True)
+            elif model=='section':
+                  queryset = Section.objects.all()
+                  serializer = SectionSerializer(queryset, many=True)
+            elif model=='uninitialized-batch':
+                  queryset = Batch.objects.annotate(
+                        sections_count = Count('sections')
+                  ).filter(sections_count__lt=2)
+                  serializer = BatchSerializer(queryset, many=True)
+            elif model=='roomtype':
+                  queryset = RoomType.objects.all()
+                  serializer = RoomTypeOptionSerializer(queryset, many=True)
+            elif model=='choice':
+                  section = Section.objects.filter(id=request.GET.get('id')).first()
+                  if section is None:
+                        return Response(status=status.HTTP_404_NOT_FOUND)
+                  queryset = RoomTypeChoice.objects.filter(section=section)
+                  serializer = RoomTypeChoiceSerializer(queryset, many=True)
+            else:
+                  return Response(status=status.HTTP_404_NOT_FOUND)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -72,7 +96,7 @@ class UpdateObjectView(APIView):
                   instance = Hostel.objects.filter(id=id).first()
                   if instance is None:
                         return Response(status=status.HTTP_404_NOT_FOUND)
-                  serializer = HostelSerializer(instance, request.data)
+                  serializer = HostelSingleSerializer(instance, request.data)
             elif model=='roomtype':
                   instance = RoomType.objects.filter(id=id).first()
                   if instance is None:
@@ -83,6 +107,11 @@ class UpdateObjectView(APIView):
                   if instance is None:
                         return Response(status=status.HTTP_404_NOT_FOUND)
                   serializer = RoomTypeChoiceSerializer(instance, request.data)
+            elif model=='section':
+                  instance = Section.objects.filter(id=id).first()
+                  if instance is None:
+                        return Response(status=status.HTTP_404_NOT_FOUND)
+                  serializer = SectionSerializer(instance, request.data)
             else:
                   return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -107,6 +136,8 @@ class DeleteObjectView(APIView):
                   instance = RoomType.objects.filter(id=id).first()
             elif model=='choice':
                   instance = RoomTypeChoice.objects.filter(id=id).first()
+            elif model=='section':
+                  instance = Section.objects.filter(id=id).first()
             else:
                   return Response(status=status.HTTP_404_NOT_FOUND)
 

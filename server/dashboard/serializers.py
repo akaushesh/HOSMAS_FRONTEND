@@ -1,12 +1,13 @@
-from rest_framework.serializers import ModelSerializer, SlugRelatedField, StringRelatedField, PrimaryKeyRelatedField, SerializerMethodField
+from rest_framework import serializers
 from preference.models import Hostel, RoomType, RoomTypeChoice
-from student.models import Batch
+from student.models import Batch, Section
 
 
-class HostelSerializer(ModelSerializer):
+class HostelSerializer(serializers.ModelSerializer):
       # Serializer for representing data of all hostels
-      available_to = SerializerMethodField()
-      allotment_enabled_for = SerializerMethodField()
+
+      available_to = serializers.SerializerMethodField()
+      allotment_enabled_for = serializers.SerializerMethodField()
 
       class Meta:
             model = Hostel
@@ -16,7 +17,7 @@ class HostelSerializer(ModelSerializer):
             list = []
             for room_type in obj.room_types.all():
                   for choice in room_type.choices.all():
-                        list.append(choice.batch.name)
+                        list.append(choice.section.batch.name)
             return list
       
       def get_allotment_enabled_for(self, obj):
@@ -24,16 +25,18 @@ class HostelSerializer(ModelSerializer):
             for room_type in obj.room_types.all():
                   if room_type.is_allotment_enabled:
                         for choice in room_type.choices.all():
-                              list.append(choice.batch.name)
+                              list.append(choice.section.batch.name)
             return list
 
 
-class RoomTypeSerializer(ModelSerializer):
-      available_to = SerializerMethodField()
+class RoomTypeSerializer(serializers.ModelSerializer):
+      # Serializer to represent data to admin on hostel side
+
+      available_to = serializers.SerializerMethodField()
 
       class Meta:
             model = RoomType
-            fields = ['id', 'name', 'hostel', 'room_size', 'rooms_count', 'is_allotment_enabled', 'available_to']
+            fields = ['id', 'name', 'hostel', 'room_size', 'rooms_count', 'available_to']
             extra_kwargs = {
                   'hostel': {'write_only': True}
             }
@@ -41,14 +44,15 @@ class RoomTypeSerializer(ModelSerializer):
       def get_available_to(self, obj):
             list = []
             for choice in obj.choices.all():
-                  list.append(choice.batch.name)
+                  list.append(choice.section.batch.name)
             return list
 
 
-class HostelSingleSerializer(ModelSerializer):
+class HostelSingleSerializer(serializers.ModelSerializer):
       # Serializer for representing data of single hostel
+
       room_types = RoomTypeSerializer(read_only=True, many=True)
-      capacity = SerializerMethodField()
+      capacity = serializers.SerializerMethodField()
 
       class Meta:
             model = Hostel
@@ -61,31 +65,96 @@ class HostelSingleSerializer(ModelSerializer):
             return cnt
 
 
-class RoomTypeChoiceSerializer(ModelSerializer):
-      room_type_name = SerializerMethodField()
-      batch_name = SerializerMethodField()
-      gender_text = SerializerMethodField()
+class RoomTypeChoiceSerializer(serializers.ModelSerializer):
+      room_type_name = serializers.SerializerMethodField()
+      hostel = serializers.SerializerMethodField()
+      batch = serializers.IntegerField(write_only=True, required=True)
+      gender = serializers.CharField(write_only=True, required=True)
 
       class Meta:
             model = RoomTypeChoice
-            fields = ['id', 'room_type', 'room_type_name', 'batch', 'batch_name', 'capacity', 'gender', 'gender_text']
+            fields = ['id', 'hostel', 'room_type', 'room_type_name', 'batch', 'gender', 'capacity']
             extra_kwargs = {
                   'room_type': {'write_only': True},
-                  'batch': {'write_only': True},
-                  'gender': {'write_only': True},
             }
       
       def get_room_type_name(self, obj):
             return obj.room_type.name
       
-      def get_batch_name(self, obj):
-            return obj.batch.name
+      def get_hostel(self, obj):
+            return obj.room_type.hostel.name
       
-      def get_gender_text(self, obj):
-            return 'Female' if obj.gender=='F' else 'Male'
+      def validate_gender(self, value):
+            if value!='M' and value!='F':
+                  raise serializers.ValidationError('Invalid Gender!')
+            return value
+      
+      def validate_batch(self, value):
+            if not Batch.objects.filter(id=value).exists():
+                  raise serializers.ValidationError('Invalid Batch!')
+            return value
+      
+      def create(self, validated_data):
+            section = Section.objects.filter(batch=validated_data['batch'], gender=validated_data['gender']).first()
+            if section is None:
+                  section = Section(batch=validated_data['batch'], gender=validated_data['gender'])
+                  section.save()
+            choice = RoomTypeChoice(
+                  room_type = validated_data['room_type'],
+                  section = section,
+                  capacity = validated_data['capacity']
+            )
+
+      def update(self, instance, validated_data):
+            section = Section.objects.filter(batch=validated_data['batch'], gender=validated_data['gender']).first()
+            instance.room_type = validated_data['room_type']
+            instance.section = section
+            instance.capacity = validated_data['capacity']
+            instance.save()
 
 
-class BatchSerializer(ModelSerializer):
+class RoomTypeOptionSerializer(serializers.ModelSerializer):
+      # Serializer to respresent data to admin about room types availble for allotment
+
+      hostel = serializers.SlugRelatedField(
+            slug_field='name',
+            read_only=True
+      )
+
+      class Meta:
+            model = RoomType
+            fields = ['id', 'name', 'hostel']
+
+
+class BatchSerializer(serializers.ModelSerializer):
+      gender = serializers.SerializerMethodField()
+
       class Meta:
             model = Batch
-            fields = ['id', 'name']
+            fields = ['id', 'name', 'gender']
+      
+      def get_gender(self, obj):
+            res = []
+            if not Section.objects.filter(batch=obj, gender='F').exists():
+                  res.append('Girls')
+            if not Section.objects.filter(batch=obj, gender='M').exists():
+                  res.append('Boys')
+            return res
+
+
+class SectionSerializer(serializers.ModelSerializer):
+      batch = serializers.SlugRelatedField(
+            slug_field='name',
+            read_only=True
+      )
+      gender = serializers.SerializerMethodField()
+
+      class Meta:
+            model = Section
+            fields = ['id', 'batch', 'gender', 'is_allotment_enabled']
+      
+      def get_batch(self, obj):
+            return obj.batch.name
+      
+      def get_gender(self, obj):
+            return 'Boys' if obj.gender=='M' else 'Girls'

@@ -1,6 +1,7 @@
 from rest_framework.permissions import BasePermission
 from rest_framework import status
 from django.core.exceptions import ObjectDoesNotExist
+from .models import Section
 
 
 class IsStudent(BasePermission):
@@ -24,8 +25,13 @@ class IsGroupMember(BasePermission):
 
 class IsPreferenceFillingLive(BasePermission):
       def has_permission(self, request, view):
-            return request.user.student.batch.is_preference_filling_live
-      
+            student = request.user.student
+            batch = student.batch
+            gender = student.gender
+            section = Section.objects.filter(batch=batch, gender=gender).first()
+            return section is not None and section.is_allotment_enabled
+
+
 class IsRetainAllowed(BasePermission):
       def has_permission(self, request, view):
             return request.user.student.batch.is_retain_allowed

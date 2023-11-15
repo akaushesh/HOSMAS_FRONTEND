@@ -19,7 +19,6 @@ class RoomType(models.Model):
     hostel = models.ForeignKey('preference.Hostel', on_delete=models.CASCADE, related_name='room_types')
     room_size = models.PositiveSmallIntegerField()
     rooms_count = models.PositiveSmallIntegerField()
-    is_allotment_enabled = models.BooleanField()
 
     def __str__(self):
         return self.name
@@ -27,12 +26,11 @@ class RoomType(models.Model):
 
 class RoomTypeChoice(models.Model):
     room_type = models.ForeignKey('preference.RoomType', on_delete=models.CASCADE, related_name='choices')
-    batch = models.ForeignKey('student.Batch', on_delete=models.CASCADE, related_name='choices')
+    section = models.ForeignKey('student.Section', on_delete=models.CASCADE, related_name='choices', null=True)
     capacity = models.PositiveIntegerField()
-    gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
 
     def __str__(self):
-        return f"{self.room_type.name}-{self.batch.name}"
+        return f"{self.room_type.name}-{self.section}"
 
 
 class Preference(models.Model):
