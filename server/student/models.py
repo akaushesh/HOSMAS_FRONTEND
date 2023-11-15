@@ -38,7 +38,6 @@ class Group (models.Model):
 
 class Batch(models.Model):
     name = models.CharField(max_length=50, unique=True, null=False, blank=False)
-    is_retain_allowed = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
@@ -48,7 +47,11 @@ class Section(models.Model):
     batch = models.ForeignKey('student.Batch', on_delete=models.CASCADE, related_name='sections')
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
     is_allotment_enabled = models.BooleanField(default=False)
+    is_retain_allowed = models.BooleanField(default=False)
 
+    class Meta:
+        unique_together = ('batch', 'gender')
+    
     def __str__(self):
         return f"{self.batch.name}-{self.gender}"
 

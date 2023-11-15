@@ -34,4 +34,5 @@ class IsPreferenceFillingLive(BasePermission):
 
 class IsRetainAllowed(BasePermission):
       def has_permission(self, request, view):
-            return request.user.student.batch.is_retain_allowed
+            section = Section.objects.filter(batch=request.user.student.batch, gender = request.user.student.gender).first()
+            return section.is_retain_allowed
