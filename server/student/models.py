@@ -46,7 +46,7 @@ class Batch(models.Model):
 
 
 class Section(models.Model):
-    batch = models.ForeignKey('student.Batch', on_delete=models.CASCADE, related_name='choices')
+    batch = models.ForeignKey('student.Batch', on_delete=models.CASCADE, related_name='sections')
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
     is_allotment_enabled = models.BooleanField(default=False)
 

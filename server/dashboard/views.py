@@ -59,11 +59,14 @@ class GetMultipleObjectsView(APIView):
                   queryset = RoomType.objects.all()
                   serializer = RoomTypeOptionSerializer(queryset, many=True)
             elif model=='choice':
-                  section = Section.objects.filter(id=request.GET.get('id')).first()
+                  section = Section.objects.filter(id=request.GET.get('section')).first()
                   if section is None:
                         return Response(status=status.HTTP_404_NOT_FOUND)
                   queryset = RoomTypeChoice.objects.filter(section=section)
                   serializer = RoomTypeChoiceSerializer(queryset, many=True)
+            elif model=='batch':
+                  queryset = Batch.objects.all()
+                  serializer = BatchSerializer(queryset, many=True)
             else:
                   return Response(status=status.HTTP_404_NOT_FOUND)
             return Response(serializer.data, status=status.HTTP_200_OK)

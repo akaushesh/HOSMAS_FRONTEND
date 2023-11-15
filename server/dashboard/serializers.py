@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from preference.models import Hostel, RoomType, RoomTypeChoice
 from student.models import Batch, Section
+import json
 
 
 class HostelSerializer(serializers.ModelSerializer):
@@ -95,22 +96,29 @@ class RoomTypeChoiceSerializer(serializers.ModelSerializer):
             return value
       
       def create(self, validated_data):
-            section = Section.objects.filter(batch=validated_data['batch'], gender=validated_data['gender']).first()
+            batch = Batch.objects.filter(id=validated_data['batch']).first()
+            section = Section.objects.filter(batch=batch, gender=validated_data['gender']).first()
             if section is None:
-                  section = Section(batch=validated_data['batch'], gender=validated_data['gender'])
+                  section = Section(batch=batch, gender=validated_data['gender'])
                   section.save()
-            choice = RoomTypeChoice(
+            instance = RoomTypeChoice(
                   room_type = validated_data['room_type'],
                   section = section,
                   capacity = validated_data['capacity']
             )
+            instance.save()
+            return instance
 
       def update(self, instance, validated_data):
-            section = Section.objects.filter(batch=validated_data['batch'], gender=validated_data['gender']).first()
+            batch = Batch.objects.filter(id=validated_data['batch']).first()
+            section = Section.objects.filter(batch=batch, gender=validated_data['gender']).first()
+            if section is None:
+                  raise serializers.ValidationError({'detail': ['Invalid Section!']})
             instance.room_type = validated_data['room_type']
             instance.section = section
             instance.capacity = validated_data['capacity']
             instance.save()
+            return instance
 
 
 class RoomTypeOptionSerializer(serializers.ModelSerializer):

@@ -6,4 +6,5 @@ from .models import *
 admin.site.register(Student)
 admin.site.register(Group)
 admin.site.register(Batch)
+admin.site.register(Section)
 admin.site.register(Invitation)
