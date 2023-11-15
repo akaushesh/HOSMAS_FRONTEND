@@ -63,19 +63,40 @@ class StudentProfileSerializer(ModelSerializer):
             read_only = True,
             slug_field = 'name'
       )
+      current_room = SlugRelatedField(
+            read_only = True,
+            slug_field = 'name'
+      )
+      current_hostel = SerializerMethodField()
       gender = SerializerMethodField()
-      role = SerializerMethodField()
+      group = SerializerMethodField()
 
       class Meta:
             model = Student
-            fields = ['name', 'rollno', 'cg', 'gender', 'batch', 'role']
+            fields = ['name', 'rollno', 'cg', 'gender', 'batch', 'current_hostel', 'current_room', 'group']
       
+      def get_current_hostel(self, obj):
+            if obj.current_room is None:
+                  return None
+            return obj.current_room.hostel.name
+
       def get_gender(self, obj):
             return 'Female' if obj.gender=='F' else 'Male'
-      
-      def get_role(self, obj):
+
+      def get_group(self, obj):
             try:
-                  _ = obj.leader_of_group
-                  return 'leader'
+                  group = obj.leader_of_group
+                  return {
+                        'leader_name': obj.name,
+                        'leader_email': obj.user.email,
+                        'size': group.members.count() + 1
+                  }
             except:
-                  return 'member' if obj.group is not None else 'unregistered'
+                  group = obj.group
+                  if group is None:
+                        return None
+                  return {
+                        'leader_name': group.leader.name,
+                        'leader_email': group.leader.user.email,
+                        'size': group.members.count() + 1
+                  }

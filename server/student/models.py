@@ -14,14 +14,13 @@ class Student (models.Model):
     name = models.CharField(max_length=100, null=False, blank=False)
     rollno = models.CharField(max_length=12, unique=True, null=False, blank=False)
 
-    branch = models.CharField(max_length=50, null=False, blank=False)
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
     cg = models.FloatField(null=False, blank=False)
 
     group = models.ForeignKey('student.Group', null=True, blank = True, on_delete=models.SET_NULL, related_name='members')    
 
     batch = models.ForeignKey('student.Batch', on_delete=models.CASCADE, related_name='students')
-    
+
     current_room = models.ForeignKey('preference.RoomType', on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):

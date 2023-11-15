@@ -8,46 +8,20 @@ import json
 class HostelSerializer(serializers.ModelSerializer):
       # Serializer for representing data of all hostels
 
-      available_to = serializers.SerializerMethodField()
-      allotment_enabled_for = serializers.SerializerMethodField()
-
       class Meta:
             model = Hostel
-            fields = ['id', 'name', 'gender', 'available_to', 'allotment_enabled_for']
-
-      def get_available_to(self, obj):
-            list = []
-            for room_type in obj.room_types.all():
-                  for choice in room_type.choices.all():
-                        list.append(choice.section.batch.name)
-            return list
-      
-      def get_allotment_enabled_for(self, obj):
-            list = []
-            for room_type in obj.room_types.all():
-                  if room_type.is_allotment_enabled:
-                        for choice in room_type.choices.all():
-                              list.append(choice.section.batch.name)
-            return list
+            fields = ['id', 'name', 'gender']
 
 
 class RoomTypeSerializer(serializers.ModelSerializer):
       # Serializer to represent data to admin on hostel side
 
-      available_to = serializers.SerializerMethodField()
-
       class Meta:
             model = RoomType
-            fields = ['id', 'name', 'hostel', 'room_size', 'rooms_count', 'available_to']
+            fields = ['id', 'name', 'hostel', 'room_size', 'rooms_count']
             extra_kwargs = {
                   'hostel': {'write_only': True}
             }
-      
-      def get_available_to(self, obj):
-            list = []
-            for choice in obj.choices.all():
-                  list.append(choice.section.batch.name)
-            return list
 
 
 class HostelSingleSerializer(serializers.ModelSerializer):
