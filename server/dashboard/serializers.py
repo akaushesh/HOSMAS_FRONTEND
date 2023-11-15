@@ -144,9 +144,9 @@ class BatchSerializer(serializers.ModelSerializer):
       def get_gender(self, obj):
             res = []
             if not Section.objects.filter(batch=obj, gender='F').exists():
-                  res.append('Girls')
+                  res.append('F')
             if not Section.objects.filter(batch=obj, gender='M').exists():
-                  res.append('Boys')
+                  res.append('M')
             return res
 
 
@@ -165,4 +165,4 @@ class SectionSerializer(serializers.ModelSerializer):
             return obj.batch.name
       
       def get_gender(self, obj):
-            return 'Boys' if obj.gender=='M' else 'Girls'
+            return obj.gender
