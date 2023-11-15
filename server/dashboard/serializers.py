@@ -134,7 +134,9 @@ class RoomTypeOptionSerializer(serializers.ModelSerializer):
             fields = ['id', 'name', 'hostel']
 
 
-class BatchSerializer(serializers.ModelSerializer):
+class BatchUninitializedSerializer(serializers.ModelSerializer):
+      # Serializer for 'Manage Preferences' section route
+
       gender = serializers.SerializerMethodField()
 
       class Meta:
@@ -148,6 +150,19 @@ class BatchSerializer(serializers.ModelSerializer):
             if not Section.objects.filter(batch=obj, gender='M').exists():
                   res.append('M')
             return res
+
+
+class BatchSerializer(serializers.ModelSerializer):
+      # Serializer for 'Manage Batches' section routes
+
+      count = serializers.SerializerMethodField()
+
+      class Meta:
+            model = Batch
+            fields = ['id', 'name', 'count']
+      
+      def get_count(self, obj):
+            return obj.students.count()
 
 
 class SectionSerializer(serializers.ModelSerializer):

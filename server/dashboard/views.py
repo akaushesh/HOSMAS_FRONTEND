@@ -12,7 +12,7 @@ from .permissions import IsAdmin
 from preference.models import Hostel, RoomType, RoomTypeChoice
 from student.models import Batch, Section, Student, Group
 
-from .serializers import HostelSerializer, HostelSingleSerializer, RoomTypeSerializer, RoomTypeChoiceSerializer, RoomTypeOptionSerializer, BatchSerializer, SectionSerializer
+from .serializers import HostelSerializer, HostelSingleSerializer, RoomTypeSerializer, RoomTypeChoiceSerializer, RoomTypeOptionSerializer, BatchSerializer, BatchUninitializedSerializer, SectionSerializer
 from student.serializers import StudentSerializer, GroupSerializer
 
 from datetime import datetime
@@ -54,7 +54,7 @@ class GetMultipleObjectsView(APIView):
                   queryset = Batch.objects.annotate(
                         sections_count = Count('sections')
                   ).filter(sections_count__lt=2)
-                  serializer = BatchSerializer(queryset, many=True)
+                  serializer = BatchUninitializedSerializer(queryset, many=True)
             elif model=='roomtype':
                   queryset = RoomType.objects.all()
                   serializer = RoomTypeOptionSerializer(queryset, many=True)
@@ -115,6 +115,11 @@ class UpdateObjectView(APIView):
                   if instance is None:
                         return Response(status=status.HTTP_404_NOT_FOUND)
                   serializer = SectionSerializer(instance, request.data)
+            elif model=='batch':
+                  instance = Batch.objects.filter(id=id).first()
+                  if instance is None:
+                        return Response(status=status.HTTP_404_NOT_FOUND)
+                  serializer = BatchSerializer(instance, request.data)
             else:
                   return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -131,7 +136,7 @@ class DeleteObjectView(APIView):
       def delete(self, request, model):
             id = request.data.get('id')
             if id is None:
-                  return Response(status=status.HTTP_400_BAD_REQUEST)
+                  return Response(status=status.HTTP_404_NOT_FOUND)
 
             if model=='hostel':
                   instance = Hostel.objects.filter(id=id).first()
@@ -141,11 +146,13 @@ class DeleteObjectView(APIView):
                   instance = RoomTypeChoice.objects.filter(id=id).first()
             elif model=='section':
                   instance = Section.objects.filter(id=id).first()
+            elif model=='batch':
+                  instance = Batch.objects.filter(id=id).first()
             else:
                   return Response(status=status.HTTP_404_NOT_FOUND)
 
             if instance is None:
-                  return Response(status=status.HTTP_400_BAD_REQUEST)
+                  return Response(status=status.HTTP_404_NOT_FOUND)
 
             instance.delete()
             return Response(status=status.HTTP_200_OK)
