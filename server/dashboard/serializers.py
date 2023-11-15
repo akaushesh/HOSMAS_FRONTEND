@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from preference.models import Hostel, RoomType, RoomTypeChoice
 from student.models import Batch, Section
+from user.models import User
 import json
 
 
@@ -181,3 +182,9 @@ class SectionSerializer(serializers.ModelSerializer):
       
       def get_gender(self, obj):
             return obj.gender
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+      class Meta:
+            model = User
+            fields = ['email']

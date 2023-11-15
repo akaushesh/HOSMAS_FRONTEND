@@ -36,3 +36,11 @@ class User(AbstractBaseUser):
     
     def __str__(self):
         return self.email
+
+
+class ResetSlug(models.Model):
+    slug = models.CharField(max_length=150, unique=True)
+    user = models.ForeignKey('user.User', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.user.email

@@ -12,7 +12,7 @@ from .permissions import IsAdmin
 from preference.models import Hostel, RoomType, RoomTypeChoice
 from student.models import Batch, Section, Student, Group
 
-from .serializers import HostelSerializer, HostelSingleSerializer, RoomTypeSerializer, RoomTypeChoiceSerializer, RoomTypeOptionSerializer, BatchSerializer, BatchUninitializedSerializer, SectionSerializer
+from .serializers import HostelSerializer, HostelSingleSerializer, RoomTypeSerializer, RoomTypeChoiceSerializer, RoomTypeOptionSerializer, BatchSerializer, BatchUninitializedSerializer, SectionSerializer, ProfileSerializer
 from student.serializers import StudentSerializer, GroupSerializer
 
 from datetime import datetime
@@ -230,3 +230,12 @@ class getGroups(APIView):
             serializer = GroupSerializer(groups, many=True)
             
             return Response({'status':'success', 'data':serializer.data, 'total_pages':total_pages}, status=status.HTTP_200_OK)
+
+
+class ProfileView(APIView):
+      permission_classes = [IsAuthenticated & IsAdmin]
+
+      def get(self, request):
+            user = request.user
+            serializer = ProfileSerializer(user)
+            return Response(serializer.data, status=status.HTTP_200_OK)

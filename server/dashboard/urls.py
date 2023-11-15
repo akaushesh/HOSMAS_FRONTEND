@@ -10,4 +10,5 @@ urlpatterns = [
       path('import-students/', views.ImportStudentsView.as_view(), name='import_students'),
       path('getStudents/', views.getStudents.as_view()),
       path('getGroups/', views.getGroups.as_view()),
+      path('profile/', views.ProfileView.as_view()),
 ]
