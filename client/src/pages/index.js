@@ -7,16 +7,20 @@ import { AccountProfileDetails } from "src/sections/account/account-profile-deta
 import { Fragment } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import { useAuth } from "src/hooks/use-auth";
 
 const Page = () => {
-  const { data, isLoading } = useQuery({
-    queryFn: () => {
-      return axios.get("https://catfact.ninja/fact");
-    },
-    queryKey: ["cat-fact"],
-    // refetchInterval: 2000,
-  });
-  // console.log(data?.data?.fact);
+  // const { data, isLoading } = useQuery({
+  //   queryFn: () => {
+  //     return axios.get("https://catfact.ninja/fact");
+  //   },
+  //   queryKey: ["cat-fact"],
+  //   // refetchInterval: 2000,
+  // });
+  // // console.log(data?.data?.fact);
+
+  const user = useAuth();
+  console.log(user);
 
   return (
     <Fragment>

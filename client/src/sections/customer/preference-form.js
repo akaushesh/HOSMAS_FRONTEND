@@ -3,10 +3,26 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import { useState } from "react";
-import { Button, Card, CardContent, CardHeader, FormHelperText, Grid } from "@mui/material";
+import {
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  FormHelperText,
+  Grid,
+  Typography,
+} from "@mui/material";
+import CustomModal from "src/components/customModal";
+import { FormConfirmation } from "./form-confirmation";
 
 export const PreferenceForm = (props) => {
   const { sx } = props;
+
+  const [openModal, setOpenModal] = useState(false);
+
+  const onCloseModal = () => {
+    setOpenModal(false);
+  };
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -15,7 +31,9 @@ export const PreferenceForm = (props) => {
       return setError("Preferences must be unique");
     }
 
+    setError("");
     console.log("Form submitted");
+    setOpenModal(true);
   };
 
   const handleChange = (event) => {
@@ -27,7 +45,7 @@ export const PreferenceForm = (props) => {
     });
   };
 
-  const options = ["A", "B", "C", "D", "M", "N"];
+  const options = ["A", "B", "C", "D", "M", "O"];
   const [preferences, setPreferences] = useState(() =>
     Array.from({ length: options.length }, () => "")
   );
@@ -35,9 +53,12 @@ export const PreferenceForm = (props) => {
 
   return (
     <Card sx={sx}>
-      <CardHeader title="Preference List" />
+      {/* <CardHeader title="Your Preference" /> */}
       <form onSubmit={handleSubmit}>
         <Grid container justifyContent="center" alignItems="center">
+          <Typography variant="h4" paddingBottom="1rem">
+            Your Preferences
+          </Typography>
           {options.map((_, index) => (
             <Grid container justifyContent="center" alignItems="center" key={index}>
               <FormControl required variant="filled" sx={{ m: 1, minWidth: 300 }}>
@@ -62,6 +83,9 @@ export const PreferenceForm = (props) => {
           <Button variant="contained" sx={{ m: 1, minWidth: 300 }} type="submit">
             Submit
           </Button>
+          <CustomModal open={openModal} onClose={onCloseModal}>
+            <FormConfirmation onClose={onCloseModal} />
+          </CustomModal>
           <FormHelperText error>{error}</FormHelperText>
         </Grid>
       </form>

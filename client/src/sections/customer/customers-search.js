@@ -2,6 +2,10 @@ import { Autocomplete, Button, Card, CircularProgress, Grid, TextField } from "@
 import SendIcon from "@mui/icons-material/Send";
 import { Stack } from "@mui/system";
 import { useState } from "react";
+import CustomModal from "src/components/customModal";
+import { CustomerConfirmation } from "./customer-confirmation";
+import axios from "axios";
+import { URL } from "config";
 
 function sleep(duration) {
   return new Promise((resolve) => {
@@ -16,6 +20,15 @@ export const CustomersSearch = () => {
   const [option, setOption] = useState([]);
   const [loading, setLoading] = useState(false);
   const [infoText, setInfoText] = useState("Enter complete enrollment number");
+  const [openModal, setOpenModal] = useState(false);
+
+  const onOpenModal = () => {
+    setOpenModal(true);
+  };
+
+  const onCloseModal = () => {
+    setOpenModal(false);
+  };
 
   const onSubmitHandler = (event) => {
     event.preventDefault();
@@ -38,7 +51,44 @@ export const CustomersSearch = () => {
 
     setLoading(true);
     (async () => {
-      await sleep(1e3);
+      // await sleep(1e3);
+      const jwt = sessionStorage.getItem("jwt");
+
+      // const searchStudentConfig = {
+      //   maxBodyLength: Infinity,
+      //   headers: {
+      //     Authorization: "Bearer " + jwt,
+      //   },
+      // };
+
+      // const data = {
+      //   rollno: "444444444",
+      // };
+
+      // const url = URL + "student/search/";
+
+      // const searchStudentResponse = await axios.post(url, data, searchStudentConfig);
+      // console.log(searchStudentResponse);
+
+      var axios = require("axios");
+      var data = '{\r\n    "rollno": "444444444"\r\n}';
+
+      var config = {
+        method: "post",
+        maxBodyLength: Infinity,
+        url: "https://api.hosmas.ccstiet.com/student/search/",
+        headers: { Authorization: "Bearer " + jwt },
+        data: data,
+      };
+
+      axios(config)
+        .then(function (response) {
+          console.log(JSON.stringify(response.data));
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+
       setLoading(false);
       setOption([{ enrollmentNumber: 102103500, name: "Aditya Parmar" }]);
     })();
@@ -85,7 +135,14 @@ export const CustomersSearch = () => {
             )}
             sx={{ width: "600px" }}
           />
-          <Button type="submit">
+          <CustomModal open={openModal} onClose={onCloseModal}>
+            <CustomerConfirmation
+              name="Vibhav Shukla"
+              enrollmentNumber="102103498"
+              onClose={onCloseModal}
+            />
+          </CustomModal>
+          <Button type="submit" onClick={onOpenModal}>
             <SendIcon color="primary" />
           </Button>
         </Stack>
