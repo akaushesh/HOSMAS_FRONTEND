@@ -76,10 +76,11 @@ class StudentProfileSerializer(ModelSerializer):
       alloted_hostel = SerializerMethodField()
       gender = SerializerMethodField()
       group = SerializerMethodField()
+      preference_filled = SerializerMethodField()
 
       class Meta:
             model = Student
-            fields = ['name', 'rollno', 'email', 'cg', 'gender', 'batch', 'current_hostel', 'current_room', 'alloted_hostel', 'alloted_room', 'group']
+            fields = ['name', 'rollno', 'email', 'cg', 'gender', 'batch', 'current_hostel', 'current_room', 'alloted_hostel', 'alloted_room', 'group', 'preference_filled']
 
       def get_email(self, obj):
             return obj.user.email
@@ -114,3 +115,12 @@ class StudentProfileSerializer(ModelSerializer):
                         'leader_email': group.leader.user.email,
                         'size': group.members.count() + 1
                   }
+      
+      def get_preference_filled(self, obj):
+            try:
+                  group = obj.leader_of_group
+            except:
+                  group = obj.group
+                  if group is None:
+                        return False
+            return group.preferences.count() > 0
