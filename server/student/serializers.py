@@ -77,7 +77,7 @@ class StudentProfileSerializer(ModelSerializer):
             fields = ['name', 'rollno', 'email', 'cg', 'gender', 'batch', 'current_hostel', 'current_room', 'group']
 
       def get_email(self, obj):
-            return self.user.email
+            return obj.user.email
 
       def get_current_hostel(self, obj):
             if obj.current_room is None:
