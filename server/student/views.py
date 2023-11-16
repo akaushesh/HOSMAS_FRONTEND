@@ -27,28 +27,27 @@ class SearchStudentView(APIView):
 
       def post(self, request):
             student = request.user.student
-            try:
-                  group = student.leader_of_group
-            except ObjectDoesNotExist:
-                  group = Group(leader=student, cg=student.cg)
-                  group.save()
-
             resultant = Student.objects.filter(rollno=request.data.get('rollno')).first()
+
             if resultant is None:
                   return Response(status=status.HTTP_404_NOT_FOUND)
 
-            if resultant==student:
+            if resultant==student or resultant.batch!=student.batch or resultant.gender!=student.gender:
                   return Response(status=status.HTTP_412_PRECONDITION_FAILED)
 
             try:
-                  _ = resultant.leader_of_group
-                  return Response(status=status.HTTP_412_PRECONDITION_FAILED)
-            except ObjectDoesNotExist:
-                  if resultant.group is not None or resultant.batch!=student.batch or resultant.gender!=student.gender:
+                  group = student.leader_of_group
+                  if resultant.group==group or Invitation.objects.filter(for_group=group, to=resultant).exists():
                         return Response(status=status.HTTP_412_PRECONDITION_FAILED)
+            except ObjectDoesNotExist:
+                  pass
 
-            if Invitation.objects.filter(for_group=student.leader_of_group, to=resultant).exists():
-                  return Response(status=status.HTTP_412_PRECONDITION_FAILED)
+            try:
+                  group = resultant.leader_of_group
+                  if student.group==group or Invitation.objects.filter(for_group=group, to=student).exists():
+                        return Response(status=status.HTTP_412_PRECONDITION_FAILED)
+            except ObjectDoesNotExist:
+                  pass
 
             serializer = StudentSerializer(resultant)
             return Response(serializer.data, status=status.HTTP_200_OK)
