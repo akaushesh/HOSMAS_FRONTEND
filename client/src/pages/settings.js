@@ -19,7 +19,6 @@ const Page = () => (
       <Container maxWidth="xl">
         <Stack spacing={3}>
           <Typography variant="h4">Update Password</Typography>
-          {/* <SettingsNotifications /> */}
           <SettingsPassword />
         </Stack>
       </Container>

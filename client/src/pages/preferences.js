@@ -11,6 +11,7 @@ import { CustomersTable } from "src/sections/customer/customers-table";
 import { CustomersSearch } from "src/sections/customer/customers-search";
 import { PreferenceForm } from "src/sections/customer/preference-form";
 import { applyPagination } from "src/utils/apply-pagination";
+import CustomModal from "src/components/customModal";
 import { OverviewLatestProducts } from "src/sections/overview/overview-latest-products";
 
 const now = new Date();
@@ -188,85 +189,20 @@ const Page = () => {
   return (
     <Fragment>
       <Head>
-        <title>Group | Thapar Hostel Management System</title>
+        <title>Preference | Thapar Hostel Management System</title>
       </Head>
       <Box
         component="main"
         marginBottom="6rem"
         sx={{
           flexGrow: 1,
-          py: 8,
+          py: 4,
         }}
       >
         <Container maxWidth="xl">
-          <Stack spacing={3}>
-            <Stack direction="row" justifyContent="space-between" spacing={4}>
-              <Stack spacing={1}>
-                <Typography variant="h4">Your Group</Typography>
-              </Stack>
-            </Stack>
-
-            <Grid container justifyContent="space-evenly">
-              <Grid item xs={12} lg={6.5} marginBottom="1rem">
-                <Stack spacing={3}>
-                  <CustomersSearch />
-                  <CustomersTable
-                    count={data.length}
-                    items={customers}
-                    onDeselectAll={customersSelection.handleDeselectAll}
-                    onDeselectOne={customersSelection.handleDeselectOne}
-                    onPageChange={handlePageChange}
-                    onRowsPerPageChange={handleRowsPerPageChange}
-                    onSelectAll={customersSelection.handleSelectAll}
-                    onSelectOne={customersSelection.handleSelectOne}
-                    page={page}
-                    rowsPerPage={rowsPerPage}
-                    selected={customersSelection.selected}
-                  />
-                </Stack>
-              </Grid>
-              <Grid item xs={12} lg={4.5} marginBottom="1rem">
-                <OverviewLatestProducts
-                  products={[
-                    {
-                      id: "5ece2c077e39da27658aa8a9",
-                      name: "Vibhav Shukla",
-                      updatedAt: subHours(now, 6).getTime(),
-                    },
-                    {
-                      id: "5ece2c0d16f70bff2cf86cd8",
-                      name: "Sidharth Bahl",
-                      updatedAt: subDays(subHours(now, 8), 2).getTime(),
-                    },
-                    {
-                      id: "b393ce1b09c1254c3a92c827",
-                      name: "Rohit Thapar",
-                      updatedAt: subDays(subHours(now, 1), 1).getTime(),
-                    },
-                    {
-                      id: "a6ede15670da63f49f752c89",
-                      name: "Harkirat Singh Makkar",
-                      updatedAt: subDays(subHours(now, 3), 3).getTime(),
-                    },
-                    {
-                      id: "a6ede18670da63f49f752c89",
-                      name: "Hardik Sharma",
-                      updatedAt: subDays(subHours(now, 3), 3).getTime(),
-                    },
-                    {
-                      id: "a6ede15670da93f49f752c89",
-                      name: "Surabhi Mishra",
-                      updatedAt: subDays(subHours(now, 3), 3).getTime(),
-                    },
-                    {
-                      id: "a8ede15670da93f49f752c89",
-                      name: "Pranjal Arora",
-                      updatedAt: subDays(subHours(now, 3), 3).getTime(),
-                    },
-                  ]}
-                  sx={{ height: "100%" }}
-                />
-              </Grid>
+          <Stack>
+            <Grid container justifyContent="center" alignItems="center">
+              <PreferenceForm sx={{ height: "100%", maxWidth: "25rem", padding: "2rem" }} />
             </Grid>
           </Stack>
         </Container>

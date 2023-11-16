@@ -86,6 +86,17 @@ export const AuthProvider = (props) => {
         name: "Anika Visser",
         email: "anika.visser@devias.io",
       };
+      // const getProfileConfig = {
+      //   method: "get",
+      //   maxBodyLength: Infinity,
+      //   headers: {
+      //     Authorization: "Bearer " + loginResponse?.data?.access,
+      //   },
+      // };
+
+      // const newURL = URL + "student/profile/";
+
+      // const getProfileResponse = await axios.get(newURL, getProfileConfig);
 
       dispatch({
         type: HANDLERS.INITIALIZE,
@@ -149,6 +160,7 @@ export const AuthProvider = (props) => {
       if (err?.response?.status === 401) {
         throw new Error(err?.response?.data?.detail);
       }
+      throw new Error("Something went wrong");
     }
 
     const getProfileConfig = {
@@ -171,7 +183,6 @@ export const AuthProvider = (props) => {
       role: getProfileResponse?.data?.role,
       rollno: getProfileResponse?.data?.rollno,
     };
-    console.log(user);
 
     dispatch({
       type: HANDLERS.SIGN_IN,
