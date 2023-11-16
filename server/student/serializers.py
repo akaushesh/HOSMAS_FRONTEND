@@ -67,14 +67,18 @@ class StudentProfileSerializer(ModelSerializer):
             read_only = True,
             slug_field = 'name'
       )
+      email = SerializerMethodField()
       current_hostel = SerializerMethodField()
       gender = SerializerMethodField()
       group = SerializerMethodField()
 
       class Meta:
             model = Student
-            fields = ['name', 'rollno', 'cg', 'gender', 'batch', 'current_hostel', 'current_room', 'group']
-      
+            fields = ['name', 'rollno', 'email', 'cg', 'gender', 'batch', 'current_hostel', 'current_room', 'group']
+
+      def get_email(request, obj):
+            return request.user.email
+
       def get_current_hostel(self, obj):
             if obj.current_room is None:
                   return None
