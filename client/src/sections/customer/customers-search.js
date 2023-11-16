@@ -42,6 +42,7 @@ export const CustomersSearch = () => {
 
   const onTextFieldChangeHandler = (e) => {
     if (e.target.value.length !== 9) {
+      setInfoText("Enter complete enrollment number");
       if (option.size !== 0) {
         setOption([]);
         return;
@@ -51,46 +52,35 @@ export const CustomersSearch = () => {
 
     setLoading(true);
     (async () => {
-      // await sleep(1e3);
-      const jwt = sessionStorage.getItem("jwt");
+      try {
+        const jwt = sessionStorage.getItem("jwt");
 
-      // const searchStudentConfig = {
-      //   maxBodyLength: Infinity,
-      //   headers: {
-      //     Authorization: "Bearer " + jwt,
-      //   },
-      // };
+        const searchStudentConfig = {
+          maxBodyLength: Infinity,
+          headers: {
+            Authorization: "Bearer " + jwt,
+          },
+        };
 
-      // const data = {
-      //   rollno: "444444444",
-      // };
+        console.log(e.target.value);
+        const data = {
+          rollno: e.target.value,
+        };
 
-      // const url = URL + "student/search/";
+        const url = URL + "student/search/";
 
-      // const searchStudentResponse = await axios.post(url, data, searchStudentConfig);
-      // console.log(searchStudentResponse);
+        const searchStudentResponse = await axios.post(url, data, searchStudentConfig);
 
-      var axios = require("axios");
-      var data = '{\r\n    "rollno": "444444444"\r\n}';
-
-      var config = {
-        method: "post",
-        maxBodyLength: Infinity,
-        url: "https://api.hosmas.ccstiet.com/student/search/",
-        headers: { Authorization: "Bearer " + jwt },
-        data: data,
-      };
-
-      axios(config)
-        .then(function (response) {
-          console.log(JSON.stringify(response.data));
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
-
+        setOption([
+          {
+            enrollmentNumber: searchStudentResponse?.data?.rollno,
+            name: searchStudentResponse?.data?.name,
+          },
+        ]);
+      } catch (err) {
+        setInfoText("No user found");
+      }
       setLoading(false);
-      setOption([{ enrollmentNumber: 102103500, name: "Aditya Parmar" }]);
     })();
   };
 
@@ -137,8 +127,8 @@ export const CustomersSearch = () => {
           />
           <CustomModal open={openModal} onClose={onCloseModal}>
             <CustomerConfirmation
-              name="Vibhav Shukla"
-              enrollmentNumber="102103498"
+              name={option[0]?.name}
+              enrollmentNumber={option[0]?.enrollmentNumber}
               onClose={onCloseModal}
             />
           </CustomModal>

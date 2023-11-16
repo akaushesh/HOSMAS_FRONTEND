@@ -10,16 +10,7 @@ import axios from "axios";
 import { useAuth } from "src/hooks/use-auth";
 
 const Page = () => {
-  // const { data, isLoading } = useQuery({
-  //   queryFn: () => {
-  //     return axios.get("https://catfact.ninja/fact");
-  //   },
-  //   queryKey: ["cat-fact"],
-  //   // refetchInterval: 2000,
-  // });
-  // // console.log(data?.data?.fact);
-
-  const user = useAuth();
+  const { user } = useAuth();
   console.log(user);
 
   return (
@@ -36,12 +27,19 @@ const Page = () => {
       >
         <Container maxWidth="xl">
           <Typography variant="h3" sx={{ mb: 3 }} paddingLeft={2}>
-            Hi, Gunjeev Singh!
+            Hi, {user?.name}!
           </Typography>
 
           <Grid container spacing={3}>
             <Grid item xs={12} lg={8} alignSelf={"center"}>
-              <AccountProfileDetails />
+              <AccountProfileDetails
+                name={user?.name}
+                email={user?.email}
+                rollNumber={user?.rollno}
+                CGPA={user?.cg}
+                hostel={user?.current_hostel}
+                roomNumber={user?.roomNumber}
+              />
             </Grid>
             <Grid item xs={12} lg={4}>
               <Grid>

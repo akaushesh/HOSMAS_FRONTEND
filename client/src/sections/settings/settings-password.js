@@ -30,7 +30,7 @@ export const SettingsPassword = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if (password !== confirmPassword) setError("Passwords do not match");
+    if (password !== confirmPassword) return setError("Passwords do not match");
     setError("");
 
     setIsLoading(true);
