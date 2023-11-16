@@ -1,18 +1,20 @@
 import { useCallback, useState } from "react";
 import Head from "next/head";
 import NextLink from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/router";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { Box, Button, FormHelperText, Stack, TextField, Typography } from "@mui/material";
 import { useAuth } from "src/hooks/use-auth";
 import { Layout as AuthLayout } from "src/layouts/auth/layout";
 import Link from "next/link";
+import axios from "axios";
+import { URL } from "config";
 
 const Page = () => {
   const router = useRouter();
-  const auth = useAuth();
-  const [method, setMethod] = useState("email");
+  const { slug } = router.query;
+  const [method, setMethod] = useState("password");
   const formik = useFormik({
     initialValues: {
       email: "",
@@ -20,34 +22,39 @@ const Page = () => {
       submit: null,
     },
     validationSchema: Yup.object({
-      email: Yup.string().email("Must be a valid email").max(255).required("Email is required"),
-      password: Yup.string().max(255).required("Password is required"),
+      password: Yup.string().min(6).max(255).required("Password is required"),
     }),
     onSubmit: async (values, helpers) => {
       try {
-        await auth.signIn(values.email, values.password);
-        router.push("/");
+        console.log(slug, values.password);
+        console.log(values.email);
+        const loginURL = URL + "auth/reset-password/";
+        const data = { slug: slug, password: values.password };
+
+        var resetPasswordConfig = {
+          method: "post",
+          maxBodyLength: Infinity,
+          headers: {},
+        };
+
+        const resetPasswordResponse = await axios.post(loginURL, data, { resetPasswordConfig });
+        console.log(resetPasswordResponse);
+        router.push("/auth/login");
       } catch (err) {
+        console.log(err);
         helpers.setStatus({ success: false });
-        helpers.setErrors({ submit: err.message });
         helpers.setSubmitting(false);
+
+        if (err.response.status == 400) helpers.setErrors({ submit: "Invalid Slug" });
+        else helpers.setErrors({ submit: err.message });
       }
     },
   });
 
-  const handleMethodChange = useCallback((event, value) => {
-    setMethod(value);
-  }, []);
-
-  const handleSkip = useCallback(() => {
-    auth.skip();
-    router.push("/");
-  }, [auth, router]);
-
   return (
     <>
       <Head>
-        <title>Login | Devias Kit</title>
+        <title>Set New Password | Thapar Hostel Management System</title>
       </Head>
       <Box
         sx={{
@@ -68,40 +75,25 @@ const Page = () => {
         >
           <div>
             <Stack spacing={1} sx={{ mb: 3 }}>
-              <Typography variant="h4">Login</Typography>
+              <Typography variant="h4">New Password</Typography>
             </Stack>
-            {method === "email" && (
+            {method === "password" && (
               <form noValidate onSubmit={formik.handleSubmit}>
-                <Stack spacing={3}>
-                  <TextField
-                    error={!!(formik.touched.email && formik.errors.email)}
-                    fullWidth
-                    helperText={formik.touched.email && formik.errors.email}
-                    label="Email Address"
-                    name="email"
-                    onBlur={formik.handleBlur}
-                    onChange={formik.handleChange}
-                    type="email"
-                    value={formik.values.email}
-                  />
-                  <TextField
-                    error={!!(formik.touched.password && formik.errors.password)}
-                    fullWidth
-                    helperText={formik.touched.password && formik.errors.password}
-                    label="Password"
-                    name="password"
-                    onBlur={formik.handleBlur}
-                    onChange={formik.handleChange}
-                    type="password"
-                    value={formik.values.password}
-                  />
-                </Stack>
+                <TextField
+                  error={!!(formik.touched.password && formik.errors.password)}
+                  fullWidth
+                  helperText={formik.touched.password && formik.errors.password}
+                  label="Password"
+                  name="password"
+                  onBlur={formik.handleBlur}
+                  onChange={formik.handleChange}
+                  type="password"
+                  value={formik.values.password}
+                />
+                {/* 
                 <FormHelperText sx={{ mt: 1 }}>
                   Did not receive a password in your mail?&nbsp;
-                  <Link style={{ color: "#6366E9" }} href="/auth/forgot-password">
-                    Forgot Password
-                  </Link>
-                </FormHelperText>
+                </FormHelperText> */}
                 {formik.errors.submit && (
                   <Typography color="error" sx={{ mt: 3 }} variant="body2">
                     {formik.errors.submit}

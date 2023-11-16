@@ -80,23 +80,37 @@ export const AuthProvider = (props) => {
     }
 
     if (isAuthenticated) {
-      const user = {
-        id: "5e86809283e28b96d2d38537",
-        avatar: "/assets/avatars/avatar-anika-visser.png",
-        name: "Anika Visser",
-        email: "anika.visser@devias.io",
+      const url = URL + "auth/token/refresh/";
+      const refreshToken = sessionStorage.getItem("refresh");
+      const data = { refresh: refreshToken };
+
+      const refreshConfig = {
+        maxBodyLength: Infinity,
+        headers: {},
       };
-      // const getProfileConfig = {
-      //   method: "get",
-      //   maxBodyLength: Infinity,
-      //   headers: {
-      //     Authorization: "Bearer " + loginResponse?.data?.access,
-      //   },
-      // };
 
-      // const newURL = URL + "student/profile/";
+      const refreshTokenResponse = await axios.post(url, data, { refreshConfig });
+      sessionStorage.setItem("jwt", refreshTokenResponse?.data?.access);
 
-      // const getProfileResponse = await axios.get(newURL, getProfileConfig);
+      const getProfileConfig = {
+        maxBodyLength: Infinity,
+        headers: {
+          Authorization: "Bearer " + refreshTokenResponse?.data?.access,
+        },
+      };
+
+      const newURL = URL + "student/profile/";
+
+      const getProfileResponse = await axios.get(newURL, getProfileConfig);
+
+      const user = {
+        batch: getProfileResponse?.data?.batch,
+        cg: getProfileResponse?.data?.cg,
+        gender: getProfileResponse?.gender,
+        name: getProfileResponse?.data?.name,
+        role: getProfileResponse?.data?.role,
+        rollno: getProfileResponse?.data?.rollno,
+      };
 
       dispatch({
         type: HANDLERS.INITIALIZE,
@@ -109,13 +123,9 @@ export const AuthProvider = (props) => {
     }
   };
 
-  useEffect(
-    () => {
-      initialize();
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  );
+  useEffect(() => {
+    initialize();
+  }, []);
 
   const skip = () => {
     try {
@@ -124,13 +134,6 @@ export const AuthProvider = (props) => {
       console.error(err);
     }
 
-    const user = {
-      id: "5e86809283e28b96d2d38537",
-      avatar: "/assets/avatars/avatar-anika-visser.png",
-      name: "Anika Visser",
-      email: "anika.visser@devias.io",
-    };
-
     dispatch({
       type: HANDLERS.SIGN_IN,
       payload: user,
@@ -138,23 +141,55 @@ export const AuthProvider = (props) => {
   };
 
   const signIn = async (email, password) => {
-    const loginURL = URL + "auth/token/";
-    const data = { email, password };
-
-    var loginConfig = {
-      method: "post",
-      maxBodyLength: Infinity,
-      headers: {},
-      data: data,
-    };
-
-    let loginResponse;
-
     try {
-      loginResponse = await axios.post(loginURL, data, { loginConfig });
+      const loginURL = URL + "auth/token/";
+      const data = { email, password };
+
+      var loginConfig = {
+        method: "post",
+        maxBodyLength: Infinity,
+        headers: {},
+        data: data,
+      };
+
+      const loginResponse = await axios.post(loginURL, data, { loginConfig });
+      console.log(loginResponse);
       window.sessionStorage.setItem("authenticated", "true");
       window.sessionStorage.setItem("jwt", loginResponse?.data?.access);
       window.sessionStorage.setItem("refresh", loginResponse?.data?.refresh);
+
+      const getProfileConfig = {
+        method: "get",
+        maxBodyLength: Infinity,
+        headers: {
+          Authorization: "Bearer " + loginResponse?.data?.access,
+        },
+      };
+
+      const newURL = URL + "student/profile/";
+
+      const getProfileResponse = await axios.get(newURL, getProfileConfig);
+
+      const user = {
+        batch: getProfileResponse?.data?.batch,
+        cg: getProfileResponse?.data?.cg,
+        gender: getProfileResponse?.gender,
+        name: getProfileResponse?.data?.name,
+        role: getProfileResponse?.data?.role,
+        rollno: getProfileResponse?.data?.rollno,
+        email: getProfileResponse?.data?.email,
+        group: getProfileResponse?.data?.group,
+        gender: getProfileResponse?.data?.gender,
+        batch: getProfileResponse?.data?.batch,
+        current_hostel: getProfileConfig?.data?.current_hostel,
+        current_room: getProfileConfig?.data?.current_room,
+      };
+      console.log(user);
+
+      dispatch({
+        type: HANDLERS.SIGN_IN,
+        payload: user,
+      });
     } catch (err) {
       console.error(err);
       if (err?.response?.status === 401) {
@@ -162,32 +197,6 @@ export const AuthProvider = (props) => {
       }
       throw new Error("Something went wrong");
     }
-
-    const getProfileConfig = {
-      method: "get",
-      maxBodyLength: Infinity,
-      headers: {
-        Authorization: "Bearer " + loginResponse?.data?.access,
-      },
-    };
-
-    const newURL = URL + "student/profile/";
-
-    const getProfileResponse = await axios.get(newURL, getProfileConfig);
-
-    const user = {
-      batch: getProfileResponse?.data?.batch,
-      cg: getProfileResponse?.data?.cg,
-      gender: getProfileResponse?.gender,
-      name: getProfileResponse?.data?.name,
-      role: getProfileResponse?.data?.role,
-      rollno: getProfileResponse?.data?.rollno,
-    };
-
-    dispatch({
-      type: HANDLERS.SIGN_IN,
-      payload: user,
-    });
   };
 
   const signUp = async (email, name, password) => {
