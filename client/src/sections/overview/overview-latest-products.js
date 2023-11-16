@@ -69,13 +69,14 @@ export const OverviewLatestProducts = (props) => {
     axios(acceptInvitationConfig)
       .then(function (response) {
         console.log(JSON.stringify(response.data));
+        queryClient.invalidateQueries(["getGroup"]);
       })
       .catch(function (error) {
         console.log(error);
       });
   };
 
-  const onRejectRequest = async (product) => {
+  const onRejectRequest = (product) => {
     const jwt = sessionStorage.getItem("jwt");
     const data = {
       id: product.id,

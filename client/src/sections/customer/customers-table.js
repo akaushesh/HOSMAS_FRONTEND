@@ -16,6 +16,9 @@ import {
 } from "@mui/material";
 import { Scrollbar } from "src/components/scrollbar";
 import { getInitials } from "src/utils/get-initials";
+import { useQuery } from "@tanstack/react-query";
+import { URL } from "config";
+import axios from "axios";
 
 export const CustomersTable = (props) => {
   const {
@@ -35,6 +38,34 @@ export const CustomersTable = (props) => {
   const selectedSome = selected.length > 0 && selected.length < items.length;
   const selectedAll = items.length > 0 && selected.length === items.length;
 
+  const {
+    data: group,
+    isLoading,
+    error,
+  } = useQuery({
+    queryFn: async () => {
+      try {
+        const jwt = sessionStorage.getItem("jwt");
+        const url = URL + "student/group/view/";
+        const getGroupConfig = {
+          maxBodyLength: Infinity,
+          headers: { Authorization: "Bearer " + jwt },
+        };
+
+        const getGroupResponse = await axios.get(url, getGroupConfig);
+        console.log(getGroupResponse);
+        return getGroupResponse?.data;
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    queryKey: ["getGroup"],
+  });
+
+  let allMembers = [];
+  if (group) allMembers = [group?.leader, ...group?.members];
+  console.log(allMembers);
+
   return (
     <Card>
       <Scrollbar>
@@ -42,63 +73,21 @@ export const CustomersTable = (props) => {
           <Table>
             <TableHead>
               <TableRow>
-                {/* <TableCell padding="checkbox">
-                  <Checkbox
-                    checked={selectedAll}
-                    indeterminate={selectedSome}
-                    onChange={(event) => {
-                      if (event.target.checked) {
-                        onSelectAll?.();
-                      } else {
-                        onDeselectAll?.();
-                      }
-                    }}
-                  />
-                </TableCell> */}
                 <TableCell>Name</TableCell>
-                <TableCell>Email</TableCell>
-                {/* <TableCell>
-                  Location
-                </TableCell>
-                <TableCell>
-                  Phone
-                </TableCell>
-                <TableCell>
-                  Signed Up
-                </TableCell> */}
+                <TableCell>Roll No</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {items.map((customer) => {
-                const isSelected = selected.includes(customer.id);
-                const createdAt = format(customer.createdAt, "dd/MM/yyyy");
-
+              {allMembers.map((member) => {
+                const isSelected = selected.includes(member.rollno);
                 return (
-                  <TableRow hover key={customer.id} selected={isSelected}>
-                    {/* <TableCell padding="checkbox">
-                      <Checkbox
-                        checked={isSelected}
-                        onChange={(event) => {
-                          if (event.target.checked) {
-                            onSelectOne?.(customer.id);
-                          } else {
-                            onDeselectOne?.(customer.id);
-                          }
-                        }}
-                      />
-                    </TableCell> */}
+                  <TableRow hover key={member.rollno} selected={isSelected}>
                     <TableCell>
                       <Stack alignItems="center" direction="row" spacing={2}>
-                        {/* <Avatar src={customer.avatar}>{getInitials(customer.name)}</Avatar> */}
-                        <Typography variant="subtitle2">{customer.name}</Typography>
+                        <Typography variant="subtitle2">{member.name}</Typography>
                       </Stack>
                     </TableCell>
-                    <TableCell>{customer.email}</TableCell>
-                    {/* <TableCell>
-                      {customer.address.city}, {customer.address.state}, {customer.address.country}
-                    </TableCell>
-                    <TableCell>{customer.phone}</TableCell>
-                    <TableCell>{createdAt}</TableCell> */}
+                    <TableCell>{member.rollno}</TableCell>
                   </TableRow>
                 );
               })}
@@ -119,16 +108,16 @@ export const CustomersTable = (props) => {
   );
 };
 
-CustomersTable.propTypes = {
-  count: PropTypes.number,
-  items: PropTypes.array,
-  onDeselectAll: PropTypes.func,
-  onDeselectOne: PropTypes.func,
-  onPageChange: PropTypes.func,
-  onRowsPerPageChange: PropTypes.func,
-  onSelectAll: PropTypes.func,
-  onSelectOne: PropTypes.func,
-  page: PropTypes.number,
-  rowsPerPage: PropTypes.number,
-  selected: PropTypes.array,
-};
+// CustomersTable.propTypes = {
+//   count: PropTypes.number,
+//   items: PropTypes.array,
+//   onDeselectAll: PropTypes.func,
+//   onDeselectOne: PropTypes.func,
+//   onPageChange: PropTypes.func,
+//   onRowsPerPageChange: PropTypes.func,
+//   onSelectAll: PropTypes.func,
+//   onSelectOne: PropTypes.func,
+//   page: PropTypes.number,
+//   rowsPerPage: PropTypes.number,
+//   selected: PropTypes.array,
+// };
