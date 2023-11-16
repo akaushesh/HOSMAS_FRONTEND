@@ -10,6 +10,7 @@ from .permissions import IsStudent, IsGroupLeader, IsGroupMember, IsPreferenceFi
 from .models import Student, Group, Invitation
 from .serializers import InvitationsReceivedSerializer, InvitationsSentSerializer, StudentSerializer, GroupSerializer, StudentProfileSerializer
 
+from .tasks import *
 # Create your views here.
 
 
@@ -80,7 +81,7 @@ class SendInvitationView(APIView):
             invitation = Invitation(to=invitee, for_group=group)
             invitation.save()
 
-            #TODO: Send mail to invitee and other group members
+            send_invitation_mail(student.name, request.user.email, student.rollno, invitee.name, invitee.user.email)
 
             return Response(status=status.HTTP_200_OK)
 
@@ -118,6 +119,7 @@ class DeleteInvitationView(APIView):
             invitation.delete()
 
             #TODO: Send email to invitee/leader accordingly
+            # ? 
 
             return Response(status=status.HTTP_200_OK)
 
@@ -147,6 +149,7 @@ class AcceptInvitationView(APIView):
                   prevgroup.cg = round(updatedcg, 2)
                   prevgroup.save()
                   #TODO: inform all previous group members to say goodbye
+                  left_group_mail(student.name, student.rollno, prevgroup.leader.user.email )
 
             student.group = group
             student.save()
@@ -163,6 +166,7 @@ class AcceptInvitationView(APIView):
             group.save()
 
             #TODO: send mail to group leader and all group members
+            joined_group_to_members(student.name, student.rollno, group.leader.user.email)
 
             return Response(status=status.HTTP_200_OK)
 
@@ -211,6 +215,9 @@ class LeaveGroupView(APIView):
 
       def patch(self, request):
             student = request.user.student
+            group = student.group
             student.group = None
             student.save()
+            
+            left_group_mail(student.name, student.rollno, group.leader.user.email)
             return Response(status=status.HTTP_200_OK)
