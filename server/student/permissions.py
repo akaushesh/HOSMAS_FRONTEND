@@ -6,6 +6,7 @@ from .models import Section
 
 class IsStudent(BasePermission):
       def has_permission(self, request, view):
+            print('is student')
             return request.user.is_student
 
 

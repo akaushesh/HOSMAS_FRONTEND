@@ -1,6 +1,7 @@
 from django.core.files.storage import default_storage
 from django.core.paginator import Paginator
 from django.db.models import Count
+from django.conf import settings
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -16,6 +17,7 @@ from .serializers import HostelSerializer, HostelSingleSerializer, RoomTypeSeria
 from student.serializers import StudentSerializer, GroupSerializer
 
 from datetime import datetime
+import csv, os
 
 # Create your views here.
 
@@ -239,3 +241,67 @@ class ProfileView(APIView):
             user = request.user
             serializer = ProfileSerializer(user)
             return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class ExportGroupsView(APIView):
+      permission_classes = [IsAuthenticated & IsAdmin]
+
+      def post(self, request):
+            section = Section.objects.filter(id=request.data.get('section')).first()
+            if section is None:
+                  return Response(status=status.HTTP_400_BAD_REQUEST)
+
+            filename = f"export/group/{section.batch.name}_{section.gender}.csv"
+            path = os.path.join(settings.MEDIA_ROOT, filename)
+            f = open(path, 'w', newline='')
+            
+            writer = csv.writer(f)
+            writer.writerow(['Group ID', 'Group CG', 'Student Roll Number', 'Student Name', 'Student email', 'Student CG', 'Preferences'])
+            queryset = Group.objects.filter(leader__batch=section.batch, leader__gender=section.gender).all()
+
+            for group in queryset:
+                  group_row = [group.id, group.cg]
+                  preference_row = []
+                  for preference in group.preferences.order_by('priority').all():
+                        preference_row.append(f"{preference.room_type_choice.room_type.hostel.name}: {preference.room_type_choice.room_type.name}")
+                  leader_row = [group.leader.rollno, group.leader.name, group.leader.user.email, group.leader.cg]
+                  row = group_row + leader_row + preference_row
+                  writer.writerow(row)
+                  for member in group.members.all():
+                        member_row = [member.rollno, member.name, member.user.email, member.cg]
+                        row = group_row + member_row + preference_row
+                        writer.writerow(row)
+                  writer.writerow([])
+            
+            f.close()
+            return Response({
+                  'link': f"{settings.MEDIA_URL}{filename}"
+            }, status=status.HTTP_200_OK)
+
+
+class ExportStudentsView(APIView):
+      permission_classes = [IsAuthenticated & IsAdmin]
+
+      def post(self, request):
+            batch = Batch.objects.filter(id=request.data.get('batch')).first()
+            if batch is None:
+                  return Response(status=status.HTTP_400_BAD_REQUEST)
+            
+            queryset = Student.objects.filter(batch=batch).all()
+
+            filename = f"export/student/batch_{batch.id}.csv"
+            path = os.path.join(settings.MEDIA_ROOT, filename)
+            f = open(path, 'w', newline='')
+
+            writer = csv.writer(f)
+            writer.writerow(['Roll Number', 'Name', 'Email', 'Gender', 'CG'])
+
+
+            for student in queryset:
+                  writer.writerow([student.rollno, student.name, student.user.email, student.gender, student.cg])
+            
+            f.close()
+
+            return Response({
+                  'link': f"{settings.MEDIA_URL}{filename}"
+            }, status=status.HTTP_200_OK)
