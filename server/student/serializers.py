@@ -9,7 +9,7 @@ class InvitationsReceivedSerializer(ModelSerializer):
 
       class Meta:
             model = Invitation
-            fields = ('id', 'group_leader_name', 'group_leader_rollno')
+            fields = ('id', 'group_leader_name', 'group_leader_rollno', 'time')
 
       def get_group_leader_name(self, obj):
             return obj.for_group.leader.name
