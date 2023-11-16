@@ -69,10 +69,8 @@ class SendInvitationView(APIView):
             if invitee is None:
                   return Response({"detail": "Invalid Roll Number"}, status=status.HTTP_400_BAD_REQUEST)
 
-            if invitee.group is not None:
-                  if invitee.group.id==group.id:
-                        return Response({"detail": "This student is already part of your group"}, status=status.HTTP_403_FORBIDDEN)
-                  return Response({"detail": "This student is already part of some another group"}, status=status.HTTP_403_FORBIDDEN)
+            if invitee==student or (invitee.group is not None and invitee.group.id==group.id):
+                  return Response({"detail": "This student is already part of your group"}, status=status.HTTP_403_FORBIDDEN)
 
             if Invitation.objects.filter(to=invitee, for_group=group).exists():
                   return Response({"detail": "You've already sent an invitation to this student"}, status=status.HTTP_403_FORBIDDEN)
@@ -217,10 +215,3 @@ class LeaveGroupView(APIView):
             student.group = None
             student.save()
             return Response(status=status.HTTP_200_OK)
-
-
-      
-            
-            
-            
-            
