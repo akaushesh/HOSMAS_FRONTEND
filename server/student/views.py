@@ -97,8 +97,18 @@ class InvitationsSentView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class WithdrawInvitationView(APIView):
-      permission_classes = [IsAuthenticated & IsStudent & IsPreferenceFillingLive & IsGroupLeader]
+class InvitationsReceivedView(APIView):
+      permission_classes = [IsAuthenticated & IsStudent & IsPreferenceFillingLive]
+
+      def get(self, request):
+            queryset = Invitation.objects.filter(to=request.user.student)
+            
+            serializer = InvitationsReceivedSerializer(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class DeleteInvitationView(APIView):
+      permission_classes = [IsAuthenticated & IsStudent & IsPreferenceFillingLive]
 
       def delete(self, request):
             invitation = Invitation.objects.filter(id=request.data.get('id')).first()
@@ -107,19 +117,9 @@ class WithdrawInvitationView(APIView):
 
             invitation.delete()
 
-            #TODO: Send email to invitee and other group members
+            #TODO: Send email to invitee/leader accordingly
 
             return Response(status=status.HTTP_200_OK)
-
-
-class InvitationsReceivedView(APIView):
-      permission_classes = [IsAuthenticated & IsStudent & IsPreferenceFillingLive & ~IsGroupLeader]
-
-      def get(self, request):
-            queryset = Invitation.objects.filter(to=request.user.student)
-            
-            serializer = InvitationsReceivedSerializer(queryset, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class AcceptInvitationView(APIView):

@@ -175,5 +175,15 @@ class deletePreferences(APIView):
                 q.delete()
         
         return Response({'status':'success'},status=status.HTTP_200_OK)
-    
-    
+
+
+class PreferenceFillingStatusView(APIView):
+      permission_classes = [IsAuthenticated & IsStudent]
+
+      def get(self, request):
+            student = request.user.student
+            section = Section.objects.filter(batch=student.batch, gender=student.gender).first()
+            result = {
+                  'is_live': section is not None and section.is_allotment_enabled
+            }
+            return Response(result, status=status.HTTP_200_OK)

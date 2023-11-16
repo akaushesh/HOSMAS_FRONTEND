@@ -21,7 +21,8 @@ class Student (models.Model):
 
     batch = models.ForeignKey('student.Batch', on_delete=models.CASCADE, related_name='students')
 
-    current_room = models.ForeignKey('preference.RoomType', on_delete=models.SET_NULL, null=True, blank=True)
+    current_room = models.ForeignKey('preference.RoomType', on_delete=models.SET_NULL, null=True, blank=True, related_name='current_students')
+    alloted_room = models.ForeignKey('preference.RoomType', on_delete=models.SET_NULL, null=True, blank=True, related_name='alloted_students')
 
     def __str__(self):
       return self.name

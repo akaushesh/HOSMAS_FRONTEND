@@ -7,4 +7,5 @@ urlpatterns = [
     path('deletePreference/', views.deletePreferences.as_view()),
     path('getPreference/', views.getPreferences.as_view()),
     path('retain/', views.Retain.as_view()),
+    path('status/', views.PreferenceFillingStatusView.as_view()),
 ]

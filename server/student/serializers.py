@@ -67,14 +67,19 @@ class StudentProfileSerializer(ModelSerializer):
             read_only = True,
             slug_field = 'name'
       )
+      alloted_room = SlugRelatedField(
+            read_only = True,
+            slug_field = 'name'
+      )
       email = SerializerMethodField()
       current_hostel = SerializerMethodField()
+      alloted_hostel = SerializerMethodField()
       gender = SerializerMethodField()
       group = SerializerMethodField()
 
       class Meta:
             model = Student
-            fields = ['name', 'rollno', 'email', 'cg', 'gender', 'batch', 'current_hostel', 'current_room', 'group']
+            fields = ['name', 'rollno', 'email', 'cg', 'gender', 'batch', 'current_hostel', 'current_room', 'alloted_hostel', 'alloted_room', 'group']
 
       def get_email(self, obj):
             return obj.user.email
@@ -83,6 +88,11 @@ class StudentProfileSerializer(ModelSerializer):
             if obj.current_room is None:
                   return None
             return obj.current_room.hostel.name
+
+      def get_alloted_hostel(self, obj):
+            if obj.alloted_room is None:
+                  return None
+            return obj.alloted_room.hostel.name
 
       def get_gender(self, obj):
             return 'Female' if obj.gender=='F' else 'Male'
