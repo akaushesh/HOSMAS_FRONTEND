@@ -6,9 +6,7 @@ import { Avatar, Card, CardContent, Stack, SvgIcon, Typography } from "@mui/mate
 import { useState } from "react";
 
 export const OverviewTotalCustomers = (props) => {
-  const { difference, sx } = props;
-  const [memberCount, setMemberCount] = useState(0);
-  const [preferenceFilled, setPreferenceFilled] = useState(false);
+  const { difference, sx, memberCount = 0, preferenceFilled = false } = props;
 
   return (
     <Card sx={sx}>
@@ -18,7 +16,9 @@ export const OverviewTotalCustomers = (props) => {
             <Typography color="text.secondary" variant="overline">
               Your Group
             </Typography>
-            <Typography variant="h4">{memberCount ? `${memberCount} people` : "None"}</Typography>
+            <Typography variant="h4">
+              {memberCount <= 1 ? "None" : `${memberCount} people`}
+            </Typography>
           </Stack>
           <Avatar
             sx={{

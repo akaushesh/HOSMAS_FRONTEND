@@ -49,14 +49,7 @@ export const AccountProfileDetails = (props) => {
         <Box sx={{ m: -1.5 }}>
           <Grid container spacing={3}>
             <Grid xs={12} md={6}>
-              <TextField
-                fullWidth
-                // helperText="Please specify the first name"
-                label="First name"
-                name="name"
-                disabled
-                value={name}
-              />
+              <TextField fullWidth label="Name" name="name" disabled value={name} />
             </Grid>
             <Grid xs={12} md={6}>
               <TextField fullWidth label="Email Address" name="email" disabled value={email} />

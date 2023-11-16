@@ -226,46 +226,7 @@ const Page = () => {
                 </Stack>
               </Grid>
               <Grid item xs={12} lg={4.5} marginBottom="1rem">
-                <OverviewLatestProducts
-                  products={[
-                    {
-                      id: "5ece2c077e39da27658aa8a9",
-                      name: "Vibhav Shukla",
-                      updatedAt: subHours(now, 6).getTime(),
-                    },
-                    {
-                      id: "5ece2c0d16f70bff2cf86cd8",
-                      name: "Sidharth Bahl",
-                      updatedAt: subDays(subHours(now, 8), 2).getTime(),
-                    },
-                    {
-                      id: "b393ce1b09c1254c3a92c827",
-                      name: "Rohit Thapar",
-                      updatedAt: subDays(subHours(now, 1), 1).getTime(),
-                    },
-                    {
-                      id: "a6ede15670da63f49f752c89",
-                      name: "Harkirat Singh Makkar",
-                      updatedAt: subDays(subHours(now, 3), 3).getTime(),
-                    },
-                    {
-                      id: "a6ede18670da63f49f752c89",
-                      name: "Hardik Sharma",
-                      updatedAt: subDays(subHours(now, 3), 3).getTime(),
-                    },
-                    {
-                      id: "a6ede15670da93f49f752c89",
-                      name: "Surabhi Mishra",
-                      updatedAt: subDays(subHours(now, 3), 3).getTime(),
-                    },
-                    {
-                      id: "a8ede15670da93f49f752c89",
-                      name: "Pranjal Arora",
-                      updatedAt: subDays(subHours(now, 3), 3).getTime(),
-                    },
-                  ]}
-                  sx={{ height: "100%" }}
-                />
+                <OverviewLatestProducts sx={{ height: "100%" }} />
               </Grid>
             </Grid>
           </Stack>

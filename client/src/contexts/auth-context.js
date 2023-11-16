@@ -110,6 +110,15 @@ export const AuthProvider = (props) => {
         name: getProfileResponse?.data?.name,
         role: getProfileResponse?.data?.role,
         rollno: getProfileResponse?.data?.rollno,
+        email: getProfileResponse?.data?.email,
+        group: getProfileResponse?.data?.group,
+        gender: getProfileResponse?.data?.gender,
+        batch: getProfileResponse?.data?.batch,
+        current_hostel: getProfileResponse?.data?.current_hostel,
+        current_room: getProfileResponse?.data?.current_room,
+        alloted_hostel: getProfileResponse?.data?.alloted_hostel,
+        alloted_room: getProfileResponse?.data?.alloted_room,
+        preference_filled: getProfileResponse?.data?.preference_filled,
       };
 
       dispatch({
@@ -181,10 +190,12 @@ export const AuthProvider = (props) => {
         group: getProfileResponse?.data?.group,
         gender: getProfileResponse?.data?.gender,
         batch: getProfileResponse?.data?.batch,
-        current_hostel: getProfileConfig?.data?.current_hostel,
-        current_room: getProfileConfig?.data?.current_room,
+        current_hostel: getProfileResponse?.data?.current_hostel,
+        current_room: getProfileResponse?.data?.current_room,
+        alloted_hostel: getProfileResponse?.data?.alloted_hostel,
+        alloted_room: getProfileResponse?.data?.alloted_room,
+        preference_filled: getProfileResponse?.data?.preference_filled,
       };
-      console.log(user);
 
       dispatch({
         type: HANDLERS.SIGN_IN,

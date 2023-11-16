@@ -37,16 +37,23 @@ const Page = () => {
                 email={user?.email}
                 rollNumber={user?.rollno}
                 CGPA={user?.cg}
-                hostel={user?.current_hostel}
-                roomNumber={user?.roomNumber}
+                hostel={user?.current_hostel ? user?.current_hostel : ""}
+                roomNumber={user?.current_room ? user?.current_room : ""}
               />
             </Grid>
             <Grid item xs={12} lg={4}>
               <Grid>
-                <OverviewBudget sx={{ height: "100%" }} />
+                <OverviewBudget
+                  allotedHostel={user.alloted_hostel ? user.alloted_hostel : ""}
+                  sx={{ height: "100%" }}
+                />
               </Grid>
               <Grid>
-                <OverviewTotalCustomers sx={{ height: "100%" }} />
+                <OverviewTotalCustomers
+                  memberCount={user?.group?.size}
+                  preferenceFilled={user?.preferenceFilled}
+                  sx={{ height: "100%" }}
+                />
               </Grid>
             </Grid>
           </Grid>

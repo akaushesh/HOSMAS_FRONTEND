@@ -7,8 +7,7 @@ import { Avatar, Card, CardContent, Stack, SvgIcon, Typography } from "@mui/mate
 import { useState } from "react";
 
 export const OverviewBudget = (props) => {
-  const { sx } = props;
-  const [allottedHostel, setAllottedHostel] = useState("M");
+  const { sx, allotedHostel } = props;
 
   return (
     <Card sx={sx}>
@@ -19,7 +18,7 @@ export const OverviewBudget = (props) => {
               Allotted Hostel
             </Typography>
             <Typography variant="h4">
-              {allottedHostel === "" ? "None" : `Hostel ${allottedHostel[0]}`}
+              {allotedHostel === "" ? "None" : `Hostel ${allotedHostel}`}
             </Typography>
           </Stack>
           <Avatar
@@ -36,16 +35,8 @@ export const OverviewBudget = (props) => {
           </Avatar>
         </Stack>
         <Stack alignItems="center" direction="row" spacing={2} sx={{ mt: 2 }}>
-          {/* <Stack alignItems="center" direction="row" spacing={0.5}>
-              <SvgIcon color={positive ? "success" : "error"} fontSize="small">
-                {positive ? <ArrowUpIcon /> : <ArrowDownIcon />}
-              </SvgIcon>
-              <Typography color={positive ? "success.main" : "error.main"} variant="body2">
-                {difference}%
-              </Typography>
-            </Stack> */}
-          <Typography color={allottedHostel ? "success.main" : "error.main"} variant="caption">
-            {allottedHostel
+          <Typography color={allotedHostel ? "success.main" : "error.main"} variant="caption">
+            {allotedHostel
               ? "Hostel allottment has been completed"
               : "Hostels have not been allotted yet"}
           </Typography>

@@ -43,15 +43,15 @@ export const SettingsPassword = () => {
     };
 
     const data = {
-      password: "password",
+      password: password,
     };
 
     const url = URL + "auth/change-password/";
     console.log(url, data, changePasswordConfig);
 
-    const searchStudentResponse = await axios.post(url, data, changePasswordConfig);
-    console.log(searchStudentResponse);
-    if (searchStudentResponse.status === 200) {
+    const changePasswordResponse = await axios.post(url, data, changePasswordConfig);
+    console.log(changePasswordResponse);
+    if (changePasswordResponse.status === 200) {
       setPassword("");
       setConfirmPassword("");
     } else {
