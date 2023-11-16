@@ -9,4 +9,5 @@ services:
     volumes:
       - ./static/:/app/static/
       - ./logs/:/app/logs/
+      - ./media/:/app/media/
     network_mode: "host"
