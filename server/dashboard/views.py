@@ -39,7 +39,7 @@ class CreateObjectView(APIView):
                   return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             serializer.save()
 
-            return Response(status=status.HTTP_201_CREATED)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class GetMultipleObjectsView(APIView):
