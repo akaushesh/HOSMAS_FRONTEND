@@ -5,7 +5,7 @@ from rest_framework import status
 from rest_framework.response import Response
 
 from rest_framework.permissions import IsAuthenticated
-from .permissions import IsStudent, IsGroupLeader, IsGroupMember, IsPreferenceFillingLive
+from .permissions import IsStudent, IsGroupLeader, IsGroupMember, IsPreferenceFillingLive, IsNotGroupLeader, IsNotGroupMember
 
 from .models import Student, Group, Invitation
 from .serializers import InvitationsReceivedSerializer, InvitationsSentSerializer, StudentSerializer, GroupSerializer, StudentProfileSerializer
@@ -24,7 +24,7 @@ class ProfileView(APIView):
 
 
 class SearchStudentView(APIView):
-      permission_classes = [IsAuthenticated & IsStudent & IsPreferenceFillingLive & ~IsGroupMember]
+      permission_classes = [IsAuthenticated & IsStudent & IsPreferenceFillingLive & IsNotGroupMember]
 
       def post(self, request):
             student = request.user.student
@@ -55,7 +55,7 @@ class SearchStudentView(APIView):
 
 
 class SendInvitationView(APIView):
-      permission_classes = [IsAuthenticated & IsStudent & IsPreferenceFillingLive & ~IsGroupMember]
+      permission_classes = [IsAuthenticated & IsStudent & IsPreferenceFillingLive & IsNotGroupMember]
 
       def post(self, request):
             student = request.user.student
@@ -125,7 +125,7 @@ class DeleteInvitationView(APIView):
 
 
 class AcceptInvitationView(APIView):
-      permission_classes = [IsAuthenticated & IsStudent & IsPreferenceFillingLive & ~IsGroupLeader]
+      permission_classes = [IsAuthenticated & IsStudent & IsPreferenceFillingLive & IsNotGroupLeader]
 
       def post(self,request):
             invitation = Invitation.objects.filter(id=request.data.get('id')).first()
