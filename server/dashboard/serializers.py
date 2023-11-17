@@ -1,7 +1,9 @@
+from django.db.models import Q, Count
 from rest_framework import serializers
 from preference.models import Hostel, RoomType, RoomTypeChoice
-from student.models import Batch, Section
+from student.models import Batch, Section, Student
 from user.models import User
+from .models import AllotmentStatus
 import json
 
 
@@ -162,3 +164,54 @@ class ProfileSerializer(serializers.ModelSerializer):
       class Meta:
             model = User
             fields = ['email']
+
+
+class AllotmentStatusSerializer(serializers.ModelSerializer):
+      student_statistics = serializers.SerializerMethodField()
+      section_statistics = serializers.SerializerMethodField()
+
+      class Meta:
+            model = AllotmentStatus
+            fields = ['is_public', 'student_statistics', 'section_statistics']
+
+      def get_student_statistics(self, obj):
+            if not obj.done:
+                  return {}
+            retain_queryset = queryset.filter((Q(leader_of_group__is_null=False) & Q(leader_of_group__retain=True)) | (Q(group__is_null=False) & Q(group__retain=True)))
+            unsuccessful_retain = retain_queryset.filter(Q(allocated_room__is_null=True)).count()
+            successful_retain = retain_queryset.filter(Q(allocated_room__is_null=False)).count()
+
+            preferences_leader_queryset = Student.objects.filter(Q(leader_of_group__is_null=False)).annotate(
+                  preferences_count = Count('leader_of_group__preferences')
+            ).filter(Q(preferences_count_gt=0))
+            
+            preferences_members_queryset = Student.objects.filter(Q(group__is_null=False)).annotate(
+                  preferences_count = Count('group__preferences')
+            ).filter(Q(preferences_count_gt=0))
+
+            successful_preferences = preferences_leader_queryset.filter(alloted_room__is_null=False).count() + preferences_members_queryset.filter(alloted_room__is_null=False).count()
+            unsuccessful_preferences = preferences_leader_queryset.filter(alloted_room__is_null=True).count() + preferences_members_queryset.filter(alloted_room__is_null=True).count()
+
+            return {
+                  'successful_retain_allotment': successful_retain,
+                  'unsuccessful_retain_allotment': unsuccessful_retain,
+                  'successfully_preference_allotment': successful_preferences,
+                  'unsuccessful_preference_allotment': unsuccessful_preferences,
+            }
+      
+      def get_section_statistics(self, obj):
+            if not obj.done:
+                  return []
+            res = []
+            sections = Section.objects.all()
+            for section in sections:
+                  for choice in section.choices.all():
+                        room_type = choice.room_type
+                        cnt = Student.objects.filter(batch=section.batch, gender=section.gender, alloted_hostel=room_type).count()
+                        res.append({
+                              'batch': section.batch.name,
+                              'gender': section.gender,
+                              'available_count': choice.capacity,
+                              'alloted_count': cnt
+                        })
+            return res

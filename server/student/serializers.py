@@ -1,6 +1,7 @@
 from rest_framework.serializers import ModelSerializer, SerializerMethodField, SlugRelatedField
 from rest_framework import serializers
 from .models import Invitation, Student, Group
+from dashboard.models import AllotmentStatus
 
 
 class InvitationsReceivedSerializer(ModelSerializer):
@@ -67,13 +68,10 @@ class StudentProfileSerializer(ModelSerializer):
             read_only = True,
             slug_field = 'name'
       )
-      alloted_room = SlugRelatedField(
-            read_only = True,
-            slug_field = 'name'
-      )
       email = SerializerMethodField()
       current_hostel = SerializerMethodField()
       alloted_hostel = SerializerMethodField()
+      alloted_room = SerializerMethodField()
       gender = SerializerMethodField()
       group = SerializerMethodField()
       preference_filled = SerializerMethodField()
@@ -91,9 +89,16 @@ class StudentProfileSerializer(ModelSerializer):
             return obj.current_room.hostel.name
 
       def get_alloted_hostel(self, obj):
-            if obj.alloted_room is None:
+            allotment_status = AllotmentStatus.objects.first()
+            if allotment_status is None or not allotment_status.is_public or obj.alloted_room is None:
                   return None
             return obj.alloted_room.hostel.name
+
+      def get_alloted_room(self, obj):
+            allotment_status = AllotmentStatus.objects.first()
+            if allotment_status is None or not allotment_status.is_public or obj.alloted_room is None:
+                  return None
+            return obj.alloted_room.name
 
       def get_gender(self, obj):
             return 'Female' if obj.gender=='F' else 'Male'

@@ -12,9 +12,12 @@ from .permissions import IsAdmin
 
 from preference.models import Hostel, RoomType, RoomTypeChoice
 from student.models import Batch, Section, Student, Group
+from .models import AllotmentStatus
 
-from .serializers import HostelSerializer, HostelSingleSerializer, RoomTypeSerializer, RoomTypeChoiceSerializer, RoomTypeOptionSerializer, BatchSerializer, BatchUninitializedSerializer, SectionSerializer, ProfileSerializer
+from .serializers import HostelSerializer, HostelSingleSerializer, RoomTypeSerializer, RoomTypeChoiceSerializer, RoomTypeOptionSerializer, BatchSerializer, BatchUninitializedSerializer, SectionSerializer, ProfileSerializer, AllotmentStatusSerializer
 from student.serializers import StudentSerializer, GroupSerializer
+
+from .tasks import allot_hostel
 
 from datetime import datetime
 import csv, os
@@ -88,6 +91,12 @@ class GetObjectView(APIView):
                   if instance is None:
                         return Response(status=status.HTTP_404_NOT_FOUND)
                   serializer = RoomTypeSerializer(instance)
+            elif model=='allotment-status':
+                  instance = AllotmentStatus.objects.first()
+                  if instance is None:
+                        instance = AllotmentStatus()
+                        instance.save()
+                  serializer = AllotmentStatusSerializer(instance)
             else:
                   return Response(status.HTTP_404_NOT_FOUND)
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -122,6 +131,12 @@ class UpdateObjectView(APIView):
                   if instance is None:
                         return Response(status=status.HTTP_404_NOT_FOUND)
                   serializer = BatchSerializer(instance, request.data)
+            elif model=='allotment-status':
+                  instance = AllotmentStatus.objects.first()
+                  if instance is None:
+                        instance = AllotmentStatus()
+                        instance.save()
+                  serializer = AllotmentStatusSerializer(instance, request.data)
             else:
                   return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -305,3 +320,11 @@ class ExportStudentsView(APIView):
             return Response({
                   'link': f"{settings.MEDIA_URL}{filename}"
             }, status=status.HTTP_200_OK)
+
+
+class AllotmentView(APIView):
+      permission_classes = [IsAuthenticated & IsAdmin]
+
+      def get(self, request):
+            allot_hostel.delay()
+            return Response(status=status.HTTP_200_OK)
