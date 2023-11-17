@@ -10,10 +10,12 @@ import { Layout as AuthLayout } from "src/layouts/auth/layout";
 import Link from "next/link";
 import axios from "axios";
 import { URL } from "config";
+import { LoadingButton } from "@mui/lab";
 
 const Page = () => {
   const router = useRouter();
   const { slug } = router.query;
+  const [loading, setLoading] = useState(false);
   const [method, setMethod] = useState("password");
   const formik = useFormik({
     initialValues: {
@@ -26,6 +28,7 @@ const Page = () => {
     }),
     onSubmit: async (values, helpers) => {
       try {
+        setLoading(true);
         console.log(slug, values.password);
         console.log(values.email);
         const loginURL = URL + "auth/reset-password/";
@@ -45,9 +48,10 @@ const Page = () => {
         helpers.setStatus({ success: false });
         helpers.setSubmitting(false);
 
-        if (err.response.status == 400) helpers.setErrors({ submit: "Invalid Slug" });
+        if (err.response.status == 400) helpers.setErrors({ submit: "Invalid link" });
         else helpers.setErrors({ submit: err.message });
       }
+      setLoading(false);
     },
   });
 
@@ -90,18 +94,27 @@ const Page = () => {
                   type="password"
                   value={formik.values.password}
                 />
-                {/* 
-                <FormHelperText sx={{ mt: 1 }}>
-                  Did not receive a password in your mail?&nbsp;
+                {/* <FormHelperText sx={{ mt: 1 }}>
+                  password has been reset&nbsp;
+                  <Link style={{ color: "#6366E9" }} href="/auth/forgot-password">
+                    login
+                  </Link>
                 </FormHelperText> */}
                 {formik.errors.submit && (
                   <Typography color="error" sx={{ mt: 3 }} variant="body2">
                     {formik.errors.submit}
                   </Typography>
                 )}
-                <Button fullWidth size="large" sx={{ mt: 3 }} type="submit" variant="contained">
+                <LoadingButton
+                  loading={loading}
+                  fullWidth
+                  size="large"
+                  sx={{ mt: 3 }}
+                  type="submit"
+                  variant="contained"
+                >
                   Continue
-                </Button>
+                </LoadingButton>
               </form>
             )}
           </div>

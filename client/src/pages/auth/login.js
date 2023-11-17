@@ -8,11 +8,13 @@ import { Box, Button, FormHelperText, Stack, TextField, Typography } from "@mui/
 import { useAuth } from "src/hooks/use-auth";
 import { Layout as AuthLayout } from "src/layouts/auth/layout";
 import Link from "next/link";
+import { LoadingButton } from "@mui/lab";
 
 const Page = () => {
   const router = useRouter();
   const auth = useAuth();
   const [method, setMethod] = useState("email");
+  const [loading, setLoading] = useState(false);
   const formik = useFormik({
     initialValues: {
       email: "",
@@ -25,7 +27,9 @@ const Page = () => {
     }),
     onSubmit: async (values, helpers) => {
       try {
+        setLoading(true);
         await auth.signIn(values.email, values.password);
+        setLoading(false);
         router.push("/");
       } catch (err) {
         helpers.setStatus({ success: false });
@@ -107,9 +111,16 @@ const Page = () => {
                     {formik.errors.submit}
                   </Typography>
                 )}
-                <Button fullWidth size="large" sx={{ mt: 3 }} type="submit" variant="contained">
+                <LoadingButton
+                  fullWidth
+                  size="large"
+                  loading={loading}
+                  sx={{ mt: 3 }}
+                  type="submit"
+                  variant="contained"
+                >
                   Continue
-                </Button>
+                </LoadingButton>
               </form>
             )}
           </div>

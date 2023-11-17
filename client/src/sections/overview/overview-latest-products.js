@@ -23,6 +23,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { URL } from "config";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "src/hooks/use-auth";
 
 function timeAgo(timestamp) {
   const currentDate = new Date();
@@ -70,6 +71,7 @@ export const OverviewLatestProducts = (props) => {
       .then(function (response) {
         console.log(JSON.stringify(response.data));
         queryClient.invalidateQueries(["getGroup"]);
+        queryClient.invalidateQueries(["getInvitation"]);
       })
       .catch(function (error) {
         console.log(error);

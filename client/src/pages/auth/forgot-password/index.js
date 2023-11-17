@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 import Head from "next/head";
 import NextLink from "next/link";
-import NavigateNextIcon from "@mui/icons-material/NavigateNext";
+import SendIcon from "@mui/icons-material/Send";
 import { useRouter } from "next/navigation";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -10,10 +10,13 @@ import { useAuth } from "src/hooks/use-auth";
 import { Layout as AuthLayout } from "src/layouts/auth/layout";
 import axios from "axios";
 import { URL } from "config";
+import { LoadingButton } from "@mui/lab";
 
 const Page = () => {
   const router = useRouter();
   const auth = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [helperText, setHelperText] = useState("You will receive a link on this email address");
   const [method, setMethod] = useState("email");
   const formik = useFormik({
     initialValues: {
@@ -26,6 +29,7 @@ const Page = () => {
     }),
     onSubmit: async (values, helpers) => {
       try {
+        setLoading(true);
         console.log(values.email);
         const loginURL = URL + "auth/initiate-reset-password/";
         const data = { email: values.email };
@@ -40,11 +44,17 @@ const Page = () => {
           initiateResetPasswordConfig,
         });
         console.log(initiateResetPasswordResponse);
+        values.email = "";
+        setHelperText("Check your email for the link!");
       } catch (err) {
+        console.log(err);
         helpers.setStatus({ success: false });
-        helpers.setErrors({ submit: err.message });
         helpers.setSubmitting(false);
+
+        if (err.response.status == 404) helpers.setErrors({ submit: "No user found" });
+        else helpers.setErrors({ submit: "Something went wrong" });
       }
+      setLoading(false);
     },
   });
 
@@ -88,24 +98,22 @@ const Page = () => {
                   value={formik.values.email}
                 />
 
-                <FormHelperText sx={{ mt: 1 }}>
-                  You will receive a link on this email address
-                </FormHelperText>
+                <FormHelperText sx={{ mt: 1 }}>{helperText}</FormHelperText>
                 {formik.errors.submit && (
                   <Typography color="error" sx={{ mt: 3 }} variant="body2">
                     {formik.errors.submit}
                   </Typography>
                 )}
-                <Button
-                  endIcon={<NavigateNextIcon />}
+                <LoadingButton
                   fullWidth
                   size="large"
+                  loading={loading}
                   sx={{ mt: 3 }}
                   type="submit"
                   variant="contained"
                 >
-                  Next
-                </Button>
+                  Send
+                </LoadingButton>
               </form>
             )}
           </div>
