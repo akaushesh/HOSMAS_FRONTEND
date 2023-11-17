@@ -8,7 +8,6 @@ class IsStudent(BasePermission):
       message = 'Only Student is authorized to perform this action'
 
       def has_permission(self, request, view):
-            print('is student')
             return request.user.is_student
 
 

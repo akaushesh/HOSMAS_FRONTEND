@@ -15,7 +15,7 @@ from .tasks import *
 
 
 class ProfileView(APIView):
-      permission_classes = [IsAuthenticated & IsStudent]
+      permission_classes = [IsAuthenticated, IsStudent]
 
       def get(self, request):
             student = request.user.student
@@ -24,7 +24,7 @@ class ProfileView(APIView):
 
 
 class SearchStudentView(APIView):
-      permission_classes = [IsAuthenticated & IsStudent & IsPreferenceFillingLive & IsNotGroupMember]
+      permission_classes = [IsAuthenticated, IsStudent, IsPreferenceFillingLive, IsNotGroupMember]
 
       def post(self, request):
             student = request.user.student
@@ -55,7 +55,7 @@ class SearchStudentView(APIView):
 
 
 class SendInvitationView(APIView):
-      permission_classes = [IsAuthenticated & IsStudent & IsPreferenceFillingLive & IsNotGroupMember]
+      permission_classes = [IsAuthenticated, IsStudent, IsPreferenceFillingLive, IsNotGroupMember]
 
       def post(self, request):
             student = request.user.student
@@ -87,7 +87,7 @@ class SendInvitationView(APIView):
 
 
 class InvitationsSentView(APIView):
-      permission_classes = [IsAuthenticated & IsStudent & IsPreferenceFillingLive & IsGroupLeader]
+      permission_classes = [IsAuthenticated, IsStudent, IsPreferenceFillingLive, IsGroupLeader]
 
       def get(self, request):
             group = request.user.student.leader_of_group
@@ -99,7 +99,7 @@ class InvitationsSentView(APIView):
 
 
 class InvitationsReceivedView(APIView):
-      permission_classes = [IsAuthenticated & IsStudent & IsPreferenceFillingLive]
+      permission_classes = [IsAuthenticated, IsStudent, IsPreferenceFillingLive]
 
       def get(self, request):
             queryset = Invitation.objects.filter(to=request.user.student)
@@ -109,7 +109,7 @@ class InvitationsReceivedView(APIView):
 
 
 class DeleteInvitationView(APIView):
-      permission_classes = [IsAuthenticated & IsStudent & IsPreferenceFillingLive]
+      permission_classes = [IsAuthenticated, IsStudent, IsPreferenceFillingLive]
 
       def delete(self, request):
             invitation = Invitation.objects.filter(id=request.data.get('id')).first()
@@ -125,7 +125,7 @@ class DeleteInvitationView(APIView):
 
 
 class AcceptInvitationView(APIView):
-      permission_classes = [IsAuthenticated & IsStudent & IsPreferenceFillingLive & IsNotGroupLeader]
+      permission_classes = [IsAuthenticated, IsStudent, IsPreferenceFillingLive, IsNotGroupLeader]
 
       def post(self,request):
             invitation = Invitation.objects.filter(id=request.data.get('id')).first()
@@ -173,7 +173,7 @@ class AcceptInvitationView(APIView):
 
 
 class GroupView(APIView):
-      permission_classes = [IsAuthenticated & IsStudent]
+      permission_classes = [IsAuthenticated, IsStudent]
 
       def get(self, request):
             student = request.user.student
@@ -189,7 +189,7 @@ class GroupView(APIView):
 
 
 class TranferGroupLeadershipView(APIView):
-      permission_classes = [IsAuthenticated & IsStudent & IsPreferenceFillingLive & IsGroupLeader]
+      permission_classes = [IsAuthenticated, IsStudent, IsPreferenceFillingLive, IsGroupLeader]
 
       def post(self, request):
             newleader = Student.objects.filter(rollno=request.data.get('rollno')).first()
@@ -212,7 +212,7 @@ class TranferGroupLeadershipView(APIView):
 
 
 class LeaveGroupView(APIView):
-      permission_classes = [IsAuthenticated & IsStudent & IsPreferenceFillingLive & IsGroupMember]
+      permission_classes = [IsAuthenticated, IsStudent, IsPreferenceFillingLive, IsGroupMember]
 
       def patch(self, request):
             student = request.user.student
