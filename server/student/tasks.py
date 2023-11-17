@@ -17,10 +17,10 @@ def send_invitation_mail(leader_name, leader_email, leader_roll, invitee_name, i
         'leader_roll':leader_roll,
         'leader_email':leader_email,
     }
-    html_message = render_to_string('dashboard/templates/sendInvitation.html', context)
+    html_message = render_to_string('dashboard/sendInvitation.html', context)
     msg = strip_tags(html_message)
     send_mail(subject, msg, settings.EMAIL_HOST_USER, (invitee_email, ), html_message=html_message, fail_silently=False)
-    return f"Invitation mail sent to {invitee_email}"
+    return f"\n send invitation mail sent to {invitee_email}\n"
 
 
 @app.task(name = "joned_group_mail")
@@ -33,36 +33,38 @@ def joined_group_mail(leader_name, leader_email, leader_roll, member_name, membe
         'leader_roll':leader_roll,
         'leader_email':leader_email,
     }
-    html_message = render_to_string('dashboard/templates/joined_group_mail.html', context)
+    html_message = render_to_string('dashboard/joined_group_mail.html', context)
     msg = strip_tags(html_message)
     send_mail(subject, msg, settings.EMAIL_HOST_USER, (member_email, ), html_message=html_message, fail_silently=False)
-    return f"Invitation mail sent to {member_email}"
+    return f"\nJoined group mail sent to {member_email}\n"
 
 
 @app.task(name = "joined_group_to_members")
-def joined_group_to_members(newmember_name, newmember_roll, member_email):
+def joined_group_to_members(leader_name,newmember_name, newmember_roll, member_email):
     subject = f"{newmember_name} joined your group for hostel alotment"
     context = {
+        'leader_name':leader_name,
         'name':newmember_name,
         'roll':newmember_roll,
     }
     
-    html_message = render_to_string('dashboard/templates/joinedgrouptomembers.html', context)
+    html_message = render_to_string('dashboard/joinedgrouptomembers.html', context)
     msg = strip_tags(html_message)
     send_mail(subject, msg, settings.EMAIL_HOST_USER, (member_email, ), html_message=html_message, fail_silently=False)
-    return f"Invitation mail sent to {member_email}"
+    return f"\nJoined group to member mail sent to {member_email}\n"
 
 
 @app.task(name = "left_group_mail")
-def left_group_mail(exmember_name, exmember_roll, member_email):
+def left_group_mail(leader_name, exmember_name, exmember_roll, member_email):
     subject = f"{exmember_name} left your group for hostel allotment"
     context = {
+        'leader_name':leader_name,
         'name':exmember_name,
         'roll':exmember_roll,
     }
-    html_message = render_to_string('dashboard/templates/leftgroupmail.html', context)
+    html_message = render_to_string('dashboard/leftgroupmail.html', context)
     msg = strip_tags(html_message)
     send_mail(subject, msg, settings.EMAIL_HOST_USER, (member_email, ), html_message=html_message, fail_silently=False)
-    return f"Invitation mail sent to {member_email}"
+    return f"\nleft group mail sent to {member_email}\n"
 
 

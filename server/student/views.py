@@ -81,9 +81,9 @@ class SendInvitationView(APIView):
             invitation = Invitation(to=invitee, for_group=group)
             invitation.save()
 
-            send_invitation_mail(student.name, request.user.email, student.rollno, invitee.name, invitee.user.email)
+            send_invitation_mail.delay(student.name, request.user.email, student.rollno, invitee.name, invitee.user.email)
 
-            return Response(status=status.HTTP_200_OK)
+            return Response({'status':'success'} , status=status.HTTP_200_OK)
 
 
 class InvitationsSentView(APIView):
@@ -149,7 +149,7 @@ class AcceptInvitationView(APIView):
                   prevgroup.cg = round(updatedcg, 2)
                   prevgroup.save()
                   #TODO: inform all previous group members to say goodbye
-                  left_group_mail(student.name, student.rollno, prevgroup.leader.user.email )
+                  left_group_mail.delay(prevgroup.leader.name, student.name, student.rollno, prevgroup.leader.user.email )
 
             student.group = group
             student.save()
@@ -164,9 +164,10 @@ class AcceptInvitationView(APIView):
             updatedcg /= cnt
             group.cg = round(updatedcg, 2)
             group.save()
-
+            lead = group.leader
             #TODO: send mail to group leader and all group members
-            joined_group_to_members(student.name, student.rollno, group.leader.user.email)
+            joined_group_mail.delay(lead.name, lead.user.email, lead.rollno, student.name, student.user.email)
+            joined_group_to_members.delay(lead.name, student.name, student.rollno, group.leader.user.email)
 
             return Response(status=status.HTTP_200_OK)
 
@@ -219,5 +220,5 @@ class LeaveGroupView(APIView):
             student.group = None
             student.save()
             
-            left_group_mail(student.name, student.rollno, group.leader.user.email)
+            left_group_mail.delay(group.leader.name, student.name, student.rollno, group.leader.user.email)
             return Response(status=status.HTTP_200_OK)
