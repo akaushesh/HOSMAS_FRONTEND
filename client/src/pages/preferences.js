@@ -202,7 +202,7 @@ const Page = () => {
         <Container maxWidth="xl">
           <Stack>
             <Grid container paddingTop="1rem" justifyContent="center" alignItems="center">
-              <PreferenceForm sx={{ height: "100%", maxWidth: "25rem", padding: "2rem" }} />
+              <PreferenceForm sx={{ height: "100%", maxWidth: "25rem", padding: "2rem 3rem" }} />
             </Grid>
           </Stack>
         </Container>

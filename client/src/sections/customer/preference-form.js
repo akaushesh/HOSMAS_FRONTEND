@@ -6,8 +6,8 @@ import { useState } from "react";
 import {
   Button,
   Card,
-  CardContent,
-  CardHeader,
+  Checkbox,
+  FormControlLabel,
   FormHelperText,
   Grid,
   Typography,
@@ -17,10 +17,15 @@ import { FormConfirmation } from "./form-confirmation";
 import { useQuery } from "@tanstack/react-query";
 import { URL } from "config";
 import axios from "axios";
+import { useAuth } from "src/hooks/use-auth";
 
 export const PreferenceForm = (props) => {
   const { sx } = props;
   const [openModal, setOpenModal] = useState(false);
+  const [retain, setRetain] = useState(false);
+
+  const { user } = useAuth();
+  const isLeader = user.email === user.group.leader_email;
 
   const onCloseModal = () => {
     setOpenModal(false);
@@ -31,8 +36,12 @@ export const PreferenceForm = (props) => {
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    if (new Set(preferences).size !== preferences.length) {
-      return setError("Preferences must be unique");
+    if (retain) {
+      console.log("Retaining");
+    } else {
+      if (new Set(preferences).size !== preferences.length) {
+        return setError("Preferences must be unique");
+      }
     }
 
     setError("");
@@ -43,6 +52,10 @@ export const PreferenceForm = (props) => {
   const handleChange = (event) => {
     const index = parseInt(event.target.name.slice(-1), 10);
     preferences[index] = event.target.value;
+  };
+
+  const handleRetentionChange = (event) => {
+    setRetain(event.target.checked);
   };
 
   const { data: availableChoices, isLoading } = useQuery({
@@ -87,7 +100,6 @@ export const PreferenceForm = (props) => {
     queryKey: ["getCurrentPreferences"],
     staleTime: Infinity,
   });
-  console.log(currentPreferences);
 
   let finalAvailableChoices = [];
   if (availableChoices) finalAvailableChoices = availableChoices;
@@ -107,12 +119,13 @@ export const PreferenceForm = (props) => {
           </Typography>
           {finalAvailableChoices.map((_, index) => (
             <Grid container justifyContent="center" alignItems="center" key={index}>
-              <FormControl required variant="filled" sx={{ m: 1, minWidth: 300 }}>
+              <FormControl required variant="filled" sx={{ m: 1, width: "100%" }}>
                 <InputLabel id={`${index + 1}`}>Preference {index + 1}</InputLabel>
                 <Select
                   name={`Preference ${index}`}
                   onChange={handleChange}
                   defaultValue={preferences[index]}
+                  disabled={!isLeader || retain}
                 >
                   <MenuItem value="">
                     <em>None</em>
@@ -126,9 +139,26 @@ export const PreferenceForm = (props) => {
               </FormControl>
             </Grid>
           ))}
-          <Button variant="contained" sx={{ m: 1, minWidth: 300 }} type="submit">
+          <Grid container justifyContent="left">
+            <FormControlLabel
+              control={<Checkbox onChange={handleRetentionChange} />}
+              label="Retain current room instead"
+            />
+          </Grid>
+
+          <Button
+            disabled={!isLeader}
+            variant="contained"
+            sx={{ m: 1, width: "100%" }}
+            type="submit"
+          >
             Submit
           </Button>
+          {!isLeader && (
+            <FormHelperText>
+              Only your group leader {user.group.leader_name} can fill this form
+            </FormHelperText>
+          )}
           <CustomModal open={openModal} onClose={onCloseModal}>
             <FormConfirmation onClose={onCloseModal} />
           </CustomModal>
