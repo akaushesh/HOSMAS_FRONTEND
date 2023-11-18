@@ -128,18 +128,27 @@ class DeleteInvitationView(APIView):
 
 
 class AcceptInvitationView(APIView):
-      permission_classes = [IsAuthenticated, IsStudent, IsPreferenceFillingLive, IsNotGroupLeader]
+      permission_classes = [IsAuthenticated, IsStudent, IsPreferenceFillingLive]
 
       def post(self,request):
             invitation = Invitation.objects.filter(id=request.data.get('id')).first()
             if invitation is None:
                   return Response({'details': 'Invalid invitation id'}, status=status.HTTP_400_BAD_REQUEST)
 
-            student = request.user.student            
+            student = request.user.student  
+                      
             if invitation.to != student:
-                  return Response(status=status.HTTP_401_UNAUTHORIZED)
+                  return Response(status=status.HTTP_400_BAD_REQUEST)
 
             group = invitation.for_group
+            
+            try:
+                  curr_group = request.user.student.leader_of_group
+                  if (curr_group.members.count()>0):
+                        return Response({'details': 'You are already a group leader'}, status=status.HTTP_400_BAD_REQUEST)
+                  curr_group.delete()
+            except ObjectDoesNotExist:
+                  pass
 
             if student.group is not None:
                   prevgroup = student.group
@@ -224,6 +233,8 @@ class LeaveGroupView(APIView):
             group = student.group
             student.group = None
             student.save()
+            group = Group(leader = student, cg = student.cg)
+            group.save()
             
             left_group_mail.delay(group.leader.name, student.name, student.rollno, group.leader.user.email)
             return Response(status=status.HTTP_200_OK)

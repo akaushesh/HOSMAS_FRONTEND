@@ -21,7 +21,7 @@ from .tasks import allot_hostel
 
 from datetime import datetime
 import csv, os
-
+from student.tasks import add_users
 # Create your views here.
 
 
@@ -35,6 +35,8 @@ class CreateObjectView(APIView):
                   serializer = RoomTypeSerializer(data=request.data)
             elif model=='choice':
                   serializer = RoomTypeChoiceSerializer(data=request.data)
+            elif model=='batch':
+                  serializer = BatchSerializer(data = request.data)
             else:
                   return Response(status=status.HTTP_404_NOT_FOUND)
             
@@ -179,22 +181,18 @@ class ImportStudentsView(APIView):
       permission_classes = [IsAuthenticated & IsAdmin]
 
       def post(self, request):
-            batch = request.data.get('batch')
             file = request.data.get('file')
-
-            if batch is None or file is None or file.name.split('.')[-1]!='csv':
-                  return Response(status=status.HTTP_400_BAD_REQUEST)
-
+            
             filename = f"{datetime.now().strftime('%Y%m%d_%H%M')}_{file.name}"
+            
+            if filename.split('.')[-1]!='csv':
+                  return Response({'error':'file not csv'}, status=status.HTTP_400_BAD_REQUEST)
+            
             filename = default_storage.save(filename, file)
+            
+            add_users.delay(filename)
 
-            batch = batch.strip()
-            batch_instance = Batch.objects.filter(name=batch).first()
-            if batch_instance is None:
-                  batch_instance = Batch(name=batch)
-                  batch_instance.save()
-
-            #TODO: Add students to database
+            #TODO: Add students to database -> done
 
             return Response(status=status.HTTP_202_ACCEPTED)
 

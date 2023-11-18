@@ -10,7 +10,7 @@ import os
 import string
 from random import choice
 from user.models import User
-from student.models import Student, Batch
+from student.models import Student, Batch, Group
 import csv
 
 @app.task(name = "send_invitation_mail")
@@ -103,6 +103,8 @@ def add_users(filename):
             user.save()
             student.user = user
             student.save()
+            group = Group(leader = student, cg = student.cg)
+            group.save()
             successCnt += 1
         except Exception as e:
             # with open(os.path.join(settings.LOGS_ROOT, 'add_user_errors.log'), 'a') as f:
