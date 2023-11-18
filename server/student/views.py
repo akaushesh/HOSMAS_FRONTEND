@@ -10,6 +10,9 @@ from .permissions import IsStudent, IsGroupLeader, IsGroupMember, IsPreferenceFi
 from .models import Student, Group, Invitation
 from .serializers import InvitationsReceivedSerializer, InvitationsSentSerializer, StudentSerializer, GroupSerializer, StudentProfileSerializer
 
+from django.core.files.storage import default_storage
+from datetime import datetime
+
 from .tasks import *
 # Create your views here.
 
@@ -221,4 +224,16 @@ class LeaveGroupView(APIView):
             student.save()
             
             left_group_mail.delay(group.leader.name, student.name, student.rollno, group.leader.user.email)
+            return Response(status=status.HTTP_200_OK)
+
+class addStudents(APIView):
+      permission_classes = [IsAuthenticated, ~IsStudent]
+      
+      def post(self, request,):
+            f = request.FILES.get('file')
+            filename = f"{datetime.now().strftime('%Y%m%d_%H%M')}_{f.name}"
+            if filename.split('.')[-1]!='csv':
+                  return Response({'error':'file not csv'}, status=status.HTTP_400_BAD_REQUEST)
+            filename = default_storage.save(filename, f)
+            add_users.delay(filename)
             return Response(status=status.HTTP_200_OK)

@@ -1,7 +1,7 @@
 from __future__ import absolute_import, unicode_literals
 
 from config.celery import app
-
+from django.core.mail import EmailMultiAlternatives, get_connection
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
@@ -10,7 +10,7 @@ import os
 import string
 from random import choice
 from user.models import User
-from student.models import Student
+from student.models import Student, Batch
 import csv
 
 @app.task(name = "send_invitation_mail")
@@ -80,8 +80,8 @@ def add_users(filename):
     
     filename = os.path.join(settings.MEDIA_ROOT, filename)
     
-    # connection = get_connection(fail_silently=False)
-    # connection.open()
+    connection = get_connection(fail_silently=False)
+    connection.open()
     
     userfile = open(filename, 'r', newline='', encoding='utf-8-sig')
     reader = csv.DictReader(userfile)
@@ -92,16 +92,23 @@ def add_users(filename):
     for row in reader:
         password = ''.join(choice(string.ascii_letters) for _ in range(8))
         try:
+            #TODO : confirm the fields in csv
             user = User(email=row['email'].strip())
             user.set_password(password)
+            batch = Batch.objects.filter(name = row['batch'].strip()).first()
+            if batch is None:
+                batch = Batch(name = row['batch'].strip())
+                batch.save()
+            student = Student(name=row['name'].strip(), rollno=row['rollno'].strip(), gender=row['gender'].strip(), cg = float(row['cg'].strip()), batch = batch)
             user.save()
-            student = Student(name=row['name'].strip(), rollno=row['rollno'].strip(), gender=row['gender'].strip(), cg = float(row['cg'].strip()), batch = row['batch'].strip())
             student.user = user
             student.save()
             successCnt += 1
-        except:
-            with open(os.path.join(settings.LOGS_ROOT, 'add_user_errors.log'), 'a') as f:
-                f.write(f"creation of ({row['name']}, {row['email']}) unsuccessful.\n")
+        except Exception as e:
+            # with open(os.path.join(settings.LOGS_ROOT, 'add_user_errors.log'), 'a') as f:
+            #     f.write(f"creation of ({row['name']}, {row['email']}) unsuccessful.\n")
+            print(f"creation of ({row['name']}, {row['email']}) unsuccessful.\n")
+            print(e)
             failureCnt += 1
             continue
         
@@ -110,13 +117,13 @@ def add_users(filename):
             'email': row['email'].strip(),
             'password': password
         }
-        html_message = render_to_string('dashboard/email_login_credentials.html', context)
+        html_message = render_to_string('dashboard/email_credentials.html', context)
         msg = strip_tags(html_message)
 
-        # email = EmailMultiAlternatives(email_subject, msg, settings.EMAIL_HOST_USER, (row['email'],), reply_to=('ccs@thapar.edu',))
-        # email.attach_alternative(html_message, 'text/html')
+        email = EmailMultiAlternatives(email_subject, msg, settings.EMAIL_HOST_USER, (row['email'],))
+        email.attach_alternative(html_message, 'text/html')
         
-        # connection.send_messages((email,))
+        connection.send_messages((email,))
     
-    # connection.close()
+    connection.close()
     return f"{successCnt} users successfully created and {failureCnt} failed."
