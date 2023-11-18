@@ -210,6 +210,8 @@ class TranferGroupLeadershipView(APIView):
 
             group.leader = newleader
             group.save()
+            
+            student.group = group
 
             return Response(status=status.HTTP_200_OK)
 
