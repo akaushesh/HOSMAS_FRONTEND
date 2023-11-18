@@ -28,12 +28,12 @@ def allot_hostel():
             section = Section.objects.filter(batch=group.leader.batch, gender=group.leader.gender)
             if not section.is_retain_allowed:
                   continue
-            if choices[group.leader.current_room.id] > 0:
+            if choices_size[group.leader.current_room.id] > 0:
                   group.leader.alloted_room = group.leader.current_room
                   group.leader.save()
                   choices_size[group.leader.alloted_room.id] -= 1
             for member in group.members.all():
-                  if choices[member.current_room.id] > 0:
+                  if choices_size[member.current_room.id] > 0:
                         member.alloted_room = member.current_room
                         member.save()
                         choices_size[member.alloted_room.id] -= 1
