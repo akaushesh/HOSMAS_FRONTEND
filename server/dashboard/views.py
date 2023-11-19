@@ -1,6 +1,6 @@
 from django.core.files.storage import default_storage
 from django.core.paginator import Paginator
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.conf import settings
 
 from rest_framework.views import APIView
@@ -202,11 +202,19 @@ class getStudents(APIView):
       
       def get(self, request):
             roll = request.data.get('roll_no')
-            students_per_page = 3
+            batch_name = request.data.get('batch')
+            batch = Batch.objects.filter(name = batch_name).first()
+            
+            if (batch is None):
+                  return Response({'error':'Batch does not exist'}, status=status.HTTP_404_NOT_FOUND)
+            
+            
+            
+            students_per_page = 20
             if roll is not None:
-                  students_list = Student.objects.filter(rollno__startswith = roll)
+                  students_list = Student.objects.filter(Q(rollno__startswith = roll) & Q(batch = batch))
             else:
-                  students_list = Student.objects.all()
+                  students_list = Student.objects.filter(batch = batch)
             p = Paginator(students_list, students_per_page)
             
             page_number = request.data.get('page')
@@ -228,7 +236,7 @@ class getGroups(APIView):
       
       def get(self, request):
             # roll = request.data.get('roll_no')
-            groups_per_page = 3
+            groups_per_page = 10
             
             groups_list = Group.objects.all()
             p = Paginator(groups_list, groups_per_page)
