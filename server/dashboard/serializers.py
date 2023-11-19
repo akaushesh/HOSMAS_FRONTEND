@@ -107,10 +107,7 @@ class BatchSerializer(serializers.ModelSerializer):
 
 
 class SectionSerializer(serializers.ModelSerializer):
-      batch_name = serializers.SlugRelatedField(
-            slug_field='name',
-            read_only=True
-      )
+      batch_name = serializers.SerializerMethodField()
 
       class Meta:
             model = Section
