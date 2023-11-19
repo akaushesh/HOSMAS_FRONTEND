@@ -46,14 +46,13 @@ class HostelSingleSerializer(serializers.ModelSerializer):
 class RoomTypeChoiceSerializer(serializers.ModelSerializer):
       room_type_name = serializers.SerializerMethodField()
       hostel = serializers.SerializerMethodField()
-      batch = serializers.IntegerField(write_only=True, required=True)
-      gender = serializers.CharField(write_only=True, required=True)
 
       class Meta:
             model = RoomTypeChoice
-            fields = ['id', 'hostel', 'room_type', 'room_type_name', 'batch', 'gender', 'capacity']
+            fields = ['id', 'hostel', 'room_type', 'room_type_name', 'section', 'capacity']
             extra_kwargs = {
                   'room_type': {'write_only': True},
+                  'section': {'write_only': True},
             }
       
       def get_room_type_name(self, obj):
@@ -61,41 +60,6 @@ class RoomTypeChoiceSerializer(serializers.ModelSerializer):
       
       def get_hostel(self, obj):
             return obj.room_type.hostel.name
-      
-      def validate_gender(self, value):
-            if value!='M' and value!='F':
-                  raise serializers.ValidationError('Invalid Gender!')
-            return value
-      
-      def validate_batch(self, value):
-            if not Batch.objects.filter(id=value).exists():
-                  raise serializers.ValidationError('Invalid Batch!')
-            return value
-      
-      def create(self, validated_data):
-            batch = Batch.objects.filter(id=validated_data['batch']).first()
-            section = Section.objects.filter(batch=batch, gender=validated_data['gender']).first()
-            if section is None:
-                  section = Section(batch=batch, gender=validated_data['gender'])
-                  section.save()
-            instance = RoomTypeChoice(
-                  room_type = validated_data['room_type'],
-                  section = section,
-                  capacity = validated_data['capacity']
-            )
-            instance.save()
-            return instance
-
-      def update(self, instance, validated_data):
-            batch = Batch.objects.filter(id=validated_data['batch']).first()
-            section = Section.objects.filter(batch=batch, gender=validated_data['gender']).first()
-            if section is None:
-                  raise serializers.ValidationError({'detail': ['Invalid Section!']})
-            instance.room_type = validated_data['room_type']
-            instance.section = section
-            instance.capacity = validated_data['capacity']
-            instance.save()
-            return instance
 
 
 class RoomTypeOptionSerializer(serializers.ModelSerializer):
@@ -143,21 +107,20 @@ class BatchSerializer(serializers.ModelSerializer):
 
 
 class SectionSerializer(serializers.ModelSerializer):
-      batch = serializers.SlugRelatedField(
+      batch_name = serializers.SlugRelatedField(
             slug_field='name',
             read_only=True
       )
-      gender = serializers.SerializerMethodField()
 
       class Meta:
             model = Section
-            fields = ['id', 'batch', 'gender', 'is_allotment_enabled']
+            fields = ['id', 'batch_name', 'batch', 'gender', 'is_allotment_enabled']
+            extra_kwargs = {
+                  'batch': {'write_only': True}
+            }
       
-      def get_batch(self, obj):
+      def get_batch_name(self, obj):
             return obj.batch.name
-      
-      def get_gender(self, obj):
-            return obj.gender
 
 
 class ProfileSerializer(serializers.ModelSerializer):

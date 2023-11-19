@@ -37,6 +37,8 @@ class CreateObjectView(APIView):
                   serializer = RoomTypeChoiceSerializer(data=request.data)
             elif model=='batch':
                   serializer = BatchSerializer(data = request.data)
+            elif model=='section':
+                  serializer = SectionSerializer(data = request.data)
             else:
                   return Response(status=status.HTTP_404_NOT_FOUND)
             
