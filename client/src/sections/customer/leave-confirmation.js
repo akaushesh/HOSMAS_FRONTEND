@@ -28,7 +28,6 @@ export const LeaveConfirmation = ({ onClose }) => {
 
     await axios(leaveGroupConfig)
       .then(function (response) {
-        // auth.initialize();
         queryClient.invalidateQueries(["getGroup"]);
         onClose();
       })

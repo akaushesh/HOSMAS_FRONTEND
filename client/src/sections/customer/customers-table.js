@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 import { Scrollbar } from "src/components/scrollbar";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { URL } from "config";
 import axios from "axios";
 import { LoadingButton } from "@mui/lab";
@@ -29,6 +29,7 @@ export const CustomersTable = (props) => {
   const { sx, selected = [] } = props;
 
   const { user } = useAuth();
+  const queryClient = useQueryClient();
 
   const [loading, setLoading] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -70,9 +71,9 @@ export const CustomersTable = (props) => {
       data: data,
     };
 
-    axios(transferOwnershipConfig)
+    await axios(transferOwnershipConfig)
       .then(function (response) {
-        console.log(JSON.stringify(response.data));
+        queryClient.invalidateQueries(["getGroup"]);
       })
       .catch(function (error) {
         console.log(error);
@@ -193,7 +194,7 @@ export const CustomersTable = (props) => {
                   </TableRow>
                 );
               })}
-              {/* {isEmpty && (
+              {isEmpty && (
                 <TableRow sx={{ position: "relative" }}>
                   <TableCell sx={{}}>&nbsp;</TableCell>
                   <TableCell sx={{}}>&nbsp;</TableCell>
@@ -208,7 +209,7 @@ export const CustomersTable = (props) => {
                     No group joined
                   </TableCell>
                 </TableRow>
-              )} */}
+              )}
             </TableBody>
           </Table>
           <CustomModal open={openModal} onClose={onCloseModal}>
