@@ -47,10 +47,8 @@ export const SettingsPassword = () => {
     };
 
     const url = URL + "auth/change-password/";
-    console.log(url, data, changePasswordConfig);
 
     const changePasswordResponse = await axios.post(url, data, changePasswordConfig);
-    console.log(changePasswordResponse);
     if (changePasswordResponse.status === 200) {
       setPassword("");
       setConfirmPassword("");

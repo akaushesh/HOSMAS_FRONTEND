@@ -96,10 +96,8 @@ export const CustomersTable = (props) => {
         };
 
         const getGroupResponse = await axios.get(url, getGroupConfig);
-        console.log(getGroupResponse);
         return getGroupResponse?.data;
       } catch (err) {
-        console.log(err);
         return null;
       }
     },
@@ -111,10 +109,10 @@ export const CustomersTable = (props) => {
 
   let allMembers = [];
   if (group) allMembers = [group?.leader, ...group?.members];
-  console.log(allMembers);
   const isLeader = group?.leader?.rollno === user?.rollno;
 
   const isEmpty = allMembers.length === 0;
+  const isWithGroup = allMembers.length > 1;
 
   return (
     <Card sx={sx}>
@@ -126,11 +124,13 @@ export const CustomersTable = (props) => {
                 <TableCell>Name</TableCell>
                 <TableCell sx={{ textAlign: "center" }}>Roll No</TableCell>
                 <TableCell>
-                  <Grid container justifyContent="flex-end">
-                    <LoadingButton onClick={onOpenModal} color="error">
-                      Leave
-                    </LoadingButton>
-                  </Grid>
+                  {isWithGroup && (
+                    <Grid container justifyContent="flex-end">
+                      <LoadingButton onClick={onOpenModal} color="error">
+                        Leave
+                      </LoadingButton>
+                    </Grid>
+                  )}
                 </TableCell>
               </TableRow>
             </TableHead>
@@ -193,7 +193,7 @@ export const CustomersTable = (props) => {
                   </TableRow>
                 );
               })}
-              {isEmpty && (
+              {/* {isEmpty && (
                 <TableRow sx={{ position: "relative" }}>
                   <TableCell sx={{}}>&nbsp;</TableCell>
                   <TableCell sx={{}}>&nbsp;</TableCell>
@@ -208,7 +208,7 @@ export const CustomersTable = (props) => {
                     No group joined
                   </TableCell>
                 </TableRow>
-              )}
+              )} */}
             </TableBody>
           </Table>
           <CustomModal open={openModal} onClose={onCloseModal}>

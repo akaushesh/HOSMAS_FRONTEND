@@ -30,7 +30,6 @@ const Page = () => {
     onSubmit: async (values, helpers) => {
       try {
         setLoading(true);
-        console.log(values.email);
         const loginURL = URL + "auth/initiate-reset-password/";
         const data = { email: values.email };
 
@@ -43,11 +42,9 @@ const Page = () => {
         const initiateResetPasswordResponse = await axios.post(loginURL, data, {
           initiateResetPasswordConfig,
         });
-        console.log(initiateResetPasswordResponse);
         values.email = "";
         setHelperText("Check your email for the link!");
       } catch (err) {
-        console.log(err);
         helpers.setStatus({ success: false });
         helpers.setSubmitting(false);
 

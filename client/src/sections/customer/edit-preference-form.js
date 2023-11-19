@@ -41,7 +41,6 @@ export const EditPreferenceForm = (props) => {
     }
 
     setError("");
-    console.log(preferences);
     setOpenModal(true);
   };
 
@@ -82,7 +81,6 @@ export const EditPreferenceForm = (props) => {
   const [preferences, setPreferences] = useState(
     Array.from({ length: finalAvailableChoices.length }, () => "")
   );
-  console.log(preferences);
 
   const [error, setError] = useState("");
 

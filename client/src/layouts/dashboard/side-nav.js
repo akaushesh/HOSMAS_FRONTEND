@@ -1,9 +1,16 @@
-import NextLink from "next/link";
 import { usePathname } from "next/navigation";
 import PropTypes from "prop-types";
-import ChevronUpDownIcon from "@heroicons/react/24/solid/ChevronUpDownIcon";
-import { Box, Divider, Drawer, Stack, SvgIcon, Typography, useMediaQuery } from "@mui/material";
-import { Logo } from "src/components/logo";
+import {
+  Box,
+  Divider,
+  Drawer,
+  Link,
+  Stack,
+  SvgIcon,
+  Typography,
+  useMediaQuery,
+} from "@mui/material";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 import { Scrollbar } from "src/components/scrollbar";
 import { items } from "./config";
 import { SideNavItem } from "./side-nav-item";
@@ -46,17 +53,6 @@ export const SideNav = (props) => {
       >
         <Box sx={{ p: 3 }}>
           <Box
-            component={NextLink}
-            href="/"
-            sx={{
-              display: "inline-flex",
-              height: 32,
-              width: 32,
-            }}
-          >
-            <Logo />
-          </Box>
-          <Box
             sx={{
               alignItems: "center",
               backgroundColor: "rgba(255, 255, 255, 0.04)",
@@ -73,9 +69,9 @@ export const SideNav = (props) => {
                 Hostel Management System
               </Typography>
             </div>
-            <SvgIcon fontSize="small" sx={{ color: "neutral.500" }}>
+            {/* <SvgIcon fontSize="small" sx={{ color: "neutral.500" }}>
               <ChevronUpDownIcon />
-            </SvgIcon>
+            </SvgIcon> */}
           </Box>
         </Box>
         <Divider sx={{ borderColor: "neutral.700" }} />
@@ -121,6 +117,14 @@ export const SideNav = (props) => {
               onClick={handleSignOut}
             />
           </Stack>
+        </Box>
+        <Box marginTop="auto">
+          <Divider sx={{ borderColor: "neutral.700" }} />
+          <Box padding={2}>
+            <Typography textAlign="center">
+              Made by <Link href="https://www.ccstiet.com">Team CCS</Link>
+            </Typography>
+          </Box>
         </Box>
       </Box>
     </Scrollbar>

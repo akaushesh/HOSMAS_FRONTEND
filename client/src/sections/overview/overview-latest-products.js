@@ -67,13 +67,10 @@ export const OverviewLatestProducts = (props) => {
 
     axios(acceptInvitationConfig)
       .then(function (response) {
-        console.log(JSON.stringify(response.data));
         queryClient.invalidateQueries(["getGroup"]);
         queryClient.invalidateQueries(["getInvitation"]);
       })
-      .catch(function (error) {
-        console.log(error?.response?.data?.detail);
-      });
+      .catch(function (error) {});
   };
 
   const onRejectRequest = (product) => {
@@ -92,12 +89,9 @@ export const OverviewLatestProducts = (props) => {
 
     axios(deleteInvitation)
       .then(function (response) {
-        console.log(JSON.stringify(response.data));
         queryClient.invalidateQueries(["getInvitation"]);
       })
-      .catch(function (error) {
-        console.log(error);
-      });
+      .catch(function (error) {});
   };
 
   const {
@@ -129,7 +123,6 @@ export const OverviewLatestProducts = (props) => {
   };
 
   const finalProducts = requests?.slice(0, limit);
-  console.log(finalProducts.length === 0);
 
   return (
     <Card sx={sx}>
@@ -157,7 +150,6 @@ export const OverviewLatestProducts = (props) => {
                   <CheckRoundedIcon />
                 </SvgIcon>
               </IconButton>
-              {/* <CircularProgress sx={{ marginRight: 2 }} size={24} /> */}
               <IconButton
                 onClick={() => {
                   onRejectRequest(product);

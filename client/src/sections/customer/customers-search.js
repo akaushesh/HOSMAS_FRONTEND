@@ -30,7 +30,7 @@ export const CustomersSearch = () => {
 
   const onSubmitHandler = (event) => {
     event.preventDefault();
-    console.log(enrollmentNumber);
+    onOpenModal();
   };
 
   const onSelectChangeHandler = (event, value) => {
@@ -62,7 +62,6 @@ export const CustomersSearch = () => {
           },
         };
 
-        console.log(e.target.value);
         const data = {
           rollno: e.target.value,
         };
@@ -133,7 +132,7 @@ export const CustomersSearch = () => {
               onClose={onCloseModal}
             />
           </CustomModal>
-          <Button disabled={!isLeader} type="submit" onClick={onOpenModal}>
+          <Button disabled={!isLeader} type="submit">
             <SendIcon color="primary" />
           </Button>
         </Stack>

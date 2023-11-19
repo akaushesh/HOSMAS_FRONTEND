@@ -50,10 +50,8 @@ const Page = () => {
         };
 
         const getCurrentPreferencesResponse = await axios.get(url, getCurrentPreferencesConfig);
-        console.log(getCurrentPreferencesResponse);
         return getCurrentPreferencesResponse?.data?.data;
       } catch (err) {
-        console.log(err);
         return [];
       }
     },

@@ -17,8 +17,6 @@ export const PreferenceForm = ({ sx, availableChoices = [], currentPreferences =
 
   const router = useRouter();
 
-  console.log(availableChoices, currentPreferences);
-
   const handleSubmit = (event) => {
     event.preventDefault();
     router.push("/preferences/edit");
@@ -28,8 +26,6 @@ export const PreferenceForm = ({ sx, availableChoices = [], currentPreferences =
     currentPreferences?.length > 0
       ? currentPreferences
       : Array.from({ length: availableChoices.length }, () => "");
-
-  console.log(preferences);
 
   return (
     <Card sx={sx}>

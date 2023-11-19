@@ -26,16 +26,16 @@ const Page = () => {
       password: Yup.string().max(255).required("Password is required"),
     }),
     onSubmit: async (values, helpers) => {
+      setLoading(true);
       try {
-        setLoading(true);
         await auth.signIn(values.email, values.password);
-        setLoading(false);
         router.push("/");
       } catch (err) {
         helpers.setStatus({ success: false });
         helpers.setErrors({ submit: err.message });
         helpers.setSubmitting(false);
       }
+      setLoading(false);
     },
   });
 
@@ -51,7 +51,7 @@ const Page = () => {
   return (
     <>
       <Head>
-        <title>Login | Devias Kit</title>
+        <title>Login | Thapar Hostel Management System</title>
       </Head>
       <Box
         sx={{

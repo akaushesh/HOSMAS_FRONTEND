@@ -9,7 +9,6 @@ import { useAuth } from "src/hooks/use-auth";
 
 const Page = () => {
   const { user } = useAuth();
-  console.log(user);
 
   return (
     <Fragment>

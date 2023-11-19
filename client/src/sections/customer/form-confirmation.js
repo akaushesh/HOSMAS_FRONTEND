@@ -5,10 +5,12 @@ import { useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { URL } from "config";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 
 export const FormConfirmation = ({ onClose, preferences, retain }) => {
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
   const router = useRouter();
   const queryClient = useQueryClient();
 
@@ -18,6 +20,7 @@ export const FormConfirmation = ({ onClose, preferences, retain }) => {
 
   const onAccept = async () => {
     setLoading(true);
+    setError("");
     const jwt = sessionStorage.getItem("jwt");
 
     if (retain) {
@@ -34,12 +37,11 @@ export const FormConfirmation = ({ onClose, preferences, retain }) => {
 
       await axios(retainConfig)
         .then(function (response) {
-          console.log(response.data);
           queryClient.invalidateQueries(["getAvailablePreferences"]);
           router.push("/preferences");
         })
         .catch(function (error) {
-          console.log(error);
+          setError("Something went wrong");
         });
     } else {
       const url = URL + "preferences/createPreference/";
@@ -65,12 +67,11 @@ export const FormConfirmation = ({ onClose, preferences, retain }) => {
 
       axios(createPreferencesConfig)
         .then(function (response) {
-          console.log(response.data);
           queryClient.invalidateQueries(["getAvailablePreferences"]);
           router.push("/preferences");
         })
         .catch(function (error) {
-          console.log(error);
+          setError("Something went wrong");
         });
     }
     setLoading(false);
@@ -91,6 +92,14 @@ export const FormConfirmation = ({ onClose, preferences, retain }) => {
       <Typography variant="body1" textAlign="justify">
         Are you sure you want to submit?
       </Typography>
+      {error && (
+        <Fragment>
+          <br />
+          <Typography variant="body1" color="error.main" textAlign="justify">
+            {error}
+          </Typography>
+        </Fragment>
+      )}
 
       <Grid container marginTop="1rem" justifyContent="space-between" alignItems="center">
         <Grid item xs={5.5}>
