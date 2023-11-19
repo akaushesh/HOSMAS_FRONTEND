@@ -1,9 +1,6 @@
-import { useCallback, useState } from "react";
 import {
   Box,
-  Button,
   Card,
-  CardActions,
   CardContent,
   CardHeader,
   Divider,
@@ -11,36 +8,8 @@ import {
   Unstable_Grid2 as Grid,
 } from "@mui/material";
 
-const states = [
-  {
-    value: "alabama",
-    label: "Alabama",
-  },
-  {
-    value: "new-york",
-    label: "New York",
-  },
-  {
-    value: "san-francisco",
-    label: "San Francisco",
-  },
-  {
-    value: "los-angeles",
-    label: "Los Angeles",
-  },
-];
-
 export const AccountProfileDetails = (props) => {
   const { name = "", email = "", rollNumber = "", CGPA = "", hostel = "", roomNumber = "" } = props;
-
-  const [values, setValues] = useState({
-    name,
-    email,
-    rollNumber,
-    CGPA,
-    hostel,
-    roomNumber,
-  });
 
   return (
     <Card>
@@ -80,7 +49,7 @@ export const AccountProfileDetails = (props) => {
             <Grid xs={12} md={6}>
               <TextField
                 fullWidth
-                label="Room Number"
+                label="Room Type"
                 name="roomNumber"
                 disabled
                 SelectProps={{ native: true }}

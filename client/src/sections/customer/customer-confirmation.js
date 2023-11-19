@@ -27,6 +27,7 @@ export const CustomerConfirmation = ({ name = "", enrollmentNumber = "", onClose
 
       const sendInvitationResponse = await axios.post(url, data, sendInvitationConfig);
       console.log(sendInvitationResponse);
+      onClose();
     } catch (err) {
       setError(err?.response?.data?.detail);
     }

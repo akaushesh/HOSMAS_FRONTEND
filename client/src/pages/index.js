@@ -5,8 +5,6 @@ import { OverviewBudget } from "src/sections/overview/overview-budget";
 import { OverviewTotalCustomers } from "src/sections/overview/overview-total-customers";
 import { AccountProfileDetails } from "src/sections/account/account-profile-details";
 import { Fragment } from "react";
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
 import { useAuth } from "src/hooks/use-auth";
 
 const Page = () => {

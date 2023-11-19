@@ -1,8 +1,3 @@
-import InputLabel from "@mui/material/InputLabel";
-import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
-import Select from "@mui/material/Select";
-import { useState } from "react";
 import {
   Button,
   Card,
@@ -10,105 +5,31 @@ import {
   FormControlLabel,
   FormHelperText,
   Grid,
+  TextField,
   Typography,
 } from "@mui/material";
-import CustomModal from "src/components/customModal";
-import { FormConfirmation } from "./form-confirmation";
-import { useQuery } from "@tanstack/react-query";
-import { URL } from "config";
-import axios from "axios";
 import { useAuth } from "src/hooks/use-auth";
+import { useRouter } from "next/router";
 
-export const PreferenceForm = (props) => {
-  const { sx } = props;
-  const [openModal, setOpenModal] = useState(false);
-  const [retain, setRetain] = useState(false);
-
+export const PreferenceForm = ({ sx, availableChoices = [], currentPreferences = [] }) => {
   const { user } = useAuth();
-  const isLeader = user.email === user.group.leader_email;
+  const isLeader = !user?.group || user?.email === user?.group?.leader_email;
 
-  const onCloseModal = () => {
-    setOpenModal(false);
-  };
+  const router = useRouter();
 
-  // const submitPreferences = () => {};
+  console.log(availableChoices, currentPreferences);
 
   const handleSubmit = (event) => {
     event.preventDefault();
-
-    if (retain) {
-      console.log("Retaining");
-    } else {
-      if (new Set(preferences).size !== preferences.length) {
-        return setError("Preferences must be unique");
-      }
-    }
-
-    setError("");
-    console.log(preferences);
-    setOpenModal(true);
+    router.push("/preferences/edit");
   };
 
-  const handleChange = (event) => {
-    const index = parseInt(event.target.name.slice(-1), 10);
-    preferences[index] = event.target.value;
-  };
-
-  const handleRetentionChange = (event) => {
-    setRetain(event.target.checked);
-  };
-
-  const { data: availableChoices, isLoading } = useQuery({
-    queryFn: async () => {
-      const url = URL + "preferences/getChoices/";
-      const jwt = sessionStorage.getItem("jwt");
-
-      const getAvailableChoicesConfig = {
-        maxBodyLength: Infinity,
-        headers: {
-          Authorization: "Bearer " + jwt,
-        },
-      };
-
-      const availableChoicesResponse = await axios.get(url, getAvailableChoicesConfig);
-      return availableChoicesResponse?.data;
-    },
-    queryKey: ["getAvailablePreferences"],
-  });
-
-  const { data: currentPreferences } = useQuery({
-    queryFn: async () => {
-      try {
-        const url = URL + "preferences/getPreference/";
-        const jwt = sessionStorage.getItem("jwt");
-
-        const getCurrentPreferencesConfig = {
-          maxBodyLength: Infinity,
-          headers: {
-            Authorization: "Bearer " + jwt,
-          },
-        };
-
-        const getCurrentPreferencesResponse = await axios.get(url, getCurrentPreferencesConfig);
-        console.log(getCurrentPreferencesResponse);
-        return getCurrentPreferencesResponse?.data;
-      } catch (err) {
-        console.log(err);
-        return [];
-      }
-    },
-    queryKey: ["getCurrentPreferences"],
-    staleTime: Infinity,
-  });
-
-  let finalAvailableChoices = [];
-  if (availableChoices) finalAvailableChoices = availableChoices;
   const preferences =
-    currentPreferences?.size > 0
+    currentPreferences?.length > 0
       ? currentPreferences
-      : Array.from({ length: finalAvailableChoices.length }, () => "");
+      : Array.from({ length: availableChoices.length }, () => "");
 
-  const [error, setError] = useState("");
+  console.log(preferences);
 
   return (
     <Card sx={sx}>
@@ -117,33 +38,21 @@ export const PreferenceForm = (props) => {
           <Typography variant="h4" paddingBottom="1rem">
             Your Preferences
           </Typography>
-          {finalAvailableChoices.map((_, index) => (
+          {availableChoices.map((_, index) => (
             <Grid container justifyContent="center" alignItems="center" key={index}>
-              <FormControl required variant="filled" sx={{ m: 1, width: "100%" }}>
-                <InputLabel id={`${index + 1}`}>Preference {index + 1}</InputLabel>
-                <Select
-                  name={`Preference ${index}`}
-                  onChange={handleChange}
-                  defaultValue={preferences[index]}
-                  disabled={!isLeader || retain}
-                >
-                  <MenuItem value="">
-                    <em>None</em>
-                  </MenuItem>
-                  {finalAvailableChoices.map((choice, index) => (
-                    <MenuItem key={index} value={choice}>
-                      {choice.room_name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+              <TextField
+                fullWidth
+                label={`Preference ${index + 1}`}
+                name="CGPA"
+                disabled
+                SelectProps={{ native: true }}
+                value={preferences[index]?.room_type_choice || ""}
+                sx={{ m: 1, width: "100%" }}
+              />
             </Grid>
           ))}
           <Grid container justifyContent="left">
-            <FormControlLabel
-              control={<Checkbox onChange={handleRetentionChange} />}
-              label="Retain current room instead"
-            />
+            <FormControlLabel control={<Checkbox disabled />} label="Retain current room instead" />
           </Grid>
 
           <Button
@@ -152,17 +61,13 @@ export const PreferenceForm = (props) => {
             sx={{ m: 1, width: "100%" }}
             type="submit"
           >
-            Submit
+            Edit
           </Button>
           {!isLeader && (
             <FormHelperText>
               Only your group leader {user.group.leader_name} can fill this form
             </FormHelperText>
           )}
-          <CustomModal open={openModal} onClose={onCloseModal}>
-            <FormConfirmation onClose={onCloseModal} />
-          </CustomModal>
-          <FormHelperText error>{error}</FormHelperText>
         </Grid>
       </form>
     </Card>

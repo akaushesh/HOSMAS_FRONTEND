@@ -1,12 +1,9 @@
 import PropTypes from "prop-types";
-import ArrowDownIcon from "@heroicons/react/24/solid/ArrowDownIcon";
-import ArrowUpIcon from "@heroicons/react/24/solid/ArrowUpIcon";
 import UsersIcon from "@heroicons/react/24/solid/UsersIcon";
 import { Avatar, Card, CardContent, Stack, SvgIcon, Typography } from "@mui/material";
-import { useState } from "react";
 
 export const OverviewTotalCustomers = (props) => {
-  const { difference, sx, memberCount = 0, preferenceFilled = false } = props;
+  const { sx, memberCount = 0, preferenceFilled = false } = props;
 
   return (
     <Card sx={sx}>

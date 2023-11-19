@@ -1,18 +1,8 @@
 import NextLink from "next/link";
 import { usePathname } from "next/navigation";
 import PropTypes from "prop-types";
-import ArrowTopRightOnSquareIcon from "@heroicons/react/24/solid/ArrowTopRightOnSquareIcon";
 import ChevronUpDownIcon from "@heroicons/react/24/solid/ChevronUpDownIcon";
-import {
-  Box,
-  Button,
-  Divider,
-  Drawer,
-  Stack,
-  SvgIcon,
-  Typography,
-  useMediaQuery,
-} from "@mui/material";
+import { Box, Divider, Drawer, Stack, SvgIcon, Typography, useMediaQuery } from "@mui/material";
 import { Logo } from "src/components/logo";
 import { Scrollbar } from "src/components/scrollbar";
 import { items } from "./config";
@@ -34,10 +24,6 @@ export const SideNav = (props) => {
     auth.signOut();
     router.push("/auth/login");
   }, [onClose, auth, router]);
-
-  // const handleSignOut = () => {
-  //   console.log("Signing Out");
-  // };
 
   const content = (
     <Scrollbar
@@ -86,9 +72,6 @@ export const SideNav = (props) => {
               <Typography color="inherit" variant="subtitle1">
                 Hostel Management System
               </Typography>
-              {/* <Typography color="neutral.400" variant="body2">
-                Management
-              </Typography> */}
             </div>
             <SvgIcon fontSize="small" sx={{ color: "neutral.500" }}>
               <ChevronUpDownIcon />

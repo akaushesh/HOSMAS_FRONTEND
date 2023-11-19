@@ -1,12 +1,8 @@
-import PropTypes from "prop-types";
-import { format } from "date-fns";
 import {
-  Avatar,
   Box,
   Button,
   Card,
-  Checkbox,
-  CircularProgress,
+  Grid,
   IconButton,
   Popover,
   Stack,
@@ -15,19 +11,19 @@ import {
   TableBody,
   TableCell,
   TableHead,
-  TablePagination,
   TableRow,
   Typography,
 } from "@mui/material";
 import { Scrollbar } from "src/components/scrollbar";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { getInitials } from "src/utils/get-initials";
 import { useQuery } from "@tanstack/react-query";
 import { URL } from "config";
 import axios from "axios";
 import { LoadingButton } from "@mui/lab";
 import { useState } from "react";
 import { useAuth } from "src/hooks/use-auth";
+import CustomModal from "src/components/customModal";
+import { LeaveConfirmation } from "./leave-confirmation";
 
 export const CustomersTable = (props) => {
   const { sx, selected = [] } = props;
@@ -45,25 +41,14 @@ export const CustomersTable = (props) => {
     setAnchorEl(null);
   };
 
-  const onLeaveGroup = async () => {
-    const jwt = sessionStorage.getItem("jwt");
+  const [openModal, setOpenModal] = useState(false);
 
-    var leaveGroupConfig = {
-      method: "patch",
-      maxBodyLength: Infinity,
-      url: URL + "student/group/leave/",
-      headers: {
-        Authorization: "Bearer " + jwt,
-      },
-    };
+  const onOpenModal = () => {
+    setOpenModal(true);
+  };
 
-    axios(leaveGroupConfig)
-      .then(function (response) {
-        console.log(JSON.stringify(response.data));
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
+  const onCloseModal = () => {
+    setOpenModal(false);
   };
 
   const onTransferOwnership = async (member) => {
@@ -115,6 +100,7 @@ export const CustomersTable = (props) => {
         return getGroupResponse?.data;
       } catch (err) {
         console.log(err);
+        return null;
       }
     },
     queryKey: ["getGroup"],
@@ -127,16 +113,8 @@ export const CustomersTable = (props) => {
   if (group) allMembers = [group?.leader, ...group?.members];
   console.log(allMembers);
   const isLeader = group?.leader?.rollno === user?.rollno;
-  // allMembers = [
-  //   {
-  //     rollno: "222222222",
-  //     name: "Aditya",
-  //   },
-  //   {
-  //     rollno: "102103498",
-  //     name: "Chinmayee",
-  //   },
-  // ];
+
+  const isEmpty = allMembers.length === 0;
 
   return (
     <Card sx={sx}>
@@ -144,36 +122,46 @@ export const CustomersTable = (props) => {
         <Box sx={{ minWidth: 350 }}>
           <Table>
             <TableHead>
-              <TableRow sx={{ position: "relative" }}>
+              <TableRow>
                 <TableCell>Name</TableCell>
-                <TableCell>Roll No</TableCell>
-                <TableCell sx={{ padding: "0", position: "absolute", top: "0", right: "0" }}>
-                  <LoadingButton onClick={onLeaveGroup} color="error">
-                    Leave
-                  </LoadingButton>
+                <TableCell sx={{ textAlign: "center" }}>Roll No</TableCell>
+                <TableCell>
+                  <Grid container justifyContent="flex-end">
+                    <LoadingButton onClick={onOpenModal} color="error">
+                      Leave
+                    </LoadingButton>
+                  </Grid>
                 </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {allMembers.map((member) => {
+              {allMembers.map((member, index) => {
                 const isSelected = selected.includes(member.rollno);
                 return (
-                  <TableRow
-                    sx={{ position: "relative" }}
-                    hover
-                    key={member.rollno}
-                    selected={isSelected}
-                  >
+                  <TableRow hover key={member.rollno} selected={isSelected}>
                     <TableCell>
                       <Stack alignItems="center" direction="row" spacing={2}>
                         <Typography variant="subtitle2">{member.name}</Typography>
                       </Stack>
                     </TableCell>
-                    <TableCell>{member.rollno}</TableCell>
-                    {isLeader && user.rollno !== member.rollno && (
-                      <TableCell
-                        sx={{ position: "absolute", top: "0", right: "0", marginRight: "0.5rem" }}
-                      >
+                    <TableCell sx={{ textAlign: "center" }}>{member.rollno}</TableCell>
+                    {index === 0 && (
+                      <TableCell sx={{ textAlign: "right" }}>
+                        <Grid container justifyContent="flex-end">
+                          <Button
+                            sx={{ padding: "0.1rem", borderRadius: "4rem" }}
+                            variant="outlined"
+                          >
+                            Leader
+                          </Button>
+                        </Grid>
+                      </TableCell>
+                    )}
+                    {!isLeader && index !== 0 && (
+                      <TableCell sx={{ textAlign: "right" }}>&nbsp;</TableCell>
+                    )}
+                    {isLeader && index !== 0 && (
+                      <TableCell sx={{ textAlign: "right" }}>
                         <IconButton
                           sx={{ padding: "0" }}
                           aria-describedby={id}
@@ -205,19 +193,29 @@ export const CustomersTable = (props) => {
                   </TableRow>
                 );
               })}
+              {isEmpty && (
+                <TableRow sx={{ position: "relative" }}>
+                  <TableCell sx={{}}>&nbsp;</TableCell>
+                  <TableCell sx={{}}>&nbsp;</TableCell>
+                  <TableCell
+                    sx={{
+                      position: "absolute",
+                      top: "0",
+                      left: "50%",
+                      transform: "translateX(-50%)",
+                    }}
+                  >
+                    No group joined
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
+          <CustomModal open={openModal} onClose={onCloseModal}>
+            <LeaveConfirmation onClose={onCloseModal} />
+          </CustomModal>
         </Box>
       </Scrollbar>
-      {/* <TablePagination
-        component="div"
-        count={count}
-        onPageChange={onPageChange}
-        onRowsPerPageChange={onRowsPerPageChange}
-        page={page}
-        rowsPerPage={rowsPerPage}
-        rowsPerPageOptions={[5, 10, 25]}
-      /> */}
     </Card>
   );
 };

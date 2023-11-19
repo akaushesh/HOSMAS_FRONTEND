@@ -1,11 +1,8 @@
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import {
-  Button,
   Card,
   CardActions,
   CardContent,
-  CardHeader,
-  CircularProgress,
   Divider,
   Stack,
   TextField,
@@ -20,11 +17,14 @@ export const SettingsPassword = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   const handlePasswordChange = (event) => {
+    setSuccessMessage("");
     setPassword(event.target.value);
   };
   const handleConfirmPasswordChange = (event) => {
+    setSuccessMessage("");
     setConfirmPassword(event.target.value);
   };
 
@@ -54,6 +54,7 @@ export const SettingsPassword = () => {
     if (changePasswordResponse.status === 200) {
       setPassword("");
       setConfirmPassword("");
+      setSuccessMessage("Password Updated");
     } else {
       setError("Missing Data");
     }
@@ -82,9 +83,16 @@ export const SettingsPassword = () => {
               type="password"
               value={confirmPassword}
             />
-            <Typography variant="body2" color="error.main">
-              {error}
-            </Typography>
+            {error && (
+              <Typography variant="body2" color="error.main">
+                {error}
+              </Typography>
+            )}
+            {successMessage && (
+              <Typography variant="body2" color="grey">
+                {successMessage}
+              </Typography>
+            )}
           </Stack>
         </CardContent>
         <Divider />

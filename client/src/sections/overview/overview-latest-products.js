@@ -1,8 +1,6 @@
-import { formatDistanceToNow } from "date-fns";
 import PropTypes from "prop-types";
 import ArrowRightIcon from "@heroicons/react/24/solid/ArrowRightIcon";
 import ArrowLeftIcon from "@heroicons/react/24/solid/ArrowLeftIcon";
-import EllipsisVerticalIcon from "@heroicons/react/24/solid/EllipsisVerticalIcon";
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import {
@@ -11,19 +9,19 @@ import {
   Card,
   CardActions,
   CardHeader,
-  CircularProgress,
   Divider,
+  Grid,
   IconButton,
   List,
   ListItem,
   ListItemText,
   SvgIcon,
+  Typography,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import axios from "axios";
 import { URL } from "config";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useAuth } from "src/hooks/use-auth";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 function timeAgo(timestamp) {
   const currentDate = new Date();
@@ -74,7 +72,7 @@ export const OverviewLatestProducts = (props) => {
         queryClient.invalidateQueries(["getInvitation"]);
       })
       .catch(function (error) {
-        console.log(error);
+        console.log(error?.response?.data?.detail);
       });
   };
 
@@ -131,6 +129,7 @@ export const OverviewLatestProducts = (props) => {
   };
 
   const finalProducts = requests?.slice(0, limit);
+  console.log(finalProducts.length === 0);
 
   return (
     <Card sx={sx}>
@@ -175,6 +174,13 @@ export const OverviewLatestProducts = (props) => {
         })}
       </List>
       <Divider />
+      <Grid container marginTop="1.5rem" justifyContent="center" alignItems="center">
+        <Grid item>
+          {finalProducts.length === 0 && (
+            <Typography variant="body2">No pending requests</Typography>
+          )}
+        </Grid>
+      </Grid>
       <CardActions sx={{ justifyContent: "flex-end" }}>
         {requests.size > 4 && (
           <Button

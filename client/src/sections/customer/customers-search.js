@@ -6,14 +6,7 @@ import CustomModal from "src/components/customModal";
 import { CustomerConfirmation } from "./customer-confirmation";
 import axios from "axios";
 import { URL } from "config";
-
-function sleep(duration) {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve();
-    }, duration);
-  });
-}
+import { useAuth } from "src/hooks/use-auth";
 
 export const CustomersSearch = () => {
   const [enrollmentNumber, setEnrollmentNumber] = useState("");
@@ -21,9 +14,14 @@ export const CustomersSearch = () => {
   const [loading, setLoading] = useState(false);
   const [infoText, setInfoText] = useState("Enter complete enrollment number");
   const [openModal, setOpenModal] = useState(false);
+  const [entryIsCorrect, setEntryIsCorrect] = useState(false);
+
+  const { user } = useAuth();
+  const isLeader = !user?.group || user?.email === user?.group?.leader_email;
 
   const onOpenModal = () => {
-    setOpenModal(true);
+    if (entryIsCorrect) setOpenModal(true);
+    else setInfoText("Invalid entry cannot proceed");
   };
 
   const onCloseModal = () => {
@@ -38,11 +36,13 @@ export const CustomersSearch = () => {
   const onSelectChangeHandler = (event, value) => {
     if (!value) return;
     setEnrollmentNumber(value.enrollmentNumber);
+    setEntryIsCorrect(true);
   };
 
   const onTextFieldChangeHandler = (e) => {
     if (e.target.value.length !== 9) {
       setInfoText("Enter complete enrollment number");
+      setEntryIsCorrect(false);
       if (option.size !== 0) {
         setOption([]);
         return;
@@ -89,6 +89,7 @@ export const CustomersSearch = () => {
       <form onSubmit={onSubmitHandler}>
         <Stack direction="row" alignItems="center">
           <Autocomplete
+            disabled={!isLeader}
             id="enrollment-number-tags"
             loading={loading}
             options={option}
@@ -117,7 +118,7 @@ export const CustomersSearch = () => {
             renderInput={(params) => (
               <TextField
                 {...params}
-                label="Add member"
+                label={isLeader ? "Add member" : "Only leader can add members"}
                 placeholder="Enrollment Number"
                 onChange={onTextFieldChangeHandler}
                 value={enrollmentNumber}
@@ -132,7 +133,7 @@ export const CustomersSearch = () => {
               onClose={onCloseModal}
             />
           </CustomModal>
-          <Button type="submit" onClick={onOpenModal}>
+          <Button disabled={!isLeader} type="submit" onClick={onOpenModal}>
             <SendIcon color="primary" />
           </Button>
         </Stack>
