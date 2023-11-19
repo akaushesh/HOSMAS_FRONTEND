@@ -1,13 +1,27 @@
 version: '3'
 
 services:
-  hosmasapi:
-    image: ccs/hosmas
+  hosmas-api:
+    image: ccs/hosmas-api
     build:
       context: .
       dockerfile: ./Dockerfile
+    depends_on:
+      - hosmas-celery
     volumes:
       - ./static/:/app/static/
       - ./logs/:/app/logs/
       - ./media/:/app/media/
     network_mode: "host"
+  
+  hosmas-celery:
+    image: ccs/hosmas-celery
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    volumes:
+      - ./media/:/app/media/
+      - ./logs/:/app/logs/
+    command: celery -A config worker -l info
+    network_mode: "host"
+    restart: always
