@@ -14,7 +14,7 @@ from preference.models import Hostel, RoomType, RoomTypeChoice
 from student.models import Batch, Section, Student, Group
 from .models import AllotmentStatus
 
-from .serializers import HostelSerializer, HostelSingleSerializer, RoomTypeSerializer, RoomTypeChoiceSerializer, RoomTypeOptionSerializer, BatchSerializer, BatchUninitializedSerializer, SectionSerializer, ProfileSerializer, AllotmentStatusSerializer
+from .serializers import HostelSerializer, HostelSingleSerializer, RoomTypeSerializer, RoomTypeChoiceSerializer, RoomTypeOptionSerializer, BatchSerializer, BatchUninitializedSerializer, SectionSerializer, ProfileSerializer, AllotmentStatusSerializer, SectionRoomTypeSerializer
 from student.serializers import StudentSerializer, GroupSerializer
 
 from .tasks import allot_hostel
@@ -68,11 +68,11 @@ class GetMultipleObjectsView(APIView):
                   queryset = RoomType.objects.all()
                   serializer = RoomTypeOptionSerializer(queryset, many=True)
             elif model=='choice':
-                  section = Section.objects.filter(id=request.GET.get('section')).first()
-                  if section is None:
+                  queryset = Section.objects.filter(id=request.GET.get('section')).first()
+                  if queryset is None:
                         return Response(status=status.HTTP_404_NOT_FOUND)
-                  queryset = RoomTypeChoice.objects.filter(section=section)
-                  serializer = RoomTypeChoiceSerializer(queryset, many=True)
+                  
+                  serializer = SectionRoomTypeSerializer(queryset)
             elif model=='batch':
                   queryset = Batch.objects.all()
                   serializer = BatchSerializer(queryset, many=True)
@@ -124,7 +124,7 @@ class UpdateObjectView(APIView):
                   instance = RoomTypeChoice.objects.filter(id=id).first()
                   if instance is None:
                         return Response(status=status.HTTP_404_NOT_FOUND)
-                  serializer = RoomTypeChoiceSerializer(instance, request.data)
+                  serializer = RoomTypeChoiceSerializer(instance, request.data, partial=True)
             elif model=='section':
                   instance = Section.objects.filter(id=id).first()
                   if instance is None:
