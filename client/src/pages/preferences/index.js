@@ -18,20 +18,50 @@ import axios from "axios";
 import { URL } from "config";
 
 const Page = () => {
+  const { data: isLive } = useQuery({
+    queryFn: async () => {
+      try {
+        const url = URL + "preferences/status/";
+        const jwt = sessionStorage.getItem("jwt");
+
+        const getPreferenceStatusConfig = {
+          maxBodyLength: Infinity,
+          url: url,
+          headers: {
+            Authorization: "Bearer " + jwt,
+          },
+        };
+
+        const getPreferenceStatusResponse = await axios.get(url, getPreferenceStatusConfig);
+        return getPreferenceStatusResponse?.data?.is_live;
+      } catch (err) {
+        console.log(err);
+        return false;
+      }
+    },
+    queryKey: ["isPreferenceFillingLive"],
+  });
+
+  console.log(isLive);
+
   const { data: availableChoices, isLoading } = useQuery({
     queryFn: async () => {
-      const url = URL + "preferences/getChoices/";
-      const jwt = sessionStorage.getItem("jwt");
+      try {
+        const url = URL + "preferences/getChoices/";
+        const jwt = sessionStorage.getItem("jwt");
 
-      const getAvailableChoicesConfig = {
-        maxBodyLength: Infinity,
-        headers: {
-          Authorization: "Bearer " + jwt,
-        },
-      };
+        const getAvailableChoicesConfig = {
+          maxBodyLength: Infinity,
+          headers: {
+            Authorization: "Bearer " + jwt,
+          },
+        };
 
-      const availableChoicesResponse = await axios.get(url, getAvailableChoicesConfig);
-      return availableChoicesResponse?.data;
+        const availableChoicesResponse = await axios.get(url, getAvailableChoicesConfig);
+        return availableChoicesResponse?.data;
+      } catch (err) {
+        return [];
+      }
     },
     queryKey: ["getAvailablePreferences"],
   });
@@ -71,17 +101,33 @@ const Page = () => {
           flexGrow: 1,
           py: 4,
         }}
+        position="relative"
       >
         <Container maxWidth="xl">
-          <Stack>
-            <Grid container paddingTop="1rem" justifyContent="center" alignItems="center">
-              <PreferenceForm
-                sx={{ height: "100%", maxWidth: "25rem", padding: "2rem 3rem" }}
-                availableChoices={availableChoices}
-                currentPreferences={currentPreferences}
-              />
-            </Grid>
-          </Stack>
+          {isLive ? (
+            <Stack>
+              <Grid container paddingTop="1rem" justifyContent="center" alignItems="center">
+                <PreferenceForm
+                  sx={{ height: "100%", maxWidth: "25rem", padding: "2rem 3rem" }}
+                  availableChoices={availableChoices}
+                  currentPreferences={currentPreferences}
+                />
+              </Grid>
+            </Stack>
+          ) : (
+            <Box
+              sx={{
+                position: "absolute",
+                top: "47%",
+                left: "50%",
+                transform: "translate(-50%,-50%)",
+              }}
+            >
+              <Typography marginTop="18%" textAlign="center" vatiant="body2" color="grey">
+                Preference filling is not currently live for you
+              </Typography>
+            </Box>
+          )}
         </Container>
       </Box>
     </Fragment>
