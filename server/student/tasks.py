@@ -76,12 +76,12 @@ def left_group_mail(leader_name, exmember_name, exmember_roll, member_email):
 
 @app.task(name='add_users')
 def add_users(filename):
-    email_subject = 'User Credentials for Hostel Management'
+    # email_subject = 'User Credentials for Hostel Management'
     
-    filename = os.path.join(settings.MEDIA_ROOT, filename)
+    filename = os.path.join(settings.BASE_DIR, 'imported_data', filename)
     
-    connection = get_connection(fail_silently=False)
-    connection.open()
+    # connection = get_connection(fail_silently=False)
+    # connection.open()
     
     userfile = open(filename, 'r', newline='', encoding='utf-8-sig')
     reader = csv.DictReader(userfile)
@@ -119,13 +119,13 @@ def add_users(filename):
             'email': row['email'].strip(),
             'password': password
         }
-        html_message = render_to_string('dashboard/email_credentials.html', context)
-        msg = strip_tags(html_message)
+        # html_message = render_to_string('dashboard/email_credentials.html', context)
+        # msg = strip_tags(html_message)
 
-        email = EmailMultiAlternatives(email_subject, msg, settings.EMAIL_HOST_USER, (row['email'],))
-        email.attach_alternative(html_message, 'text/html')
+        # email = EmailMultiAlternatives(email_subject, msg, settings.EMAIL_HOST_USER, (row['email'],))
+        # email.attach_alternative(html_message, 'text/html')
         
-        connection.send_messages((email,))
+        # connection.send_messages((email,))
     
-    connection.close()
+    # connection.close()
     return f"{successCnt} users successfully created and {failureCnt} failed."
