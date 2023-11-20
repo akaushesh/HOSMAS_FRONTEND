@@ -121,7 +121,7 @@ class SectionSerializer(serializers.ModelSerializer):
 
 class SectionRoomTypeSerializer(serializers.ModelSerializer):
     batch_name = serializers.SerializerMethodField()
-    room_choices = RoomTypeChoiceSerializer(source='choices', many=True)
+    room_choices = RoomTypeChoiceSerializer(source='choices', many=True, read_only=True)
 
     class Meta:
         model = Section

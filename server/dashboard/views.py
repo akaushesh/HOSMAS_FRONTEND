@@ -124,7 +124,7 @@ class UpdateObjectView(APIView):
                   instance = RoomTypeChoice.objects.filter(id=id).first()
                   if instance is None:
                         return Response(status=status.HTTP_404_NOT_FOUND)
-                  serializer = RoomTypeChoiceSerializer(instance, request.data)
+                  serializer = RoomTypeChoiceSerializer(instance, request.data, partial=True)
             elif model=='section':
                   instance = Section.objects.filter(id=id).first()
                   if instance is None:
