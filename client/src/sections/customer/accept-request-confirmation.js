@@ -4,9 +4,10 @@ import { Box, Stack } from "@mui/system";
 import { useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { URL } from "config";
+import { useRouter } from "next/router";
 import { Fragment, useState } from "react";
 
-export const TransferOwnershipConfirmation = ({ member, onClose }) => {
+export const AcceptRequestConfirmation = ({ product, onClose }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -14,35 +15,32 @@ export const TransferOwnershipConfirmation = ({ member, onClose }) => {
 
   const onAccept = async () => {
     setLoading(true);
-    const url = URL + "student/group/transfer/";
     const jwt = sessionStorage.getItem("jwt");
     const data = {
-      rollno: member?.rollno,
+      id: product.id,
     };
 
-    const transferOwnershipConfig = {
+    const acceptInvitationConfig = {
       method: "post",
       maxBodyLength: Infinity,
-      url: url,
-      headers: {
-        Authorization: "Bearer " + jwt,
-      },
+      url: URL + "student/invitation/accept/",
+      headers: { Authorization: "Bearer " + jwt },
       data: data,
     };
 
-    await axios(transferOwnershipConfig)
+    await axios(acceptInvitationConfig)
       .then(function (response) {
         queryClient.invalidateQueries(["getGroup"]);
+        queryClient.invalidateQueries(["getInvitation"]);
         queryClient.invalidateQueries(["getProfile"]);
         onClose();
       })
       .catch(function (error) {
-        if (error?.response?.data?.detail) {
-          setError(error?.response?.data?.detail);
-        } else {
-          setError("Something went wrong");
-        }
+        if (error?.response?.data?.detail) setError(error?.response?.data?.detail);
+        else setError("Something went wrong");
+        console.log(error);
       });
+
     setLoading(false);
   };
 
@@ -57,8 +55,8 @@ export const TransferOwnershipConfirmation = ({ member, onClose }) => {
       </Typography>
 
       <Typography variant="body1" textAlign="justify">
-        If you accept you will no longer be the leader of your group. Its ownership will be
-        transferred to {member?.name} with enrollment number {member?.rollno}.
+        If you accept your current preferences if set will be deleted and you will be added to{" "}
+        {product?.group_leader_name}'s group.
       </Typography>
       <br />
       <Typography variant="body1" textAlign="justify">

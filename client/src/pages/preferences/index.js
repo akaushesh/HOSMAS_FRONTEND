@@ -32,8 +32,6 @@ const Page = () => {
     queryKey: ["isPreferenceFillingLive"],
   });
 
-  console.log(isLive);
-
   const { data: availableChoices, isLoading } = useQuery({
     queryFn: async () => {
       try {

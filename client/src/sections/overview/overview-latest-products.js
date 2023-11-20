@@ -22,7 +22,7 @@ import axios from "axios";
 import { URL } from "config";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import CustomModal from "src/components/customModal";
-import { TransferOwnershipConfirmation } from "../customer/transfer-ownership-confirmation";
+import { AcceptRequestConfirmation } from "../customer/accept-request-confirmation";
 
 function timeAgo(timestamp) {
   const currentDate = new Date();
@@ -146,7 +146,7 @@ export const OverviewLatestProducts = (props) => {
                 </SvgIcon>
               </IconButton>
               <CustomModal open={openModal} onClose={onCloseModal}>
-                <TransferOwnershipConfirmation product={modalProduct} onClose={onCloseModal} />
+                <AcceptRequestConfirmation product={modalProduct} onClose={onCloseModal} />
               </CustomModal>
               <IconButton
                 onClick={() => {
