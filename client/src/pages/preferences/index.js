@@ -2,7 +2,7 @@ import { Fragment } from "react";
 import Head from "next/head";
 import { Box, Container, Grid, Stack, Typography } from "@mui/material";
 import { Layout as DashboardLayout } from "src/layouts/dashboard/layout";
-import { PreferenceForm } from "src/sections/customer/preference-form";
+import { PreferenceForm } from "src/sections/preference/preference-form";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { URL } from "config";
@@ -25,7 +25,6 @@ const Page = () => {
         const getPreferenceStatusResponse = await axios.get(url, getPreferenceStatusConfig);
         return getPreferenceStatusResponse?.data?.is_live;
       } catch (err) {
-        console.log(err);
         return false;
       }
     },

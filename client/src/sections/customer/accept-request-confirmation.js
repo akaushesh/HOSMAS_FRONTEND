@@ -38,7 +38,6 @@ export const AcceptRequestConfirmation = ({ product, onClose }) => {
       .catch(function (error) {
         if (error?.response?.data?.detail) setError(error?.response?.data?.detail);
         else setError("Something went wrong");
-        console.log(error);
       });
 
     setLoading(false);
