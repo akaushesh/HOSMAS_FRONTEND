@@ -108,7 +108,6 @@ class BatchSerializer(serializers.ModelSerializer):
 
 class SectionSerializer(serializers.ModelSerializer):
       batch_name = serializers.SerializerMethodField()
-
       class Meta:
             model = Section
             fields = ['id', 'batch_name', 'batch', 'gender', 'is_allotment_enabled']
@@ -118,7 +117,18 @@ class SectionSerializer(serializers.ModelSerializer):
       
       def get_batch_name(self, obj):
             return obj.batch.name
+      
 
+class SectionRoomTypeSerializer(serializers.ModelSerializer):
+    batch_name = serializers.SerializerMethodField()
+    room_choices = RoomTypeChoiceSerializer(source='choices', many=True)
+
+    class Meta:
+        model = Section
+        fields = ['id', 'batch_name', 'gender', 'room_choices', 'is_allotment_enabled']
+
+    def get_batch_name(self, obj):
+        return obj.batch.name
 
 class ProfileSerializer(serializers.ModelSerializer):
       class Meta:
