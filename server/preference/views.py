@@ -159,7 +159,14 @@ class getPreferences(APIView):
             return Response({'error':'No preferences found'},status=status.HTTP_400_BAD_REQUEST)
         
         serializer = PreferenceSerializer(p, many=True)
-        return Response({'status':'success','data':serializer.data}, status.HTTP_200_OK)
+        res = {
+            'status':'success',
+            'data': {
+                'retain': group.retain,
+                'preferences': serializer.data,
+            }
+        }
+        return Response(res, status.HTTP_200_OK)
             
 
 class deletePreferences(APIView):

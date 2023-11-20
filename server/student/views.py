@@ -46,13 +46,6 @@ class SearchStudentView(APIView):
             except ObjectDoesNotExist:
                   pass
 
-            try:
-                  group = resultant.leader_of_group
-                  if student.group==group or Invitation.objects.filter(for_group=group, to=student).exists():
-                        return Response(status=status.HTTP_412_PRECONDITION_FAILED)
-            except ObjectDoesNotExist:
-                  pass
-
             serializer = StudentSerializer(resultant)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -146,6 +139,11 @@ class AcceptInvitationView(APIView):
                   curr_group = request.user.student.leader_of_group
                   if (curr_group.members.count()>0):
                         return Response({'details': 'You are already a group leader'}, status=status.HTTP_400_BAD_REQUEST)
+                  
+                  rev_invitation = Invitation.objects.filter(to=group.leader, group=current_group).first()
+                  if rev_invitation is not None:
+                        rev_invitation.delete()
+                  
                   curr_group.delete()
             except ObjectDoesNotExist:
                   pass
