@@ -8,11 +8,13 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useAuth } from "src/hooks/use-auth";
+import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/router";
 
 export const PreferenceForm = ({ sx, availableChoices = [], currentPreferences = [] }) => {
-  const { user } = useAuth();
+  const queryClient = useQueryClient();
+
+  const user = queryClient.getQueryData(["getProfile"]);
   const isLeader = !user?.group || user?.email === user?.group?.leader_email;
 
   const router = useRouter();
@@ -61,7 +63,7 @@ export const PreferenceForm = ({ sx, availableChoices = [], currentPreferences =
           </Button>
           {!isLeader && (
             <FormHelperText>
-              Only your group leader {user.group.leader_name} can fill this form
+              Only your group leader {user.group.leader_name} can edit this form
             </FormHelperText>
           )}
         </Grid>

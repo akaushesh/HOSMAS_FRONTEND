@@ -76,7 +76,7 @@ export const CustomersTable = (props) => {
         queryClient.invalidateQueries(["getGroup"]);
       })
       .catch(function (error) {
-        console.log(error);
+        // console.log(error);
       });
 
     setLoading(false);

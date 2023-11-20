@@ -14,17 +14,17 @@ import {
 } from "@mui/material";
 import CustomModal from "src/components/customModal";
 import { FormConfirmation } from "./form-confirmation";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { URL } from "config";
 import axios from "axios";
-import { useAuth } from "src/hooks/use-auth";
 
 export const EditPreferenceForm = (props) => {
   const { sx } = props;
   const [openModal, setOpenModal] = useState(false);
   const [retain, setRetain] = useState(false);
+  const queryClient = useQueryClient();
 
-  const { user } = useAuth();
+  const user = queryClient.getQueryData(["getProfile"]);
   const isLeader = !user?.group || user?.email === user?.group?.leader_email;
 
   const onCloseModal = () => {

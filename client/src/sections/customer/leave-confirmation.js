@@ -8,7 +8,6 @@ import { Fragment, useState } from "react";
 import { useAuth } from "src/hooks/use-auth";
 
 export const LeaveConfirmation = ({ onClose }) => {
-  const auth = useAuth();
   const queryClient = useQueryClient();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -29,6 +28,7 @@ export const LeaveConfirmation = ({ onClose }) => {
     await axios(leaveGroupConfig)
       .then(function (response) {
         queryClient.invalidateQueries(["getGroup"]);
+        queryClient.invalidateQueries(["getProfile"]);
         onClose();
       })
       .catch(function (error) {

@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useReducer, useRef } from "react"
 import { URL } from "config";
 import PropTypes from "prop-types";
 import axios from "axios";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 const HANDLERS = {
   INITIALIZE: "INITIALIZE",
@@ -60,8 +61,31 @@ export const AuthContext = createContext({ undefined });
 
 export const AuthProvider = (props) => {
   const { children } = props;
+  const queryClient = useQueryClient();
   const [state, dispatch] = useReducer(reducer, initialState);
   const initialized = useRef(false);
+
+  const { data: user } = useQuery({
+    queryFn: async () => {
+      try {
+        const jwt = sessionStorage.getItem("jwt");
+        const getProfileConfig = {
+          maxBodyLength: Infinity,
+          headers: {
+            Authorization: "Bearer " + jwt,
+          },
+        };
+
+        const newURL = URL + "student/profile/";
+
+        const getProfileResponse = await axios.get(newURL, getProfileConfig);
+        return getProfileResponse?.data;
+      } catch (err) {
+        return null;
+      }
+    },
+    queryKey: ["getProfile"],
+  });
 
   const initialize = async () => {
     // Prevent from calling twice in development mode with React.StrictMode enabled
@@ -92,33 +116,24 @@ export const AuthProvider = (props) => {
       const refreshTokenResponse = await axios.post(url, data, { refreshConfig });
       sessionStorage.setItem("jwt", refreshTokenResponse?.data?.access);
 
-      const getProfileConfig = {
-        maxBodyLength: Infinity,
-        headers: {
-          Authorization: "Bearer " + refreshTokenResponse?.data?.access,
-        },
-      };
-
-      const newURL = URL + "student/profile/";
-
-      const getProfileResponse = await axios.get(newURL, getProfileConfig);
+      const userProfile = queryClient.getQueriesData(["getProfile"])[0][1];
 
       const user = {
-        batch: getProfileResponse?.data?.batch,
-        cg: getProfileResponse?.data?.cg,
-        gender: getProfileResponse?.gender,
-        name: getProfileResponse?.data?.name,
-        role: getProfileResponse?.data?.role,
-        rollno: getProfileResponse?.data?.rollno,
-        email: getProfileResponse?.data?.email,
-        group: getProfileResponse?.data?.group,
-        gender: getProfileResponse?.data?.gender,
-        batch: getProfileResponse?.data?.batch,
-        current_hostel: getProfileResponse?.data?.current_hostel,
-        current_room: getProfileResponse?.data?.current_room,
-        alloted_hostel: getProfileResponse?.data?.alloted_hostel,
-        alloted_room: getProfileResponse?.data?.alloted_room,
-        preference_filled: getProfileResponse?.data?.preference_filled,
+        batch: userProfile?.batch,
+        cg: userProfile?.cg,
+        gender: userProfile?.gender,
+        name: userProfile?.name,
+        role: userProfile?.role,
+        rollno: userProfile?.rollno,
+        email: userProfile?.email,
+        group: userProfile?.group,
+        gender: userProfile?.gender,
+        batch: userProfile?.batch,
+        current_hostel: userProfile?.current_hostel,
+        current_room: userProfile?.current_room,
+        alloted_hostel: userProfile?.alloted_hostel,
+        alloted_room: userProfile?.alloted_room,
+        preference_filled: userProfile?.preference_filled,
       };
 
       dispatch({
@@ -162,39 +177,28 @@ export const AuthProvider = (props) => {
       };
 
       const loginResponse = await axios.post(loginURL, data, { loginConfig });
-      console.log(loginResponse);
       window.sessionStorage.setItem("authenticated", "true");
       window.sessionStorage.setItem("jwt", loginResponse?.data?.access);
       window.sessionStorage.setItem("refresh", loginResponse?.data?.refresh);
 
-      const getProfileConfig = {
-        method: "get",
-        maxBodyLength: Infinity,
-        headers: {
-          Authorization: "Bearer " + loginResponse?.data?.access,
-        },
-      };
-
-      const newURL = URL + "student/profile/";
-
-      const getProfileResponse = await axios.get(newURL, getProfileConfig);
+      const userProfile = queryClient.getQueriesData(["getProfile"])[0][1];
 
       const user = {
-        batch: getProfileResponse?.data?.batch,
-        cg: getProfileResponse?.data?.cg,
-        gender: getProfileResponse?.gender,
-        name: getProfileResponse?.data?.name,
-        role: getProfileResponse?.data?.role,
-        rollno: getProfileResponse?.data?.rollno,
-        email: getProfileResponse?.data?.email,
-        group: getProfileResponse?.data?.group,
-        gender: getProfileResponse?.data?.gender,
-        batch: getProfileResponse?.data?.batch,
-        current_hostel: getProfileResponse?.data?.current_hostel,
-        current_room: getProfileResponse?.data?.current_room,
-        alloted_hostel: getProfileResponse?.data?.alloted_hostel,
-        alloted_room: getProfileResponse?.data?.alloted_room,
-        preference_filled: getProfileResponse?.data?.preference_filled,
+        batch: userProfile?.batch,
+        cg: userProfile?.cg,
+        gender: userProfile?.gender,
+        name: userProfile?.name,
+        role: userProfile?.role,
+        rollno: userProfile?.rollno,
+        email: userProfile?.email,
+        group: userProfile?.group,
+        gender: userProfile?.gender,
+        batch: userProfile?.batch,
+        current_hostel: userProfile?.current_hostel,
+        current_room: userProfile?.current_room,
+        alloted_hostel: userProfile?.alloted_hostel,
+        alloted_room: userProfile?.alloted_room,
+        preference_filled: userProfile?.preference_filled,
       };
 
       dispatch({
@@ -215,7 +219,6 @@ export const AuthProvider = (props) => {
   };
 
   const signOut = () => {
-    console.log("signout");
     try {
       window.sessionStorage.setItem("authenticated", "false");
       window.sessionStorage.removeItem("jwt");

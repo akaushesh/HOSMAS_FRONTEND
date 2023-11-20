@@ -29,8 +29,6 @@ const Page = () => {
     onSubmit: async (values, helpers) => {
       try {
         setLoading(true);
-        console.log(slug, values.password);
-        console.log(values.email);
         const loginURL = URL + "auth/reset-password/";
         const data = { slug: slug, password: values.password };
 
@@ -41,10 +39,8 @@ const Page = () => {
         };
 
         const resetPasswordResponse = await axios.post(loginURL, data, { resetPasswordConfig });
-        console.log(resetPasswordResponse);
         router.push("/auth/login");
       } catch (err) {
-        console.log(err);
         helpers.setStatus({ success: false });
         helpers.setSubmitting(false);
 
