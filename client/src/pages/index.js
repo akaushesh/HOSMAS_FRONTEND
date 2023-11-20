@@ -9,8 +9,6 @@ import { useQueryClient } from "@tanstack/react-query";
 
 const Page = () => {
   const queryClient = useQueryClient();
-  // const userResponse = queryClient.getQueryData(["getProfile"]);
-  // const user = userResponse !== null ? userResponse[0][1] : {};
   const user = queryClient.getQueryData(["getProfile"]);
 
   return (
@@ -38,13 +36,14 @@ const Page = () => {
                 rollNumber={user?.rollno}
                 CGPA={user?.cg}
                 hostel={user?.current_hostel ? user?.current_hostel : ""}
-                roomNumber={user?.current_room ? user?.current_room : ""}
+                phoneNumber={user?.phoneNumber ? user?.phoneNumber : ""}
               />
             </Grid>
             <Grid item xs={12} lg={4}>
               <Grid>
                 <OverviewBudget
                   allotedHostel={user?.alloted_hostel ? user.alloted_hostel : ""}
+                  currentSemester={user?.current_semester ? user?.current_semester : ""}
                   sx={{ height: "100%" }}
                 />
               </Grid>

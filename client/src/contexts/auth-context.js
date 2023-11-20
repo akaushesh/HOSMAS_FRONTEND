@@ -80,6 +80,7 @@ export const AuthProvider = (props) => {
         const newURL = URL + "student/profile/";
 
         const getProfileResponse = await axios.get(newURL, getProfileConfig);
+        console.log(getProfileResponse?.data);
         return getProfileResponse?.data;
       } catch (err) {
         return null;

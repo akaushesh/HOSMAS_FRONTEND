@@ -9,7 +9,14 @@ import {
 } from "@mui/material";
 
 export const AccountProfileDetails = (props) => {
-  const { name = "", email = "", rollNumber = "", CGPA = "", hostel = "", roomNumber = "" } = props;
+  const {
+    name = "",
+    email = "",
+    rollNumber = "",
+    CGPA = "",
+    hostel = "",
+    phoneNumber = "",
+  } = props;
 
   return (
     <Card>
@@ -34,7 +41,17 @@ export const AccountProfileDetails = (props) => {
               />
             </Grid>
             <Grid xs={12} md={6}>
-              <TextField fullWidth label="hostel" name="hostel" disabled value={hostel} />
+              <TextField
+                fullWidth
+                label="Phone Number"
+                name="phoneNumber"
+                disabled
+                type="number"
+                value={phoneNumber}
+              />
+            </Grid>
+            <Grid xs={12} md={6}>
+              <TextField fullWidth label="Current Hostel" name="hostel" disabled value={hostel} />
             </Grid>
             <Grid xs={12} md={6}>
               <TextField
@@ -46,7 +63,7 @@ export const AccountProfileDetails = (props) => {
                 value={CGPA}
               />
             </Grid>
-            <Grid xs={12} md={6}>
+            {/* <Grid xs={12} md={6}>
               <TextField
                 fullWidth
                 label="Room Type"
@@ -55,7 +72,7 @@ export const AccountProfileDetails = (props) => {
                 SelectProps={{ native: true }}
                 value={roomNumber}
               />
-            </Grid>
+            </Grid> */}
           </Grid>
         </Box>
       </CardContent>

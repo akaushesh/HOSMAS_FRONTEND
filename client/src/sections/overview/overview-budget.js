@@ -3,7 +3,7 @@ import DomainIcon from "@mui/icons-material/Domain";
 import { Avatar, Card, CardContent, Stack, SvgIcon, Typography } from "@mui/material";
 
 export const OverviewBudget = (props) => {
-  const { sx, allotedHostel } = props;
+  const { sx, allotedHostel, currentSemester } = props;
 
   return (
     <Card sx={sx}>
@@ -33,8 +33,8 @@ export const OverviewBudget = (props) => {
         <Stack alignItems="center" direction="row" spacing={2} sx={{ mt: 2 }}>
           <Typography color={allotedHostel ? "success.main" : "error.main"} variant="caption">
             {allotedHostel
-              ? "Hostel allottment has been completed"
-              : "Hostels have not been allotted yet"}
+              ? `Hostel allottment completed for ${currentSemester}`
+              : `Hostels allotment not completed for ${currentSemester}`}
           </Typography>
         </Stack>
       </CardContent>
