@@ -21,15 +21,14 @@ import { URL } from "config";
 import axios from "axios";
 import { LoadingButton } from "@mui/lab";
 import { useState } from "react";
-import { useAuth } from "src/hooks/use-auth";
 import CustomModal from "src/components/customModal";
 import { LeaveConfirmation } from "./leave-confirmation";
 
 export const CustomersTable = (props) => {
   const { sx, selected = [] } = props;
 
-  const { user } = useAuth();
   const queryClient = useQueryClient();
+  const user = queryClient.getQueryData(["getProfile"]);
 
   const [loading, setLoading] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -74,6 +73,7 @@ export const CustomersTable = (props) => {
     await axios(transferOwnershipConfig)
       .then(function (response) {
         queryClient.invalidateQueries(["getGroup"]);
+        queryClient.invalidateQueries(["getProfile"]);
       })
       .catch(function (error) {
         // console.log(error);

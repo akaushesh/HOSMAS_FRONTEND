@@ -5,7 +5,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { URL } from "config";
 import { Fragment, useState } from "react";
-import { useAuth } from "src/hooks/use-auth";
 
 export const LeaveConfirmation = ({ onClose }) => {
   const queryClient = useQueryClient();

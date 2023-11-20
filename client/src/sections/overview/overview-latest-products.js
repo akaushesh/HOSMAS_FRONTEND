@@ -69,6 +69,7 @@ export const OverviewLatestProducts = (props) => {
       .then(function (response) {
         queryClient.invalidateQueries(["getGroup"]);
         queryClient.invalidateQueries(["getInvitation"]);
+        queryClient.invalidateQueries(["getProfile"]);
       })
       .catch(function (error) {});
   };

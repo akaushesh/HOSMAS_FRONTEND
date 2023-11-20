@@ -5,10 +5,13 @@ import { OverviewBudget } from "src/sections/overview/overview-budget";
 import { OverviewTotalCustomers } from "src/sections/overview/overview-total-customers";
 import { AccountProfileDetails } from "src/sections/account/account-profile-details";
 import { Fragment } from "react";
-import { useAuth } from "src/hooks/use-auth";
+import { useQueryClient } from "@tanstack/react-query";
 
 const Page = () => {
-  const { user } = useAuth();
+  const queryClient = useQueryClient();
+  // const userResponse = queryClient.getQueryData(["getProfile"]);
+  // const user = userResponse !== null ? userResponse[0][1] : {};
+  const user = queryClient.getQueryData(["getProfile"]);
 
   return (
     <Fragment>
