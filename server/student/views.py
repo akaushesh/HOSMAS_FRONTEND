@@ -34,22 +34,25 @@ class SearchStudentView(APIView):
             resultant = Student.objects.filter(rollno=request.data.get('rollno')).first()
 
             if resultant is None:
-                  return Response(status=status.HTTP_404_NOT_FOUND)
+                  return Response({'detail': 'No student found!'}, status=status.HTTP_403_FORBIDDEN)
 
-            if resultant==student or resultant.batch!=student.batch or resultant.gender!=student.gender:
-                  return Response(status=status.HTTP_412_PRECONDITION_FAILED)
+            if resultant==student:
+                  return Response({'detail': 'You can\'t send invitation to yourself!'}, status=status.HTTP_403_FORBIDDEN)
+
+            if resultant.batch!=student.batch or resultant.gender!=student.gender:
+                  return Response({'detail': 'You can only send invitation to a student with same batch and same gender!'}, status=status.HTTP_403_FORBIDDEN)
 
             try:
                   group = student.leader_of_group
-                  if resultant.group==group or Invitation.objects.filter(for_group=group, to=resultant).exists():
-                        return Response(status=status.HTTP_412_PRECONDITION_FAILED)
-            except ObjectDoesNotExist:
-                  pass
-
-            try:
-                  group = resultant.leader_of_group
-                  if student.group==group or Invitation.objects.filter(for_group=group, to=student).exists():
-                        return Response(status=status.HTTP_412_PRECONDITION_FAILED)
+                  if resultant.group==group:
+                        return Response({'detail': 'This student is already part of your group!'}, status=status.HTTP_403_FORBIDDEN)
+                  if Invitation.objects.filter(for_group=group, to=resultant).exists():
+                        return Response({'detail': 'You\'ve already sent an invitation to this student!'}, status=status.HTTP_403_FORBIDDEN)
+            
+                  members_count = group.members.count()
+                  if members_count >= 3:
+                        return Response({'detail': 'You\'re group is already full!'}, status=status.HTTP_400_BAD_REQUEST)
+            
             except ObjectDoesNotExist:
                   pass
 
@@ -62,24 +65,28 @@ class SendInvitationView(APIView):
 
       def post(self, request):
             student = request.user.student
+            
             try:
                   group = student.leader_of_group
+                  members_count = group.members.count()
+                  if members_count >= 3:
+                        return Response({'detail': 'You\'re group is already full!'}, status=status.HTTP_400_BAD_REQUEST)
             except ObjectDoesNotExist:
                   group = Group(leader=student, cg=student.cg)
                   group.save()
             
             invitee = Student.objects.filter(rollno=request.data.get("rollno")).first()
             if invitee is None:
-                  return Response({"detail": "Invalid Roll Number"}, status=status.HTTP_400_BAD_REQUEST)
+                  return Response({"detail": "Invalid Roll Number!"}, status=status.HTTP_403_FORBIDDEN)
 
             if invitee==student or (invitee.group is not None and invitee.group.id==group.id):
-                  return Response({"detail": "This student is already part of your group"}, status=status.HTTP_403_FORBIDDEN)
+                  return Response({"detail": "This student is already part of your group!"}, status=status.HTTP_403_FORBIDDEN)
 
             if Invitation.objects.filter(to=invitee, for_group=group).exists():
-                  return Response({"detail": "You've already sent an invitation to this student"}, status=status.HTTP_403_FORBIDDEN)
+                  return Response({"detail": "You've already sent an invitation to this student!"}, status=status.HTTP_403_FORBIDDEN)
 
             if invitee.batch!=student.batch or invitee.gender!=student.gender:
-                  return Response({'detail': 'Inter-gender or Inter-batch groups are not allowed!'}, status=status.HTTP_400_BAD_REQUEST)
+                  return Response({'detail': 'Inter-gender or Inter-batch groups are not allowed!'}, status=status.HTTP_403_FORBIDDEN)
 
             invitation = Invitation(to=invitee, for_group=group)
             invitation.save()
@@ -117,7 +124,7 @@ class DeleteInvitationView(APIView):
       def delete(self, request):
             invitation = Invitation.objects.filter(id=request.data.get('id')).first()
             if invitation is None:
-                  return Response({"detail": "Invitation not found"}, status=status.HTTP_404_NOT_FOUND)
+                  return Response({"detail": "Invitation not found"}, status=status.HTTP_403_FORBIDDEN)
 
             invitation.delete()
 
@@ -133,19 +140,24 @@ class AcceptInvitationView(APIView):
       def post(self,request):
             invitation = Invitation.objects.filter(id=request.data.get('id')).first()
             if invitation is None:
-                  return Response({'details': 'Invalid invitation id'}, status=status.HTTP_400_BAD_REQUEST)
+                  return Response({'detail': 'Invalid invitation id!'}, status=status.HTTP_403_FORBIDDEN)
 
             student = request.user.student  
                       
             if invitation.to != student:
-                  return Response(status=status.HTTP_400_BAD_REQUEST)
+                  return Response({'detail': 'You\'re not authorized to accept someone\'s invitation!'}, status=status.HTTP_403_FORBIDDEN)
 
             group = invitation.for_group
             
             try:
                   curr_group = request.user.student.leader_of_group
                   if (curr_group.members.count()>0):
-                        return Response({'details': 'You are already a group leader'}, status=status.HTTP_400_BAD_REQUEST)
+                        return Response({'detail': 'You\'re a group leader! First tranfer your group ownership in order to accept any invitation.'}, status=status.HTTP_403_FORBIDDEN)
+                  
+                  rev_invitation = Invitation.objects.filter(to=group.leader, group=current_group).first()
+                  if rev_invitation is not None:
+                        rev_invitation.delete()
+                  
                   curr_group.delete()
             except ObjectDoesNotExist:
                   pass
@@ -193,7 +205,7 @@ class GroupView(APIView):
                   group = student.leader_of_group
             except ObjectDoesNotExist:
                   if student.group is None:
-                        return Response(status=status.HTTP_404_NOT_FOUND)
+                        return Response({'detail': 'You\'re not a part of any group!'}, status=status.HTTP_403_FORBIDDEN)
                   group = student.group
 
             serializer = GroupSerializer(group, context={'student': student})
@@ -206,13 +218,13 @@ class TranferGroupLeadershipView(APIView):
       def post(self, request):
             newleader = Student.objects.filter(rollno=request.data.get('rollno')).first()
             if newleader is None:
-                  return Response(status=status.HTTP_400_BAD_REQUEST)
+                  return Response({'detail': 'Invalid student roll number!'}, status=status.HTTP_403_FORBIDDEN)
             
             student = request.user.student
             group = student.leader_of_group
 
             if newleader.group is None or newleader.group!=group:
-                  return Response({'detail': 'You can only tranfer ownership to one of your group member'}, status=status.HTTP_400_BAD_REQUEST)
+                  return Response({'detail': 'You can only tranfer ownership to one of your group member!'}, status=status.HTTP_403_FORBIDDEN)
 
             newleader.group = None
             newleader.save()
@@ -227,11 +239,17 @@ class TranferGroupLeadershipView(APIView):
 
 
 class LeaveGroupView(APIView):
-      permission_classes = [IsAuthenticated, IsStudent, IsPreferenceFillingLive, IsGroupMember]
+      permission_classes = [IsAuthenticated, IsStudent, IsPreferenceFillingLive]
 
       def patch(self, request):
             student = request.user.student
-            group = student.group
+            try:
+                  _ = student.leader_of_group
+                  return Response({'detail': 'You must tranfer the group ownership to one of the group members to leave this group!'}, status=status.HTTP_403_FORBIDDEN)
+            except:
+                  group = student.group
+                  if group is None:
+                        return Response({'detail': 'Only a Group Member is authorized to perform this action!'}, status=status.HTTP_403_FORBIDDEN)
             student.group = None
             student.save()
             group = Group(leader = student, cg = student.cg)
@@ -247,7 +265,7 @@ class addStudents(APIView):
             f = request.FILES.get('file')
             filename = f"{datetime.now().strftime('%Y%m%d_%H%M')}_{f.name}"
             if filename.split('.')[-1]!='csv':
-                  return Response({'error':'file not csv'}, status=status.HTTP_400_BAD_REQUEST)
+                  return Response({'error':'file not csv'}, status=status.HTTP_403_FORBIDDEN)
             filename = default_storage.save(filename, f)
             add_users.delay(filename)
             return Response(status=status.HTTP_200_OK)

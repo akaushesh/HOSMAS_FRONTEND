@@ -71,7 +71,6 @@ class GetMultipleObjectsView(APIView):
                   queryset = Section.objects.filter(id=request.GET.get('section')).first()
                   if queryset is None:
                         return Response(status=status.HTTP_404_NOT_FOUND)
-                  
                   serializer = SectionRoomTypeSerializer(queryset)
             elif model=='batch':
                   queryset = Batch.objects.all()
