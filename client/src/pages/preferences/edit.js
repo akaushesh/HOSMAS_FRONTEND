@@ -2,13 +2,13 @@ import { Fragment } from "react";
 import Head from "next/head";
 import { Box, Container, Grid, Stack } from "@mui/material";
 import { Layout as DashboardLayout } from "src/layouts/dashboard/layout";
-import { EditPreferenceForm } from "src/sections/customer/edit-preference-form";
+import { EditPreferenceForm } from "src/sections/preference/edit-preference-form";
 
 const Page = () => {
   return (
     <Fragment>
       <Head>
-        <title>Preference | Thapar Hostel Management System</title>
+        <title>Edit Preference | Thapar Hostel Management System</title>
       </Head>
       <Box
         component="main"

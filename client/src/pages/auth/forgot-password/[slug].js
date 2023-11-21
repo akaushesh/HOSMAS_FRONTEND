@@ -5,7 +5,6 @@ import { useRouter } from "next/router";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { Box, Button, FormHelperText, Stack, TextField, Typography } from "@mui/material";
-import { useAuth } from "src/hooks/use-auth";
 import { Layout as AuthLayout } from "src/layouts/auth/layout";
 import Link from "next/link";
 import axios from "axios";

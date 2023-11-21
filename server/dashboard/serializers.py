@@ -3,7 +3,7 @@ from rest_framework import serializers
 from preference.models import Hostel, RoomType, RoomTypeChoice
 from student.models import Batch, Section, Student
 from user.models import User
-from .models import AllotmentStatus
+from .models import AllotmentStatus, AcademicSession, Faq
 import json
 
 
@@ -185,3 +185,17 @@ class AllotmentStatusSerializer(serializers.ModelSerializer):
                               'alloted_count': cnt
                         })
             return res
+
+
+class AcademicSessionSerializer(serializers.ModelSerializer):
+      class Meta:
+            model = AcademicSession
+            fields = ['name']
+
+
+class FAQSerializer(serializers.ModelSerializer):
+      
+      class Meta:
+            model = Faq
+            fields = ['id', 'question', 'answer']
+            

@@ -5,10 +5,11 @@ import { OverviewBudget } from "src/sections/overview/overview-budget";
 import { OverviewTotalCustomers } from "src/sections/overview/overview-total-customers";
 import { AccountProfileDetails } from "src/sections/account/account-profile-details";
 import { Fragment } from "react";
-import { useAuth } from "src/hooks/use-auth";
+import { useQueryClient } from "@tanstack/react-query";
 
 const Page = () => {
-  const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const user = queryClient.getQueryData(["getProfile"]);
 
   return (
     <Fragment>
@@ -35,13 +36,14 @@ const Page = () => {
                 rollNumber={user?.rollno}
                 CGPA={user?.cg}
                 hostel={user?.current_hostel ? user?.current_hostel : ""}
-                roomNumber={user?.current_room ? user?.current_room : ""}
+                phoneNumber={user?.phoneNumber ? user?.phoneNumber : ""}
               />
             </Grid>
             <Grid item xs={12} lg={4}>
               <Grid>
                 <OverviewBudget
                   allotedHostel={user?.alloted_hostel ? user.alloted_hostel : ""}
+                  academicSession={user?.academic_session ? user?.academic_session : ""}
                   sx={{ height: "100%" }}
                 />
               </Grid>

@@ -21,15 +21,15 @@ import { URL } from "config";
 import axios from "axios";
 import { LoadingButton } from "@mui/lab";
 import { useState } from "react";
-import { useAuth } from "src/hooks/use-auth";
 import CustomModal from "src/components/customModal";
 import { LeaveConfirmation } from "./leave-confirmation";
+import { TransferOwnershipConfirmation } from "./transfer-ownership-confirmation";
 
 export const CustomersTable = (props) => {
   const { sx, selected = [] } = props;
 
-  const { user } = useAuth();
   const queryClient = useQueryClient();
+  const user = queryClient.getQueryData(["getProfile"]);
 
   const [loading, setLoading] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -42,44 +42,29 @@ export const CustomersTable = (props) => {
     setAnchorEl(null);
   };
 
-  const [openModal, setOpenModal] = useState(false);
+  const [openLeaveModal, setOpenLeaveModal] = useState(false);
+  const [openOwnerTransferModal, setOpenOwnerTransferModal] = useState(false);
+  const [modalMember, setModalMember] = useState(null);
 
-  const onOpenModal = () => {
-    setOpenModal(true);
+  const onOpenLeaveModal = () => {
+    setOpenLeaveModal(true);
   };
 
-  const onCloseModal = () => {
-    setOpenModal(false);
+  const onCloseLeaveModal = () => {
+    setOpenLeaveModal(false);
+  };
+
+  const onOpenOwnerTransferModal = () => {
+    setOpenOwnerTransferModal(true);
+  };
+
+  const onCloseOwnerTransferModal = () => {
+    setOpenOwnerTransferModal(false);
   };
 
   const onTransferOwnership = async (member) => {
-    setLoading(true);
-
-    const url = URL + "student/group/transfer/";
-    const jwt = sessionStorage.getItem("jwt");
-    const data = {
-      rollno: member?.rollno,
-    };
-
-    const transferOwnershipConfig = {
-      method: "post",
-      maxBodyLength: Infinity,
-      url: url,
-      headers: {
-        Authorization: "Bearer " + jwt,
-      },
-      data: data,
-    };
-
-    await axios(transferOwnershipConfig)
-      .then(function (response) {
-        queryClient.invalidateQueries(["getGroup"]);
-      })
-      .catch(function (error) {
-        // console.log(error);
-      });
-
-    setLoading(false);
+    setModalMember(member);
+    onOpenOwnerTransferModal();
   };
 
   const {
@@ -127,7 +112,7 @@ export const CustomersTable = (props) => {
                 <TableCell>
                   {isWithGroup && (
                     <Grid container justifyContent="flex-end">
-                      <LoadingButton onClick={onOpenModal} color="error">
+                      <LoadingButton onClick={onOpenLeaveModal} color="error">
                         Leave
                       </LoadingButton>
                     </Grid>
@@ -137,15 +122,15 @@ export const CustomersTable = (props) => {
             </TableHead>
             <TableBody>
               {allMembers.map((member, index) => {
-                const isSelected = selected.includes(member.rollno);
+                const isSelected = selected.includes(member?.rollno);
                 return (
-                  <TableRow hover key={member.rollno} selected={isSelected}>
+                  <TableRow hover key={member?.rollno} selected={isSelected}>
                     <TableCell>
                       <Stack alignItems="center" direction="row" spacing={2}>
-                        <Typography variant="subtitle2">{member.name}</Typography>
+                        <Typography variant="subtitle2">{member?.name}</Typography>
                       </Stack>
                     </TableCell>
-                    <TableCell sx={{ textAlign: "center" }}>{member.rollno}</TableCell>
+                    <TableCell sx={{ textAlign: "center" }}>{member?.rollno}</TableCell>
                     {index === 0 && (
                       <TableCell sx={{ textAlign: "right" }}>
                         <Grid container justifyContent="flex-end">
@@ -188,6 +173,15 @@ export const CustomersTable = (props) => {
                           >
                             Make Group Leader
                           </LoadingButton>
+                          <CustomModal
+                            onClose={onCloseOwnerTransferModal}
+                            open={openOwnerTransferModal}
+                          >
+                            <TransferOwnershipConfirmation
+                              member={modalMember}
+                              onClose={onCloseOwnerTransferModal}
+                            />
+                          </CustomModal>
                         </Popover>
                       </TableCell>
                     )}
@@ -212,8 +206,8 @@ export const CustomersTable = (props) => {
               )}
             </TableBody>
           </Table>
-          <CustomModal open={openModal} onClose={onCloseModal}>
-            <LeaveConfirmation onClose={onCloseModal} />
+          <CustomModal open={openLeaveModal} onClose={onCloseLeaveModal}>
+            <LeaveConfirmation onClose={onCloseLeaveModal} />
           </CustomModal>
         </Box>
       </Scrollbar>

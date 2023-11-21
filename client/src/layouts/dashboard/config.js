@@ -1,12 +1,8 @@
-import ChartBarIcon from "@heroicons/react/24/solid/ChartBarIcon";
-import CogIcon from "@heroicons/react/24/solid/CogIcon";
-import LockClosedIcon from "@heroicons/react/24/solid/LockClosedIcon";
-import ShoppingBagIcon from "@heroicons/react/24/solid/ShoppingBagIcon";
 import UserIcon from "@heroicons/react/24/solid/UserIcon";
 import RoomPreferencesIcon from "@mui/icons-material/RoomPreferences";
-import UserPlusIcon from "@heroicons/react/24/solid/UserPlusIcon";
 import UsersIcon from "@heroicons/react/24/solid/UsersIcon";
-import XCircleIcon from "@heroicons/react/24/solid/XCircleIcon";
+import KeyIcon from "@mui/icons-material/Key";
+import LiveHelpIcon from "@mui/icons-material/LiveHelp";
 import { SvgIcon } from "@mui/material";
 
 export const items = [
@@ -37,59 +33,22 @@ export const items = [
       </SvgIcon>
     ),
   },
-  // {
-  //   title: "Companies",
-  //   path: "/companies",
-  //   icon: (
-  //     <SvgIcon fontSize="small">
-  //       <ShoppingBagIcon />
-  //     </SvgIcon>
-  //   ),
-  // },
-  // {
-  //   title: "Account",
-  //   path: "/account",
-  //   icon: (
-  //     <SvgIcon fontSize="small">
-  //       <UserIcon />
-  //     </SvgIcon>
-  //   ),
-  // },
   {
-    title: "Settings",
-    path: "/settings",
+    title: "FAQs",
+    path: "/FAQs",
     icon: (
       <SvgIcon fontSize="small">
-        <CogIcon />
+        <LiveHelpIcon />
       </SvgIcon>
     ),
   },
-  // {
-  //   title: "Login",
-  //   path: "/auth/login",
-  //   icon: (
-  //     <SvgIcon fontSize="small">
-  //       <LockClosedIcon />
-  //     </SvgIcon>
-  //   ),
-  // },
-
-  // {
-  //   title: 'Register',
-  //   path: '/auth/register',
-  //   icon: (
-  //     <SvgIcon fontSize="small">
-  //       <UserPlusIcon />
-  //     </SvgIcon>
-  //   )
-  // },
-  // {
-  //   title: "Error",
-  //   path: "/404",
-  //   icon: (
-  //     <SvgIcon fontSize="small">
-  //       <XCircleIcon />
-  //     </SvgIcon>
-  //   ),
-  // },
+  {
+    title: "Reset Password",
+    path: "/settings",
+    icon: (
+      <SvgIcon fontSize="small">
+        <KeyIcon />
+      </SvgIcon>
+    ),
+  },
 ];

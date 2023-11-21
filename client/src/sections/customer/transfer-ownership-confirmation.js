@@ -1,40 +1,51 @@
 import { LoadingButton } from "@mui/lab";
 import { Button, Grid, Typography } from "@mui/material";
-import { Box } from "@mui/system";
+import { Box, Stack } from "@mui/system";
 import { useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { URL } from "config";
 import { Fragment, useState } from "react";
 
-export const LeaveConfirmation = ({ onClose }) => {
-  const queryClient = useQueryClient();
+export const TransferOwnershipConfirmation = ({ member, onClose }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const queryClient = useQueryClient();
+
   const onAccept = async () => {
     setLoading(true);
+    const url = URL + "student/group/transfer/";
     const jwt = sessionStorage.getItem("jwt");
+    const data = {
+      rollno: member?.rollno,
+    };
 
-    var leaveGroupConfig = {
-      method: "patch",
+    const transferOwnershipConfig = {
+      method: "post",
       maxBodyLength: Infinity,
-      url: URL + "student/group/leave/",
+      url: url,
       headers: {
         Authorization: "Bearer " + jwt,
       },
+      data: data,
     };
 
-    await axios(leaveGroupConfig)
+    await axios(transferOwnershipConfig)
       .then(function (response) {
         queryClient.invalidateQueries(["getGroup"]);
         queryClient.invalidateQueries(["getProfile"]);
         onClose();
       })
       .catch(function (error) {
-        setError(error?.response?.data?.detail);
+        if (error?.response?.data?.detail) {
+          setError(error?.response?.data?.detail);
+        } else {
+          setError("Something went wrong");
+        }
       });
     setLoading(false);
   };
+
   const onReject = () => {
     onClose();
   };
@@ -46,17 +57,17 @@ export const LeaveConfirmation = ({ onClose }) => {
       </Typography>
 
       <Typography variant="body1" textAlign="justify">
-        If you leave your group you will only be able to rejoin it if you receive another joining
-        request.
+        If you accept you will no longer be the leader of your group. Its ownership will be
+        transferred to {member?.name} with enrollment number {member?.rollno}.
       </Typography>
       <br />
       <Typography variant="body1" textAlign="justify">
-        Are you sure you want to leave?
+        Are you sure you want to accept?
       </Typography>
       {error && (
         <Fragment>
           <br />
-          <Typography variant="body1" textAlign="justify" color="error.main">
+          <Typography variant="body1" color="error.main" textAlign="justify">
             {error}
           </Typography>
         </Fragment>

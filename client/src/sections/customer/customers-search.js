@@ -6,9 +6,11 @@ import CustomModal from "src/components/customModal";
 import { CustomerConfirmation } from "./customer-confirmation";
 import axios from "axios";
 import { URL } from "config";
-import { useAuth } from "src/hooks/use-auth";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const CustomersSearch = () => {
+  const queryClient = useQueryClient();
+
   const [enrollmentNumber, setEnrollmentNumber] = useState("");
   const [option, setOption] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -16,7 +18,7 @@ export const CustomersSearch = () => {
   const [openModal, setOpenModal] = useState(false);
   const [entryIsCorrect, setEntryIsCorrect] = useState(false);
 
-  const { user } = useAuth();
+  const user = queryClient.getQueryData(["getProfile"]);
   const isLeader = !user?.group || user?.email === user?.group?.leader_email;
 
   const onOpenModal = () => {
@@ -77,7 +79,8 @@ export const CustomersSearch = () => {
           },
         ]);
       } catch (err) {
-        setInfoText("No user found");
+        if (err?.response?.data?.detail) setInfoText(err?.response?.data?.detail);
+        else setInfoText("No user found");
       }
       setLoading(false);
     })();

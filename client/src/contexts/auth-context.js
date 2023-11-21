@@ -69,6 +69,7 @@ export const AuthProvider = (props) => {
     queryFn: async () => {
       try {
         const jwt = sessionStorage.getItem("jwt");
+        if (!jwt) return null;
         const getProfileConfig = {
           maxBodyLength: Infinity,
           headers: {
@@ -180,6 +181,8 @@ export const AuthProvider = (props) => {
       window.sessionStorage.setItem("authenticated", "true");
       window.sessionStorage.setItem("jwt", loginResponse?.data?.access);
       window.sessionStorage.setItem("refresh", loginResponse?.data?.refresh);
+
+      queryClient.invalidateQueries(["getProfile"]);
 
       const userProfile = queryClient.getQueriesData(["getProfile"])[0][1];
 

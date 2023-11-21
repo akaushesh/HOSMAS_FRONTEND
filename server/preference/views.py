@@ -51,7 +51,7 @@ class createPreference (APIView):
             
         group = stud.leader_of_group
         
-        group.retain = False
+        group.is_retained = False
         group.save()
         
         legalChoices = []
@@ -136,7 +136,7 @@ class Retain(APIView):
             if (member_curr is None or member_curr.id not in roomChoices):
                 return Response({'error':member.name + ' is unable to retain'}, status=status.HTTP_400_BAD_REQUEST)
             
-        group.retain = True
+        group.is_retained = True
         group.save()
         
         return Response({'status':'success'},status=status.HTTP_201_CREATED)
@@ -159,7 +159,14 @@ class getPreferences(APIView):
             return Response({'error':'No preferences found'},status=status.HTTP_400_BAD_REQUEST)
         
         serializer = PreferenceSerializer(p, many=True)
-        return Response({'status':'success','data':serializer.data}, status.HTTP_200_OK)
+        res = {
+            'status':'success',
+            'data': {
+                'retain': group.is_retained,
+                'preferences': serializer.data,
+            }
+        }
+        return Response(res, status.HTTP_200_OK)
             
 
 class deletePreferences(APIView):

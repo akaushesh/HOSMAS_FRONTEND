@@ -1,20 +1,14 @@
 import { useCallback, useState } from "react";
 import Head from "next/head";
-import NextLink from "next/link";
-import SendIcon from "@mui/icons-material/Send";
-import { useRouter } from "next/navigation";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { Box, Button, FormHelperText, Stack, TextField, Typography } from "@mui/material";
-import { useAuth } from "src/hooks/use-auth";
+import { Box, FormHelperText, Stack, TextField, Typography } from "@mui/material";
 import { Layout as AuthLayout } from "src/layouts/auth/layout";
 import axios from "axios";
 import { URL } from "config";
 import { LoadingButton } from "@mui/lab";
 
 const Page = () => {
-  const router = useRouter();
-  const auth = useAuth();
   const [loading, setLoading] = useState(false);
   const [helperText, setHelperText] = useState("You will receive a link on this email address");
   const [method, setMethod] = useState("email");
