@@ -23,7 +23,7 @@ def allot_hostel():
             choices_size[choice.id] = choice.capacity
       
       # Handing groups that retained their previous room
-      retain_groups = Group.objects.filter(retain=True).all()
+      retain_groups = Group.objects.filter(is_retained=True).all()
       for group in retain_groups:
             section = Section.objects.filter(batch=group.leader.batch, gender=group.leader.gender)
             if not section.is_retain_allowed:
@@ -40,7 +40,7 @@ def allot_hostel():
 
       # Handling groups that have filled preferences
       unalloted_groups = []
-      groups = Group.objects.filter(retain=False).order_by('-cg').all()
+      groups = Group.objects.filter(is_retained=False).order_by('-cg').all()
       for group in groups:
             members = group.members.all()
             group_size = len(members) + 1
