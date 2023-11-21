@@ -154,7 +154,7 @@ class AcceptInvitationView(APIView):
                   if (curr_group.members.count()>0):
                         return Response({'detail': 'You\'re a group leader! First tranfer your group ownership in order to accept any invitation.'}, status=status.HTTP_403_FORBIDDEN)
                   
-                  rev_invitation = Invitation.objects.filter(to=group.leader, group=current_group).first()
+                  rev_invitation = Invitation.objects.filter(to=group.leader, group=curr_group).first()
                   if rev_invitation is not None:
                         rev_invitation.delete()
                   
