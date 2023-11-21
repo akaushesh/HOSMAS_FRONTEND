@@ -148,6 +148,9 @@ class AcceptInvitationView(APIView):
                   return Response({'detail': 'You\'re not authorized to accept someone\'s invitation!'}, status=status.HTTP_403_FORBIDDEN)
 
             group = invitation.for_group
+
+            if group.members.count() >= 3:
+                  return Response({'detail': 'Unable to accept this invitation because the group is already full!'}, status=status.HTTP_403_FORBIDDEN)
             
             try:
                   curr_group = request.user.student.leader_of_group
