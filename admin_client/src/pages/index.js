@@ -1,0 +1,25 @@
+import Head from "next/head";
+import { subDays, subHours } from "date-fns";
+import { Box, Container, Unstable_Grid2 as Grid, Typography } from "@mui/material";
+import { Layout as DashboardLayout } from "src/layouts/dashboard/layout";
+import { OverviewBudget } from "src/sections/overview/overview-budget";
+import { OverviewLatestOrders } from "src/sections/overview/overview-latest-orders";
+import { OverviewLatestProducts } from "src/sections/overview/overview-latest-products";
+import { OverviewSales } from "src/sections/overview/overview-sales";
+import { OverviewTasksProgress } from "src/sections/overview/overview-tasks-progress";
+import { OverviewTotalCustomers } from "src/sections/overview/overview-total-customers";
+import { OverviewTotalProfit } from "src/sections/overview/overview-total-profit";
+import { StudentAccountProfilePage } from "src/sections/account/student-account-profile-details";
+import { OverviewTraffic } from "src/sections/overview/overview-traffic";
+import { Fragment } from "react";
+import { AdminAccountProfilePage } from "src/sections/account/admin-account-profile-details";
+
+const now = new Date();
+
+const Page = () => {
+  return <AdminAccountProfilePage />;
+};
+
+Page.getLayout = (page) => <DashboardLayout>{page}</DashboardLayout>;
+
+export default Page;
