@@ -4,7 +4,6 @@ import ArrowLeftIcon from "@heroicons/react/24/solid/ArrowLeftIcon";
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import {
-  Box,
   Button,
   Card,
   CardActions,
@@ -22,6 +21,8 @@ import { useState } from "react";
 import axios from "axios";
 import { URL } from "config";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import CustomModal from "src/components/customModal";
+import { AcceptRequestConfirmation } from "../customer/accept-request-confirmation";
 
 function timeAgo(timestamp) {
   const currentDate = new Date();
@@ -49,29 +50,22 @@ export const OverviewLatestProducts = (props) => {
 
   const [limit, setLimit] = useState(4);
   const [requests, setRequests] = useState([]);
+  const [openModal, setOpenModal] = useState(false);
+  const [modalProduct, setModalProduct] = useState(null);
+
+  const onOpenModal = () => {
+    setOpenModal(true);
+  };
+
+  const onCloseModal = () => {
+    setOpenModal(false);
+  };
 
   const queryClient = useQueryClient();
 
   const onAcceptRequest = (product) => {
-    const jwt = sessionStorage.getItem("jwt");
-    const data = {
-      id: product.id,
-    };
-    const acceptInvitationConfig = {
-      method: "post",
-      maxBodyLength: Infinity,
-      url: URL + "student/invitation/accept/",
-      headers: { Authorization: "Bearer " + jwt },
-      data: data,
-    };
-
-    axios(acceptInvitationConfig)
-      .then(function (response) {
-        queryClient.invalidateQueries(["getGroup"]);
-        queryClient.invalidateQueries(["getInvitation"]);
-        queryClient.invalidateQueries(["getProfile"]);
-      })
-      .catch(function (error) {});
+    setModalProduct(product);
+    onOpenModal();
   };
 
   const onRejectRequest = (product) => {
@@ -151,6 +145,9 @@ export const OverviewLatestProducts = (props) => {
                   <CheckRoundedIcon />
                 </SvgIcon>
               </IconButton>
+              <CustomModal open={openModal} onClose={onCloseModal}>
+                <AcceptRequestConfirmation product={modalProduct} onClose={onCloseModal} />
+              </CustomModal>
               <IconButton
                 onClick={() => {
                   onRejectRequest(product);
@@ -175,7 +172,7 @@ export const OverviewLatestProducts = (props) => {
         </Grid>
       </Grid>
       <CardActions sx={{ justifyContent: "flex-end" }}>
-        {requests.size > 4 && (
+        {requests.length > 4 && (
           <Button
             color="inherit"
             onClick={OnClickHandler}

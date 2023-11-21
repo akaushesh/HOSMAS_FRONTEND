@@ -13,7 +13,6 @@ import { useRouter } from "next/router";
 
 export const PreferenceForm = ({ sx, availableChoices = [], currentPreferences = [] }) => {
   const queryClient = useQueryClient();
-
   const user = queryClient.getQueryData(["getProfile"]);
   const isLeader = !user?.group || user?.email === user?.group?.leader_email;
 
@@ -25,9 +24,11 @@ export const PreferenceForm = ({ sx, availableChoices = [], currentPreferences =
   };
 
   const preferences =
-    currentPreferences?.length > 0
-      ? currentPreferences
+    currentPreferences?.preferences?.length > 0
+      ? currentPreferences?.preferences
       : Array.from({ length: availableChoices.length }, () => "");
+
+  const checked = !!currentPreferences?.retain;
 
   return (
     <Card sx={sx}>
@@ -44,13 +45,16 @@ export const PreferenceForm = ({ sx, availableChoices = [], currentPreferences =
                 name="CGPA"
                 disabled
                 SelectProps={{ native: true }}
-                value={preferences[index]?.room_type_choice || ""}
+                value={preferences[index]?.room_type_name || ""}
                 sx={{ m: 1, width: "100%" }}
               />
             </Grid>
           ))}
           <Grid container justifyContent="left">
-            <FormControlLabel control={<Checkbox disabled />} label="Retain current room instead" />
+            <FormControlLabel
+              control={<Checkbox checked={checked} disabled />}
+              label="Retain current room instead"
+            />
           </Grid>
 
           <Button

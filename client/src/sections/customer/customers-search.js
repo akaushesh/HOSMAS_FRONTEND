@@ -79,7 +79,8 @@ export const CustomersSearch = () => {
           },
         ]);
       } catch (err) {
-        setInfoText("No user found");
+        if (err?.response?.data?.detail) setInfoText(err?.response?.data?.detail);
+        else setInfoText("No user found");
       }
       setLoading(false);
     })();

@@ -1,18 +1,8 @@
-import { Fragment, useCallback, useMemo, useState } from "react";
+import { Fragment } from "react";
 import Head from "next/head";
-import { subDays, subHours } from "date-fns";
-import ArrowDownOnSquareIcon from "@heroicons/react/24/solid/ArrowDownOnSquareIcon";
-import ArrowUpOnSquareIcon from "@heroicons/react/24/solid/ArrowUpOnSquareIcon";
-import PlusIcon from "@heroicons/react/24/solid/PlusIcon";
-import { Box, Button, Container, Grid, Stack, SvgIcon, Typography } from "@mui/material";
-import { useSelection } from "src/hooks/use-selection";
+import { Box, Container, Grid, Stack, Typography } from "@mui/material";
 import { Layout as DashboardLayout } from "src/layouts/dashboard/layout";
-import { CustomersTable } from "src/sections/customer/customers-table";
-import { CustomersSearch } from "src/sections/customer/customers-search";
-import { PreferenceForm } from "src/sections/customer/preference-form";
-import { applyPagination } from "src/utils/apply-pagination";
-import CustomModal from "src/components/customModal";
-import { OverviewLatestProducts } from "src/sections/overview/overview-latest-products";
+import { PreferenceForm } from "src/sections/preference/preference-form";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { URL } from "config";
@@ -35,14 +25,11 @@ const Page = () => {
         const getPreferenceStatusResponse = await axios.get(url, getPreferenceStatusConfig);
         return getPreferenceStatusResponse?.data?.is_live;
       } catch (err) {
-        console.log(err);
         return false;
       }
     },
     queryKey: ["isPreferenceFillingLive"],
   });
-
-  console.log(isLive);
 
   const { data: availableChoices, isLoading } = useQuery({
     queryFn: async () => {

@@ -59,27 +59,28 @@ export const EditPreferenceForm = (props) => {
 
   const { data: availableChoices, isLoading } = useQuery({
     queryFn: async () => {
-      const url = URL + "preferences/getChoices/";
-      const jwt = sessionStorage.getItem("jwt");
+      try {
+        const url = URL + "preferences/getChoices/";
+        const jwt = sessionStorage.getItem("jwt");
 
-      const getAvailableChoicesConfig = {
-        maxBodyLength: Infinity,
-        headers: {
-          Authorization: "Bearer " + jwt,
-        },
-      };
+        const getAvailableChoicesConfig = {
+          maxBodyLength: Infinity,
+          headers: {
+            Authorization: "Bearer " + jwt,
+          },
+        };
 
-      const availableChoicesResponse = await axios.get(url, getAvailableChoicesConfig);
-      return availableChoicesResponse?.data;
+        const availableChoicesResponse = await axios.get(url, getAvailableChoicesConfig);
+        return availableChoicesResponse?.data;
+      } catch (err) {
+        return [];
+      }
     },
     queryKey: ["getAvailablePreferences"],
   });
 
-  let finalAvailableChoices = [];
-  if (availableChoices) finalAvailableChoices = availableChoices;
-
   const [preferences, setPreferences] = useState(
-    Array.from({ length: finalAvailableChoices.length }, () => "")
+    Array.from({ length: availableChoices.length }, () => "")
   );
 
   const [error, setError] = useState("");
@@ -91,7 +92,7 @@ export const EditPreferenceForm = (props) => {
           <Typography variant="h4" paddingBottom="1rem">
             Your Preferences
           </Typography>
-          {finalAvailableChoices.map((_, index) => (
+          {availableChoices.map((_, index) => (
             <Grid container justifyContent="center" alignItems="center" key={index}>
               <FormControl required variant="filled" sx={{ m: 1, width: "100%" }}>
                 <InputLabel id={`${index + 1}`}>Preference {index + 1}</InputLabel>
@@ -104,7 +105,7 @@ export const EditPreferenceForm = (props) => {
                   <MenuItem value="">
                     <em>None</em>
                   </MenuItem>
-                  {finalAvailableChoices.map((choice, index) => (
+                  {availableChoices.map((choice, index) => (
                     <MenuItem key={index} value={choice}>
                       {choice.room_name}
                     </MenuItem>
