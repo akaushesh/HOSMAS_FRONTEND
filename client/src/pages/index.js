@@ -43,7 +43,7 @@ const Page = () => {
               <Grid>
                 <OverviewBudget
                   allotedHostel={user?.alloted_hostel ? user.alloted_hostel : ""}
-                  currentSemester={user?.current_semester ? user?.current_semester : ""}
+                  academicSession={user?.academic_session ? user?.academic_session : ""}
                   sx={{ height: "100%" }}
                 />
               </Grid>

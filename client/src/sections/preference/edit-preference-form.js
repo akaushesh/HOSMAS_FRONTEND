@@ -90,7 +90,7 @@ export const EditPreferenceForm = (props) => {
       <form onSubmit={handleSubmit}>
         <Grid container justifyContent="center" alignItems="center">
           <Typography variant="h4" paddingBottom="1rem">
-            Your Preferences
+            Edit Preferences
           </Typography>
           {availableChoices.map((_, index) => (
             <Grid container justifyContent="center" alignItems="center" key={index}>
