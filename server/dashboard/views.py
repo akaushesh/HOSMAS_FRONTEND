@@ -12,9 +12,9 @@ from .permissions import IsAdmin
 
 from preference.models import Hostel, RoomType, RoomTypeChoice
 from student.models import Batch, Section, Student, Group
-from .models import AllotmentStatus
+from .models import AllotmentStatus, AcademicSession
 
-from .serializers import HostelSerializer, HostelSingleSerializer, RoomTypeSerializer, RoomTypeChoiceSerializer, RoomTypeOptionSerializer, BatchSerializer, BatchUninitializedSerializer, SectionSerializer, ProfileSerializer, AllotmentStatusSerializer, SectionRoomTypeSerializer
+from .serializers import HostelSerializer, HostelSingleSerializer, RoomTypeSerializer, RoomTypeChoiceSerializer, RoomTypeOptionSerializer, BatchSerializer, BatchUninitializedSerializer, SectionSerializer, ProfileSerializer, AllotmentStatusSerializer, SectionRoomTypeSerializer, AcademicSessionSerializer
 from student.serializers import StudentSerializer, GroupSerializer
 
 from .tasks import allot_hostel
@@ -100,6 +100,12 @@ class GetObjectView(APIView):
                         instance = AllotmentStatus()
                         instance.save()
                   serializer = AllotmentStatusSerializer(instance)
+            elif model=='academic-session':
+                  instance = AcademicSession.objects.first()
+                  if instance is None:
+                        instance = AcademicSession(name='')
+                        instance.save()
+                  serializer = AcademicSessionSerializer(instance)
             else:
                   return Response(status.HTTP_404_NOT_FOUND)
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -140,6 +146,12 @@ class UpdateObjectView(APIView):
                         instance = AllotmentStatus()
                         instance.save()
                   serializer = AllotmentStatusSerializer(instance, request.data)
+            elif model=='academic-session':
+                  instance = AcademicSession.objects.first()
+                  if instance is None:
+                        instance = AcademicSession(name='')
+                        instance.save()
+                  serializer = AcademicSessionSerializer(instance, request.data)
             else:
                   return Response(status=status.HTTP_404_NOT_FOUND)
 

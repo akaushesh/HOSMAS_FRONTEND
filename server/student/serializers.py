@@ -1,7 +1,7 @@
 from rest_framework.serializers import ModelSerializer, SerializerMethodField, SlugRelatedField
 from rest_framework import serializers
 from .models import Invitation, Student, Group
-from dashboard.models import AllotmentStatus
+from dashboard.models import AllotmentStatus, AcademicSession
 
 
 class InvitationsReceivedSerializer(ModelSerializer):
@@ -70,10 +70,11 @@ class StudentProfileSerializer(ModelSerializer):
       gender = SerializerMethodField()
       group = SerializerMethodField()
       preference_filled = SerializerMethodField()
+      academic_session = SerializerMethodField()
 
       class Meta:
             model = Student
-            fields = ['name', 'rollno', 'email', 'cg', 'gender', 'batch', 'alloted_hostel', 'alloted_room', 'group', 'preference_filled']
+            fields = ['name', 'rollno', 'email', 'cg', 'gender', 'batch', 'alloted_hostel', 'alloted_room', 'group', 'preference_filled', 'academic_session']
 
       def get_email(self, obj):
             return obj.user.email
@@ -119,3 +120,10 @@ class StudentProfileSerializer(ModelSerializer):
                   if group is None:
                         return False
             return group.preferences.count() > 0
+      
+      def get_academic_session(self, obj):
+            instance = AcademicSession.objects.first()
+            if instance is None:
+                  instance = AcademicSession(name='')
+                  instance.save()
+            return instance.name
