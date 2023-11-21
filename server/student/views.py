@@ -195,6 +195,9 @@ class AcceptInvitationView(APIView):
             #TODO: send mail to group leader and all group members
             joined_group_mail.delay(lead.name, lead.user.email, lead.rollno, student.name, student.user.email)
             joined_group_to_members.delay(lead.name, student.name, student.rollno, group.leader.user.email)
+            members = group.members.all()
+            for member in members:
+                  joined_group_to_members.delay(member.name, student.name, student.rollno, member.user.email)
 
             return Response(status=status.HTTP_200_OK)
 
@@ -259,6 +262,10 @@ class LeaveGroupView(APIView):
             group.save()
             
             left_group_mail.delay(group.leader.name, student.name, student.rollno, group.leader.user.email)
+            
+            members = group.members.all()
+            for member in members:
+                  left_group_mail.delay(member.name, student.name, student.rollno, member.user.email)
             return Response(status=status.HTTP_200_OK)
 
 class addStudents(APIView):

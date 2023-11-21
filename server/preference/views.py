@@ -51,7 +51,7 @@ class createPreference (APIView):
             
         group = stud.leader_of_group
         
-        group.retain = False
+        group.is_retained = False
         group.save()
         
         legalChoices = []
@@ -136,7 +136,7 @@ class Retain(APIView):
             if (member_curr is None or member_curr.id not in roomChoices):
                 return Response({'error':member.name + ' is unable to retain'}, status=status.HTTP_400_BAD_REQUEST)
             
-        group.retain = True
+        group.is_retained = True
         group.save()
         
         return Response({'status':'success'},status=status.HTTP_201_CREATED)
@@ -162,7 +162,7 @@ class getPreferences(APIView):
         res = {
             'status':'success',
             'data': {
-                'retain': group.retain,
+                'retain': group.is_retained,
                 'preferences': serializer.data,
             }
         }

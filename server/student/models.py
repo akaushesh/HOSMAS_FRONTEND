@@ -31,7 +31,8 @@ class Student (models.Model):
 class Group (models.Model):
     leader = models.OneToOneField('student.Student', on_delete=models.CASCADE, related_name='leader_of_group')
     cg = models.FloatField(null=False, blank=False)
-    retain = models.BooleanField(default=False)
+    is_retained = models.BooleanField(default=False)
+    is_preferences_filled = models.BooleanField(default=False)
 
     def __str__(self):
         return self.leader.name
