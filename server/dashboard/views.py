@@ -359,7 +359,7 @@ class createFAQ(APIView):
             return Response(status=status.HTTP_200_OK)
       
 class getFAQ(APIView):
-      permission_classes = [IsAuthenticated, IsAdmin]
+      permission_classes = [IsAuthenticated]
       
       def get(self, request):
             faqs = Faq.objects.all()
