@@ -1,7 +1,8 @@
 from django.db.models import Q, Count
 from rest_framework import serializers
 from preference.models import Hostel, RoomType, RoomTypeChoice
-from student.models import Batch, Section, Student
+from student.models import Batch, Section, Student, Group
+from student.serializers import StudentProfileSerializer
 from user.models import User
 from .models import AllotmentStatus, AcademicSession, Faq
 import json
@@ -199,3 +200,10 @@ class FAQSerializer(serializers.ModelSerializer):
             model = Faq
             fields = ['id', 'question', 'answer']
             
+class GroupDetailSerializer(serializers.ModelSerializer):
+    leader_of_group = StudentProfileSerializer(source='leader', read_only=True)
+    members = StudentProfileSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Group
+        fields = ['leader_of_group', 'members', 'cg', 'is_retained', 'is_preferences_filled']

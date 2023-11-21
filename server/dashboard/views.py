@@ -15,6 +15,7 @@ from student.models import Batch, Section, Student, Group
 from .models import AllotmentStatus, AcademicSession, Faq
 
 from .serializers import HostelSerializer, HostelSingleSerializer, RoomTypeSerializer, RoomTypeChoiceSerializer, RoomTypeOptionSerializer, BatchSerializer, BatchUninitializedSerializer, SectionSerializer, ProfileSerializer, AllotmentStatusSerializer, SectionRoomTypeSerializer, AcademicSessionSerializer, FAQSerializer
+from .serializers import *
 from student.serializers import StudentSerializer, GroupSerializer
 
 from .tasks import allot_hostel
@@ -266,6 +267,17 @@ class getGroups(APIView):
             serializer = GroupSerializer(groups, many=True)
             
             return Response({'status':'success', 'data':serializer.data, 'total_pages':total_pages}, status=status.HTTP_200_OK)
+      
+class getGroup(APIView):
+      permission_classes = [IsAuthenticated & IsAdmin]
+      
+      def get(self, request):
+            id = request.data.get('id')
+            group = Group.objects.filter(id=id).first()
+            if group is None:
+                  return Response({'error':'Group does not exist'}, status=status.HTTP_404_NOT_FOUND)
+            serializer = GroupDetailSerializer(group)
+            return Response({'status':'success', 'data':serializer.data}, status=status.HTTP_200_OK)
 
 
 class ProfileView(APIView):

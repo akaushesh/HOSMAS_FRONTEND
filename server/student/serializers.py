@@ -53,7 +53,7 @@ class GroupSerializer(ModelSerializer):
 
       class Meta:
             model = Group
-            fields = ['leader', 'members', 'cg', 'role']
+            fields = ['id', 'leader', 'members', 'cg', 'role']
       
       def get_role(self, obj):
             return 'leader' if self.context.get('student')==obj.leader else 'member'
