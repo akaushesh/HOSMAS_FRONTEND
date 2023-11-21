@@ -2,6 +2,7 @@ import UserIcon from "@heroicons/react/24/solid/UserIcon";
 import RoomPreferencesIcon from "@mui/icons-material/RoomPreferences";
 import UsersIcon from "@heroicons/react/24/solid/UsersIcon";
 import KeyIcon from "@mui/icons-material/Key";
+import LiveHelpIcon from "@mui/icons-material/LiveHelp";
 import { SvgIcon } from "@mui/material";
 
 export const items = [
@@ -29,6 +30,15 @@ export const items = [
     icon: (
       <SvgIcon fontSize="small">
         <RoomPreferencesIcon />
+      </SvgIcon>
+    ),
+  },
+  {
+    title: "FAQs",
+    path: "/FAQs",
+    icon: (
+      <SvgIcon fontSize="small">
+        <LiveHelpIcon />
       </SvgIcon>
     ),
   },
