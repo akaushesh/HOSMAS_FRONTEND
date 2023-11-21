@@ -267,15 +267,3 @@ class LeaveGroupView(APIView):
             for member in members:
                   left_group_mail.delay(member.name, student.name, student.rollno, member.user.email)
             return Response(status=status.HTTP_200_OK)
-
-class addStudents(APIView):
-      permission_classes = [IsAuthenticated, ~IsStudent]
-      
-      def post(self, request,):
-            f = request.FILES.get('file')
-            filename = f"{datetime.now().strftime('%Y%m%d_%H%M')}_{f.name}"
-            if filename.split('.')[-1]!='csv':
-                  return Response({'error':'file not csv'}, status=status.HTTP_403_FORBIDDEN)
-            filename = default_storage.save(filename, f)
-            add_users.delay(filename)
-            return Response(status=status.HTTP_200_OK)

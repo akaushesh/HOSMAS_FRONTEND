@@ -148,7 +148,7 @@ class AllotmentStatusSerializer(serializers.ModelSerializer):
       def get_student_statistics(self, obj):
             if not obj.done:
                   return {}
-            retain_queryset = Student.objects.filter((Q(leader_of_group__is_null=False) & Q(leader_of_group__retain=True)) | (Q(group__is_null=False) & Q(group__retain=True)))
+            retain_queryset = Student.objects.filter((Q(leader_of_group__is_null=False) & Q(leader_of_group__is_retained=True)) | (Q(group__is_null=False) & Q(group__is_retained=True)))
             unsuccessful_retain = retain_queryset.filter(Q(allocated_room__is_null=True)).count()
             successful_retain = retain_queryset.filter(Q(allocated_room__is_null=False)).count()
 

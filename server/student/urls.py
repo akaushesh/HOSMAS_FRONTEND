@@ -12,5 +12,4 @@ urlpatterns = [
       path('group/view/', views.GroupView.as_view(), name='view_group'),
       path('group/transfer/', views.TranferGroupLeadershipView.as_view(), name='transfer_leadership'),
       path('group/leave/', views.LeaveGroupView.as_view(), name='leave_group'),
-      path('add/',views.addStudents.as_view()),
 ]

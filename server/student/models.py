@@ -13,6 +13,7 @@ class Student (models.Model):
 
     name = models.CharField(max_length=100, null=False, blank=False)
     rollno = models.CharField(max_length=12, unique=True, null=False, blank=False)
+    phoneno = models.CharField(max_length=12, unique=True, null=True)
 
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
     cg = models.FloatField(null=False, blank=False)

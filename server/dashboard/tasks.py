@@ -7,6 +7,69 @@ from preference.models import RoomTypeChoice, Preference
 from .models import AllotmentStatus
 
 
+@app.task(name='add_users')
+def add_users(filename):
+      # email_subject = 'User Credentials for Hostel Management'
+
+      filename = os.path.join(settings.BASE_DIR, 'imported-data', filename)
+
+      # connection = get_connection(fail_silently=False)
+      # connection.open()
+
+      userfile = open(filename, 'r', newline='', encoding='utf-8-sig')
+      reader = csv.DictReader(userfile)
+
+      successCnt = 0
+      failureCnt = 0
+
+      for row in reader:
+            password = ''.join(choice(string.ascii_letters) for _ in range(8))
+            try:
+                  #TODO : confirm the fields in csv
+                  
+                  batch = Batch.objects.filter(name = row['batch'].strip()).first()
+                  if batch is None:
+                        batch = Batch(name = row['batch'].strip())
+                        batch.save()
+                  
+                  user = User(email=row['email'].strip())
+                  user.set_password(password)
+                  user.save()
+                  
+                  student = Student(name=row['name'].strip(), rollno=row['rollno'].strip(), phoneno=row['phoneno'].strip(), gender=row['gender'].strip(), cg = float(row['cg'].strip()), batch = batch, user=user)
+                  student.save()
+
+                  group = Group(leader = student, cg = student.cg)
+                  group.save()
+
+                  successCnt += 1
+            except Exception as e:
+                  with open(os.path.join(settings.LOGS_ROOT, 'add_user_errors.log'), 'a') as f:
+                      f.write(f"creation of ({row['name']}, {row['email']}) unsuccessful.\n")
+                      f.write(f"{e}")
+                      f.write("\n")
+                  # print(f"creation of ({row['name']}, {row['email']}) unsuccessful.\n")
+                  # print(e)
+                  failureCnt += 1
+                  continue
+            
+            # context = {
+            #       'name': row['name'].strip(),
+            #       'email': row['email'].strip(),
+            #       'password': password
+            # }
+            # html_message = render_to_string('dashboard/email_credentials.html', context)
+            # msg = strip_tags(html_message)
+
+            # email = EmailMultiAlternatives(email_subject, msg, settings.EMAIL_HOST_USER, (row['email'],))
+            # email.attach_alternative(html_message, 'text/html')
+            
+            # connection.send_messages((email,))
+
+      # connection.close()
+      return f"{successCnt} users successfully created and {failureCnt} failed."
+
+
 @app.task(name = "allot_hostel")
 def allot_hostel():
       status = AllotmentStatus.objects.first()

@@ -18,11 +18,10 @@ from .serializers import HostelSerializer, HostelSingleSerializer, RoomTypeSeria
 from .serializers import *
 from student.serializers import StudentSerializer, GroupSerializer
 
-from .tasks import allot_hostel
+from .tasks import allot_hostel, add_users
 
 from datetime import datetime
 import csv, os
-from student.tasks import add_users
 # Create your views here.
 
 
