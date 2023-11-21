@@ -197,11 +197,13 @@ class ImportStudentsView(APIView):
             file = request.data.get('file')
             
             filename = f"{datetime.now().strftime('%Y%m%d_%H%M')}_{file.name}"
-            
+
             if filename.split('.')[-1]!='csv':
                   return Response({'error':'file not csv'}, status=status.HTTP_400_BAD_REQUEST)
             
-            filename = default_storage.save(filename, file)
+            storage = default_storage
+            storage.location = os.path.join(settings.BASE_DIR, 'imported-data')
+            filename = storage.save(filename, file)
             
             add_users.delay(filename)
 
@@ -359,6 +361,7 @@ class AllotmentView(APIView):
             allot_hostel.delay()
             return Response(status=status.HTTP_200_OK)
 
+
 class createFAQ(APIView):
       permission_classes = [IsAuthenticated, IsAdmin]
       
@@ -368,7 +371,8 @@ class createFAQ(APIView):
             faq = Faq(question=question, answer=answer)
             faq.save()
             return Response(status=status.HTTP_200_OK)
-      
+     
+
 class getFAQ(APIView):
       permission_classes = [IsAuthenticated]
       
@@ -376,7 +380,8 @@ class getFAQ(APIView):
             faqs = Faq.objects.all()
             serializer = FAQSerializer(faqs, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
-      
+
+  
 class deleteFAQ(APIView):
       permission_classes = [IsAuthenticated, IsAdmin]
       

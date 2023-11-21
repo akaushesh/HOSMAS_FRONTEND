@@ -11,8 +11,6 @@ from .models import AllotmentStatus
 def add_users(filename):
       # email_subject = 'User Credentials for Hostel Management'
 
-      filename = os.path.join(settings.BASE_DIR, 'imported-data', filename)
-
       # connection = get_connection(fail_silently=False)
       # connection.open()
 
