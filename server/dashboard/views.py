@@ -12,9 +12,9 @@ from .permissions import IsAdmin
 
 from preference.models import Hostel, RoomType, RoomTypeChoice
 from student.models import Batch, Section, Student, Group
-from .models import AllotmentStatus, AcademicSession
+from .models import AllotmentStatus, AcademicSession, Faq
 
-from .serializers import HostelSerializer, HostelSingleSerializer, RoomTypeSerializer, RoomTypeChoiceSerializer, RoomTypeOptionSerializer, BatchSerializer, BatchUninitializedSerializer, SectionSerializer, ProfileSerializer, AllotmentStatusSerializer, SectionRoomTypeSerializer, AcademicSessionSerializer
+from .serializers import HostelSerializer, HostelSingleSerializer, RoomTypeSerializer, RoomTypeChoiceSerializer, RoomTypeOptionSerializer, BatchSerializer, BatchUninitializedSerializer, SectionSerializer, ProfileSerializer, AllotmentStatusSerializer, SectionRoomTypeSerializer, AcademicSessionSerializer, FAQSerializer
 from student.serializers import StudentSerializer, GroupSerializer
 
 from .tasks import allot_hostel
@@ -346,4 +346,33 @@ class AllotmentView(APIView):
 
       def get(self, request):
             allot_hostel.delay()
+            return Response(status=status.HTTP_200_OK)
+
+class createFAQ(APIView):
+      permission_classes = [IsAuthenticated, IsAdmin]
+      
+      def post(self, request):
+            question = request.data.get('question')
+            answer = request.data.get('answer')
+            faq = Faq(question=question, answer=answer)
+            faq.save()
+            return Response(status=status.HTTP_200_OK)
+      
+class getFAQ(APIView):
+      permission_classes = [IsAuthenticated, IsAdmin]
+      
+      def get(self, request):
+            faqs = Faq.objects.all()
+            serializer = FAQSerializer(faqs, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+      
+class deleteFAQ(APIView):
+      permission_classes = [IsAuthenticated, IsAdmin]
+      
+      def post(self, request):
+            id = request.data.get('id')
+            faq = Faq.objects.filter(id=id).first()
+            if faq is None:
+                  return Response(status=status.HTTP_404_NOT_FOUND)
+            faq.delete()
             return Response(status=status.HTTP_200_OK)
