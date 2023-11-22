@@ -193,8 +193,8 @@ CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_RESULT_BACKEND = 'django-db'
 CELERY_RESULT_SERIALIZER = 'json'
 
-EMAIL_HOST_USERS = config('EMAIL_HOST_USERS', cast=list)
-EMAIL_HOST_PASSWORDS = config('EMAIL_HOST_PASSWORDS', cast=list)
+EMAIL_HOST_USERS = config('EMAIL_HOST_USERS', cast=lambda v: [s.strip() for s in v.split(',')])
+EMAIL_HOST_PASSWORDS = config('EMAIL_HOST_PASSWORDS', cast=lambda v: [s.strip() for s in v.split(',')])
 EMAIL_HOST_USERS_COUNT = config('EMAIL_HOST_USERS_COUNT', cast=int)
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
