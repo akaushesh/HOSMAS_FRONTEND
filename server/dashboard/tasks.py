@@ -13,64 +13,185 @@ from student.models import Student, Batch, Group
 from django.conf import settings
 import os
 
+
 @app.task(name='add_users')
 def add_users(filename):
-      # email_subject = 'User Credentials for Hostel Management'
-
-      # connection = get_connection(fail_silently=False)
-      # connection.open()
 
       userfile = open(filename, 'r', newline='', encoding='utf-8-sig')
       reader = csv.DictReader(userfile)
 
+      # Check if atleast one out of email or rollno is present in given data
+      headers = reader.fieldnames
+      unique_identifiers = ['email', 'rollno']
+
+      if not any(val for val in unique_identifiers):
+            # Log error
+            with open(os.path.join(settings.LOGS_ROOT, 'add_user_errors.log'), 'a') as f:
+                  f.write(f"Atleast one out of email or rollno must be present! Aborting...")
+                  f.write("\n")
+            return
+
       successCnt = 0
       failureCnt = 0
+      cnt = 1
 
       for row in reader:
-            password = ''.join(choice(string.ascii_letters) for _ in range(8))
             try:
-                  #TODO : confirm the fields in csv
+                  student = None
                   
-                  batch = Batch.objects.filter(name = row['batch'].strip()).first()
-                  if batch is None:
-                        batch = Batch(name = row['batch'].strip())
-                        batch.save()
+                  # Extract data into variables and data preprocessing
+                  phoneno = row.get('phoneno')
+                  if phoneno is not None:
+                        phoneno = phoneno.strip()
                   
-                  user = User(email=row['email'].strip())
-                  user.set_password(password)
-                  user.save()
+                  cg = row.get('cg')
+                  if cg is not None:
+                        cg = round(float(cg.strip()), 2)
                   
-                  student = Student(name=row['name'].strip(), rollno=row['rollno'].strip(), phoneno=row['phoneno'].strip(), gender=row['gender'].strip(), cg = float(row['cg'].strip()), batch = batch, user=user)
-                  student.save()
+                  batch = row.get('batch')
+                  if batch is not None:
+                        batch = batch.strip()
+                        batch = Batch.objects.filter(name = batch).first()
+                        if batch is None:
+                              batch = Batch(name = row['batch'].strip())
+                              batch.save()
 
-                  group = Group(leader = student, cg = student.cg)
-                  group.save()
+                  email = row.get('email')
+                  if email is not None:
+                        email = email.strip()
+                        user = User.objects.filter(email=email).first()
+                        if user is None:
+                              user = User(email=email)
+                              password = ''.join(choice(string.ascii_letters + string.digits) for _ in range(8))
+                              user.set_password(password)
+                              user.save()
+                  
+                        if user.student is not None:
+                              student = user.student
+                  
+                  rollno = row.get('rollno')
+                  if rollno is not None:
+                        rollno = rollno.strip()
+                        if student is None:
+                              student = Student.objects.filter(rollno=rollno).first()
+                  
+                  current_room = row.get('current_room_type')
+                  is_current_room_null = False
+                  if current_room is not None:
+                        current_room = current_room.strip()
+                        if current_room=='':
+                              # check if admin wants to make current room related field null
+                              is_current_room_null = True
+                              current_room = None
+                        else:
+                              current_room = RoomType.objects.filter(name=current_room).first()
+                              if current_room is None:
+                                    raise Exception(f'Room Type {current_room} not found!')
+                  
+                  current_hostel = row.get('current_hostel')
+                  if current_hostel is not None:
+                        if is_current_room_null:
+                              current_hostel = None
+                        else:
+                              current_hostel = current_hostel.strip()
+                              current_hostel = Hostel.objects.filter(name=current_hostel).first()
+                              if current_hostel is None:
+                                    raise Exception(f'Hostel {current_hostel} not found!')
+                  
+                  alloted_room = row.get('alloted_room_type')
+                  is_alloted_room_null = False
+                  if alloted_room is not None:
+                        alloted_room = alloted_room.strip()
+                        if alloted_room=='':
+                              # check if admin wants to make allocated room related details null
+                              is_alloted_room_null = True
+                        else:
+                              alloted_room = RoomType.objects.filter(name=alloted_room).first()
+                              if alloted_room is None:
+                                    raise Exception(f'Room Type {alloted_room} not found!')
+                  
+                  alloted_hostel = row.get('alloted_hostel')
+                  if alloted_hostel is not None:
+                        if is_alloted_room_null:
+                              alloted_hostel = None
+                        else:
+                              alloted_hostel = alloted_hostel.strip()
+                              alloted_hostel = Hostel.objects.filter(name=alloted_hostel).first()
+                              if alloted_hostel is None:
+                                    raise Exception(f'Hostel {alloted_hostel} not found!')
+                              
+                  if student is None:
+                        # create new student
+                        student = Student(
+                              name = name, 
+                              rollno = rollno, 
+                              phoneno = phoneno, 
+                              gender = gender, 
+                              cg = cg, 
+                              batch = batch, 
+                              user = user,
+                              current_hostel = current_hostel,
+                              current_room = current_room,
+                              alloted_hostel = alloted_hostel,
+                              alloted_room = alloted_room
+                              )
+                        student.save()
+
+                        group = Group(leader = student, cg = student.cg)
+                        group.save()
+                  else:
+                        # update details of existing student
+                        if name is not None:
+                              student.name = name
+                        if rollno is not None:
+                              student.rollno = rollno
+                        if phoneno is not None:
+                              student.phoneno = phoneno
+                        if gender is not None:
+                              student.gender = gender
+                        if cg is not None:
+                              student.cg = cg
+                        if batch is not None:
+                              student.batch = batch
+                        if is_current_room_null or current_room is not None:
+                              student.current_room = current_room
+                        if is_current_room_null or current_hostel is not None:
+                              student.current_hostel = current_hostel
+                        if is_alloted_room_null or alloted_room is not None:
+                              student.alloted_room = alloted_room
+                        if is_alloted_room_null or alloted_hostel is not None:
+                              student.alloted_hostel = alloted_hostel
+                        student.save()
+
+                        group = Group.objects.filter(leader=student).first()
+                        if group is None:
+                              group = Group(leader=student, cg=student.cg)
+                              group.save()
+                        else:
+                              # update group cg
+                              updatedcg = student.cg
+                              groupSize = 1
+                              for member in group.members.all():
+                                    updatedcg += member.cg
+                                    groupSize += 1
+                              updatedcg /= groupSize
+                              group.cg = round(updatedcg, 2)
+                              group.save()
 
                   successCnt += 1
+            
             except Exception as e:
+                  # log error
                   with open(os.path.join(settings.LOGS_ROOT, 'add_user_errors.log'), 'a') as f:
-                      f.write(f"creation of ({row['name']}, {row['email']}) unsuccessful.\n")
+                      f.write(f"Creation of item {cnt} unsuccessful.\n")
                       f.write(f"{e}")
                       f.write("\n")
                   # print(f"creation of ({row['name']}, {row['email']}) unsuccessful.\n")
                   # print(e)
                   failureCnt += 1
-                  continue
-            
-            # context = {
-            #       'name': row['name'].strip(),
-            #       'email': row['email'].strip(),
-            #       'password': password
-            # }
-            # html_message = render_to_string('dashboard/email_credentials.html', context)
-            # msg = strip_tags(html_message)
 
-            # email = EmailMultiAlternatives(email_subject, msg, settings.EMAIL_HOST_USER, (row['email'],))
-            # email.attach_alternative(html_message, 'text/html')
-            
-            # connection.send_messages((email,))
+            cnt += 1
 
-      # connection.close()
       return f"{successCnt} users successfully created and {failureCnt} failed."
 
 
