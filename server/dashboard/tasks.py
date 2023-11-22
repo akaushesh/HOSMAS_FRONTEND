@@ -5,7 +5,13 @@ from config.celery import app
 from student.models import Group, Section
 from preference.models import RoomTypeChoice, Preference
 from .models import AllotmentStatus
-
+import csv
+from random import choice
+import string
+from user.models import User
+from student.models import Student, Batch, Group
+from django.conf import settings
+import os
 
 @app.task(name='add_users')
 def add_users(filename):
