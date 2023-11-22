@@ -180,6 +180,8 @@ class DeleteObjectView(APIView):
                   instance = Section.objects.filter(id=id).first()
             elif model=='batch':
                   instance = Batch.objects.filter(id=id).first()
+            elif model=='section':
+                  instance = Section.objects.filter(id=id).first()
             else:
                   return Response(status=status.HTTP_404_NOT_FOUND)
 
