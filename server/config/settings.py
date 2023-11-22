@@ -193,8 +193,16 @@ CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_RESULT_BACKEND = 'django-db'
 CELERY_RESULT_SERIALIZER = 'json'
 
-EMAIL_HOST_USER = config('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+EMAIL_HOST_USERS = config('EMAIL_HOST_USERS', cast=list)
+EMAIL_HOST_PASSWORDS = config('EMAIL_HOST_PASSWORDS', cast=list)
+EMAIL_HOST_USERS_COUNT = config('EMAIL_HOST_USERS_COUNT', cast=int)
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379",
+    }
+}
