@@ -3,7 +3,7 @@ from __future__ import absolute_import, unicode_literals
 from config.celery import app
 
 from student.models import Group, Section
-from preference.models import RoomTypeChoice, Preference
+from preference.models import *
 from .models import AllotmentStatus
 import csv
 from random import choice
@@ -120,6 +120,15 @@ def add_users(filename):
                               if alloted_hostel is None:
                                     raise Exception(f'Hostel {alloted_hostel} not found!')
                               
+                  name = row.get('name')
+                  if (name is not None):
+                        name = name.strip()
+                  
+                  gender = row.get('gender')
+                  if gender is not None:
+                        gender = gender.strip()
+                        
+                        
                   if student is None:
                         # create new student
                         student = Student(
