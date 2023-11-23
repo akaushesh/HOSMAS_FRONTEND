@@ -35,8 +35,8 @@ const Page = () => {
                 email={user?.email}
                 rollNumber={user?.rollno}
                 CGPA={user?.cg}
-                hostel={user?.current_hostel ? user?.current_hostel : ""}
-                phoneNumber={user?.phoneNumber ? user?.phoneNumber : ""}
+                feeDue={user?.feeDue}
+                phoneNumber={user?.phoneNumber}
               />
             </Grid>
             <Grid item xs={12} lg={4}>

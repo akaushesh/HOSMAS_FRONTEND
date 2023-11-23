@@ -14,7 +14,7 @@ export const AccountProfileDetails = (props) => {
     email = "",
     rollNumber = "",
     CGPA = "",
-    hostel = "",
+    feeDue = "",
     phoneNumber = "",
   } = props;
 
@@ -51,7 +51,13 @@ export const AccountProfileDetails = (props) => {
               />
             </Grid>
             <Grid xs={12} md={6}>
-              <TextField fullWidth label="Current Hostel" name="hostel" disabled value={hostel} />
+              <TextField
+                fullWidth
+                label="Fee Due"
+                name="feeDue"
+                disabled
+                value={feeDue ? feeDue : 0}
+              />
             </Grid>
             <Grid xs={12} md={6}>
               <TextField
