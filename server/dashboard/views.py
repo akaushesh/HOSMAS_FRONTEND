@@ -134,7 +134,7 @@ class UpdateObjectView(APIView):
                   instance = Section.objects.filter(id=id).first()
                   if instance is None:
                         return Response(status=status.HTTP_404_NOT_FOUND)
-                  serializer = SectionSerializer(instance, request.data)
+                  serializer = SectionSerializer(instance, request.data, partial=True)
             elif model=='batch':
                   instance = Batch.objects.filter(id=id).first()
                   if instance is None:
