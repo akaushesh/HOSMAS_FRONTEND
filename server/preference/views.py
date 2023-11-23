@@ -21,20 +21,20 @@ class getAvailableChoices(APIView):
     permission_classes = [IsAuthenticated & IsStudent]
     
     def get(self, request):
-        stud = request.user.student
+        stud = Student.objects.filter(user=request.user).select_related('batch').first()
         batch = stud.batch
         gender = stud.gender
 
         section = Section.objects.filter(Q(batch = batch) & Q(gender = gender)).first()
         
         if (section is None or section.is_allotment_enabled==False):
-            return Response({'error':'Allotment unavailable'},status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error':'Allotment unavailable'}, status=status.HTTP_400_BAD_REQUEST)
 
         cachedVal = cache.get(f"choices-{section.id}")
         if cachedVal is not None:
             return Response(json.loads(cachedVal), status=status.HTTP_200_OK)
 
-        roomtypechoices = section.choices.all()
+        roomtypechoices = RoomTypeChoice.objects.filter(section=section).select_related('room_type__hostel').all()
         data = []
         for choice in roomtypechoices:
             room_detail = {
@@ -52,7 +52,7 @@ class createPreference (APIView):
     
     def post(self, request):
         data = request.data
-        stud = request.user.student
+        stud = Student.objects.filter(user=request.user).select_related('batch', 'leader_of_group').first()
         batch = stud.batch
         gender = stud.gender
         
@@ -67,7 +67,7 @@ class createPreference (APIView):
         legalChoices = []
         # roomChoices = []
         
-        section = Section.objects.filter(Q(batch = batch) & Q(gender = gender)).first()
+        section = Section.objects.filter(Q(batch = batch) & Q(gender = gender)).prefetch_related('choices').first()
         
         
         roomTypeChoices = section.choices.all()
@@ -110,7 +110,7 @@ class Retain(APIView):
     
     def post(self, request):
         # data = request.data
-        stud = request.user.student
+        stud = Student.objects.filter(user=request.user).select_related('batch', 'leader_of_group', 'current_room').prefetch_related('leader_of_group__members__current_room').first()
         batch = stud.batch
         gender = stud.gender
         
@@ -122,7 +122,7 @@ class Retain(APIView):
         legalChoices = []
         roomChoices = []
         
-        section = Section.objects.filter(Q(batch = batch) & Q(gender = gender)).first()
+        section = Section.objects.filter(Q(batch = batch) & Q(gender = gender)).prefetch_related('choices__room_type').first()
         
         
         roomTypeChoices = section.choices.all()
@@ -138,19 +138,19 @@ class Retain(APIView):
             for q in p:
                 q.delete()
         
-        lead_curr = group.leader.current_room
+        lead_curr = student.current_room
         if (lead_curr is None or lead_curr.id not in roomChoices):
             return Response({'error':group.leader.name + ' is unable to retain'}, status=status.HTTP_400_BAD_REQUEST)
+
         members = group.members.all()
-        
         for member in members:
             member_curr = member.current_room
             if (member_curr is None or member_curr.id not in roomChoices):
                 return Response({'error':member.name + ' is unable to retain'}, status=status.HTTP_400_BAD_REQUEST)
-            
+
         group.is_retained = True
         group.save()
-        
+
         return Response({'status':'success'},status=status.HTTP_201_CREATED)
 
 
@@ -158,13 +158,13 @@ class getPreferences(APIView):
     permission_classes = [IsAuthenticated & IsStudent]
     
     def get(self, request):
-        stud = request.user.student
+        stud = Student.objects.filter(user=request.user).select_related('leader_of_group', 'group').first()
         if (not IsGroupLeader.has_permission(self, request, self)):
             group = stud.group
         else:
             group = stud.leader_of_group
         
-        p = Preference.objects.filter(group = group).order_by('priority')
+        p = Preference.objects.filter(group = group).order_by('priority').select_related(room_type_choice__room_type__hostel).all()
         if (p is None):
             return Response({'error':'No preferences found'},status=status.HTTP_400_BAD_REQUEST)
         
@@ -183,7 +183,7 @@ class deletePreferences(APIView):
     permission_classes = [IsAuthenticated & IsStudent & ~IsGroupMember]
     
     def post(self, request):
-        stud = request.user.student
+        stud = Student.objects.filter(user=request.user).select_related('leader_of_group').first()
         group = stud.leader_of_group
         
         p = Preference.objects.filter(group = group)
@@ -201,7 +201,7 @@ class PreferenceFillingStatusView(APIView):
       permission_classes = [IsAuthenticated & IsStudent]
 
       def get(self, request):
-            student = request.user.student
+            student = Student.objects.filter(user=request.user).select_related('batch').first()
             section = Section.objects.filter(batch=student.batch, gender=student.gender).first()
             result = {
                   'is_live': section is not None and section.is_allotment_enabled

@@ -22,7 +22,7 @@ class ProfileView(APIView):
       permission_classes = [IsAuthenticated, IsStudent]
 
       def get(self, request):
-            student = request.user.student
+            student = Student.objects.filter(user=request.user).select_related('batch', 'leader_of_group', 'group__leader', 'alloted_room__hostel').first()
             serializer = StudentProfileSerializer(student)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -31,8 +31,8 @@ class SearchStudentView(APIView):
       permission_classes = [IsAuthenticated, IsStudent, IsPreferenceFillingLive, IsNotGroupMember]
 
       def post(self, request):
-            student = request.user.student
-            resultant = Student.objects.filter(rollno=request.data.get('rollno')).first()
+            student = Student.objects.filter(user=request.user).select_related('batch', 'leader_of_group').first()
+            resultant = Student.objects.filter(rollno=request.data.get('rollno')).select_related('batch', 'group').first()
 
             if resultant is None:
                   return Response({'detail': 'No student found!'}, status=status.HTTP_403_FORBIDDEN)
@@ -68,7 +68,7 @@ class SendInvitationView(APIView):
       permission_classes = [IsAuthenticated, IsStudent, IsPreferenceFillingLive, IsNotGroupMember]
 
       def post(self, request):
-            student = request.user.student
+            student = Student.objects.filter(user=request.user).select_related('leader_of_group', 'batch').first()
             
             try:
                   group = student.leader_of_group
@@ -79,7 +79,7 @@ class SendInvitationView(APIView):
                   group = Group(leader=student, cg=student.cg)
                   group.save()
             
-            invitee = Student.objects.filter(rollno=request.data.get("rollno")).first()
+            invitee = Student.objects.filter(rollno=request.data.get("rollno")).select_related('group', 'batch').first()
             if invitee is None:
                   return Response({"detail": "Invalid Roll Number!"}, status=status.HTTP_403_FORBIDDEN)
 
@@ -106,7 +106,7 @@ class InvitationsSentView(APIView):
       def get(self, request):
             group = request.user.student.leader_of_group
 
-            queryset = Invitation.objects.filter(for_group=group)
+            queryset = Invitation.objects.filter(for_group=group).select_related('to').all()
 
             serializer = InvitationsSentSerializer(queryset, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -116,7 +116,7 @@ class InvitationsReceivedView(APIView):
       permission_classes = [IsAuthenticated, IsStudent, IsPreferenceFillingLive]
 
       def get(self, request):
-            queryset = Invitation.objects.filter(to=request.user.student)
+            queryset = Invitation.objects.filter(to=request.user.student).select_related('for_group__leader').all()
             
             serializer = InvitationsReceivedSerializer(queryset, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -142,12 +142,12 @@ class AcceptInvitationView(APIView):
       permission_classes = [IsAuthenticated, IsStudent, IsPreferenceFillingLive]
 
       def post(self,request):
-            invitation = Invitation.objects.filter(id=request.data.get('id')).first()
+            invitation = Invitation.objects.filter(id=request.data.get('id')).select_related('for_group').first()
             if invitation is None:
                   return Response({'detail': 'Invalid invitation id!'}, status=status.HTTP_403_FORBIDDEN)
 
-            student = request.user.student  
-                      
+            student = Student.objects.filter(user=request.user).select_related('leader_of_group', 'group__leader').prefetch_related('group__members').first()  
+
             if invitation.to != student:
                   return Response({'detail': 'You\'re not authorized to accept someone\'s invitation!'}, status=status.HTTP_403_FORBIDDEN)
 
@@ -157,11 +157,11 @@ class AcceptInvitationView(APIView):
                   return Response({'detail': 'Unable to accept this invitation because the group is already full!'}, status=status.HTTP_403_FORBIDDEN)
             
             try:
-                  curr_group = request.user.student.leader_of_group
+                  curr_group = student.leader_of_group
                   if (curr_group.members.count()>0):
                         return Response({'detail': 'You\'re a group leader! First tranfer your group ownership in order to accept any invitation.'}, status=status.HTTP_403_FORBIDDEN)
                   
-                  rev_invitation = Invitation.objects.filter(to=group.leader, group=curr_group).first()
+                  rev_invitation = Invitation.objects.filter(to=group.leader, for_group=curr_group).first()
                   if rev_invitation is not None:
                         rev_invitation.delete()
                   
@@ -195,8 +195,9 @@ class AcceptInvitationView(APIView):
             updatedcg /= cnt
             group.cg = round(updatedcg, 2)
             group.save()
+            
+            # email to leader and members
             lead = group.leader
-            #TODO: send mail to group leader and all group members
             joined_group_mail.delay(lead.name, lead.user.email, lead.rollno, student.name, student.user.email)
             joined_group_to_members.delay(lead.name, student.name, student.rollno, group.leader.user.email)
             members = group.members.all()
@@ -210,7 +211,7 @@ class GroupView(APIView):
       permission_classes = [IsAuthenticated, IsStudent]
 
       def get(self, request):
-            student = request.user.student
+            student = Student.objects.filter(user=request.user).select_related('leader_of_group__leader', 'group__leader').prefetch_related('group__members').first()
             try:
                   group = student.leader_of_group
             except ObjectDoesNotExist:
@@ -226,11 +227,11 @@ class TranferGroupLeadershipView(APIView):
       permission_classes = [IsAuthenticated, IsStudent, IsPreferenceFillingLive, IsGroupLeader]
 
       def post(self, request):
-            newleader = Student.objects.filter(rollno=request.data.get('rollno')).first()
+            newleader = Student.objects.filter(rollno=request.data.get('rollno')).select_related('group').first()
             if newleader is None:
                   return Response({'detail': 'Invalid student roll number!'}, status=status.HTTP_403_FORBIDDEN)
             
-            student = request.user.student
+            student = Student.objects.filter(user=request.user).select_related('leader_of_group').first()
             group = student.leader_of_group
 
             if newleader.group is None or newleader.group!=group:
@@ -252,7 +253,7 @@ class LeaveGroupView(APIView):
       permission_classes = [IsAuthenticated, IsStudent, IsPreferenceFillingLive]
 
       def patch(self, request):
-            student = request.user.student
+            student = Student.objects.filter(user=request.user).select_related('leader_of_group', 'group').first()
             try:
                   _ = student.leader_of_group
                   return Response({'detail': 'You must tranfer the group ownership to one of the group members to leave this group!'}, status=status.HTTP_403_FORBIDDEN)

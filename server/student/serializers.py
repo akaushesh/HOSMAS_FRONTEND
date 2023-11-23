@@ -74,7 +74,7 @@ class StudentProfileSerializer(ModelSerializer):
 
       class Meta:
             model = Student
-            fields = ['name', 'rollno', 'email', 'cg', 'gender', 'batch', 'alloted_hostel', 'alloted_room', 'group', 'preference_filled', 'academic_session']
+            fields = ['name', 'rollno', 'phoneno', 'email', 'cg', 'gender', 'batch', 'alloted_hostel', 'alloted_room', 'group', 'preference_filled', 'academic_session']
 
       def get_email(self, obj):
             return obj.user.email
