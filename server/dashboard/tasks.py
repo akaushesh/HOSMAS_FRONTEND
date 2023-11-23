@@ -13,6 +13,11 @@ from student.models import Student, Batch, Group
 from django.conf import settings
 import os
 from django.core.files.storage import default_storage
+from django.core.mail import send_mail, get_connection
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+from django.conf import settings
+from django.core.cache import cache
 
 @app.task(name='add_users')
 def add_users(filename):
@@ -297,3 +302,23 @@ def allot_hostel():
       status.save()
 
       return 1
+
+@app.task(name = "send_reminder_mail")
+def send_reminder_mail(name,email,last_date):
+      subject = "Reminder for filling preferences"
+      idx = cache.get('emailIdIndex', 0)
+      connection = get_connection(username=settings.EMAIL_HOST_USERS[idx], password=settings.EMAIL_HOST_PASSWORDS[idx], fail_silently=False)
+      connection.open()
+      context = {
+            "name" : name,
+            "last_date":last_date
+      }
+      html_message = render_to_string('dashboard/remindermail.html', context)
+      msg = strip_tags(html_message)
+      
+      send_mail(subject, msg, settings.EMAIL_HOST_USERS[idx], (email, ), html_message=html_message, connection=connection, fail_silently=False)
+      connection.close()
+      
+      return f"\nReminder mail sent to {email}\n"
+      
+            

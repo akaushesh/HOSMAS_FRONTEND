@@ -19,7 +19,7 @@ from .serializers import HostelSerializer, HostelSingleSerializer, RoomTypeSeria
 from .serializers import *
 from student.serializers import StudentSerializer, GroupSerializer
 
-from .tasks import allot_hostel, add_users
+from .tasks import allot_hostel, add_users, send_reminder_mail
 
 from datetime import datetime
 import csv, os
@@ -410,4 +410,23 @@ class UpdateSectionsAllotmentStatusView(APIView):
                         return Response(status=status.HTTP_400_BAD_REQUEST)
                   instance.is_allotment_enabled = item.get('is_allotment_enabled')
                   instance.save()
+                  return Response(status=status.HTTP_200_OK)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+      
+class sendReminderMail(APIView):
+      permission_classes = [IsAuthenticated, IsAdmin]
+      
+      def post(self, request):
+            data = request.data
+            batch_name = data.get('batch')
+            last_date = data.get('last_date')
+            if (batch_name is None):
+                  return Response(status=status.HTTP_400_BAD_REQUEST)
+            batch = Batch.objects.filter(name=batch_name).first()
+            if (batch is None):
+                  return Response(status=status.HTTP_400_BAD_REQUEST)
+            students = Student.objects.filter(batch=batch).all()
+            for student in students:
+                  send_reminder_mail.delay(student.name, student.user.email, last_date)
             return Response(status=status.HTTP_200_OK)
+                  
