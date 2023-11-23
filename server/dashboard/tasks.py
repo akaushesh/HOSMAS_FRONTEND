@@ -1,7 +1,7 @@
 from __future__ import absolute_import, unicode_literals
 
 from config.celery import app
-
+from django.db.models import Q
 from student.models import Group, Section
 from preference.models import *
 from .models import AllotmentStatus
@@ -12,12 +12,13 @@ from user.models import User
 from student.models import Student, Batch, Group
 from django.conf import settings
 import os
-
+from django.core.files.storage import default_storage
 
 @app.task(name='add_users')
 def add_users(filename):
-
-      userfile = open(filename, 'r', newline='', encoding='utf-8-sig')
+      storage = default_storage
+      storage.location = os.path.join(settings.BASE_DIR, 'imported-data')
+      userfile = storage.open(filename, 'r')
       reader = csv.DictReader(userfile)
 
       # Check if atleast one out of email or rollno is present in given data
@@ -65,9 +66,11 @@ def add_users(filename):
                               password = ''.join(choice(string.ascii_letters + string.digits) for _ in range(8))
                               user.set_password(password)
                               user.save()
-                  
-                        if user.student is not None:
-                              student = user.student
+                        try:
+                              if user.student is not None:
+                                    student = user.student
+                        except:
+                              pass
                   
                   rollno = row.get('rollno')
                   if rollno is not None:
@@ -83,11 +86,14 @@ def add_users(filename):
                               # check if admin wants to make current room related field null
                               is_current_room_null = True
                               current_room = None
-                        else:
-                              current_room = RoomType.objects.filter(name=current_room).first()
-                              if current_room is None:
-                                    raise Exception(f'Room Type {current_room} not found!')
+                        # else:
+                        #       current_room = RoomType.objects.filter(name=current_room).first()
+                        #       if current_room is None:
+                        #             raise Exception(f'Room Type {current_room} not found!')
+                  else:
+                        is_current_room_null = True
                   
+                  current_roomtype = None
                   current_hostel = row.get('current_hostel')
                   if current_hostel is not None:
                         if is_current_room_null:
@@ -96,7 +102,10 @@ def add_users(filename):
                               current_hostel = current_hostel.strip()
                               current_hostel = Hostel.objects.filter(name=current_hostel).first()
                               if current_hostel is None:
-                                    raise Exception(f'Hostel {current_hostel} not found!')
+                                    raise Exception(f'Current Hostel {current_hostel} not found!')
+                              current_roomtype = RoomType.objects.filter(Q(name=current_room) & Q(hostel = current_hostel)).first()
+                              if current_roomtype is None:
+                                    raise Exception(f'Current Room Type {current_room} not found!')
                   
                   alloted_room = row.get('alloted_room_type')
                   is_alloted_room_null = False
@@ -105,11 +114,15 @@ def add_users(filename):
                         if alloted_room=='':
                               # check if admin wants to make allocated room related details null
                               is_alloted_room_null = True
-                        else:
-                              alloted_room = RoomType.objects.filter(name=alloted_room).first()
-                              if alloted_room is None:
-                                    raise Exception(f'Room Type {alloted_room} not found!')
-                  
+                              alloted_room = None
+                        # else:
+                        #       alloted_room = RoomType.objects.filter(name=alloted_room).first()
+                        #       if alloted_room is None:
+                        #             raise Exception(f'Room Type {alloted_room} not found!')
+                  else:
+                        is_alloted_room_null = True
+                        
+                  alloted_roomtype = None 
                   alloted_hostel = row.get('alloted_hostel')
                   if alloted_hostel is not None:
                         if is_alloted_room_null:
@@ -118,7 +131,10 @@ def add_users(filename):
                               alloted_hostel = alloted_hostel.strip()
                               alloted_hostel = Hostel.objects.filter(name=alloted_hostel).first()
                               if alloted_hostel is None:
-                                    raise Exception(f'Hostel {alloted_hostel} not found!')
+                                    raise Exception(f'Alloted Hostel {alloted_hostel} not found!')
+                              alloted_roomtype = RoomType.objects.filter(Q(name=alloted_room) & Q(hostel = alloted_hostel)).first()
+                              if alloted_roomtype is None:
+                                    raise Exception(f'Alloted Room Type {alloted_room} not found!')
                               
                   name = row.get('name')
                   if (name is not None):
@@ -139,10 +155,8 @@ def add_users(filename):
                               cg = cg, 
                               batch = batch, 
                               user = user,
-                              current_hostel = current_hostel,
-                              current_room = current_room,
-                              alloted_hostel = alloted_hostel,
-                              alloted_room = alloted_room
+                              current_room = current_roomtype,
+                              alloted_room = alloted_roomtype
                               )
                         student.save()
 
@@ -162,14 +176,18 @@ def add_users(filename):
                               student.cg = cg
                         if batch is not None:
                               student.batch = batch
-                        if is_current_room_null or current_room is not None:
-                              student.current_room = current_room
-                        if is_current_room_null or current_hostel is not None:
-                              student.current_hostel = current_hostel
-                        if is_alloted_room_null or alloted_room is not None:
-                              student.alloted_room = alloted_room
-                        if is_alloted_room_null or alloted_hostel is not None:
-                              student.alloted_hostel = alloted_hostel
+                        # if is_current_room_null or current_room is not None:
+                        #       student.current_room = current_room
+                        # if is_current_room_null or current_hostel is not None:
+                        #       student.current_hostel = current_hostel
+                        # if is_alloted_room_null or alloted_room is not None:
+                        #       student.alloted_room = alloted_room
+                        # if is_alloted_room_null or alloted_hostel is not None:
+                        #       student.alloted_hostel = alloted_hostel
+                        if current_roomtype is not None:
+                              student.current_room = current_roomtype
+                        if alloted_roomtype is not None:
+                              student.alloted_room = alloted_roomtype
                         student.save()
 
                         group = Group.objects.filter(leader=student).first()
@@ -191,12 +209,12 @@ def add_users(filename):
             
             except Exception as e:
                   # log error
-                  with open(os.path.join(settings.LOGS_ROOT, 'add_user_errors.log'), 'a') as f:
-                      f.write(f"Creation of item {cnt} unsuccessful.\n")
-                      f.write(f"{e}")
-                      f.write("\n")
-                  # print(f"creation of ({row['name']}, {row['email']}) unsuccessful.\n")
-                  # print(e)
+                  # with open(os.path.join(settings.LOGS_ROOT, 'add_user_errors.log'), 'a') as f:
+                  #     f.write(f"Creation of item {cnt} unsuccessful.\n")
+                  #     f.write(f"{e}")
+                  #     f.write("\n")
+                  print(f"creation of ({row['name']}, {row['email']}) unsuccessful.\n")
+                  print(e)
                   failureCnt += 1
 
             cnt += 1
