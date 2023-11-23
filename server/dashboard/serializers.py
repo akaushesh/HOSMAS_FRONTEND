@@ -111,13 +111,24 @@ class SectionSerializer(serializers.ModelSerializer):
       batch_name = serializers.SerializerMethodField()
       class Meta:
             model = Section
-            fields = ['id', 'batch_name', 'batch', 'gender', 'is_allotment_enabled']
+            fields = ['id', 'batch_name', 'batch', 'gender', 'is_allotment_enabled', 'is_retain_allowed']
             extra_kwargs = {
                   'batch': {'write_only': True}
             }
       
       def get_batch_name(self, obj):
             return obj.batch.name
+      
+      def update(self, instance, validated_data):
+            updated_allotment_status = validated_data.get('is_allotment_enabled')
+            if updated_allotment_status is not None:
+                  if not instance.is_allotment_enabled and updated_allotment_status:
+                        # TODO: Send mails to all section's students
+                        print('Send Mails!')
+                  instance.is_allotment_enabled = updated_allotment_status
+            instance.is_retain_allowed = validated_data.get('is_retain_allowed', instance.is_retain_allowed)
+            instance.save()
+            return instance
       
 
 class SectionRoomTypeSerializer(serializers.ModelSerializer):

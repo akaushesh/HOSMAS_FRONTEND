@@ -7,6 +7,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
+from student.permissions import IsStudent
 
 from .permissions import IsAdmin
 
@@ -395,8 +396,7 @@ class deleteFAQ(APIView):
                   return Response(status=status.HTTP_404_NOT_FOUND)
             faq.delete()
             return Response(status=status.HTTP_200_OK)
-
-
+      
 class UpdateSectionsAllotmentStatusView(APIView):
       permission_classes = [IsAuthenticated, IsAdmin]
 
