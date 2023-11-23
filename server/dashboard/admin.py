@@ -1,4 +1,8 @@
 from django.contrib import admin
 from .models import Faq
 # Register your models here.
-admin.site.register(Faq)
+
+class FAQAdmin(admin.ModelAdmin):
+      list_display = ('id', 'question', 'answer')
+
+admin.site.register(Faq, FAQAdmin)
