@@ -1,17 +1,21 @@
 from django.shortcuts import render
 from django.db.models import Q
-
-# Create your views here.
+from django.core.cache import cache
 
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+
 from student.permissions import *
 from dashboard.permissions import IsAdmin
+
 from .models import *
 from student.models import *
 from .serializers import *
+
+import json
+
 
 class getAvailableChoices(APIView):
     permission_classes = [IsAuthenticated & IsStudent]
@@ -20,12 +24,16 @@ class getAvailableChoices(APIView):
         stud = request.user.student
         batch = stud.batch
         gender = stud.gender
-        # roomTypeChoices = RoomTypeChoice.objects.filter(Q(batch=batch) & Q(gender=gender))
+
         section = Section.objects.filter(Q(batch = batch) & Q(gender = gender)).first()
         
         if (section is None or section.is_allotment_enabled==False):
             return Response({'error':'Allotment unavailable'},status=status.HTTP_400_BAD_REQUEST)
-        
+
+        cachedVal = cache.get(f"choices-{section.id}")
+        if cachedVal is not None:
+            return Response(json.loads(cachedVal), status=status.HTTP_200_OK)
+
         roomtypechoices = section.choices.all()
         data = []
         for choice in roomtypechoices:
@@ -35,7 +43,9 @@ class getAvailableChoices(APIView):
                 'room_hostel' : choice.room_type.hostel.name
             }
             data.append(room_detail)
+        cache.set(f"choices-{section.id}", json.dumps(data))
         return Response(data, status=status.HTTP_200_OK)
+
 
 class createPreference (APIView):
     permission_classes = [IsAuthenticated & IsStudent & ~IsGroupMember & IsPreferenceFillingLive]
@@ -142,9 +152,7 @@ class Retain(APIView):
         group.save()
         
         return Response({'status':'success'},status=status.HTTP_201_CREATED)
-            
-        
-    
+
 
 class getPreferences(APIView):
     permission_classes = [IsAuthenticated & IsStudent]

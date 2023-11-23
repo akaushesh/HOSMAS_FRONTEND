@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.cache import cache
 from student.models import GENDER_CHOICES
 
 # Create your models here.
@@ -21,7 +22,7 @@ class RoomType(models.Model):
     rooms_count = models.PositiveSmallIntegerField()
 
     def __str__(self):
-        return self.name
+        return f"{self.hostel.name}: {self.name}"
 
 
 class RoomTypeChoice(models.Model):
@@ -31,6 +32,14 @@ class RoomTypeChoice(models.Model):
 
     def __str__(self):
         return f"{self.room_type.name}-{self.section}"
+    
+    def save(self, *args, **kwargs):
+        cache.delete(f"choices-{self.section.id}")
+        super().save(*args, **kwargs)
+    
+    def delete(self, *args, **kwargs):
+        cache.delete(f"choices-{self.section.id}")
+        super().delete(*args, **kwargs)
 
 
 class Preference(models.Model):
