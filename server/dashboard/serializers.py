@@ -123,7 +123,7 @@ class SectionSerializer(serializers.ModelSerializer):
             updated_allotment_status = validated_data.get('is_allotment_enabled')
             if updated_allotment_status is not None:
                   if not instance.is_allotment_enabled and updated_allotment_status:
-                        # TODO: Send mails to all section's students
+                        # TODO: Send mails to all section's students    
                         print('Send Mails!')
                   instance.is_allotment_enabled = updated_allotment_status
             instance.is_retain_allowed = validated_data.get('is_retain_allowed', instance.is_retain_allowed)

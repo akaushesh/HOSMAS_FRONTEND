@@ -89,6 +89,8 @@ class createPreference (APIView):
                 used.append(value)
                 createdPreferences.append(p)   
         serializer = PreferenceSerializer(createdPreferences, many=True)
+        group.is_preferences_filled = True
+        group.save()
                 
         return Response({'status':'success','data':serializer.data},status=status.HTTP_201_CREATED)
                 
@@ -180,7 +182,10 @@ class deletePreferences(APIView):
         if (p is not None):
             for q in p:
                 q.delete()
+        group.is_retained = False
+        group.is_preferences_filled = False
         
+        group.save()
         return Response({'status':'success'},status=status.HTTP_200_OK)
 
 
