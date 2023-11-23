@@ -1,7 +1,8 @@
 from django.db.models import Q, Count
 from rest_framework import serializers
 from preference.models import Hostel, RoomType, RoomTypeChoice
-from student.models import Batch, Section, Student
+from student.models import Batch, Section, Student, Group
+from student.serializers import StudentProfileSerializer
 from user.models import User
 from .models import AllotmentStatus, AcademicSession, Faq
 import json
@@ -110,13 +111,24 @@ class SectionSerializer(serializers.ModelSerializer):
       batch_name = serializers.SerializerMethodField()
       class Meta:
             model = Section
-            fields = ['id', 'batch_name', 'batch', 'gender', 'is_allotment_enabled']
+            fields = ['id', 'batch_name', 'batch', 'gender', 'is_allotment_enabled', 'is_retain_allowed']
             extra_kwargs = {
                   'batch': {'write_only': True}
             }
       
       def get_batch_name(self, obj):
             return obj.batch.name
+      
+      def update(self, instance, validated_data):
+            updated_allotment_status = validated_data.get('is_allotment_enabled')
+            if updated_allotment_status is not None:
+                  if not instance.is_allotment_enabled and updated_allotment_status:
+                        # TODO: Send mails to all section's students    
+                        print('Send Mails!')
+                  instance.is_allotment_enabled = updated_allotment_status
+            instance.is_retain_allowed = validated_data.get('is_retain_allowed', instance.is_retain_allowed)
+            instance.save()
+            return instance
       
 
 class SectionRoomTypeSerializer(serializers.ModelSerializer):
@@ -147,7 +159,7 @@ class AllotmentStatusSerializer(serializers.ModelSerializer):
       def get_student_statistics(self, obj):
             if not obj.done:
                   return {}
-            retain_queryset = Student.objects.filter((Q(leader_of_group__is_null=False) & Q(leader_of_group__retain=True)) | (Q(group__is_null=False) & Q(group__retain=True)))
+            retain_queryset = Student.objects.filter((Q(leader_of_group__is_null=False) & Q(leader_of_group__is_retained=True)) | (Q(group__is_null=False) & Q(group__is_retained=True)))
             unsuccessful_retain = retain_queryset.filter(Q(allocated_room__is_null=True)).count()
             successful_retain = retain_queryset.filter(Q(allocated_room__is_null=False)).count()
 
@@ -199,3 +211,10 @@ class FAQSerializer(serializers.ModelSerializer):
             model = Faq
             fields = ['id', 'question', 'answer']
             
+class GroupDetailSerializer(serializers.ModelSerializer):
+    leader_of_group = StudentProfileSerializer(source='leader', read_only=True)
+    members = StudentProfileSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Group
+        fields = ['leader_of_group', 'members', 'cg', 'is_retained', 'is_preferences_filled']

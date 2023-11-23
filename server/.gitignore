@@ -60,3 +60,6 @@ pics
 
 # static folder
 static
+
+# import data folder
+imported-data/

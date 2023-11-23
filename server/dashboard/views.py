@@ -7,6 +7,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
+from student.permissions import IsStudent
 
 from .permissions import IsAdmin
 
@@ -15,13 +16,13 @@ from student.models import Batch, Section, Student, Group
 from .models import AllotmentStatus, AcademicSession, Faq
 
 from .serializers import HostelSerializer, HostelSingleSerializer, RoomTypeSerializer, RoomTypeChoiceSerializer, RoomTypeOptionSerializer, BatchSerializer, BatchUninitializedSerializer, SectionSerializer, ProfileSerializer, AllotmentStatusSerializer, SectionRoomTypeSerializer, AcademicSessionSerializer, FAQSerializer
+from .serializers import *
 from student.serializers import StudentSerializer, GroupSerializer
 
-from .tasks import allot_hostel
+from .tasks import allot_hostel, add_users, send_reminder_mail
 
 from datetime import datetime
 import csv, os
-from student.tasks import add_users
 # Create your views here.
 
 
@@ -134,7 +135,7 @@ class UpdateObjectView(APIView):
                   instance = Section.objects.filter(id=id).first()
                   if instance is None:
                         return Response(status=status.HTTP_404_NOT_FOUND)
-                  serializer = SectionSerializer(instance, request.data)
+                  serializer = SectionSerializer(instance, request.data, partial=True)
             elif model=='batch':
                   instance = Batch.objects.filter(id=id).first()
                   if instance is None:
@@ -180,6 +181,8 @@ class DeleteObjectView(APIView):
                   instance = Section.objects.filter(id=id).first()
             elif model=='batch':
                   instance = Batch.objects.filter(id=id).first()
+            elif model=='section':
+                  instance = Section.objects.filter(id=id).first()
             else:
                   return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -197,11 +200,13 @@ class ImportStudentsView(APIView):
             file = request.data.get('file')
             
             filename = f"{datetime.now().strftime('%Y%m%d_%H%M')}_{file.name}"
-            
+
             if filename.split('.')[-1]!='csv':
                   return Response({'error':'file not csv'}, status=status.HTTP_400_BAD_REQUEST)
             
-            filename = default_storage.save(filename, file)
+            storage = default_storage
+            storage.location = os.path.join(settings.BASE_DIR, 'imported-data')
+            filename = storage.save(filename, file)
             
             add_users.delay(filename)
 
@@ -217,13 +222,14 @@ class getStudents(APIView):
             roll = request.data.get('roll_no')
             batch_name = request.data.get('batch')
             batch = Batch.objects.filter(name = batch_name).first()
+            # pages = request.data.get('pages')
             
             if (batch is None):
                   return Response({'error':'Batch does not exist'}, status=status.HTTP_404_NOT_FOUND)
             
             
             
-            students_per_page = 20
+            students_per_page = request.data.get('students_per_page')
             if roll is not None:
                   students_list = Student.objects.filter(Q(rollno__startswith = roll) & Q(batch = batch))
             else:
@@ -249,7 +255,7 @@ class getGroups(APIView):
       
       def get(self, request):
             # roll = request.data.get('roll_no')
-            groups_per_page = 10
+            groups_per_page = request.data.get('groups_per_page')
             
             groups_list = Group.objects.all()
             p = Paginator(groups_list, groups_per_page)
@@ -266,6 +272,17 @@ class getGroups(APIView):
             serializer = GroupSerializer(groups, many=True)
             
             return Response({'status':'success', 'data':serializer.data, 'total_pages':total_pages}, status=status.HTTP_200_OK)
+      
+class getGroup(APIView):
+      permission_classes = [IsAuthenticated & IsAdmin]
+      
+      def get(self, request):
+            id = request.data.get('id')
+            group = Group.objects.filter(id=id).first()
+            if group is None:
+                  return Response({'error':'Group does not exist'}, status=status.HTTP_404_NOT_FOUND)
+            serializer = GroupDetailSerializer(group)
+            return Response({'status':'success', 'data':serializer.data}, status=status.HTTP_200_OK)
 
 
 class ProfileView(APIView):
@@ -348,6 +365,7 @@ class AllotmentView(APIView):
             allot_hostel.delay()
             return Response(status=status.HTTP_200_OK)
 
+
 class createFAQ(APIView):
       permission_classes = [IsAuthenticated, IsAdmin]
       
@@ -357,7 +375,8 @@ class createFAQ(APIView):
             faq = Faq(question=question, answer=answer)
             faq.save()
             return Response(status=status.HTTP_200_OK)
-      
+     
+
 class getFAQ(APIView):
       permission_classes = [IsAuthenticated]
       
@@ -365,7 +384,8 @@ class getFAQ(APIView):
             faqs = Faq.objects.all()
             serializer = FAQSerializer(faqs, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
-      
+
+  
 class deleteFAQ(APIView):
       permission_classes = [IsAuthenticated, IsAdmin]
       
@@ -376,3 +396,50 @@ class deleteFAQ(APIView):
                   return Response(status=status.HTTP_404_NOT_FOUND)
             faq.delete()
             return Response(status=status.HTTP_200_OK)
+      
+class UpdateSectionsAllotmentStatusView(APIView):
+      permission_classes = [IsAuthenticated, IsAdmin]
+
+      def post(self, request):
+            data = request.data
+            for item in data:
+                  if item.get('id') is None or item.get('is_allotment_enabled') is None:
+                        return Response(status=status.HTTP_400_BAD_REQUEST)
+                  instance = Section.objects.filter(id=item.get('id')).first()
+                  if instance is None:
+                        return Response(status=status.HTTP_400_BAD_REQUEST)
+                  instance.is_allotment_enabled = item.get('is_allotment_enabled')
+                  instance.save()
+                  return Response(status=status.HTTP_200_OK)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+      
+class sendReminderMail(APIView):
+      permission_classes = [IsAuthenticated, IsAdmin]
+      
+      def post(self, request):
+            data = request.data
+            last_date = data.get('last_date')
+            # if (batch_name is None):
+            #       return Response(status=status.HTTP_400_BAD_REQUEST)
+            # batch = Batch.objects.filter(name=batch_name).first()
+            # if (batch is None):
+            #       return Response(status=status.HTTP_400_BAD_REQUEST)
+            # students = Student.objects.filter(batch=batch).all()
+            
+            sections = Section.objects.filter(is_allotment_enabled=True).all()
+            for section in sections:
+                  groups = Group.objects.filter(
+                        Q(leader__batch = section.batch) 
+                        & Q(leader__gender = section.gender)
+                        & Q(is_retained = False)
+                        & Q(is_preferences_filled = False)
+                  ).all()
+                  for group in groups:
+                        for student in group.members.all():
+                              send_reminder_mail.delay(student.name, student.user.email, last_date)
+                        send_reminder_mail.delay(group.leader.name, group.leader.user.email, last_date)
+            
+            # for student in students:
+            #       send_reminder_mail.delay(student.name, student.user.email, last_date)
+            return Response(status=status.HTTP_200_OK)
+                  

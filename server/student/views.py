@@ -13,6 +13,7 @@ from .serializers import InvitationsReceivedSerializer, InvitationsSentSerialize
 from django.core.files.storage import default_storage
 from datetime import datetime
 
+from dashboard.tasks import add_users
 from .tasks import *
 # Create your views here.
 
@@ -39,8 +40,11 @@ class SearchStudentView(APIView):
             if resultant==student:
                   return Response({'detail': 'You can\'t send invitation to yourself!'}, status=status.HTTP_403_FORBIDDEN)
 
-            if resultant.batch!=student.batch or resultant.gender!=student.gender:
-                  return Response({'detail': 'You can only send invitation to a student with same batch and same gender!'}, status=status.HTTP_403_FORBIDDEN)
+            if resultant.batch!=student.batch:
+                  return Response({'detail': 'You can only send invitation to a student with same batch!'}, status=status.HTTP_403_FORBIDDEN)
+
+            if resultant.gender!=student.gender:
+                  return Response({'detail': 'You can only send invitation to a student with same gender!'}, status=status.HTTP_403_FORBIDDEN)
 
             try:
                   group = student.leader_of_group
@@ -268,14 +272,3 @@ class LeaveGroupView(APIView):
                   left_group_mail.delay(member.name, student.name, student.rollno, member.user.email)
             return Response(status=status.HTTP_200_OK)
 
-class addStudents(APIView):
-      permission_classes = [IsAuthenticated, ~IsStudent]
-      
-      def post(self, request,):
-            f = request.FILES.get('file')
-            filename = f"{datetime.now().strftime('%Y%m%d_%H%M')}_{f.name}"
-            if filename.split('.')[-1]!='csv':
-                  return Response({'error':'file not csv'}, status=status.HTTP_403_FORBIDDEN)
-            filename = default_storage.save(filename, f)
-            add_users.delay(filename)
-            return Response(status=status.HTTP_200_OK)
