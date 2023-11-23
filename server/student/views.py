@@ -40,8 +40,11 @@ class SearchStudentView(APIView):
             if resultant==student:
                   return Response({'detail': 'You can\'t send invitation to yourself!'}, status=status.HTTP_403_FORBIDDEN)
 
-            if resultant.batch!=student.batch or resultant.gender!=student.gender:
-                  return Response({'detail': 'You can only send invitation to a student with same batch and same gender!'}, status=status.HTTP_403_FORBIDDEN)
+            if resultant.batch!=student.batch:
+                  return Response({'detail': 'You can only send invitation to a student with same batch!'}, status=status.HTTP_403_FORBIDDEN)
+
+            if resultant.gender!=student.gender:
+                  return Response({'detail': 'You can only send invitation to a student with same gender!'}, status=status.HTTP_403_FORBIDDEN)
 
             try:
                   group = student.leader_of_group

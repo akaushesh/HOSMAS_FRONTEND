@@ -134,7 +134,7 @@ class UpdateObjectView(APIView):
                   instance = Section.objects.filter(id=id).first()
                   if instance is None:
                         return Response(status=status.HTTP_404_NOT_FOUND)
-                  serializer = SectionSerializer(instance, request.data)
+                  serializer = SectionSerializer(instance, request.data, partial=True)
             elif model=='batch':
                   instance = Batch.objects.filter(id=id).first()
                   if instance is None:
@@ -180,6 +180,8 @@ class DeleteObjectView(APIView):
                   instance = Section.objects.filter(id=id).first()
             elif model=='batch':
                   instance = Batch.objects.filter(id=id).first()
+            elif model=='section':
+                  instance = Section.objects.filter(id=id).first()
             else:
                   return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -219,13 +221,14 @@ class getStudents(APIView):
             roll = request.data.get('roll_no')
             batch_name = request.data.get('batch')
             batch = Batch.objects.filter(name = batch_name).first()
+            # pages = request.data.get('pages')
             
             if (batch is None):
                   return Response({'error':'Batch does not exist'}, status=status.HTTP_404_NOT_FOUND)
             
             
             
-            students_per_page = 20
+            students_per_page = request.data.get('students_per_page')
             if roll is not None:
                   students_list = Student.objects.filter(Q(rollno__startswith = roll) & Q(batch = batch))
             else:
@@ -251,7 +254,7 @@ class getGroups(APIView):
       
       def get(self, request):
             # roll = request.data.get('roll_no')
-            groups_per_page = 10
+            groups_per_page = request.data.get('groups_per_page')
             
             groups_list = Group.objects.all()
             p = Paginator(groups_list, groups_per_page)
@@ -392,3 +395,19 @@ class deleteFAQ(APIView):
                   return Response(status=status.HTTP_404_NOT_FOUND)
             faq.delete()
             return Response(status=status.HTTP_200_OK)
+
+
+class UpdateSectionsAllotmentStatusView(APIView):
+      permission_classes = [IsAuthenticated, IsAdmin]
+
+      def post(self, request):
+            data = request.data
+            for item in data:
+                  if item.get('id') is None or item.get('is_allotment_enabled') is None:
+                        return Response(status=status.HTTP_400_BAD_REQUEST)
+                  instance = Section.objects.filter(id=item.get('id')).first()
+                  if instance is None:
+                        return Response(status=status.HTTP_400_BAD_REQUEST)
+                  instance.is_allotment_enabled = item.get('is_allotment_enabled')
+                  instance.save()
+                  return Response(status=status.HTTP_200_OK)
