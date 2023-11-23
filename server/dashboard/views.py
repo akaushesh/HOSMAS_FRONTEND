@@ -394,3 +394,19 @@ class deleteFAQ(APIView):
                   return Response(status=status.HTTP_404_NOT_FOUND)
             faq.delete()
             return Response(status=status.HTTP_200_OK)
+
+
+class UpdateSectionsAllotmentStatusView(APIView):
+      permission_classes = [IsAuthenticated, IsAdmin]
+
+      def post(self, request):
+            data = request.data
+            for item in data:
+                  if item.get('id') is None or item.get('is_allotment_enabled') is None:
+                        return Response(status=status.HTTP_400_BAD_REQUEST)
+                  instance = Section.objects.filter(id=item.get('id')).first()
+                  if instance is None:
+                        return Response(status=status.HTTP_400_BAD_REQUEST)
+                  instance.is_allotment_enabled = item.get('is_allotment_enabled')
+                  instance.save()
+                  return Response(status=status.HTTP_200_OK)
