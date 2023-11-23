@@ -6,6 +6,7 @@ from student.serializers import StudentProfileSerializer
 from user.models import User
 from .models import AllotmentStatus, AcademicSession, Faq
 import json
+from .tasks import send_start_allocation_mail
 
 
 class HostelSerializer(serializers.ModelSerializer):
@@ -124,6 +125,12 @@ class SectionSerializer(serializers.ModelSerializer):
             if updated_allotment_status is not None:
                   if not instance.is_allotment_enabled and updated_allotment_status:
                         # TODO: Send mails to all section's students    
+                        groups = Group.objects.filter(Q(leader__batch = instance.batch)
+                                                      & Q(leader__gender = instance.gender)).all()
+                        for group in groups:
+                              for student in group.members.all():
+                                    send_start_allocation_mail.delay(student.name, student.user.email)
+                              send_start_allocation_mail.delay(group.leader.name, group.leader.user.email)
                         print('Send Mails!')
                   instance.is_allotment_enabled = updated_allotment_status
             instance.is_retain_allowed = validated_data.get('is_retain_allowed', instance.is_retain_allowed)

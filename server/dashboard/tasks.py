@@ -320,5 +320,23 @@ def send_reminder_mail(name,email,last_date):
       connection.close()
       
       return f"\nReminder mail sent to {email}\n"
+
+
+@app.task(name = "send_start_allocation_mail")
+def send_start_allocation_mail(name,email):
+      subject = "Hostel Allotment Started"
+      idx = cache.get('emailIdIndex', 0)
+      connection = get_connection(username=settings.EMAIL_HOST_USERS[idx], password=settings.EMAIL_HOST_PASSWORDS[idx], fail_silently=False)
+      connection.open()
+      context = {
+            "name" : name,
+      }
+      html_message = render_to_string('dashboard/startallocationmail.html', context)
+      msg = strip_tags(html_message)
+      
+      send_mail(subject, msg, settings.EMAIL_HOST_USERS[idx], (email, ), html_message=html_message, connection=connection, fail_silently=False)
+      connection.close()
+      
+      return f"\nStart allocation mail sent to {email}\n"
       
             
