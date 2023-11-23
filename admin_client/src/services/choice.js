@@ -36,8 +36,9 @@ export const updateChoice = async (id, data, accessToken) => {
   return res;
 };
 
-export const deleteChoice = async (data, accessToken) => {
-  const res = await choiceApi.delete("delete/", data, {
+export const deleteChoice = async (id, accessToken) => {
+  const res = await choiceApi.delete("delete/", {
+    data: { id: id },
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },

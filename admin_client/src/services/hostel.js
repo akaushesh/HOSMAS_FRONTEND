@@ -36,8 +36,10 @@ export const updateHostel = async (id, data, accessToken) => {
   return res;
 };
 
-export const deleteHostel = async (data, accessToken) => {
-  const res = await hostelApi.delete("delete/", data, {
+export const deleteHostel = async (id, accessToken) => {
+  console.log("test ", accessToken);
+  const res = await hostelApi.delete("delete/", {
+    data: { id: id },
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },

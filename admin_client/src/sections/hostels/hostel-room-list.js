@@ -26,8 +26,9 @@ import {
 import { Scrollbar } from "src/components/scrollbar";
 import Link from "next/link";
 import CustomModal from "src/components/CustomModal";
-import { createRoomType, updateRoomType } from "src/services/roomType";
+import { createRoomType, deleteRoomType, updateRoomType } from "src/services/roomType";
 import { useAuthContext } from "src/contexts/auth-context";
+import ConfirmationModal from "src/components/ConfirmationModal";
 
 export const HostelRoomList = ({ rooms, setHostelData, hostelId }) => {
   const { accessToken } = useAuthContext();
@@ -44,6 +45,9 @@ export const HostelRoomList = ({ rooms, setHostelData, hostelId }) => {
     roomSize: "",
     roomCount: "",
   });
+
+  const [deleteConfirmationModalOpen, setDeleteConfirmationModalOpen] = useState(false);
+
   // const [room, setRoom] = useState(null);
 
   const handleUpdateRoomFormChange = (event) => {
@@ -106,7 +110,7 @@ export const HostelRoomList = ({ rooms, setHostelData, hostelId }) => {
         setHostelData((prev) => {
           return {
             ...prev,
-            hostelRooms: [...prev.hostelRooms, roomTypeData],
+            hostelRooms: [...prev.hostelRooms, { ...roomTypeData, id: res?.data?.id }],
           };
         });
         setCreateRoomTypeForm({
@@ -115,6 +119,33 @@ export const HostelRoomList = ({ rooms, setHostelData, hostelId }) => {
           roomCount: "",
         });
         setShowCreateRoomModal(false);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleDeleteRoomType = async () => {
+    try {
+      // console.log(updateRoomTypeForm);
+      const roomTypeId = updateRoomTypeForm.id;
+      const res = await deleteRoomType(roomTypeId, accessToken);
+      console.log(res);
+
+      if (res.status == 200) {
+        setDeleteConfirmationModalOpen(false);
+        setShowHostelRoomModal(false);
+        setHostelData((prev) => {
+          return {
+            ...prev,
+            hostelRooms: [
+              prev.hostelRooms.map((roomType) => {
+                if (roomType?.id != roomTypeId) return roomType;
+              }),
+            ],
+            // if (prev?.id != roomTypeId) return prev;
+          };
+        });
       }
     } catch (err) {
       console.log(err);
@@ -144,13 +175,14 @@ export const HostelRoomList = ({ rooms, setHostelData, hostelId }) => {
   return (
     <>
       <Card>
-        {/* <CardHeader title="Hostels" /> */}
         <Stack direction="row" m={2} alignItems="center" justifyContent="space-between">
           <Typography variant="h6">Room Types</Typography>
+
           <Button variant="contained" onClick={() => setShowCreateRoomModal(true)}>
             Add
           </Button>
         </Stack>
+
         <Scrollbar sx={{ flexGrow: 1 }}>
           <Box sx={{ minWidth: 500 }}>
             <Table>
@@ -161,9 +193,9 @@ export const HostelRoomList = ({ rooms, setHostelData, hostelId }) => {
                   <TableCell>Available Rooms</TableCell>
                 </TableRow>
               </TableHead>
+
               <TableBody>
                 {rooms.map((room) => {
-                  // const createdAt = format(room.createdAt, 'dd/MM/yyyy');
                   console.log(room);
                   return (
                     <TableRow
@@ -183,14 +215,17 @@ export const HostelRoomList = ({ rooms, setHostelData, hostelId }) => {
           </Box>
         </Scrollbar>
       </Card>
+
       <CustomModal open={showHostelRoomModal} onClose={onHostelRoomModalClose} minWidth={400}>
         <Box>
           <Stack direction="row" alignItems="center" justifyContent="space-between" mb={3}>
             <Typography variant="h5">{updateRoomTypeForm.roomTypeName}</Typography>
+
             <Button variant="contained" onClick={handleUpdateRoomType}>
               Save
             </Button>
           </Stack>
+
           <Stack spacing={2}>
             <TextField
               value={updateRoomTypeForm.roomTypeName}
@@ -210,16 +245,35 @@ export const HostelRoomList = ({ rooms, setHostelData, hostelId }) => {
               name="roomSize"
               onChange={handleUpdateRoomFormChange}
             />
+
+            <Button
+              variant="contained"
+              sx={{
+                backgroundColor: "error.main",
+                "&:hover": {
+                  backgroundColor: "error.dark",
+                },
+              }}
+              onClick={() => {
+                setDeleteConfirmationModalOpen(true);
+              }}
+            >
+              Delete Hostel
+            </Button>
           </Stack>
         </Box>
       </CustomModal>
+
       <CustomModal
         open={showCreateRoomModal}
         onClose={() => setShowCreateRoomModal(false)}
-        minWidth={300}
+        maxWidth={300}
       >
         <Stack alignItems="center">
-          <Typography mb={2}>Create a room</Typography>
+          <Typography variant="h5" mb={2}>
+            Create a room
+          </Typography>
+
           <Grid container spacing={3} justifyContent="center" mb={3}>
             <Grid item xs={12}>
               <TextField
@@ -249,11 +303,23 @@ export const HostelRoomList = ({ rooms, setHostelData, hostelId }) => {
               />
             </Grid>
           </Grid>
+
           <Button variant="contained" onClick={handleCreateRoomType}>
             Submit
           </Button>
         </Stack>
       </CustomModal>
+
+      <ConfirmationModal
+        open={deleteConfirmationModalOpen}
+        onClose={() => {
+          setDeleteConfirmationModalOpen(false);
+        }}
+        message="Are you sure you want to delete this Room Type?"
+        noMessage="No, leave it"
+        yesMessage="Yes, delete it"
+        execFunction={handleDeleteRoomType}
+      />
     </>
   );
 };

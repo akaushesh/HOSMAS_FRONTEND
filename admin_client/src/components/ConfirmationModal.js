@@ -1,15 +1,27 @@
 import React from "react";
 import CustomModal from "./CustomModal";
-import { Typography } from "@mui/material";
+import { Typography, Grid, Button } from "@mui/material";
 
-function ConfirmationModal(props) {
+function ConfirmationModal({ open, onClose, message, yesMessage, noMessage, execFunction }) {
   return (
-    <CustomModal>
-      <Typography>{props.message}</Typography>
-      <Stack direction="row" spacing={2}>
-        <Button>No, leave it</Button>
-        <Button>Yes, Delete it</Button>
-      </Stack>
+    <CustomModal open={open} onClose={onClose} maxWidth={400}>
+      <Typography variant="h5" mb={5} textAlign="center">
+        {message}
+      </Typography>
+
+      <Grid container spacing={2} justifyContent="center">
+        <Grid item xs={12} md={6}>
+          <Button variant="contained" onClick={execFunction} fullWidth>
+            {yesMessage}
+          </Button>
+        </Grid>
+
+        <Grid item xs={12} md={6}>
+          <Button variant="contained" onClick={onClose} fullWidth>
+            {noMessage}
+          </Button>
+        </Grid>
+      </Grid>
     </CustomModal>
   );
 }

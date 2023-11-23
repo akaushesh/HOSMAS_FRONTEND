@@ -26,3 +26,23 @@ export const updateSection = async (id, data, accessToken) => {
   });
   return res;
 };
+
+export const updateSectionsAllotmentStatus = async (data, accessToken) => {
+  const res = await sectionApi.post(`update/all-status/`, data, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+  return res;
+};
+
+export const deleteSection = async (id, accessToken) => {
+  console.log("test ", accessToken);
+  const res = await sectionApi.delete("delete/", {
+    data: { id: id },
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+  return res;
+};

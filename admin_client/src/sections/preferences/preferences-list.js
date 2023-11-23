@@ -26,7 +26,8 @@ import Link from "next/link";
 import CustomModal from "src/components/CustomModal";
 import { useAuthContext } from "src/contexts/auth-context";
 import { getHostel, getAllHostels } from "src/services/hostel";
-import { createChoice, updateChoice } from "src/services/choice";
+import { createChoice, deleteChoice, updateChoice } from "src/services/choice";
+import ConfirmationModal from "src/components/ConfirmationModal";
 
 const statusMap = {
   pending: "warning",
@@ -36,6 +37,7 @@ const statusMap = {
 
 export const PreferencesList = ({ sectionId, preferences, setPreferences }) => {
   const { accessToken } = useAuthContext();
+
   const [updatePreferenceData, setUpdatePreferenceData] = useState({
     hostel: "",
     roomType: "",
@@ -50,18 +52,20 @@ export const PreferencesList = ({ sectionId, preferences, setPreferences }) => {
   const [createPreferenceRoomType, setCreatePreferenceRoomType] = useState();
   const [createPreferenceCapacity, setCreatePreferenceCapacity] = useState();
 
+  const [deleteConfirmationModalOpen, setDeleteConfirmationModalOpen] = useState(false);
+
   useEffect(() => {
     console.log("testing");
     if (openCreatePreferenceModal == true) {
       console.log("sending request");
       try {
-        const getData = async () => {
+        const fetchAllHostelsData = async () => {
           const res = await getAllHostels(accessToken);
           console.log(res);
           setCreatePreferenceHostelOptions(res?.data);
         };
 
-        getData();
+        fetchAllHostelsData();
       } catch (err) {
         console.log(err);
       }
@@ -71,13 +75,13 @@ export const PreferencesList = ({ sectionId, preferences, setPreferences }) => {
   useEffect(() => {
     if (createPreferenceHostel) {
       try {
-        const getData = async () => {
+        const fetchHostelData = async () => {
           const res = await getHostel(createPreferenceHostel.id, accessToken);
           console.log(res);
           setCreatePreferenceRoomTypeOptions(res?.data?.room_types);
         };
 
-        getData();
+        fetchHostelData();
       } catch (err) {
         console.log(err);
       }
@@ -149,6 +153,29 @@ export const PreferencesList = ({ sectionId, preferences, setPreferences }) => {
     }
   };
 
+  const handleDeletePreference = async () => {
+    try {
+      // console.log(updateRoomTypeForm);
+      const choiceId = updatePreferenceData.id;
+      const res = await deleteChoice(choiceId, accessToken);
+      console.log(res);
+
+      if (res.status == 200) {
+        setDeleteConfirmationModalOpen(false);
+        setOpenUpdatePreferenceModal(false);
+        setPreferences((prev) => {
+          return [
+            prev.map((preference) => {
+              if (preference?.id == choiceId) return prev;
+            }),
+          ];
+        });
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   return (
     <Card>
       <Stack direction="row" m={2} alignItems="center" justifyContent="space-between">
@@ -157,6 +184,7 @@ export const PreferencesList = ({ sectionId, preferences, setPreferences }) => {
           Add
         </Button>
       </Stack>
+
       <Scrollbar sx={{ flexGrow: 1 }}>
         <Box sx={{ minWidth: 400 }}>
           <Table>
@@ -167,6 +195,7 @@ export const PreferencesList = ({ sectionId, preferences, setPreferences }) => {
                 <TableCell>Capacity</TableCell>
               </TableRow>
             </TableHead>
+
             <TableBody>
               {preferences.map((preference) => {
                 // const createdAt = format(preference.createdAt, 'dd/MM/yyyy');
@@ -190,6 +219,7 @@ export const PreferencesList = ({ sectionId, preferences, setPreferences }) => {
           </Table>
         </Box>
       </Scrollbar>
+
       <CustomModal
         open={openUpdatePreferenceModal}
         onClose={() => setOpenUpdatePreferenceModal(false)}
@@ -200,10 +230,12 @@ export const PreferencesList = ({ sectionId, preferences, setPreferences }) => {
             <Typography variant="h5">
               {updatePreferenceData?.hostel} {updatePreferenceData?.roomType}
             </Typography>
+
             <Button variant="contained" onClick={handleUpdatePreference}>
               Save
             </Button>
           </Stack>
+
           <Stack alignItems="center">
             <TextField
               value={updatePreferenceData?.capacity}
@@ -212,14 +244,31 @@ export const PreferencesList = ({ sectionId, preferences, setPreferences }) => {
               onChange={(e) => {
                 setUpdatePreferenceData((prev) => ({ ...prev, capacity: e.target.value }));
               }}
+              sx={{ mb: 3 }}
             />
+
+            <Button
+              variant="contained"
+              sx={{
+                backgroundColor: "error.main",
+                "&:hover": {
+                  backgroundColor: "error.dark",
+                },
+              }}
+              onClick={() => {
+                setDeleteConfirmationModalOpen(true);
+              }}
+            >
+              Delete Preference
+            </Button>
           </Stack>
         </Box>
       </CustomModal>
+
       <CustomModal
         open={openCreatePreferenceModal}
         onClose={() => setOpenCreatePreferenceModal(false)}
-        minWidth={300}
+        maxWidth={300}
       >
         <Stack alignItems="center">
           <Typography mb={2}>Create preference</Typography>
@@ -243,6 +292,7 @@ export const PreferencesList = ({ sectionId, preferences, setPreferences }) => {
                 })}
               </TextField>
             </Grid>
+
             <Grid item xs={12}>
               <TextField
                 name="roomType"
@@ -261,6 +311,7 @@ export const PreferencesList = ({ sectionId, preferences, setPreferences }) => {
                 })}
               </TextField>
             </Grid>
+
             <Grid item xs={12}>
               <TextField
                 label="Total Rooms"
@@ -271,11 +322,23 @@ export const PreferencesList = ({ sectionId, preferences, setPreferences }) => {
               />
             </Grid>
           </Grid>
+
           <Button variant="contained" onClick={handleCreatePreference}>
             Submit
           </Button>
         </Stack>
       </CustomModal>
+
+      <ConfirmationModal
+        open={deleteConfirmationModalOpen}
+        onClose={() => {
+          setDeleteConfirmationModalOpen(false);
+        }}
+        message="Are you sure you want to delete this Room Type?"
+        noMessage="No, leave it"
+        yesMessage="Yes, delete it"
+        execFunction={handleDeletePreference}
+      />
     </Card>
   );
 };

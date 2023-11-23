@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useReducer, useRef } from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
-import { signIn as signInApi } from "src/services/auth";
+import { getProfile, signIn as signInApi } from "src/services/auth";
 // import { addAccessTokenToRequests } from "src/services/api";
 
 const HANDLERS = {
@@ -82,6 +82,15 @@ export const AuthProvider = (props) => {
     }
 
     if (accessToken) {
+      try {
+        await getProfile(accessToken);
+      } catch (err) {
+        console.log(err);
+        dispatch({
+          type: HANDLERS.INITIALIZE,
+        });
+      }
+
       dispatch({
         type: HANDLERS.INITIALIZE,
         payload: accessToken,

@@ -38,7 +38,11 @@ function ManageHostelsPage() {
         setHostels((prev) => {
           return [
             ...prev,
-            { id: res?.id, name: createHostelForm.hostelName, gender: createHostelForm.gender },
+            {
+              id: res?.data?.id,
+              name: createHostelForm.hostelName,
+              gender: createHostelForm.gender,
+            },
           ];
         });
         setCreateHostelForm({
@@ -56,13 +60,13 @@ function ManageHostelsPage() {
 
   useEffect(() => {
     try {
-      const getData = async () => {
+      const fetchAllHostelsData = async () => {
         const res = await getAllHostels(accessToken);
         setHostels(res?.data);
         console.log(res);
       };
 
-      getData();
+      fetchAllHostelsData();
     } catch (err) {
       console.log(err);
     }
@@ -81,13 +85,17 @@ function ManageHostelsPage() {
       <Stack alignItems="center" mt={7}>
         <Button onClick={() => setOpenCreateHostelModal(true)}>+ Add Hostel</Button>
       </Stack>
+
       <CustomModal
         open={openCreateHostelModal}
         onClose={() => setOpenCreateHostelModal(false)}
-        minWidth="200px"
+        maxWidth={600}
       >
         <Stack alignItems="center">
-          <Typography mb={2}>Create a Hostel</Typography>
+          <Typography variant="h5" mb={2}>
+            Create a Hostel
+          </Typography>
+
           <Grid container spacing={3} justifyContent="center" mb={3}>
             <Grid item xs={12} md={6}>
               <TextField
@@ -98,6 +106,7 @@ function ManageHostelsPage() {
                 onChange={handleFormChange}
               />
             </Grid>
+
             <Grid item xs={12} md={6}>
               <TextField
                 name="gender"
@@ -116,6 +125,7 @@ function ManageHostelsPage() {
                 })}
               </TextField>
             </Grid>
+
             <Grid item xs={12} md={6}>
               <TextField
                 label="Caretaker Email"
@@ -125,6 +135,7 @@ function ManageHostelsPage() {
                 onChange={handleFormChange}
               />
             </Grid>
+
             <Grid item xs={12} md={6}>
               <TextField
                 label="Caretaker Name"
@@ -135,6 +146,7 @@ function ManageHostelsPage() {
               />
             </Grid>
           </Grid>
+
           <Button variant="contained" onClick={handleCreateHostelFormSubmit}>
             Submit
           </Button>

@@ -36,10 +36,12 @@ export const updateRoomType = async (id, data, accessToken) => {
   return res;
 };
 
-export const deleteRoomType = async (data, accessToken) => {
-  const res = await roomTypeApi.delete("delete/", data, {
+export const deleteRoomType = async (id, accessToken) => {
+  const res = await roomTypeApi.delete("delete/", {
+    data: { id: id },
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
   });
+  return res;
 };

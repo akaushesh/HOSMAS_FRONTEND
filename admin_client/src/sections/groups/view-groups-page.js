@@ -11,6 +11,8 @@ import { Layout as DashboardLayout } from "src/layouts/dashboard/layout";
 import { applyPagination } from "src/utils/apply-pagination";
 import { GroupsTable } from "src/sections/groups/groups-table";
 import { GroupsSearch } from "src/sections/groups/groups-search";
+import { getAllGroups } from "src/services/others";
+import { useAuthContext } from "src/contexts/auth-context";
 
 const now = new Date();
 
@@ -44,11 +46,23 @@ const useCustomerIds = (customers) => {
 };
 
 const ViewGroupsPage = () => {
+  const { accessToken } = useAuthContext();
+
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const customers = useCustomers(page, rowsPerPage);
   const customersIds = useCustomerIds(customers);
   const customersSelection = useSelection(customersIds);
+  const [groups, setGroups] = useState([]);
+
+  useEffect(() => {
+    const fetchGroupsData = async () => {
+      const res = await getAllGroups(accessToken);
+      console.log(res);
+    };
+
+    fetchGroupsData();
+  }, []);
 
   const handlePageChange = useCallback((event, value) => {
     setPage(value);
@@ -57,10 +71,6 @@ const ViewGroupsPage = () => {
   const handleRowsPerPageChange = useCallback((event) => {
     setRowsPerPage(event.target.value);
   }, []);
-
-  // useEffect(() => {
-
-  // }, [])
 
   return (
     <>
@@ -76,6 +86,7 @@ const ViewGroupsPage = () => {
             <Stack direction="row" justifyContent="space-between" spacing={4}>
               <Stack spacing={1}>
                 <Typography variant="h4">Customers</Typography>
+
                 <Stack alignItems="center" direction="row" spacing={1}>
                   <Button
                     color="inherit"
@@ -87,6 +98,7 @@ const ViewGroupsPage = () => {
                   >
                     Import
                   </Button>
+
                   <Button
                     color="inherit"
                     startIcon={
@@ -99,6 +111,7 @@ const ViewGroupsPage = () => {
                   </Button>
                 </Stack>
               </Stack>
+
               <div>
                 <Button
                   startIcon={
@@ -112,7 +125,9 @@ const ViewGroupsPage = () => {
                 </Button>
               </div>
             </Stack>
+
             <GroupsSearch />
+
             <GroupsTable
               count={data.length}
               items={customers}

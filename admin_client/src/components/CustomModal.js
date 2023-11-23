@@ -1,13 +1,14 @@
 import React from "react";
 import { Modal, Box } from "@mui/material";
 
-function CustomModal({ open, onClose, minWidth = 600, children }) {
+function CustomModal({ open, onClose, maxWidth, minWidth, children }) {
   const style = {
     position: "absolute",
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    minWidth: { minWidth },
+    maxWidth: maxWidth ? maxWidth : "auto",
+    minWidth: minWidth ? minWidth : "auto",
     bgcolor: "background.paper",
     borderRadius: 1,
     boxShadow: 24,
@@ -17,7 +18,7 @@ function CustomModal({ open, onClose, minWidth = 600, children }) {
   };
 
   return (
-    <Modal open={open} onClose={onClose}>
+    <Modal open={open} onClose={onClose} sx={{ overflow: "auto" }}>
       <Box sx={{ ...style }}>{children}</Box>
     </Modal>
   );
