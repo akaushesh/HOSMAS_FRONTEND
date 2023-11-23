@@ -221,13 +221,14 @@ class getStudents(APIView):
             roll = request.data.get('roll_no')
             batch_name = request.data.get('batch')
             batch = Batch.objects.filter(name = batch_name).first()
+            # pages = request.data.get('pages')
             
             if (batch is None):
                   return Response({'error':'Batch does not exist'}, status=status.HTTP_404_NOT_FOUND)
             
             
             
-            students_per_page = 20
+            students_per_page = request.data.get('students_per_page')
             if roll is not None:
                   students_list = Student.objects.filter(Q(rollno__startswith = roll) & Q(batch = batch))
             else:
@@ -253,7 +254,7 @@ class getGroups(APIView):
       
       def get(self, request):
             # roll = request.data.get('roll_no')
-            groups_per_page = 10
+            groups_per_page = request.data.get('groups_per_page')
             
             groups_list = Group.objects.all()
             p = Paginator(groups_list, groups_per_page)
