@@ -19,5 +19,5 @@ urlpatterns = [
       path('getFAQ/', views.getFAQ.as_view()),
       path('createFAQ/', views.createFAQ.as_view()),
       path('deleteFAQ/', views.deleteFAQ.as_view()),
-      
+      path('sendReminderMail/', views.sendReminderMail.as_view()),
 ]

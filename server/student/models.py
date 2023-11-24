@@ -9,7 +9,7 @@ GENDER_CHOICES = (
 
 
 class Student (models.Model):
-    user = models.OneToOneField('user.User', on_delete=models.CASCADE, related_name='student')
+    user = models.OneToOneField('user.User', on_delete=models.CASCADE, related_name='student', unique=True)
 
     name = models.CharField(max_length=100, null=False, blank=False)
     rollno = models.CharField(max_length=12, unique=True, null=False, blank=False)
@@ -63,6 +63,9 @@ class Invitation(models.Model):
     to = models.ForeignKey('student.Student',  on_delete=models.CASCADE, related_name='invitations')
     for_group = models.ForeignKey('student.Group', on_delete=models.CASCADE, related_name='invitations')
     time = models.DateTimeField(auto_now_add=True, blank=True)
+
+    class Meta:
+        unique_together = ('to', 'for_group')
 
     def __str__(self):
         return f"{self.for_group.id}-{self.to.name}"

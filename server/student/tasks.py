@@ -121,3 +121,92 @@ def left_group_mail(leader_name, exmember_name, exmember_roll, member_email):
     connection.close()
 
     return f"\nleft group mail sent to {member_email}\n"
+
+
+@app.task(name = "send_preferences_mail")
+def send_preferences_mail(email, name, d):
+        
+        idx = cache.get('emailIdIndex', 0)
+        cache.set('emailIdIndex', (idx + 1) % settings.EMAIL_HOST_USERS_COUNT)
+    
+        connection = get_connection(username=settings.EMAIL_HOST_USERS[idx], password=settings.EMAIL_HOST_PASSWORDS[idx], fail_silently=False)
+        connection.open()
+        
+        subject = "Hostel Allotment Preferences filled for your group"
+        context = {
+            'name':name,
+            'data':d,
+        }
+        html_message = render_to_string('dashboard/preferences.html', context)
+        msg = strip_tags(html_message)
+        
+        send_mail(subject, msg, settings.EMAIL_HOST_USERS[idx], (email, ), html_message=html_message, connection=connection, fail_silently=False)
+        connection.close()
+        
+        return f"\nPreferences mail sent to {email}\n"
+
+
+@app.task(name = "send_retain_mail")
+def send_retain_mail(email, name):
+        
+        idx = cache.get('emailIdIndex', 0)
+        cache.set('emailIdIndex', (idx + 1) % settings.EMAIL_HOST_USERS_COUNT)
+    
+        connection = get_connection(username=settings.EMAIL_HOST_USERS[idx], password=settings.EMAIL_HOST_PASSWORDS[idx], fail_silently=False)
+        connection.open()
+        
+        subject = "Hostel Allotment Preferences filled for your group"
+        context = {
+            'name':name,
+        }
+        html_message = render_to_string('dashboard/retain.html', context)
+        msg = strip_tags(html_message)
+        
+        send_mail(subject, msg, settings.EMAIL_HOST_USERS[idx], (email, ), html_message=html_message, connection=connection, fail_silently=False)
+        connection.close()
+        
+        return f"\nPreferences mail sent to {email}\n"
+    
+@app.task(name = "send_teamleader_change_mail")
+def send_teamleader_change_mail(newName, newRoll, email):
+            
+            idx = cache.get('emailIdIndex', 0)
+            cache.set('emailIdIndex', (idx + 1) % settings.EMAIL_HOST_USERS_COUNT)
+        
+            connection = get_connection(username=settings.EMAIL_HOST_USERS[idx], password=settings.EMAIL_HOST_PASSWORDS[idx], fail_silently=False)
+            connection.open()
+            
+            subject = "Group Leader for your Hostel Allocation was changed"
+            context = {
+                'newName':newName,
+                'newRoll':newRoll,
+            }
+            html_message = render_to_string('dashboard/teamleaderchange.html', context)
+            msg = strip_tags(html_message)
+            
+            send_mail(subject, msg, settings.EMAIL_HOST_USERS[idx], (email, ), html_message=html_message, connection=connection, fail_silently=False)
+            connection.close()
+            
+            return f"\nTeam Leader Change mail sent to {email}\n"
+        
+
+@app.task(name = "send_preferences_deleted_mail")
+def send_preferences_deleted_mail(email, name):
+                
+                idx = cache.get('emailIdIndex', 0)
+                cache.set('emailIdIndex', (idx + 1) % settings.EMAIL_HOST_USERS_COUNT)
+            
+                connection = get_connection(username=settings.EMAIL_HOST_USERS[idx], password=settings.EMAIL_HOST_PASSWORDS[idx], fail_silently=False)
+                connection.open()
+                
+                subject = "Hostel Allotment Preferences deleted for your group"
+                context = {
+                    'name':name,
+                }
+                html_message = render_to_string('dashboard/deletepreferences.html', context)
+                msg = strip_tags(html_message)
+                
+                send_mail(subject, msg, settings.EMAIL_HOST_USERS[idx], (email, ), html_message=html_message, connection=connection, fail_silently=False)
+                connection.close()
+                
+                return f"\nPreferences mail sent to {email}\n"
