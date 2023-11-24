@@ -58,7 +58,7 @@ class GetMultipleObjectsView(APIView):
                   queryset = Hostel.objects.all()
                   serializer = HostelSerializer(queryset, many=True)
             elif model=='section':
-                  queryset = Section.objects.all()
+                  queryset = Section.objects.select_related('batch').all()
                   serializer = SectionSerializer(queryset, many=True)
             elif model=='uninitialized-batch':
                   queryset = Batch.objects.annotate(
@@ -66,10 +66,10 @@ class GetMultipleObjectsView(APIView):
                   ).filter(sections_count__lt=2)
                   serializer = BatchUninitializedSerializer(queryset, many=True)
             elif model=='roomtype':
-                  queryset = RoomType.objects.all()
+                  queryset = RoomType.objects.select_related('hostel').all()
                   serializer = RoomTypeOptionSerializer(queryset, many=True)
             elif model=='choice':
-                  queryset = Section.objects.filter(id=request.GET.get('section')).first()
+                  queryset = Section.objects.filter(id=request.GET.get('section')).select_related('batch').prefetch_related('choices').first()
                   if queryset is None:
                         return Response(status=status.HTTP_404_NOT_FOUND)
                   serializer = SectionRoomTypeSerializer(queryset)
@@ -86,7 +86,7 @@ class GetObjectView(APIView):
       
       def get(self, request, model, id):
             if model=='hostel':
-                  instance = Hostel.objects.filter(id=id).first()
+                  instance = Hostel.objects.filter(id=id).prefetch_related('room_types').first()
                   if instance is None:
                         return Response(status=status.HTTP_404_NOT_FOUND)
                   serializer = HostelSingleSerializer(instance)
@@ -396,7 +396,8 @@ class deleteFAQ(APIView):
                   return Response(status=status.HTTP_404_NOT_FOUND)
             faq.delete()
             return Response(status=status.HTTP_200_OK)
-      
+
+
 class UpdateSectionsAllotmentStatusView(APIView):
       permission_classes = [IsAuthenticated, IsAdmin]
 
@@ -412,7 +413,8 @@ class UpdateSectionsAllotmentStatusView(APIView):
                   instance.save()
                   return Response(status=status.HTTP_200_OK)
             return Response(status=status.HTTP_400_BAD_REQUEST)
-      
+
+
 class sendReminderMail(APIView):
       permission_classes = [IsAuthenticated, IsAdmin]
       
@@ -426,7 +428,7 @@ class sendReminderMail(APIView):
             #       return Response(status=status.HTTP_400_BAD_REQUEST)
             # students = Student.objects.filter(batch=batch).all()
             
-            sections = Section.objects.filter(is_allotment_enabled=True).all()
+            sections = Section.objects.filter(is_allotment_enabled=True).select_related('batch').all()
             for section in sections:
                   groups = Group.objects.filter(
                         Q(leader__batch = section.batch) 
@@ -442,4 +444,3 @@ class sendReminderMail(APIView):
             # for student in students:
             #       send_reminder_mail.delay(student.name, student.user.email, last_date)
             return Response(status=status.HTTP_200_OK)
-                  
