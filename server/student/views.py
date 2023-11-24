@@ -132,9 +132,6 @@ class DeleteInvitationView(APIView):
 
             invitation.delete()
 
-            #TODO: Send email to invitee/leader accordingly
-            # ? 
-
             return Response(status=status.HTTP_200_OK)
 
 
