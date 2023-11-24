@@ -378,7 +378,7 @@ class createFAQ(APIView):
      
 
 class getFAQ(APIView):
-      permission_classes = [IsAuthenticated]
+      permission_classes = [IsAuthenticated, IsAdmin]
       
       def get(self, request):
             faqs = Faq.objects.all()
@@ -396,6 +396,25 @@ class deleteFAQ(APIView):
                   return Response(status=status.HTTP_404_NOT_FOUND)
             faq.delete()
             return Response(status=status.HTTP_200_OK)
+      
+class updateFAQ(APIView):
+      permission_classes = [IsAuthenticated, IsAdmin]
+      
+      def post(self, request):
+            id = request.data.get('id')
+            faq = Faq.objects.filter(id=id).first()
+            if faq is None:
+                  return Response(status=status.HTTP_404_NOT_FOUND)
+            question = request.data.get('question')
+            answer = request.data.get('answer')
+            
+            if question is not None:
+                  faq.question = question
+            if answer is not None:
+                  faq.answer = answer
+            faq.save()
+            return Response(status=status.HTTP_200_OK)
+            
 
 
 class UpdateSectionsAllotmentStatusView(APIView):
