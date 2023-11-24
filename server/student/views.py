@@ -5,7 +5,7 @@ from rest_framework import status
 from rest_framework.response import Response
 
 from rest_framework.permissions import IsAuthenticated
-from .permissions import IsStudent, IsGroupLeader, IsGroupMember, IsPreferenceFillingLive, IsNotGroupLeader, IsNotGroupMember
+from .permissions import IsStudent, IsNotDefaulter, IsPreferenceFillingLive, IsGroupLeader, IsGroupMember, IsNotGroupLeader, IsNotGroupMember
 
 from .models import Student, Group, Invitation
 from .serializers import InvitationsReceivedSerializer, InvitationsSentSerializer, StudentSerializer, GroupSerializer, StudentProfileSerializer
@@ -28,15 +28,21 @@ class ProfileView(APIView):
 
 
 class SearchStudentView(APIView):
-      permission_classes = [IsAuthenticated, IsStudent, IsPreferenceFillingLive, IsNotGroupMember]
+      permission_classes = [IsAuthenticated, IsStudent, IsNotDefaulter, IsPreferenceFillingLive, IsNotGroupMember]
 
       def post(self, request):
             student = Student.objects.filter(user=request.user).select_related('batch', 'leader_of_group').first()
-            resultant = Student.objects.filter(rollno=request.data.get('rollno')).select_related('batch', 'group').first()
+            resultant = Student.objects.filter(rollno=request.data.get('rollno')).select_related('batch', 'group', 'defaulter').first()
 
             if resultant is None:
                   return Response({'detail': 'No student found!'}, status=status.HTTP_403_FORBIDDEN)
 
+            try:
+                  _ = invitee.defaulter
+                  return Response({"detail": "This student is suspended from Hostel Allocation Process"}, status=status.HTTP_403_FORBIDDEN)
+            except ObjectDoesNotExist:
+                  pass
+            
             if resultant==student:
                   return Response({'detail': 'You can\'t send invitation to yourself!'}, status=status.HTTP_403_FORBIDDEN)
 
@@ -65,7 +71,7 @@ class SearchStudentView(APIView):
 
 
 class SendInvitationView(APIView):
-      permission_classes = [IsAuthenticated, IsStudent, IsPreferenceFillingLive, IsNotGroupMember]
+      permission_classes = [IsAuthenticated, IsStudent, IsNotDefaulter, IsPreferenceFillingLive, IsNotGroupMember]
 
       def post(self, request):
             student = Student.objects.filter(user=request.user).select_related('leader_of_group', 'batch').first()
@@ -79,10 +85,16 @@ class SendInvitationView(APIView):
                   group = Group(leader=student, cg=student.cg)
                   group.save()
             
-            invitee = Student.objects.filter(rollno=request.data.get("rollno")).select_related('group', 'batch').first()
+            invitee = Student.objects.filter(rollno=request.data.get("rollno")).select_related('group', 'batch', 'defaulter').first()
             if invitee is None:
                   return Response({"detail": "Invalid Roll Number!"}, status=status.HTTP_403_FORBIDDEN)
 
+            try:
+                  _ = invitee.defaulter
+                  return Response({"detail": "This student is suspended from Hostel Allocation Process"}, status=status.HTTP_403_FORBIDDEN)
+            except ObjectDoesNotExist:
+                  pass
+            
             if invitee==student or (invitee.group is not None and invitee.group.id==group.id):
                   return Response({"detail": "This student is already part of your group!"}, status=status.HTTP_403_FORBIDDEN)
 
@@ -136,7 +148,7 @@ class DeleteInvitationView(APIView):
 
 
 class AcceptInvitationView(APIView):
-      permission_classes = [IsAuthenticated, IsStudent, IsPreferenceFillingLive]
+      permission_classes = [IsAuthenticated, IsStudent, IsNotDefaulter, IsPreferenceFillingLive]
 
       def post(self,request):
             invitation = Invitation.objects.filter(id=request.data.get('id')).select_related('for_group').first()
@@ -176,7 +188,7 @@ class AcceptInvitationView(APIView):
                   updatedcg /= cnt
                   prevgroup.cg = round(updatedcg, 2)
                   prevgroup.save()
-                  #TODO: inform all previous group members to say goodbye
+                  # inform all previous group members to say goodbye
                   members = prevgroup.members.all()
                   for member in members:
                         left_group_mail.delay(member.name, student.name, student.rollno, member.user.email)
@@ -277,4 +289,3 @@ class LeaveGroupView(APIView):
             for member in members:
                   left_group_mail.delay(member.name, student.name, student.rollno, member.user.email)
             return Response(status=status.HTTP_200_OK)
-

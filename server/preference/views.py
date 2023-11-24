@@ -18,7 +18,7 @@ import json
 from student.tasks import send_preferences_mail, send_retain_mail, send_preferences_deleted_mail
 
 class getAvailableChoices(APIView):
-    permission_classes = [IsAuthenticated & IsStudent]
+    permission_classes = [IsAuthenticated, IsStudent]
     
     def get(self, request):
         stud = Student.objects.filter(user=request.user).select_related('batch').first()
@@ -48,7 +48,7 @@ class getAvailableChoices(APIView):
 
 
 class createPreference (APIView):
-    permission_classes = [IsAuthenticated & IsStudent & ~IsGroupMember & IsPreferenceFillingLive]
+    permission_classes = [IsAuthenticated, IsStudent, IsNotDefaulter, IsNotGroupMember, IsPreferenceFillingLive]
     
     def post(self, request):
         data = request.data
@@ -110,7 +110,7 @@ class createPreference (APIView):
                 
                 
 class Retain(APIView):
-    permission_classes = [IsAuthenticated & IsStudent & IsPreferenceFillingLive & ~IsGroupMember & IsRetainAllowed]
+    permission_classes = [IsAuthenticated, IsStudent, IsNotDefaulter, IsPreferenceFillingLive, IsNotGroupMember, IsRetainAllowed]
     
     def post(self, request):
         # data = request.data
@@ -186,7 +186,7 @@ class getPreferences(APIView):
             
 
 class deletePreferences(APIView):
-    permission_classes = [IsAuthenticated & IsStudent & ~IsGroupMember]
+    permission_classes = [IsAuthenticated, IsStudent, IsNotGroupMember]
     
     def post(self, request):
         stud = Student.objects.filter(user=request.user).select_related('leader_of_group').first()
@@ -209,7 +209,7 @@ class deletePreferences(APIView):
 
 
 class PreferenceFillingStatusView(APIView):
-      permission_classes = [IsAuthenticated & IsStudent]
+      permission_classes = [IsAuthenticated, IsStudent]
 
       def get(self, request):
             student = Student.objects.filter(user=request.user).select_related('batch').first()

@@ -2,7 +2,7 @@ from __future__ import absolute_import, unicode_literals
 
 from config.celery import app
 from django.db.models import Q
-from student.models import Group, Section
+from student.models import Group, Section, Defaulter
 from preference.models import *
 from .models import AllotmentStatus
 import csv
@@ -22,7 +22,7 @@ from django.core.cache import cache
 @app.task(name='add_users')
 def add_users(filename):
       storage = default_storage
-      storage.location = os.path.join(settings.BASE_DIR, 'imported-data')
+      storage.location = os.path.join(settings.BASE_DIR, 'imported-data', 'student')
       userfile = storage.open(filename, 'r')
       reader = csv.DictReader(userfile)
 
@@ -214,14 +214,53 @@ def add_users(filename):
             
             except Exception as e:
                   # log error
-                  # with open(os.path.join(settings.LOGS_ROOT, 'add_user_errors.log'), 'a') as f:
-                  #     f.write(f"Creation of item {cnt} unsuccessful.\n")
-                  #     f.write(f"{e}")
-                  #     f.write("\n")
-                  print(f"creation of ({row['name']}, {row['email']}) unsuccessful.\n")
-                  print(e)
+                  with open(os.path.join(settings.LOGS_ROOT, 'add_user_errors.log'), 'a') as f:
+                      f.write(f"Creation of item {cnt} unsuccessful.\n")
+                      f.write(f"{e}")
+                      f.write("\n")
+                  # print(f"creation of ({row['name']}, {row['email']}) unsuccessful.\n")
+                  # print(e)
                   failureCnt += 1
 
+            cnt += 1
+
+      return f"{successCnt} users successfully created and {failureCnt} failed."
+
+
+@app.task(name = "add_defaulters")
+def add_defaulters(filename):
+      storage = default_storage
+      storage.location = os.path.join(settings.BASE_DIR, 'imported-data', 'defaulter')
+      userfile = storage.open(filename, 'r')
+      reader = csv.DictReader(userfile)
+
+      fieldnames = reader.fieldnames
+      if len(fieldnames)!=1 or fieldnames[0]!='student':
+            with open(os.path.join(settings.LOGS_ROOT, 'add_defaulter_errors.log'), 'a') as f:
+                  f.write(f"student field must be present! Aborting...")
+                  f.write("\n")
+            return 0
+      
+      cnt = 1
+      successCnt = 0
+      failureCnt = 0
+
+      for row in reader:
+            try:
+                  student = Student.objects.filter(rollno=row['student']).first()
+                  if student in None:
+                        raise Exception(f"Student with roll number {row['student']} not found!")
+                  instance = Defaulter.objects.filter(student=student).first()
+                  if instance is None:
+                        instance = Defaulter(student=student)
+                        instance.save()
+                  successCnt += 1
+            except BaseException as e:
+                  with open(os.path.join(settings.LOGS_ROOT, 'add_defaulter_errors.log'), 'a') as f:
+                        f.write(f"Creation of item {cnt} unsuccessful.\n")
+                        f.write(e)
+                        f.write("\n")
+                  failureCnt += 1
             cnt += 1
 
       return f"{successCnt} users successfully created and {failureCnt} failed."
@@ -302,6 +341,7 @@ def allot_hostel():
       status.save()
 
       return 1
+
 
 @app.task(name = "send_reminder_mail")
 def send_reminder_mail(name,email,last_date):

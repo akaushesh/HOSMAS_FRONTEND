@@ -15,11 +15,11 @@ from preference.models import Hostel, RoomType, RoomTypeChoice
 from student.models import Batch, Section, Student, Group
 from .models import AllotmentStatus, AcademicSession, Faq
 
-from .serializers import HostelSerializer, HostelSingleSerializer, RoomTypeSerializer, RoomTypeChoiceSerializer, RoomTypeOptionSerializer, BatchSerializer, BatchUninitializedSerializer, SectionSerializer, ProfileSerializer, AllotmentStatusSerializer, SectionRoomTypeSerializer, AcademicSessionSerializer, FAQSerializer
+from .serializers import HostelSerializer, HostelSingleSerializer, RoomTypeSerializer, RoomTypeChoiceSerializer, RoomTypeOptionSerializer, BatchSerializer, BatchUninitializedSerializer, SectionSerializer, ProfileSerializer, AllotmentStatusSerializer, SectionRoomTypeSerializer, AcademicSessionSerializer, FAQSerializer, DefaulterSerializer
 from .serializers import *
 from student.serializers import StudentSerializer, GroupSerializer
 
-from .tasks import allot_hostel, add_users, send_reminder_mail
+from .tasks import allot_hostel, add_users, add_defaulters, send_reminder_mail
 
 from datetime import datetime
 import csv, os
@@ -40,6 +40,11 @@ class CreateObjectView(APIView):
                   serializer = BatchSerializer(data = request.data)
             elif model=='section':
                   serializer = SectionSerializer(data = request.data)
+            elif model=='defaulter':
+                  student = Student.objects.filter(rollno=request.data.get('student')).first()
+                  if student is None:
+                        return Response(status=status.HTTP_400_BAD_REQUEST)
+                  serializer = DefaulterSerializer(data = {'student': student.id})
             else:
                   return Response(status=status.HTTP_404_NOT_FOUND)
             
@@ -76,6 +81,9 @@ class GetMultipleObjectsView(APIView):
             elif model=='batch':
                   queryset = Batch.objects.all()
                   serializer = BatchSerializer(queryset, many=True)
+            elif model=='defaulter':
+                  queryset = Defaulter.objects.select_related('student__user').all()
+                  serializer = DefaulterSerializer(queryset, many=True)
             else:
                   return Response(status=status.HTTP_404_NOT_FOUND)
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -183,6 +191,8 @@ class DeleteObjectView(APIView):
                   instance = Batch.objects.filter(id=id).first()
             elif model=='section':
                   instance = Section.objects.filter(id=id).first()
+            elif model=='defaulter':
+                  instance = Defaulter.objects.filter(id=id).first()
             else:
                   return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -205,12 +215,30 @@ class ImportStudentsView(APIView):
                   return Response({'error':'file not csv'}, status=status.HTTP_400_BAD_REQUEST)
             
             storage = default_storage
-            storage.location = os.path.join(settings.BASE_DIR, 'imported-data')
+            storage.location = os.path.join(settings.BASE_DIR, 'imported-data', 'student')
             filename = storage.save(filename, file)
             
             add_users.delay(filename)
 
-            #TODO: Add students to database -> done
+            return Response(status=status.HTTP_202_ACCEPTED)
+
+
+class ImportDefaultersView(APIView):
+      permission_classes = [IsAuthenticated, IsAdmin]
+
+      def post(self, request):
+            file = request.data.get('file')
+            
+            filename = f"{datetime.now().strftime('%Y%m%d_%H%M')}_{file.name}"
+
+            if filename.split('.')[-1]!='csv':
+                  return Response({'error':'file not csv'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            storage = default_storage
+            storage.location = os.path.join(settings.BASE_DIR, 'imported-data', 'defaulter')
+            filename = storage.save(filename, file)
+            
+            add_defaulters.delay(filename)
 
             return Response(status=status.HTTP_202_ACCEPTED)
 
