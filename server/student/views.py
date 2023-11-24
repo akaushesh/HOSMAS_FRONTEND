@@ -177,6 +177,9 @@ class AcceptInvitationView(APIView):
                   prevgroup.cg = round(updatedcg, 2)
                   prevgroup.save()
                   #TODO: inform all previous group members to say goodbye
+                  members = prevgroup.members.all()
+                  for member in members:
+                        left_group_mail.delay(member.name, student.name, student.rollno, member.user.email)
                   left_group_mail.delay(prevgroup.leader.name, student.name, student.rollno, prevgroup.leader.user.email )
 
             student.group = group
@@ -242,7 +245,12 @@ class TranferGroupLeadershipView(APIView):
             
             student.group = group
             student.save()
-
+            
+            members = group.members.all()
+            for member in members:
+                  send_teamleader_change_mail.delay(group.leader.name,group.leader.rollno,member.user.email)
+            send_teamleader_change_mail.delay(group.leader.name,group.leader.rollno,group.leader.user.email)
+            
             return Response(status=status.HTTP_200_OK)
 
 

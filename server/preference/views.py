@@ -15,7 +15,7 @@ from student.models import *
 from .serializers import *
 
 import json
-from student.tasks import send_preferences_mail, send_retain_mail
+from student.tasks import send_preferences_mail, send_retain_mail, send_preferences_deleted_mail
 
 class getAvailableChoices(APIView):
     permission_classes = [IsAuthenticated & IsStudent]
@@ -200,6 +200,11 @@ class deletePreferences(APIView):
         group.is_preferences_filled = False
         
         group.save()
+        
+        members = group.members.all()
+        for member in members:
+            send_preferences_deleted_mail.delay(member.user.email, member.name)
+        send_preferences_deleted_mail.delay(group.leader.user.email, group.leader.name)
         return Response({'status':'success'},status=status.HTTP_200_OK)
 
 
