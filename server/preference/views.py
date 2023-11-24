@@ -168,7 +168,7 @@ class getPreferences(APIView):
         else:
             group = stud.leader_of_group
         
-        p = Preference.objects.filter(group = group).order_by('priority').select_related(room_type_choice__room_type__hostel).all()
+        p = Preference.objects.filter(group = group).order_by('priority').select_related('room_type_choice__room_type__hostel').all()
         if (p is None):
             return Response({'error':'No preferences found'},status=status.HTTP_400_BAD_REQUEST)
         
