@@ -15,7 +15,7 @@ from student.models import *
 from .serializers import *
 
 import json
-from student.tasks import send_preferences_mail
+from student.tasks import send_preferences_mail, send_retain_mail
 
 class getAvailableChoices(APIView):
     permission_classes = [IsAuthenticated & IsStudent]
@@ -154,7 +154,9 @@ class Retain(APIView):
 
         group.is_retained = True
         group.save()
-
+        for member in group.members.all():
+            send_retain_mail.delay(member.user.email, member.name)
+        send_retain_mail.delay(group.leader.user.email, group.leader.name)
         return Response({'status':'success'},status=status.HTTP_201_CREATED)
 
 

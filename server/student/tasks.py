@@ -144,3 +144,25 @@ def send_preferences_mail(email, name, d):
         connection.close()
         
         return f"\nPreferences mail sent to {email}\n"
+
+
+@app.task(name = "send_retain_mail")
+def send_retain_mail(email, name):
+        
+        idx = cache.get('emailIdIndex', 0)
+        cache.set('emailIdIndex', (idx + 1) % settings.EMAIL_HOST_USERS_COUNT)
+    
+        connection = get_connection(username=settings.EMAIL_HOST_USERS[idx], password=settings.EMAIL_HOST_PASSWORDS[idx], fail_silently=False)
+        connection.open()
+        
+        subject = "Hostel Allotment Preferences filled for your group"
+        context = {
+            'name':name,
+        }
+        html_message = render_to_string('dashboard/retain.html', context)
+        msg = strip_tags(html_message)
+        
+        send_mail(subject, msg, settings.EMAIL_HOST_USERS[idx], (email, ), html_message=html_message, connection=connection, fail_silently=False)
+        connection.close()
+        
+        return f"\nPreferences mail sent to {email}\n"
