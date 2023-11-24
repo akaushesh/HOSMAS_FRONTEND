@@ -15,7 +15,7 @@ from student.models import *
 from .serializers import *
 
 import json
-
+from student.tasks import send_preferences_mail
 
 class getAvailableChoices(APIView):
     permission_classes = [IsAuthenticated & IsStudent]
@@ -52,7 +52,7 @@ class createPreference (APIView):
     
     def post(self, request):
         data = request.data
-        stud = Student.objects.filter(user=request.user).select_related('batch', 'leader_of_group').first()
+        stud = request.user.student
         batch = stud.batch
         gender = stud.gender
         
@@ -67,7 +67,7 @@ class createPreference (APIView):
         legalChoices = []
         # roomChoices = []
         
-        section = Section.objects.filter(Q(batch = batch) & Q(gender = gender)).prefetch_related('choices').first()
+        section = Section.objects.filter(Q(batch = batch) & Q(gender = gender)).first()
         
         
         roomTypeChoices = section.choices.all()
@@ -88,20 +88,24 @@ class createPreference (APIView):
                 q.delete()
         # print("hello")
         # print(legalChoices)
-        
+        d=[]
         for key,value in data['order'].items():
             if (value in used) or (int(value) not in legalChoices):
                 return Response({"detail": "Invalid Preference"}, status=status.HTTP_400_BAD_REQUEST)
             else:
                 room_type_choice = RoomTypeChoice.objects.get(id = int(value))
+                d.append({"preference":key, "room_type_choice":str(room_type_choice.room_type)})
                 p = Preference(room_type_choice = room_type_choice, group = group, priority = key )
                 p.save()
                 used.append(value)
-                createdPreferences.append(p)   
+                createdPreferences.append(p)
         serializer = PreferenceSerializer(createdPreferences, many=True)
         group.is_preferences_filled = True
         group.save()
-                
+        print(d)
+        for member in group.members.all():
+            send_preferences_mail.delay(member.user.email, member.name, d)
+        send_preferences_mail.delay(group.leader.user.email, group.leader.name, d)
         return Response({'status':'success','data':serializer.data},status=status.HTTP_201_CREATED)
                 
                 
@@ -138,7 +142,7 @@ class Retain(APIView):
             for q in p:
                 q.delete()
         
-        lead_curr = student.current_room
+        lead_curr = stud.current_room
         if (lead_curr is None or lead_curr.id not in roomChoices):
             return Response({'error':group.leader.name + ' is unable to retain'}, status=status.HTTP_400_BAD_REQUEST)
 
