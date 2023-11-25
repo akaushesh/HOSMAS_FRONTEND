@@ -1,7 +1,7 @@
 from django.db.models import Q, Count
 from rest_framework import serializers
 from preference.models import Hostel, RoomType, RoomTypeChoice
-from student.models import Batch, Section, Student, Group
+from student.models import Batch, Section, Student, Group, Defaulter
 from student.serializers import StudentProfileSerializer
 from user.models import User
 from .models import AllotmentStatus, AcademicSession, Faq
@@ -149,6 +149,7 @@ class SectionRoomTypeSerializer(serializers.ModelSerializer):
     def get_batch_name(self, obj):
         return obj.batch.name
 
+
 class ProfileSerializer(serializers.ModelSerializer):
       class Meta:
             model = User
@@ -225,3 +226,25 @@ class GroupDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group
         fields = ['leader_of_group', 'members', 'cg', 'is_retained', 'is_preferences_filled']
+
+
+class DefaulterSerializer(serializers.ModelSerializer):
+      student_name = serializers.SerializerMethodField()
+      student_email = serializers.SerializerMethodField()
+      student_rollno = serializers.SerializerMethodField()
+      
+      class Meta:
+            model = Defaulter
+            fields = ['id', 'student', 'student_name', 'student_rollno', 'student_email']
+            extra_kwargs = {
+                  'student': {'write_only': True}
+            }
+
+      def get_student_name(self, obj):
+            return obj.student.name
+      
+      def get_student_rollno(self, obj):
+            return obj.student.rollno
+      
+      def get_student_email(self, obj):
+            return obj.student.user.email

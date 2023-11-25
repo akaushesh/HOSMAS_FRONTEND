@@ -66,8 +66,23 @@ class InvitationAdmin(admin.ModelAdmin):
       search_fields = ('to__name', 'to__rollno', 'for_group__leader__name', 'for_group__leader__rollno')
 
 
+class DefaulterAdmin(admin.ModelAdmin):
+      def student_name(self, obj):
+            return obj.student.name
+      
+      def student_email(self, obj):
+            return obj.student.user.email
+      
+      def student_rollno(self, obj):
+            return obj.student.rollno
+
+      list_display = ('id', 'student_name', 'student_rollno', 'student_email')
+      search_fields = ('student__name', 'student__rollno', 'student__user__email')
+
+
 admin.site.register(Student, StudentAdmin)
 admin.site.register(Group, GroupAdmin)
 admin.site.register(Batch, BatchAdmin)
 admin.site.register(Section, SectionAdmin)
 admin.site.register(Invitation, InvitationAdmin)
+admin.site.register(Defaulter, DefaulterAdmin)

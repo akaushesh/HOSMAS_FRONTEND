@@ -3,6 +3,7 @@ from . import views
 
 urlpatterns = [
       path('import-students/', views.ImportStudentsView.as_view(), name='import_students'),
+      path('import-defaulters/', views.ImportDefaultersView.as_view(), name='import_defaulters'),
       path('getStudents/', views.getStudents.as_view()),
       path('getGroups/', views.getGroups.as_view()),
       path('getGroup/', views.getGroup.as_view()),
@@ -19,5 +20,6 @@ urlpatterns = [
       path('getFAQ/', views.getFAQ.as_view()),
       path('createFAQ/', views.createFAQ.as_view()),
       path('deleteFAQ/', views.deleteFAQ.as_view()),
+      path('updateFAQ/', views.updateFAQ.as_view()),
       path('sendReminderMail/', views.sendReminderMail.as_view()),
 ]

@@ -11,6 +11,36 @@ class IsStudent(BasePermission):
             return request.user.is_student
 
 
+class IsNotDefaulter(BasePermission):
+      message = 'You are currently suspended from Hostel Allocation Process'
+
+      def has_permission(self, request, view):
+            try:
+                  _ = request.user.student.defaulter
+                  return False
+            except ObjectDoesNotExist:
+                  return True
+
+
+class IsPreferenceFillingLive(BasePermission):
+      message = 'Hostel Preference Filling Process is not live'
+
+      def has_permission(self, request, view):
+            student = request.user.student
+            batch = student.batch
+            gender = student.gender
+            section = Section.objects.filter(batch=batch, gender=gender).first()
+            return section is not None and section.is_allotment_enabled
+
+
+class IsRetainAllowed(BasePermission):
+      message = 'Retain is not allowed'
+
+      def has_permission(self, request, view):
+            section = Section.objects.filter(batch=request.user.student.batch, gender = request.user.student.gender).first()
+            return section.is_retain_allowed
+
+
 class IsGroupLeader(BasePermission):
       message = 'Only a Group Leader is authorized to perform this action'
 
@@ -45,22 +75,3 @@ class IsNotGroupMember(BasePermission):
 
       def has_permission(self, request, view):
             return request.user.student.group is None
-
-
-class IsPreferenceFillingLive(BasePermission):
-      message = 'Hostel Preference Filling Process is not live'
-
-      def has_permission(self, request, view):
-            student = request.user.student
-            batch = student.batch
-            gender = student.gender
-            section = Section.objects.filter(batch=batch, gender=gender).first()
-            return section is not None and section.is_allotment_enabled
-
-
-class IsRetainAllowed(BasePermission):
-      message = 'Retain is not allowed'
-
-      def has_permission(self, request, view):
-            section = Section.objects.filter(batch=request.user.student.batch, gender = request.user.student.gender).first()
-            return section.is_retain_allowed

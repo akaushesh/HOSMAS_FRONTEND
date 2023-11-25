@@ -39,6 +39,13 @@ class Group (models.Model):
         return self.leader.name
 
 
+class Defaulter(models.Model):
+    student = models.OneToOneField(Student, on_delete=models.CASCADE, related_name='defaulter')
+
+    def __str__(self):
+        return self.student.rollno
+
+
 class Batch(models.Model):
     name = models.CharField(max_length=50, unique=True, null=False, blank=False)
 
