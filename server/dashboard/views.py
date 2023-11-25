@@ -254,17 +254,15 @@ class getStudents(APIView):
             
             if (batch is None):
                   return Response({'error':'Batch does not exist'}, status=status.HTTP_404_NOT_FOUND)
-            
-            
-            
-            students_per_page = request.data.get('students_per_page')
+
+            students_per_page = request.GET.get('students_per_page')
             if roll is not None:
                   students_list = Student.objects.filter(Q(rollno__startswith = roll) & Q(batch = batch))
             else:
                   students_list = Student.objects.filter(batch = batch)
             p = Paginator(students_list, students_per_page)
             
-            page_number = request.data.get('page')
+            page_number = request.GET.get('page')
             if page_number is None:
                   page_number = 1
             page_number = int(page_number)
@@ -283,12 +281,12 @@ class getGroups(APIView):
       
       def get(self, request):
             # roll = request.data.get('roll_no')
-            groups_per_page = request.data.get('groups_per_page')
+            groups_per_page = request.GET.get('groups_per_page')
             
             groups_list = Group.objects.all()
             p = Paginator(groups_list, groups_per_page)
             
-            page_number = request.data.get('page')
+            page_number = request.GET.get('page')
             if page_number is None:
                   page_number = 1
             page_number = int(page_number)
@@ -300,7 +298,8 @@ class getGroups(APIView):
             serializer = GroupSerializer(groups, many=True)
             
             return Response({'status':'success', 'data':serializer.data, 'total_pages':total_pages}, status=status.HTTP_200_OK)
-      
+
+
 class getGroup(APIView):
       permission_classes = [IsAuthenticated & IsAdmin]
       
@@ -443,7 +442,6 @@ class updateFAQ(APIView):
             faq.save()
             return Response(status=status.HTTP_200_OK)
             
-
 
 class UpdateSectionsAllotmentStatusView(APIView):
       permission_classes = [IsAuthenticated, IsAdmin]
