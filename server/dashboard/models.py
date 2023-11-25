@@ -1,3 +1,4 @@
+from django.core.cache import cache
 from django.db import models
 
 # Create your models here.
@@ -15,6 +16,15 @@ class AcademicSession(models.Model):
       def __str__(self):
             return self.name
       
+      def save(self, *args, **kwargs):
+            cache.delete('academicSession')
+            return super().save(*args, **kwargs)
+      
+      def delete(self, *args, **kwargs):
+            cache.delete('academicSession')
+            return super().save(*args, **kwargs)
+
+
 class Faq(models.Model):
       question = models.TextField()
       answer = models.TextField()

@@ -1,3 +1,4 @@
+from django.core.cache import cache
 from rest_framework.serializers import ModelSerializer, SerializerMethodField, SlugRelatedField
 from rest_framework import serializers
 from .models import Invitation, Student, Group
@@ -122,8 +123,12 @@ class StudentProfileSerializer(ModelSerializer):
             return group.preferences.count() > 0
       
       def get_academic_session(self, obj):
+            cachedObj = cache.get('academicSession')
+            if cachedObj is not None:
+                  return cachedObj
             instance = AcademicSession.objects.first()
             if instance is None:
                   instance = AcademicSession(name='')
                   instance.save()
+            cache.set('academicSession', instance.name)
             return instance.name

@@ -41,11 +41,11 @@ class RoomTypeChoice(models.Model):
     
     def save(self, *args, **kwargs):
         cache.delete(f"choices-{self.section.id}")
-        super().save(*args, **kwargs)
+        return super(self).save(*args, **kwargs)
     
     def delete(self, *args, **kwargs):
         cache.delete(f"choices-{self.section.id}")
-        super().delete(*args, **kwargs)
+        return super(self).delete(*args, **kwargs)
 
 
 class Preference(models.Model):
