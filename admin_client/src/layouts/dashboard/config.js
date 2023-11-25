@@ -63,6 +63,15 @@ export const items = [
       </SvgIcon>
     ),
   },
+  {
+    title: "Manage FAQs",
+    path: "/manage-faqs",
+    icon: (
+      <SvgIcon fontSize="small">
+        <UsersIcon />
+      </SvgIcon>
+    ),
+  },
   // {
   //   title: "Companies",
   //   path: "/companies",

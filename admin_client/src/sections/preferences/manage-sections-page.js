@@ -83,6 +83,7 @@ function ManageSectionsPage() {
   useEffect(() => {
     if (createSectionStep == 3 && selectedBatch && selectedGender) {
       setCreateSectionModalOpen(false);
+
       const handleCreateSection = async () => {
         const sectionData = {
           batch: selectedBatch?.id,
@@ -102,6 +103,7 @@ function ManageSectionsPage() {
         } catch (err) {
           console.log(err);
         }
+
         setCreateSectionStep(1);
         setSelectedGender("");
         setSelectedBatch("");
@@ -114,6 +116,7 @@ function ManageSectionsPage() {
   const handleAddSectionClicked = () => {
     try {
       setCreateSectionModalOpen(true);
+
       const getData = async () => {
         const res = await getAllUnitializedBatches(accessToken);
         setAvailableBatches(res?.data);
@@ -137,10 +140,16 @@ function ManageSectionsPage() {
       }}
     >
       <SectionsList sections={sections} />
+
       <Stack alignItems="center" mt={7}>
         <Button onClick={handleAddSectionClicked}>+ Add Section</Button>
       </Stack>
-      <CustomModal open={createSectionModalOpen} onClose={() => setCreateSectionModalOpen(false)}>
+
+      <CustomModal
+        open={createSectionModalOpen}
+        onClose={() => setCreateSectionModalOpen(false)}
+        minWidth={700}
+      >
         <Grid container spacing={4} justifyContent="center">
           {createSectionStep == 1 && (
             <BatchesCardList
@@ -149,6 +158,7 @@ function ManageSectionsPage() {
               setCreateSectionStep={setCreateSectionStep}
             />
           )}
+
           {createSectionStep == 2 && (
             <GenderCardList
               genders={availableBatches.find((batch) => batch.id === selectedBatch.id).gender}
@@ -157,6 +167,7 @@ function ManageSectionsPage() {
             />
           )}
         </Grid>
+
         <Button
           disabled={createSectionStep == 1}
           onClick={() => {

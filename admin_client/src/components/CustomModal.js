@@ -8,7 +8,7 @@ function CustomModal({ open, onClose, maxWidth, minWidth, children }) {
     left: "50%",
     transform: "translate(-50%, -50%)",
     maxWidth: maxWidth ? maxWidth : "auto",
-    minWidth: minWidth ? minWidth : "auto",
+    width: "100%",
     bgcolor: "background.paper",
     borderRadius: 1,
     boxShadow: 24,

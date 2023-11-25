@@ -303,7 +303,7 @@ export const AdminAccountProfilePage = () => {
         <CustomModal
           open={openUpdatePreferenceModal}
           onClose={() => setOpenUpdatePreferenceModal(false)}
-          minWidth="6 00px"
+          maxWidth={700}
         >
           <Grid container spacing={2} mb={2}>
             {sections.map((section) => {
