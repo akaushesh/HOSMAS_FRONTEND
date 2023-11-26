@@ -81,9 +81,6 @@ class GetMultipleObjectsView(APIView):
             elif model=='batch':
                   queryset = Batch.objects.all()
                   serializer = BatchSerializer(queryset, many=True)
-            elif model=='defaulter':
-                  queryset = Defaulter.objects.select_related('student__user').all()
-                  serializer = DefaulterSerializer(queryset, many=True)
             else:
                   return Response(status=status.HTTP_404_NOT_FOUND)
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -247,17 +244,19 @@ class getStudents(APIView):
       permission_classes = [IsAuthenticated & IsAdmin]
       
       def get(self, request):
-            roll = request.data.get('roll_no')
-            batch_name = request.data.get('batch')
-            batch = Batch.objects.filter(name = batch_name).first()
+            name = request.GET.get('name')
+            roll = request.GET.get('roll_no')
+            email = request.GET.get('email')
+            batch_id = request.GET.get('batch')
+            batch = Batch.objects.filter(id = batch_id).first()
             # pages = request.data.get('pages')
             
             if (batch is None):
                   return Response({'error':'Batch does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
             students_per_page = request.GET.get('students_per_page')
-            if roll is not None:
-                  students_list = Student.objects.filter(Q(rollno__startswith = roll) & Q(batch = batch))
+            if roll is not None or name is not None or email is not None:
+                  students_list = Student.objects.filter(Q(batch = batch), Q(rollno__startswith = roll) | Q(name__startswith = name) | Q(user__email__startswith = email) | Q(name__contains = name) | Q(email__contains = email) )
             else:
                   students_list = Student.objects.filter(batch = batch)
             p = Paginator(students_list, students_per_page)
@@ -280,10 +279,15 @@ class getGroups(APIView):
       permission_classes = [IsAuthenticated & IsAdmin]
       
       def get(self, request):
-            # roll = request.data.get('roll_no')
+            roll = request.GET.get('roll_no')
+            name = request.GET.get('name')
+            email = request.GET.get('email')
             groups_per_page = request.GET.get('groups_per_page')
             
-            groups_list = Group.objects.all()
+            if roll is not None or name is not None or email is not None:
+                  groups_list = Group.objects.filter(Q(leader__rollno__startswith = roll) | Q(leader__name__startswith = name) | Q(leader__user__email__startswith = email) | Q(leader__name__contains = name) | Q(members__rollno__startswith = roll) | Q(members__name__startswith = name) | Q(members__user__email__startswith = email) | Q(members__name__contains = name) )
+            else:
+                  groups_list = Group.objects.all()
             p = Paginator(groups_list, groups_per_page)
             
             page_number = request.GET.get('page')
@@ -310,6 +314,35 @@ class getGroup(APIView):
                   return Response({'error':'Group does not exist'}, status=status.HTTP_404_NOT_FOUND)
             serializer = GroupDetailSerializer(group)
             return Response({'status':'success', 'data':serializer.data}, status=status.HTTP_200_OK)
+
+
+class getDefaulters(APIView):
+      permission_classes = [IsAuthenticated, IsAdmin]
+
+      def get(self, request):
+            roll = request.GET.get('roll_no')
+            name = request.GET.get('name')
+            email = request.GET.get('email')
+            defaulters_per_page = request.GET.get('defaulters_per_page')
+            
+            if roll is not None or name is not None or email is not None:
+                  defaulters_list = Defaulter.objects.filter(Q(student__rollno__startswith = roll) | Q(student__name__startswith = name) | Q(student__user__email__startswith = email) | Q(student__name__contains = name) )
+            else:
+                  defaulters_list = Defaulter.objects.all()
+            p = Paginator(defaulters_list, defaulters_per_page)
+            
+            page_number = request.GET.get('page')
+            if page_number is None:
+                  page_number = 1
+            page_number = int(page_number)
+            total_pages = p.num_pages
+            if (page_number>total_pages or page_number<1):
+                  return Response({'error':'Page does not exist'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            defaulters = p.page(page_number)
+            serializer = DefaulterSerializer(defaulters, many=True)
+            
+            return Response({'status':'success', 'data':serializer.data, 'total_pages':total_pages}, status=status.HTTP_200_OK)
 
 
 class ProfileView(APIView):
