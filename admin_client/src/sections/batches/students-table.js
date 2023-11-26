@@ -55,10 +55,10 @@ export const StudentsTable = (props) => {
                     }}
                   />
                 </TableCell>
-                <TableCell>Group ID</TableCell>
-                <TableCell>Leader Name</TableCell>
-                <TableCell>Leader Email</TableCell>
-                <TableCell>Hostel</TableCell>
+                <TableCell>Roll No.</TableCell>
+                <TableCell>Name</TableCell>
+                <TableCell>Email</TableCell>
+                <TableCell></TableCell>
                 <TableCell>Room Type</TableCell>
                 <TableCell>Average CG</TableCell>
               </TableRow>

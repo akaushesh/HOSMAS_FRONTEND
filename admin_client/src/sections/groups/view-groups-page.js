@@ -14,32 +14,7 @@ import { GroupsSearch } from "src/sections/groups/groups-search";
 import { getAllGroups } from "src/services/others";
 import { useAuthContext } from "src/contexts/auth-context";
 
-const now = new Date();
-
-const data = [
-  {
-    id: "5e887ac47eed253091be10cb",
-    address: {
-      city: "Cleveland",
-      country: "USA",
-      state: "Ohio",
-      street: "2849 Fulton Street",
-    },
-    avatar: "/assets/avatars/avatar-carson-darrin.png",
-    createdAt: subDays(subHours(now, 7), 1).getTime(),
-    email: "carson.darrin@devias.io",
-    name: "Carson Darrin",
-    phone: "304-428-3097",
-  },
-];
-
-const useCustomers = (page, rowsPerPage) => {
-  return useMemo(() => {
-    return applyPagination(data, page, rowsPerPage);
-  }, [page, rowsPerPage]);
-};
-
-const useCustomerIds = (customers) => {
+const useGroupsIDs = (customers) => {
   return useMemo(() => {
     return customers.map((customer) => customer.id);
   }, [customers]);
@@ -49,20 +24,25 @@ const ViewGroupsPage = () => {
   const { accessToken } = useAuthContext();
 
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
-  const customers = useCustomers(page, rowsPerPage);
-  const customersIds = useCustomerIds(customers);
-  const customersSelection = useSelection(customersIds);
+  const [rowsPerPage, setRowsPerPage] = useState(20);
   const [groups, setGroups] = useState([]);
+  const groupsIds = useGroupsIDs(groups);
+  const groupsSelection = useSelection(groupsIds);
+  // const groupsSelection = useMemo(() => {
+  //   return useSelection(groupsIds);
+  // }, [groupsIds]);
 
   useEffect(() => {
     const fetchGroupsData = async () => {
-      const res = await getAllGroups(accessToken);
+      const res = await getAllGroups(20, page + 1, accessToken);
+      if (res.status == 200) {
+        setGroups(res.data.data);
+      }
       console.log(res);
     };
 
     fetchGroupsData();
-  }, []);
+  }, [page]);
 
   const handlePageChange = useCallback((event, value) => {
     setPage(value);
@@ -129,17 +109,16 @@ const ViewGroupsPage = () => {
             <GroupsSearch />
 
             <GroupsTable
-              count={data.length}
-              items={customers}
-              onDeselectAll={customersSelection.handleDeselectAll}
-              onDeselectOne={customersSelection.handleDeselectOne}
+              count={groups.length}
+              items={groups}
+              onDeselectAll={groupsSelection.handleDeselectAll}
+              onDeselectOne={groupsSelection.handleDeselectOne}
               onPageChange={handlePageChange}
-              onRowsPerPageChange={handleRowsPerPageChange}
-              onSelectAll={customersSelection.handleSelectAll}
-              onSelectOne={customersSelection.handleSelectOne}
+              onSelectAll={groupsSelection.handleSelectAll}
+              onSelectOne={groupsSelection.handleSelectOne}
               page={page}
               rowsPerPage={rowsPerPage}
-              selected={customersSelection.selected}
+              selected={groupsSelection.selected}
             />
           </Stack>
         </Container>

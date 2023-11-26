@@ -1,5 +1,5 @@
 import React from "react";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState, useEffect } from "react";
 import Head from "next/head";
 import { subDays, subHours } from "date-fns";
 import ArrowDownOnSquareIcon from "@heroicons/react/24/solid/ArrowDownOnSquareIcon";
@@ -13,44 +13,35 @@ import { StudentsTable } from "./students-table";
 import { StudentsSearch } from "./students-search";
 import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
 import Link from "next/link";
+import { useAuthContext } from "src/contexts/auth-context";
+import { getStudents } from "src/services/others";
 
-const now = new Date();
-
-const data = [
-  {
-    id: "5e887ac47eed253091be10cb",
-    address: {
-      city: "Cleveland",
-      country: "USA",
-      state: "Ohio",
-      street: "2849 Fulton Street",
-    },
-    avatar: "/assets/avatars/avatar-carson-darrin.png",
-    createdAt: subDays(subHours(now, 7), 1).getTime(),
-    email: "carson.darrin@devias.io",
-    name: "Carson Darrin",
-    phone: "304-428-3097",
-  },
-];
-
-const useCustomers = (page, rowsPerPage) => {
-  return useMemo(() => {
-    return applyPagination(data, page, rowsPerPage);
-  }, [page, rowsPerPage]);
-};
-
-const useCustomerIds = (customers) => {
+const useStudentsIDs = (customers) => {
   return useMemo(() => {
     return customers.map((customer) => customer.id);
   }, [customers]);
 };
 
-const ViewBatchDetailsPage = () => {
+const ViewBatchDetailsPage = ({ batchId }) => {
+  const { accessToken } = useAuthContext();
+
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
-  const customers = useCustomers(page, rowsPerPage);
-  const customersIds = useCustomerIds(customers);
-  const customersSelection = useSelection(customersIds);
+  const [rowsPerPage, setRowsPerPage] = useState(20);
+  const [students, setStudents] = useState([]);
+  const studentsIds = useStudentsIDs(students);
+  const studentsSelection = useSelection(studentsIds);
+
+  useEffect(() => {
+    const fetchStudentsData = async () => {
+      const res = await getStudents(20, page + 1, "b1", accessToken);
+      if (res.status == 200) {
+        setStudents(res.data.data);
+      }
+      console.log(res);
+    };
+
+    fetchStudentsData();
+  }, [page]);
 
   const handlePageChange = useCallback((event, value) => {
     setPage(value);
@@ -119,17 +110,16 @@ const ViewBatchDetailsPage = () => {
             </Stack>
             <StudentsSearch />
             <StudentsTable
-              count={data.length}
-              items={customers}
-              onDeselectAll={customersSelection.handleDeselectAll}
-              onDeselectOne={customersSelection.handleDeselectOne}
+              count={students.length}
+              items={students}
+              onDeselectAll={studentsSelection.handleDeselectAll}
+              onDeselectOne={studentsSelection.handleDeselectOne}
               onPageChange={handlePageChange}
-              onRowsPerPageChange={handleRowsPerPageChange}
-              onSelectAll={customersSelection.handleSelectAll}
-              onSelectOne={customersSelection.handleSelectOne}
+              onSelectAll={studentsSelection.handleSelectAll}
+              onSelectOne={studentsSelection.handleSelectOne}
               page={page}
               rowsPerPage={rowsPerPage}
-              selected={customersSelection.selected}
+              selected={studentsSelection.selected}
             />
           </Stack>
         </Container>

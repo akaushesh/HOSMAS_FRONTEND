@@ -32,6 +32,8 @@ export const GroupsTable = (props) => {
     selected = [],
   } = props;
 
+  console.log(items);
+
   const selectedSome = selected.length > 0 && selected.length < items.length;
   const selectedAll = items.length > 0 && selected.length === items.length;
 
@@ -57,7 +59,7 @@ export const GroupsTable = (props) => {
                 </TableCell>
                 <TableCell>Group ID</TableCell>
                 <TableCell>Leader Name</TableCell>
-                <TableCell>Leader Email</TableCell>
+                <TableCell>Leader Roll No.</TableCell>
                 <TableCell>Hostel</TableCell>
                 <TableCell>Room Type</TableCell>
                 <TableCell>Average CG</TableCell>
@@ -66,7 +68,6 @@ export const GroupsTable = (props) => {
             <TableBody>
               {items.map((group) => {
                 const isSelected = selected.includes(group.id);
-                const createdAt = format(group.createdAt, "dd/MM/yyyy");
 
                 return (
                   <TableRow hover key={group.id} selected={isSelected}>
@@ -86,15 +87,13 @@ export const GroupsTable = (props) => {
                     <TableCell>
                       {/* <Stack alignItems="center" direction="row" spacing={2}> */}
                       {/* <Avatar src={group.avatar}>{getInitials(group.name)}</Avatar> */}
-                      <Typography variant="subtitle2">{group.name}</Typography>
+                      <Typography variant="subtitle2">{group?.leader?.name}</Typography>
                       {/* </Stack> */}
                     </TableCell>
-                    <TableCell>{group.email}</TableCell>
-                    <TableCell>
-                      {group.address.city}, {group.address.state}, {group.address.country}
-                    </TableCell>
-                    <TableCell>{group.phone}</TableCell>
-                    <TableCell>{createdAt}</TableCell>
+                    <TableCell>{group?.leader?.rollno}</TableCell>
+                    <TableCell>{group?.hostel ?? "NA"}</TableCell>
+                    <TableCell>{group?.roomType ?? "NA"}</TableCell>
+                    <TableCell>{group?.cg}</TableCell>
                   </TableRow>
                 );
               })}
@@ -106,10 +105,10 @@ export const GroupsTable = (props) => {
         component="div"
         count={count}
         onPageChange={onPageChange}
-        onRowsPerPageChange={onRowsPerPageChange}
+        // onRowsPerPageChange={onRowsPerPageChange}
         page={page}
         rowsPerPage={rowsPerPage}
-        rowsPerPageOptions={[5, 10, 25]}
+        rowsPerPageOptions={[5]}
       />
     </Card>
   );
