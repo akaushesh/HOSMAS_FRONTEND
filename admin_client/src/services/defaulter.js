@@ -1,11 +1,14 @@
-import { batchApi } from "./api";
+import { defaulterApi } from "./api";
 
-export const getAllUnitializedBatches = async (accessToken) => {
-  const res = await batchApi.get("uninitialized-batch/view/multiple/", {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
+export const getAllDefaulters = async (q, defaulters_per_page, page, accessToken) => {
+  const res = await defaulterApi.get(
+    `getDefaulters?q=${q}&page=${page}&defaulters_per_page=${defaulters_per_page}`,
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    }
+  );
   return res;
 };
 

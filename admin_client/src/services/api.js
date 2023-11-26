@@ -30,6 +30,10 @@ export const faqApi = axios.create({
   baseURL: url + "dashboard/",
 });
 
+export const defaulterApi = axios.create({
+  baseURL: url + "dashboard/",
+});
+
 export const otherApi = axios.create({
   baseURL: url,
 });

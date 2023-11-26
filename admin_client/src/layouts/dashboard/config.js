@@ -72,6 +72,15 @@ export const items = [
       </SvgIcon>
     ),
   },
+  {
+    title: "Manage Defaulters",
+    path: "/manage-defaulters",
+    icon: (
+      <SvgIcon fontSize="small">
+        <UsersIcon />
+      </SvgIcon>
+    ),
+  },
   // {
   //   title: "Companies",
   //   path: "/companies",
