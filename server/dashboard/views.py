@@ -244,19 +244,16 @@ class getStudents(APIView):
       permission_classes = [IsAuthenticated & IsAdmin]
       
       def get(self, request):
-            name = request.GET.get('name')
-            roll = request.GET.get('roll_no')
-            email = request.GET.get('email')
+            q = request.GET.get('q')
             batch_id = request.GET.get('batch')
             batch = Batch.objects.filter(id = batch_id).first()
-            # pages = request.data.get('pages')
             
             if (batch is None):
                   return Response({'error':'Batch does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
             students_per_page = request.GET.get('students_per_page')
-            if roll is not None or name is not None or email is not None:
-                  students_list = Student.objects.filter(Q(batch = batch), Q(rollno__startswith = roll) | Q(name__startswith = name) | Q(user__email__startswith = email) | Q(name__contains = name) | Q(email__contains = email) )
+            if q is not None:
+                  students_list = Student.objects.filter(Q(batch = batch), Q(rollno__startswith = q) | Q(name__contains = q) | Q(user__email__contains = q) )
             else:
                   students_list = Student.objects.filter(batch = batch)
             p = Paginator(students_list, students_per_page)
@@ -279,13 +276,11 @@ class getGroups(APIView):
       permission_classes = [IsAuthenticated & IsAdmin]
       
       def get(self, request):
-            roll = request.GET.get('roll_no')
-            name = request.GET.get('name')
-            email = request.GET.get('email')
+            q = request.GET.get('q')
             groups_per_page = request.GET.get('groups_per_page')
             
-            if roll is not None or name is not None or email is not None:
-                  groups_list = Group.objects.filter(Q(leader__rollno__startswith = roll) | Q(leader__name__startswith = name) | Q(leader__user__email__startswith = email) | Q(leader__name__contains = name) | Q(members__rollno__startswith = roll) | Q(members__name__startswith = name) | Q(members__user__email__startswith = email) | Q(members__name__contains = name) )
+            if q is not None:
+                  groups_list = Group.objects.filter(Q(leader__rollno__startswith = q) | Q(leader__name__contains = q) | Q(leader__user__email__contains = q) | Q(members__rollno__startswith = q) | Q(members__name__contains = q) | Q(members__user__email__contains = q) )
             else:
                   groups_list = Group.objects.all()
             p = Paginator(groups_list, groups_per_page)
@@ -320,13 +315,11 @@ class getDefaulters(APIView):
       permission_classes = [IsAuthenticated, IsAdmin]
 
       def get(self, request):
-            roll = request.GET.get('roll_no')
-            name = request.GET.get('name')
-            email = request.GET.get('email')
+            q = request.GET.get('q')
             defaulters_per_page = request.GET.get('defaulters_per_page')
             
-            if roll is not None or name is not None or email is not None:
-                  defaulters_list = Defaulter.objects.filter(Q(student__rollno__startswith = roll) | Q(student__name__startswith = name) | Q(student__user__email__startswith = email) | Q(student__name__contains = name) )
+            if q is not None:
+                  defaulters_list = Defaulter.objects.filter(Q(student__rollno__startswith = q) | Q(student__name__contains = q) | Q(student__user__email__contains = q) )
             else:
                   defaulters_list = Defaulter.objects.all()
             p = Paginator(defaulters_list, defaulters_per_page)
