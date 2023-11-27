@@ -15,7 +15,7 @@ from preference.models import Hostel, RoomType, RoomTypeChoice
 from student.models import Batch, Section, Student, Group
 from .models import AllotmentStatus, AcademicSession, Faq
 
-from .serializers import HostelSerializer, HostelSingleSerializer, RoomTypeSerializer, RoomTypeChoiceSerializer, RoomTypeOptionSerializer, BatchSerializer, BatchUninitializedSerializer, SectionSerializer, ProfileSerializer, AllotmentStatusSerializer, SectionRoomTypeSerializer, AcademicSessionSerializer, FAQSerializer, DefaulterSerializer
+from .serializers import HostelSerializer, HostelSingleSerializer, RoomTypeSerializer, RoomTypeChoiceSerializer, RoomTypeOptionSerializer, BatchSerializer, BatchUninitializedSerializer, SectionSerializer, ProfileSerializer, AllotmentStatusSerializer, SectionRoomTypeSerializer, AcademicSessionSerializer, FAQSerializer, DefaulterSerializer, StudentAdminSideProfileSerializer
 from .serializers import *
 from student.serializers import StudentSerializer, GroupSerializer
 
@@ -45,6 +45,8 @@ class CreateObjectView(APIView):
                   if student is None:
                         return Response(status=status.HTTP_400_BAD_REQUEST)
                   serializer = DefaulterSerializer(data = {'student': student.id})
+            elif model=='student':
+                  serializer = StudentAdminSideProfileSerializer(data=request.data)
             else:
                   return Response(status=status.HTTP_404_NOT_FOUND)
             
@@ -70,6 +72,9 @@ class GetMultipleObjectsView(APIView):
                         sections_count = Count('sections')
                   ).filter(sections_count__lt=2)
                   serializer = BatchUninitializedSerializer(queryset, many=True)
+            elif model=='batch':
+                  queryset = Batch.objects.all()
+                  serializer = BatchSerializer(queryset, many=True)
             elif model=='roomtype':
                   queryset = RoomType.objects.select_related('hostel').all()
                   serializer = RoomTypeOptionSerializer(queryset, many=True)
@@ -78,9 +83,6 @@ class GetMultipleObjectsView(APIView):
                   if queryset is None:
                         return Response(status=status.HTTP_404_NOT_FOUND)
                   serializer = SectionRoomTypeSerializer(queryset)
-            elif model=='batch':
-                  queryset = Batch.objects.all()
-                  serializer = BatchSerializer(queryset, many=True)
             else:
                   return Response(status=status.HTTP_404_NOT_FOUND)
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -112,6 +114,16 @@ class GetObjectView(APIView):
                         instance = AcademicSession(name='')
                         instance.save()
                   serializer = AcademicSessionSerializer(instance)
+            elif model=='student':
+                  instance = Student.objects.filter(rollno=id).first()
+                  if instance is None:
+                        return Response(status=status.HTTP_404_NOT_FOUND)
+                  serializer = StudentAdminSideProfileSerializer(instance)
+            elif model=='batch':
+                  instance = Batch.objects.filter(id=id).first()
+                  if instance is None:
+                        return Response(status=status.HTTP_404_NOT_FOUND)
+                  serializer = BatchSerializer(instance)
             else:
                   return Response(status.HTTP_404_NOT_FOUND)
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -158,6 +170,11 @@ class UpdateObjectView(APIView):
                         instance = AcademicSession(name='')
                         instance.save()
                   serializer = AcademicSessionSerializer(instance, request.data)
+            elif model=='student':
+                  instance = Student.objects.filter(rollno=id).first()
+                  if instance is None:
+                        return Response(status=status.HTTP_404_NOT_FOUND)
+                  serializer = StudentAdminSideProfileSerializer(instance, request.data, partial=True)
             else:
                   return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -190,6 +207,8 @@ class DeleteObjectView(APIView):
                   instance = Section.objects.filter(id=id).first()
             elif model=='defaulter':
                   instance = Defaulter.objects.filter(id=id).first()
+            elif model=='student':
+                  instance = Student.objects.filter(rollno=id).first()
             else:
                   return Response(status=status.HTTP_404_NOT_FOUND)
 

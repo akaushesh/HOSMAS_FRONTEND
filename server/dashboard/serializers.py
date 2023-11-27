@@ -1,12 +1,15 @@
 from django.db.models import Q, Count
+from django.db import transaction
 from rest_framework import serializers
 from preference.models import Hostel, RoomType, RoomTypeChoice
 from student.models import Batch, Section, Student, Group, Defaulter
 from student.serializers import StudentProfileSerializer
 from user.models import User
 from .models import AllotmentStatus, AcademicSession, Faq
-import json
+import json, string
 from .tasks import send_start_allocation_mail
+from random import choice
+from collections import OrderedDict
 
 
 class HostelSerializer(serializers.ModelSerializer):
@@ -248,3 +251,139 @@ class DefaulterSerializer(serializers.ModelSerializer):
       
       def get_student_email(self, obj):
             return obj.student.user.email
+
+
+class StudentAdminSideUserSerializer(serializers.ModelSerializer):
+      # nested serializer for handling user email in admin side student view
+
+      class Meta:
+            model = User
+            fields = ['email']
+
+
+class StudentAdminSideBatchSerializer(serializers.ModelSerializer):
+      # nested serializer for handling student batch in admin side student view
+
+      class Meta:
+            model = Batch
+            fields = ['id', 'name']
+            extra_kwargs = {
+                  'name': {'read_only': True},
+                  'id': {'read_only': False}
+            }
+
+
+class StudentAdminSideRoomTypeSerializer(serializers.ModelSerializer):
+      # nested serializer for handling current and alloted hostels in admin side student view
+
+      hostel = serializers.SerializerMethodField()
+      
+      class Meta:
+            model = RoomType
+            fields = ['id', 'name', 'hostel']
+            extra_kwargs = {
+                  'name': {'read_only': True},
+                  'id': {'read_only': False}
+            }
+      
+      def get_hostel(self, obj):
+            return obj.hostel.name
+
+
+class StudentAdminSideProfileSerializer(serializers.ModelSerializer):
+      # Serializer to represent student profile data on admin side
+
+      batch = StudentAdminSideBatchSerializer()
+      current_room = StudentAdminSideRoomTypeSerializer(allow_null=True)
+      alloted_room = StudentAdminSideRoomTypeSerializer(allow_null=True)
+      user = StudentAdminSideUserSerializer()
+
+      class Meta:
+            model = Student
+            fields = ['rollno', 'name', 'phoneno', 'gender', 'cg', 'batch', 'current_room', 'alloted_room', 'user']
+
+      @transaction.atomic
+      def create(self, validated_data):
+            user_data = validated_data.pop('user')
+            user = User(email=user_data.get('email'))
+            password = ''.join(choice(string.ascii_letters + string.digits) for _ in range(8))
+            user.set_password(password)
+            user.save()
+
+            batch_data = validated_data.pop('batch')
+            batch = Batch.objects.filter(id=batch_data.get('id')).first()
+            
+            if batch is None:
+                  raise serializers.ValidationError({'batch': {'id': 'No Batch Found!'}})
+
+            current_room_data = validated_data.pop('current_room')
+            if current_room_data is not None:
+                  current_room = RoomType.objects.filter(id=current_room_data.get('id')).first()
+                  if current_room is None:
+                        raise serializers.ValidationError({'current_room': {'id': 'No Room Type Found!'}})
+            else:
+                  current_room = None
+            
+            alloted_room_data = validated_data.pop('alloted_room')
+            if alloted_room_data is not None:
+                  alloted_room = RoomType.objects.filter(id=alloted_room_data.get('id')).first()
+                  if alloted_room is None:
+                        raise serializers.ValidationError({'alloted_room': {'id': 'No Room Type Found!'}})
+            else:
+                  alloted_room = None
+            
+
+            instance = Student.objects.create(user=user, batch=batch, current_room=current_room, alloted_room=alloted_room, **validated_data)
+
+            return instance
+
+      @transaction.atomic
+      def update(self, instance, validated_data):
+            if validated_data.get('user') is not None:
+                  user_data = validated_data.pop('user')
+                  if user_data.get('email') is not None:
+                        user = instance.user
+                        user.email = user_data.get('email')
+                        user.save()
+            
+            current_room = None
+            if validated_data.get('current_room') is not None:
+                  current_room_data = validated_data.pop('current_room')
+                  if current_room_data.get('id') is not None:
+                        current_room = RoomType.objects.filter(id=current_room_data.get('id')).first()
+                        if current_room is None:
+                              raise serializers.ValidationError({'current_room': {'id': 'No Room Type found!'}})
+                  
+            alloted_room = None
+            if validated_data.get('alloted_room') is not None:
+                  alloted_room_data = validated_data.pop('alloted_room')
+                  if alloted_room_data.get('id') is not None:
+                        alloted_room = RoomType.objects.filter(id=alloted_room_data.get('id')).first()
+                        if alloted_room is None:
+                              raise serializers.ValidationError({'alloted_room': {'id': 'No Room Type found!'}})
+            
+            batch = None
+            if validated_data.get('batch') is not None:
+                  batch_data = validated_data.pop('batch')
+                  if batch_data.get('id') is not None:
+                        batch = Batch.objects.filter(id=batch_data.get('id')).first()
+                        if batch is None:
+                              raise serializers.ValidationError({'batch': {'id': 'No Batch found!'}})
+            
+
+            instance.name = validated_data.get('name', instance.name)
+            instance.rollno = validated_data.get('rollno', instance.rollno)
+            instance.phoneno = validated_data.get('phoneno', instance.phoneno)
+            instance.gender = validated_data.get('gender', instance.gender)
+            instance.cg = validated_data.get('cg', instance.cg)
+            
+            if current_room is not None:
+                  instance.current_room = current_room
+            if alloted_room is not None:
+                  instance.alloted_room = alloted_room
+            
+            if batch is not None:
+                  instance.batch = batch
+            
+            instance.save()
+            return instance
