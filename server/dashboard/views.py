@@ -2,12 +2,14 @@ from django.core.files.storage import default_storage
 from django.core.paginator import Paginator
 from django.db.models import Count, Q
 from django.conf import settings
+from django.db import transaction
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from student.permissions import IsStudent
+from student.tasks import *
 
 from .permissions import IsAdmin
 
@@ -15,9 +17,9 @@ from preference.models import Hostel, RoomType, RoomTypeChoice
 from student.models import Batch, Section, Student, Group
 from .models import AllotmentStatus, AcademicSession, Faq
 
-from .serializers import HostelSerializer, HostelSingleSerializer, RoomTypeSerializer, RoomTypeChoiceSerializer, RoomTypeOptionSerializer, BatchSerializer, BatchUninitializedSerializer, SectionSerializer, ProfileSerializer, AllotmentStatusSerializer, SectionRoomTypeSerializer, AcademicSessionSerializer, FAQSerializer, DefaulterSerializer, StudentAdminSideProfileSerializer
+from .serializers import HostelSerializer, HostelSingleSerializer, RoomTypeSerializer, RoomTypeChoiceSerializer, RoomTypeOptionSerializer, BatchSerializer, BatchUninitializedSerializer, SectionSerializer, ProfileSerializer, AllotmentStatusSerializer, SectionRoomTypeSerializer, AcademicSessionSerializer, FAQSerializer, DefaulterSerializer
 from .serializers import *
-from student.serializers import StudentSerializer, GroupSerializer
+from student.serializers import StudentSerializer, GroupSerializer, StudentProfileSerializer, StudentSerializer
 
 from .tasks import allot_hostel, add_users, add_defaulters, send_reminder_mail
 
@@ -46,7 +48,7 @@ class CreateObjectView(APIView):
                         return Response(status=status.HTTP_400_BAD_REQUEST)
                   serializer = DefaulterSerializer(data = {'student': student.id})
             elif model=='student':
-                  serializer = StudentAdminSideProfileSerializer(data=request.data)
+                  serializer = StudentProfileSerializer(data=request.data)
             else:
                   return Response(status=status.HTTP_404_NOT_FOUND)
             
@@ -97,35 +99,65 @@ class GetObjectView(APIView):
                   if instance is None:
                         return Response(status=status.HTTP_404_NOT_FOUND)
                   serializer = HostelSingleSerializer(instance)
+            
             elif model=='roomtype':
                   instance = RoomType.objects.filter(id=id).first()
                   if instance is None:
                         return Response(status=status.HTTP_404_NOT_FOUND)
                   serializer = RoomTypeSerializer(instance)
+            
             elif model=='allotment-status':
                   instance = AllotmentStatus.objects.first()
                   if instance is None:
                         instance = AllotmentStatus()
                         instance.save()
                   serializer = AllotmentStatusSerializer(instance)
+            
             elif model=='academic-session':
                   instance = AcademicSession.objects.first()
                   if instance is None:
                         instance = AcademicSession(name='')
                         instance.save()
                   serializer = AcademicSessionSerializer(instance)
+            
             elif model=='student':
                   instance = Student.objects.filter(rollno=id).first()
                   if instance is None:
                         return Response(status=status.HTTP_404_NOT_FOUND)
-                  serializer = StudentAdminSideProfileSerializer(instance)
+                  serializer = StudentProfileSerializer(instance)
+            
+            elif model=='search-student':
+                  # View to search the student to add it into a group
+                  instance = Student.objects.filter(rollno=id).first()
+                  
+                  if instance is None:
+                        return Response(status=status.HTTP_404_NOT_FOUND)
+                  
+                  try:
+                        _ = instance.defaulter
+                        return Response({"detail": "This student is suspended from Hostel Allocation Process"}, status=status.HTTP_403_FORBIDDEN)
+                  except ObjectDoesNotExist:
+                        pass
+                  
+                  try:
+                        gp = instance.leader_of_group
+                        if gp.members.count()>0:
+                              return Response({'detail': 'This student is already a leader of another group!'}, status=status.HTTP_403_FORBIDDEN)
+                  except ObjectDoesNotExist:
+                        if instance.group is not None:
+                              return Response({'detail': 'This student is already a part of another group!'}, status=status.HTTP_409_CONFLICT)
+                  
+                  serializer = StudentSerializer(instance)
+            
             elif model=='batch':
                   instance = Batch.objects.filter(id=id).first()
                   if instance is None:
                         return Response(status=status.HTTP_404_NOT_FOUND)
                   serializer = BatchSerializer(instance)
+            
             else:
                   return Response(status.HTTP_404_NOT_FOUND)
+            
             return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -174,7 +206,7 @@ class UpdateObjectView(APIView):
                   instance = Student.objects.filter(rollno=id).first()
                   if instance is None:
                         return Response(status=status.HTTP_404_NOT_FOUND)
-                  serializer = StudentAdminSideProfileSerializer(instance, request.data, partial=True)
+                  serializer = StudentProfileSerializer(instance, request.data, partial=True)
             else:
                   return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -216,6 +248,25 @@ class DeleteObjectView(APIView):
                   return Response(status=status.HTTP_404_NOT_FOUND)
 
             instance.delete()
+            return Response(status=status.HTTP_200_OK)
+
+
+class DeleteObjectsView(APIView):
+      permission_classes = [IsAuthenticated, IsAdmin]
+
+      def delete(self, request, model):
+            ids = request.data.get('ids')
+            if isinstance(ids, list):
+                  return Response(status=status.HTTP_400_BAD_REQUEST)
+            for id in ids:
+                  if model=='defaulter':
+                        instance = Defaulter.objects.filter(id=id).first()
+                  elif model=='student':
+                        instance = Student.objects.filter(rollno=id).first()
+                  else:
+                        return Response(status=status.HTTP_404_NOT_FOUND)
+                  if instance is not None:
+                        instance.delete()
             return Response(status=status.HTTP_200_OK)
 
 
@@ -533,4 +584,255 @@ class sendReminderMail(APIView):
             
             # for student in students:
             #       send_reminder_mail.delay(student.name, student.user.email, last_date)
+            return Response(status=status.HTTP_200_OK)
+
+
+class CreateGroupView(APIView):
+      permission_classes = [IsAuthenticated, IsAdmin]
+
+      def post(self, request):
+            leader_rollno = request.data.get('leader')
+            leader = Student.objects.filter(rollno=leader_rollno).select_related('leader_of_group', 'defaulter', 'group').first()
+            if leader is None:
+                  return Response({'detail': f'No student found with roll number {leader_rollno}!'}, status=status.HTTP_403_FORBIDDEN)
+            
+            group = None
+            left_group_mails = []
+            members_list = []
+            member_exist = {}
+
+            try:
+                  _ = leader.defaulter
+                  return Response({'detail': f'{leader_rollno} is currently suspended from Hostel Allocation Process!'}, status=status.HTTP_403_FORBIDDEN)
+            except ObjectDoesNotExist:
+                  pass
+
+            try:
+                  gp = leader.leader_of_group
+                  if gp.members.count()>0:
+                        return Response({'detail': f'{leader_rollno} is a leader of another group! Please first transfer ownership of that group'}, status=status.HTTP_403_FORBIDDEN)
+                  group = gp
+            except ObjectDoesNotExist:
+                  pass
+            
+            member_exist[leader_rollno] = True
+            members_data = request.data.get('members')
+
+            for member_rollno in members_data:
+                  if member_exist.get(member_rollno, False):
+                        return Response({'detail': f'{member_rollno} is present multiple times in request data!'}, status=status.HTTP_403_FORBIDDEN)
+
+                  member = Student.objects.filter(rollno=member_rollno).select_related('leader_of_group', 'defaulter', 'group').first()
+                  if member is None:
+                        return Response({'detail': f'No student found with roll number {member_rollno}!'}, status=status.HTTP_403_FORBIDDEN)
+                  
+                  try:
+                        _ = member.defaulter
+                        return Response({'detail': f'{member_rollno} is currently suspended from Hostel Allocation Process!'}, status=status.HTTP_403_FORBIDDEN)
+                  except ObjectDoesNotExist:
+                        pass
+                  
+                  try:
+                        gp = member.leader_of_group
+                        if gp.members.count()>0:
+                              return Response({'detail': f'{member_rollno} is a leader of another group! Please first transfer the ownership of thet group'}, status=status.HTTP_403_FORBIDDEN)
+                  except ObjectDoesNotExist:
+                        pass
+
+                  members_list.append(member)
+                  member_exist[member_rollno] = True
+            
+            with transaction.atomic():
+                  if leader.group is not None:
+                        left_group_mails.append((leader, leader.group))
+                        leader.group = None
+                        group = Group.objects.create(leader=leader, cg=leader.cg)
+                  
+                  cg = leader.cg
+                  if group is None:
+                        group = Group.objects.create(leader=leader, cg=cg)
+
+                  for member in members_list:            
+                        try:
+                              gp = member.leader_of_group
+                              if gp.members.count()==0:
+                                    gp.delete()
+                        except ObjectDoesNotExist:
+                              if member.group is not None:
+                                    left_group_mails.append((member, member.group))
+
+                        member.group = group
+                        cg += member.cg
+                        member.save()
+
+                  cg = round(cg / (len(members_data) + 1), 2)
+                  group.cg = cg
+                  group.save()
+
+            for target in left_group_mails:
+                  left_group_mail.delay(target[1].leader.name, target[0].name, target[0].rollno, target[1].leader.user.email)
+                  target_ms = target[1].members.all()
+                  for m in target_ms:
+                        left_group_mail.delay(m.name, target[0].name, target[0].rollno, m.user.email)
+            
+            for m in members_list:
+                  joined_group_mail.delay(leader.name, leader.user.email, leader.rollno, m.name, m.user.email)
+                  joined_group_to_members.delay(leader.name, m.name, m.rollno, group.leader.user.email)
+                  for m2 in members_list:
+                        if m2 != m:
+                              joined_group_to_members.delay(m2.name, m.name, m.rollno, m2.user.email)
+
+            serializer = GroupDetailSerializer(group)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+# Edit Existing group routes
+
+class AddToGroupView(APIView):
+      permission_classes = [IsAuthenticated, IsAdmin]
+
+      def post(sef, request):
+            student = Student.objects.filter(rollno=request.data.get('rollno')).select_related('leader_of_group', 'defaulter').first()
+            if student is None:
+                  return Response({'detail': 'No Student Found!'}, status=status.HTTP_404_NOT_FOUND)
+            
+            group = Group.objects.filter(id=request.data.get('group')).prefetch_related('members').first()
+            if group is None:
+                  return Response({'detail': 'No Group Found!'}, status=status.HTTP_404_NOT_FOUND)
+            
+            try:
+                  _ = student.defaulter
+                  return Response({"detail": "This student is currently suspended from Hostel Allocation Process"}, status=status.HTTP_403_FORBIDDEN)
+            except ObjectDoesNotExist:
+                  pass
+            
+            try:
+                  gp = student.leader_of_group
+                  if gp==group:
+                        return Response({'detail': 'This student is already leader of this group.'}, status=status.HTTP_403_FORBIDDEN)
+                  if gp.members.count()>0:
+                        return Response({'detail': 'This student is leader of some another group! First transfer ownership of that group.'}, status=status.HTTP_403_FORBIDDEN)
+                  gp.delete()
+            except ObjectDoesNotExist:
+                  if student.group is not None:
+                        if student.group==group:
+                              return Response({'detail': 'This student is already a member of this group.'}, status=status.HTTP_403_FORBIDDEN)
+                        gp = student.group
+                        left_group_mail.delay(gp.leader.name, student.name, student.rollno, gp.leader.user.email)
+                        ms = gp.members.all()
+                        for m in ms:
+                              left_group_mail.delay(m.name, student.name, student.rollno, m.user.email)
+            
+            with transaction.atomic():
+                  student.group = group
+                  student.save()
+
+                  updatedcg = group.leader.cg
+                  cnt = 1
+                  for member in group.members.all():
+                        updatedcg += member.cg
+                        cnt += 1
+                  updatedcg /= cnt
+                  group.cg = round(updatedcg, 2)
+                  group.save()
+
+            lead = group.leader
+            joined_group_mail.delay(lead.name, lead.user.email, lead.rollno, student.name, student.user.email)
+            joined_group_to_members.delay(lead.name, student.name, student.rollno, group.leader.user.email)
+            members = group.members.all()
+            for member in members:
+                  joined_group_to_members.delay(member.name, student.name, student.rollno, member.user.email)
+
+            serializer = GroupDetailSerializer(group)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class ChangeGroupLeaderView(APIView):
+      permission_classes = [IsAuthenticated, IsAdmin]
+
+      def post(self, request):
+            newleader = Student.objects.filter(rollno=request.data.get('rollno')).select_related('leader_of_group', 'defaulter').first()
+            if newleader is None:
+                  return Response({'detail': 'No Student Found!'}, status=status.HTTP_404_NOT_FOUND)
+            
+            group = Group.objects.filter(id=request.data.get('group')).prefetch_related('members').first()
+            if group is None:
+                  return Response({'detail': 'No Group Found!'}, status=status.HTTP_404_NOT_FOUND)
+            
+            if group.leader==newleader:
+                  return Response({'detail': 'This student already the leader of this group.'}, status=status.HTTP_403_FORBIDDEN)
+            
+            if newleader.group is None or newleader.group!=group:
+                  return Response({'detail': 'You can only tranfer ownership to one of the group members!'}, status=status.HTTP_403_FORBIDDEN)
+
+            with transaction.atomic():
+                  newleader.group = None
+                  newleader.save()
+
+                  old_leader = group.leader
+                  group.leader = newleader
+                  group.save()
+                  
+                  old_leader.group = group
+                  old_leader.save()
+            
+            members = group.members.all()
+            for member in members:
+                  send_teamleader_change_mail.delay(group.leader.name,group.leader.rollno,member.user.email)
+            send_teamleader_change_mail.delay(group.leader.name,group.leader.rollno,group.leader.user.email)
+            
+            serializer = GroupDetailSerializer(group)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class RemoveFromGroupView(APIView):
+      permission_classes = [IsAuthenticated, IsAdmin]
+
+      def post(self, request):
+            student = Student.objects.filter(rollno=request.data.get('rollno')).select_related('leader_of_group', 'defaulter').first()
+            if student is None:
+                  return Response({'detail': 'No Student Found!'}, status=status.HTTP_404_NOT_FOUND)
+            
+            try:
+                  _ = student.leader_of_group
+                  return Response({'detail': 'You must tranfer the group ownership to one of the group members to leave this group!'}, status=status.HTTP_403_FORBIDDEN)
+            except:
+                  group = student.group
+                  if group is None:
+                        return Response({'detail': 'You can only remove a group member from the group!'}, status=status.HTTP_403_FORBIDDEN)
+            
+            with transaction.atomic():
+                  student.group = None
+                  student.save()
+                  indvgroup = Group(leader = student, cg = student.cg)
+                  indvgroup.save()
+            
+            left_group_mail.delay(group.leader.name, student.name, student.rollno, group.leader.user.email)
+            
+            members = group.members.all()
+            for member in members:
+                  left_group_mail.delay(member.name, student.name, student.rollno, member.user.email)
+            
+            serializer = GroupDetailSerializer(group)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class DeleteGroupsView(APIView):
+      permission_classes = [IsAuthenticated, IsAdmin]
+
+      def delete(self, request):
+            ids = request.data.get('ids')
+            if not isinstance(ids, list):
+                  return Response({'detail': 'Invalid data!'}, status=status.HTTP_400_BAD_REQUEST)
+            with transaction.atomic():
+                  for id in ids:
+                        group = Group.objects.filter(id=id).prefetch_related('members', 'preferences').first()
+                        if group is None:
+                              continue
+                        for member in group.members.all():
+                              member.group = None
+                              newgp = Group.objects.create(leader=member, cg=member.cg)
+                              member.save()
+                        for preference in group.preferences.all():
+                              preference.delete()
             return Response(status=status.HTTP_200_OK)

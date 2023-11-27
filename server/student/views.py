@@ -39,7 +39,7 @@ class SearchStudentView(APIView):
 
             try:
                   _ = invitee.defaulter
-                  return Response({"detail": "This student is suspended from Hostel Allocation Process"}, status=status.HTTP_403_FORBIDDEN)
+                  return Response({"detail": "This student is currently suspended from Hostel Allocation Process"}, status=status.HTTP_403_FORBIDDEN)
             except ObjectDoesNotExist:
                   pass
             
@@ -280,8 +280,8 @@ class LeaveGroupView(APIView):
                         return Response({'detail': 'Only a Group Member is authorized to perform this action!'}, status=status.HTTP_403_FORBIDDEN)
             student.group = None
             student.save()
-            group = Group(leader = student, cg = student.cg)
-            group.save()
+            indvgroup = Group(leader = student, cg = student.cg)
+            indvgroup.save()
             
             left_group_mail.delay(group.leader.name, student.name, student.rollno, group.leader.user.email)
             
