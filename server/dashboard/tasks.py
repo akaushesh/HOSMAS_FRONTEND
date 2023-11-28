@@ -21,9 +21,11 @@ from django.core.cache import cache
 
 @app.task(name='add_users')
 def add_users(filename):
-      storage = default_storage
-      storage.location = os.path.join(settings.BASE_DIR, 'imported-data', 'student')
-      userfile = storage.open(filename, 'r')
+      # storage = default_storage
+      # storage.location = os.path.join(settings.BASE_DIR, 'imported-data', 'student')
+      # userfile = storage.open(filename, 'r')
+      filename = os.path.join(settings.BASE_DIR, 'imported-data', 'student', filename)
+      userfile = open(filename, 'r', encoding='utf-8-sig')
       reader = csv.DictReader(userfile)
 
       # Check if atleast one out of email or rollno is present in given data
@@ -208,7 +210,7 @@ def add_users(filename):
                   # log error
                   with open(os.path.join(settings.LOGS_ROOT, 'add_user_errors.log'), 'a') as f:
                       f.write(f"Creation of item {cnt} unsuccessful.\n")
-                      f.write(f"{e}")
+                      f.write(f"{str(e)}")
                       f.write("\n")
                   # print(f"creation of ({row['name']}, {row['email']}) unsuccessful.\n")
                   # print(e)
@@ -221,9 +223,8 @@ def add_users(filename):
 
 @app.task(name = "add_defaulters")
 def add_defaulters(filename):
-      storage = default_storage
-      storage.location = os.path.join(settings.BASE_DIR, 'imported-data', 'defaulter')
-      userfile = storage.open(filename, 'r')
+      filename = os.path.join(settings.BASE_DIR, 'imported-data', 'defaulter', filename)
+      userfile = open(filename, 'r', encoding='utf-8-sig')
       reader = csv.DictReader(userfile)
 
       fieldnames = reader.fieldnames
@@ -240,7 +241,7 @@ def add_defaulters(filename):
       for row in reader:
             try:
                   student = Student.objects.filter(rollno=row['student']).first()
-                  if student in None:
+                  if student is None:
                         raise Exception(f"Student with roll number {row['student']} not found!")
                   instance = Defaulter.objects.filter(student=student).first()
                   if instance is None:
@@ -250,7 +251,7 @@ def add_defaulters(filename):
             except BaseException as e:
                   with open(os.path.join(settings.LOGS_ROOT, 'add_defaulter_errors.log'), 'a') as f:
                         f.write(f"Creation of item {cnt} unsuccessful.\n")
-                        f.write(e)
+                        f.write(str(e))
                         f.write("\n")
                   failureCnt += 1
             cnt += 1

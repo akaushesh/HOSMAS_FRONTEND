@@ -38,7 +38,7 @@ class SearchStudentView(APIView):
                   return Response({'detail': 'No student found!'}, status=status.HTTP_403_FORBIDDEN)
 
             try:
-                  _ = invitee.defaulter
+                  _ = resultant.defaulter
                   return Response({"detail": "This student is currently suspended from Hostel Allocation Process"}, status=status.HTTP_403_FORBIDDEN)
             except ObjectDoesNotExist:
                   pass
