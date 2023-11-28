@@ -148,7 +148,7 @@ function ManageSectionsPage() {
       <CustomModal
         open={createSectionModalOpen}
         onClose={() => setCreateSectionModalOpen(false)}
-        minWidth={700}
+        maxWidth={700}
       >
         <Grid container spacing={4} justifyContent="center">
           {createSectionStep == 1 && (

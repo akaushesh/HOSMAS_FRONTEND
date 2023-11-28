@@ -25,7 +25,7 @@ export const EditPreferenceForm = (props) => {
   const queryClient = useQueryClient();
 
   const user = queryClient.getQueryData(["getProfile"]);
-  const isLeader = !user?.group || user?.email === user?.group?.leader_email;
+  const isLeader = !user?.group || user?.user?.email === user?.group?.leader_email;
 
   const onCloseModal = () => {
     setOpenModal(false);

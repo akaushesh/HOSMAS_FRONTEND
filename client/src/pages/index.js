@@ -11,6 +11,8 @@ const Page = () => {
   const queryClient = useQueryClient();
   const user = queryClient.getQueryData(["getProfile"]);
 
+  console.log(user);
+
   return (
     <Fragment>
       <Head>
@@ -32,17 +34,17 @@ const Page = () => {
             <Grid item xs={12} lg={8} alignSelf={"center"}>
               <AccountProfileDetails
                 name={user?.name}
-                email={user?.email}
+                email={user?.user?.email}
                 rollNumber={user?.rollno}
                 CGPA={user?.cg}
                 feeDue={user?.feeDue}
-                phoneNumber={user?.phoneNumber}
+                phoneNumber={user?.phoneno}
               />
             </Grid>
             <Grid item xs={12} lg={4}>
               <Grid>
                 <OverviewBudget
-                  allotedHostel={user?.alloted_hostel ? user.alloted_hostel : ""}
+                  allotedHostel={user?.alloted_room?.hostel ? user.alloted_room?.hostel : ""}
                   academicSession={user?.academic_session ? user?.academic_session : ""}
                   sx={{ height: "100%" }}
                 />

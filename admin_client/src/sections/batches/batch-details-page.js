@@ -42,7 +42,7 @@ const ViewBatchDetailsPage = ({ batchId }) => {
     try {
       const fetchBatchDetails = async () => {
         const res = await getBatch(batchId, accessToken);
-        setBatch(res?.data?.name);
+        setBatchName(res?.data?.name);
         console.log(res);
       };
 

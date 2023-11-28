@@ -28,6 +28,7 @@ function SectionPreference({ sectionId }) {
   const [sectionData, setSectionData] = useState();
   const [preferences, setPreferences] = useState([]);
   const [isAllotmentEnabled, setIsAllotmentEnabled] = useState(false);
+  const [isRetainEnabled, setIsRetainEnabled] = useState(false);
   const [confirmationModalOpen, setConfirmationModalOpen] = useState();
 
   console.log(sectionData);
@@ -77,6 +78,16 @@ function SectionPreference({ sectionId }) {
     try {
       setIsAllotmentEnabled(e.target.checked);
       const updateData = { is_allotment_enabled: e.target.checked };
+
+      const res = await updateSection(sectionId, updateData, accessToken);
+      console.log(res);
+    } catch (err) {}
+  };
+
+  const handleRetainEnableChange = async (e) => {
+    try {
+      setIsRetainEnabled(e.target.checked);
+      const updateData = { is_retain_enabled: e.target.checked };
 
       const res = await updateSection(sectionId, updateData, accessToken);
       console.log(res);
@@ -166,7 +177,11 @@ function SectionPreference({ sectionId }) {
                 <CardContent>
                   <Stack direction="row" spacing={1} alignItems="center">
                     <Typography variant="h5">Allow Retaining</Typography>
-                    <Switch sx={{ transform: "translateY(5%)" }} />
+                    <Switch
+                      sx={{ transform: "translateY(5%)" }}
+                      checked={isRetainEnabled}
+                      onChange={handleRetainEnableChange}
+                    />
                   </Stack>
                 </CardContent>
               </Card>

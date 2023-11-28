@@ -28,7 +28,7 @@ export const createBatch = async (data, accessToken) => {
 };
 
 export const getBatch = async (id, accessToken) => {
-  const res = await batchApi.get(`batch/get/${id}`, {
+  const res = await batchApi.get(`batch/view/${id}`, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },

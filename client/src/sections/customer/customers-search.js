@@ -19,7 +19,7 @@ export const CustomersSearch = () => {
   const [entryIsCorrect, setEntryIsCorrect] = useState(false);
 
   const user = queryClient.getQueryData(["getProfile"]);
-  const isLeader = !user?.group || user?.email === user?.group?.leader_email;
+  const isLeader = !user?.group || user?.user?.email === user?.group?.leader_email;
 
   const onOpenModal = () => {
     if (entryIsCorrect) setOpenModal(true);
