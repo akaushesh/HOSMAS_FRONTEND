@@ -91,10 +91,6 @@ def add_users(filename):
                               # check if admin wants to make current room related field null
                               is_current_room_null = True
                               current_room = None
-                        # else:
-                        #       current_room = RoomType.objects.filter(name=current_room).first()
-                        #       if current_room is None:
-                        #             raise Exception(f'Room Type {current_room} not found!')
                   else:
                         is_current_room_null = True
                   
@@ -120,10 +116,6 @@ def add_users(filename):
                               # check if admin wants to make allocated room related details null
                               is_alloted_room_null = True
                               alloted_room = None
-                        # else:
-                        #       alloted_room = RoomType.objects.filter(name=alloted_room).first()
-                        #       if alloted_room is None:
-                        #             raise Exception(f'Room Type {alloted_room} not found!')
                   else:
                         is_alloted_room_null = True
                         

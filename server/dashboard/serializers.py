@@ -1,12 +1,16 @@
 from django.db.models import Q, Count
+from django.db import transaction
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
 from preference.models import Hostel, RoomType, RoomTypeChoice
 from student.models import Batch, Section, Student, Group, Defaulter
 from student.serializers import StudentProfileSerializer
 from user.models import User
 from .models import AllotmentStatus, AcademicSession, Faq
-import json
+import json, string
 from .tasks import send_start_allocation_mail
+from random import choice
+from collections import OrderedDict
 
 
 class HostelSerializer(serializers.ModelSerializer):
@@ -218,14 +222,15 @@ class FAQSerializer(serializers.ModelSerializer):
       class Meta:
             model = Faq
             fields = ['id', 'question', 'answer']
-            
-class GroupDetailSerializer(serializers.ModelSerializer):
-    leader_of_group = StudentProfileSerializer(source='leader', read_only=True)
-    members = StudentProfileSerializer(many=True, read_only=True)
 
-    class Meta:
-        model = Group
-        fields = ['leader_of_group', 'members', 'cg', 'is_retained', 'is_preferences_filled']
+
+class GroupDetailSerializer(serializers.ModelSerializer):
+      leader_of_group = StudentProfileSerializer(source='leader', read_only=True)
+      members = StudentProfileSerializer(many=True, read_only=True)
+
+      class Meta:
+            model = Group
+            fields = ['leader_of_group', 'members', 'cg', 'is_retained', 'is_preferences_filled']
 
 
 class DefaulterSerializer(serializers.ModelSerializer):
