@@ -21,9 +21,11 @@ from django.core.cache import cache
 
 @app.task(name='add_users')
 def add_users(filename):
-      storage = default_storage
-      storage.location = os.path.join(settings.BASE_DIR, 'imported-data', 'student')
-      userfile = storage.open(filename, 'r')
+      # storage = default_storage
+      # storage.location = os.path.join(settings.BASE_DIR, 'imported-data', 'student')
+      # userfile = storage.open(filename, 'r')
+      filename = os.path.join(settings.BASE_DIR, 'imported-data', 'student', filename)
+      userfile = open(filename, 'r', encoding='utf-8-sig')
       reader = csv.DictReader(userfile)
 
       # Check if atleast one out of email or rollno is present in given data
@@ -221,9 +223,8 @@ def add_users(filename):
 
 @app.task(name = "add_defaulters")
 def add_defaulters(filename):
-      storage = default_storage
-      storage.location = os.path.join(settings.BASE_DIR, 'imported-data', 'defaulter')
-      userfile = storage.open(filename, 'r')
+      filename = os.path.join(settings.BASE_DIR, 'imported-data', 'defaulter', filename)
+      userfile = open(filename, 'r', encoding='utf-8-sig')
       reader = csv.DictReader(userfile)
 
       fieldnames = reader.fieldnames
@@ -240,7 +241,7 @@ def add_defaulters(filename):
       for row in reader:
             try:
                   student = Student.objects.filter(rollno=row['student']).first()
-                  if student in None:
+                  if student is None:
                         raise Exception(f"Student with roll number {row['student']} not found!")
                   instance = Defaulter.objects.filter(student=student).first()
                   if instance is None:

@@ -206,3 +206,5 @@ CACHES = {
         "LOCATION": "redis://127.0.0.1:6379",
     }
 }
+
+LOGS_ROOT = os.path.join(BASE_DIR, config('LOGS_ROOT', default='logs'))
