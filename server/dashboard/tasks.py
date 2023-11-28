@@ -210,7 +210,7 @@ def add_users(filename):
                   # log error
                   with open(os.path.join(settings.LOGS_ROOT, 'add_user_errors.log'), 'a') as f:
                       f.write(f"Creation of item {cnt} unsuccessful.\n")
-                      f.write(f"{e}")
+                      f.write(f"{str(e)}")
                       f.write("\n")
                   # print(f"creation of ({row['name']}, {row['email']}) unsuccessful.\n")
                   # print(e)
@@ -251,7 +251,7 @@ def add_defaulters(filename):
             except BaseException as e:
                   with open(os.path.join(settings.LOGS_ROOT, 'add_defaulter_errors.log'), 'a') as f:
                         f.write(f"Creation of item {cnt} unsuccessful.\n")
-                        f.write(e)
+                        f.write(str(e))
                         f.write("\n")
                   failureCnt += 1
             cnt += 1
