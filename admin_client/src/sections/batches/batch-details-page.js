@@ -5,16 +5,17 @@ import { subDays, subHours } from "date-fns";
 import ArrowDownOnSquareIcon from "@heroicons/react/24/solid/ArrowDownOnSquareIcon";
 import ArrowUpOnSquareIcon from "@heroicons/react/24/solid/ArrowUpOnSquareIcon";
 import PlusIcon from "@heroicons/react/24/solid/PlusIcon";
-import { Box, Button, Container, Stack, SvgIcon, Typography } from "@mui/material";
+import { Box, Button, Container, Stack, SvgIcon, Typography, Card } from "@mui/material";
 import { useSelection } from "src/hooks/use-selection";
 import { Layout as DashboardLayout } from "src/layouts/dashboard/layout";
 import { applyPagination } from "src/utils/apply-pagination";
-import { StudentsTable } from "./students-table";
-import { StudentsSearch } from "./students-search";
+import { StudentsTable } from "./batch-students-table";
 import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
 import Link from "next/link";
 import { useAuthContext } from "src/contexts/auth-context";
 import { getStudents } from "src/services/others";
+import { getBatch } from "src/services/batch";
+import { TableSearch } from "src/components/table-search";
 
 const useStudentsIDs = (customers) => {
   return useMemo(() => {
@@ -25,23 +26,47 @@ const useStudentsIDs = (customers) => {
 const ViewBatchDetailsPage = ({ batchId }) => {
   const { accessToken } = useAuthContext();
 
+  const [batchName, setBatchName] = useState("");
+
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(20);
   const [students, setStudents] = useState([]);
   const studentsIds = useStudentsIDs(students);
   const studentsSelection = useSelection(studentsIds);
 
-  useEffect(() => {
-    const fetchStudentsData = async () => {
-      const res = await getStudents(20, page + 1, "b1", accessToken);
-      if (res.status == 200) {
-        setStudents(res.data.data);
-      }
-      console.log(res);
-    };
+  const [searchQuery, setSearchQuery] = useState("");
 
-    fetchStudentsData();
-  }, [page]);
+  console.log(batchId);
+
+  useEffect(() => {
+    try {
+      const fetchBatchDetails = async () => {
+        const res = await getBatch(batchId, accessToken);
+        setBatch(res?.data?.name);
+        console.log(res);
+      };
+
+      fetchBatchDetails();
+    } catch (err) {
+      console.log(err);
+    }
+  }, []);
+
+  useEffect(() => {
+    try {
+      const fetchStudentsData = async () => {
+        const res = await getStudents(searchQuery, 20, page + 1, batchId, accessToken);
+        if (res.status == 200) {
+          setStudents(res.data.data);
+        }
+        console.log(res);
+      };
+
+      fetchStudentsData();
+    } catch (err) {
+      console.log(err);
+    }
+  }, [page, searchQuery]);
 
   const handlePageChange = useCallback((event, value) => {
     setPage(value);
@@ -69,7 +94,7 @@ const ViewBatchDetailsPage = ({ batchId }) => {
                     <KeyboardBackspaceIcon fontSize="large" />
                   </Link>
                   <Typography variant="h4" pl={3}>
-                    UG1
+                    {batchName}
                   </Typography>
                 </Stack>
                 <Stack alignItems="center" direction="row" spacing={1}>
@@ -108,7 +133,19 @@ const ViewBatchDetailsPage = ({ batchId }) => {
                 </Button>
               </div> */}
             </Stack>
-            <StudentsSearch />
+
+            <Card sx={{ p: 2 }}>
+              <Stack direction="row" justifyContent="space-between" alignItems="center">
+                <TableSearch
+                  setSearchQuery={setSearchQuery}
+                  placeholder={"Enter Name, Email or Roll no."}
+                />
+                <Button sx={{ color: "error.main", height: "fit-content" }}>
+                  Delete Selected Items
+                </Button>
+              </Stack>
+            </Card>
+
             <StudentsTable
               count={students.length}
               items={students}

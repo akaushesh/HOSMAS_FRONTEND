@@ -12,8 +12,10 @@ export const getAllDefaulters = async (q, defaulters_per_page, page, accessToken
   return res;
 };
 
-export const getAllBatches = async (accessToken) => {
-  const res = await batchApi.get("batch/view/multiple/", {
+export const createDefaulter = async (rollNo, accessToken) => {
+  const data = { student: rollNo };
+
+  const res = await defaulterApi.post("defaulter/create/", data, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
@@ -21,8 +23,10 @@ export const getAllBatches = async (accessToken) => {
   return res;
 };
 
-export const createBatch = async (data, accessToken) => {
-  const res = await batchApi.post("batch/create/", data, {
+export const deleteDefaulter = async (rollNo, accessToken) => {
+  const data = { id: rollNo };
+
+  const res = await defaulterApi.delete("defaulter/delete/", data, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
@@ -30,17 +34,8 @@ export const createBatch = async (data, accessToken) => {
   return res;
 };
 
-export const updateBatch = async (id, data, accessToken) => {
-  const res = await batchApi.put(`batch/update/${id}/`, data, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
-  return res;
-};
-
-export const deleteBatch = async (data, accessToken) => {
-  const res = await batchApi.delete("delete/", data, {
+export const importDefaulters = async (data, accessToken) => {
+  const res = await defaulterApi.post("import-defaulters/", data, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },

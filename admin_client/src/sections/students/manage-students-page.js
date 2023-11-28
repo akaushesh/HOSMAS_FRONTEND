@@ -19,14 +19,14 @@ import {
 import { useSelection } from "src/hooks/use-selection";
 import { Layout as DashboardLayout } from "src/layouts/dashboard/layout";
 import { applyPagination } from "src/utils/apply-pagination";
-import { GroupsTable } from "src/sections/groups/groups-table";
 import { GroupsSearch } from "src/sections/groups/groups-search";
-import { getAllGroups } from "src/services/others";
+import { getAllGroups, getStudents } from "src/services/others";
 import { useAuthContext } from "src/contexts/auth-context";
 import CustomModal from "src/components/CustomModal";
 import { exportGroups } from "src/services/export";
 import { getAllSections } from "src/services/section";
 import { TableSearch } from "src/components/table-search";
+import { StudentsTable } from "./students-table";
 
 const useGroupsIDs = (customers) => {
   return useMemo(() => {
@@ -34,7 +34,7 @@ const useGroupsIDs = (customers) => {
   }, [customers]);
 };
 
-const ViewGroupsPage = () => {
+const ViewStudentsPage = () => {
   const { accessToken } = useAuthContext();
 
   const [page, setPage] = useState(0);
@@ -56,7 +56,7 @@ const ViewGroupsPage = () => {
   useEffect(() => {
     try {
       const fetchGroupsData = async () => {
-        const res = await getAllGroups(searchQuery, 20, page + 1, accessToken);
+        const res = await getStudents(searchQuery, 20, page + 1, "", accessToken);
         if (res.status == 200) {
           setGroups(res.data.data);
         }
@@ -120,7 +120,7 @@ const ViewGroupsPage = () => {
           <Stack spacing={3}>
             <Stack direction="row" justifyContent="space-between" spacing={4}>
               <Stack spacing={1}>
-                <Typography variant="h4">Groups</Typography>
+                <Typography variant="h4">Students</Typography>
 
                 <Stack alignItems="center" direction="row" spacing={1}>
                   <Button
@@ -179,7 +179,7 @@ const ViewGroupsPage = () => {
               </Stack>
             </Card>
 
-            <GroupsTable
+            <StudentsTable
               count={groups.length}
               items={groups}
               onDeselectAll={groupsSelection.handleDeselectAll}
@@ -248,4 +248,4 @@ const ViewGroupsPage = () => {
     </>
   );
 };
-export default ViewGroupsPage;
+export default ViewStudentsPage;

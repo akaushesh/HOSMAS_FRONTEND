@@ -34,6 +34,10 @@ export const defaulterApi = axios.create({
   baseURL: url + "dashboard/",
 });
 
+export const exportApi = axios.create({
+  baseURL: url + "dashboard/export/",
+});
+
 export const otherApi = axios.create({
   baseURL: url,
 });

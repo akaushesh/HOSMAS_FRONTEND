@@ -271,6 +271,75 @@ export const AdminAccountProfilePage = () => {
               </CardContent>
             </Card>
           </Grid>
+          <Grid xs={12} md={6} lg={4}>
+            <Card>
+              <Link href="/view-groups" style={{ color: "black", textDecoration: "none" }}>
+                <CardContent>
+                  <Stack direction="row" alignItems="center" justifyContent="space-evenly">
+                    <Avatar
+                      sx={{
+                        backgroundColor: "brown",
+                        height: 56,
+                        width: 56,
+                      }}
+                    >
+                      <SvgIcon>
+                        <UsersIcon />
+                      </SvgIcon>
+                    </Avatar>
+                    <Typography>Export Allotment Data</Typography>
+                    <EastIcon fontSize="large" />
+                  </Stack>
+                </CardContent>
+              </Link>
+            </Card>
+          </Grid>
+          <Grid xs={12} md={6} lg={4}>
+            <Card>
+              <Link href="/view-groups" style={{ color: "black", textDecoration: "none" }}>
+                <CardContent>
+                  <Stack direction="row" alignItems="center" justifyContent="space-evenly">
+                    <Avatar
+                      sx={{
+                        backgroundColor: "brown",
+                        height: 56,
+                        width: 56,
+                      }}
+                    >
+                      <SvgIcon>
+                        <UsersIcon />
+                      </SvgIcon>
+                    </Avatar>
+                    <Typography>Run Script</Typography>
+                    <EastIcon fontSize="large" />
+                  </Stack>
+                </CardContent>
+              </Link>
+            </Card>
+          </Grid>
+          <Grid xs={12} md={6} lg={4}>
+            <Card>
+              <Link href="/view-groups" style={{ color: "black", textDecoration: "none" }}>
+                <CardContent>
+                  <Stack direction="row" alignItems="center" justifyContent="space-evenly">
+                    <Avatar
+                      sx={{
+                        backgroundColor: "brown",
+                        height: 56,
+                        width: 56,
+                      }}
+                    >
+                      <SvgIcon>
+                        <UsersIcon />
+                      </SvgIcon>
+                    </Avatar>
+                    <Typography>Send Reminder Email</Typography>
+                    <EastIcon fontSize="large" />
+                  </Stack>
+                </CardContent>
+              </Link>
+            </Card>
+          </Grid>
           {/* <Grid xs={12} md={6} lg={4}>
             <Card>
               {!allotmentStarted ? (

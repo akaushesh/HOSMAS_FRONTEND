@@ -18,6 +18,7 @@ import { useAuthContext } from "src/contexts/auth-context";
 import { useRouter } from "next/router";
 import ConfirmationModal from "src/components/ConfirmationModal";
 import { deleteSection, updateSection } from "src/services/section";
+import { exportGroups } from "src/services/export";
 
 function SectionPreference({ sectionId }) {
   const { accessToken } = useAuthContext();
@@ -80,6 +81,21 @@ function SectionPreference({ sectionId }) {
       const res = await updateSection(sectionId, updateData, accessToken);
       console.log(res);
     } catch (err) {}
+  };
+
+  const handleDownloadAllotmentData = async (e) => {
+    try {
+      const fetchDownloadLink = async () => {
+        const res = await exportGroups(sectionId, accessToken);
+        if (res.status == 200) {
+          window.open(res?.data?.link, "_blank");
+        }
+      };
+
+      fetchDownloadLink();
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
@@ -151,6 +167,19 @@ function SectionPreference({ sectionId }) {
                   <Stack direction="row" spacing={1} alignItems="center">
                     <Typography variant="h5">Allow Retaining</Typography>
                     <Switch sx={{ transform: "translateY(5%)" }} />
+                  </Stack>
+                </CardContent>
+              </Card>
+            </Grid>
+
+            <Grid xs={6} md={12}>
+              <Card
+                sx={{ display: "flex", alignItems: "center" }}
+                onClick={handleDownloadAllotmentData}
+              >
+                <CardContent>
+                  <Stack direction="row" spacing={1} alignItems="center">
+                    <Typography variant="h5">Download Allotment Data</Typography>
                   </Stack>
                 </CardContent>
               </Card>

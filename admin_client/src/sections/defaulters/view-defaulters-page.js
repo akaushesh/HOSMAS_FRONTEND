@@ -5,14 +5,15 @@ import { subDays, subHours } from "date-fns";
 import ArrowDownOnSquareIcon from "@heroicons/react/24/solid/ArrowDownOnSquareIcon";
 import ArrowUpOnSquareIcon from "@heroicons/react/24/solid/ArrowUpOnSquareIcon";
 import PlusIcon from "@heroicons/react/24/solid/PlusIcon";
-import { Box, Button, Container, Stack, SvgIcon, Card, Typography } from "@mui/material";
+import { Box, Button, Container, Stack, SvgIcon, Card, Typography, TextField } from "@mui/material";
 import { useSelection } from "src/hooks/use-selection";
 import { Layout as DashboardLayout } from "src/layouts/dashboard/layout";
 import { applyPagination } from "src/utils/apply-pagination";
 import { DefaultersTable } from "src/sections/defaulters/defaulters-table";
 import { DefaultersSearch } from "src/sections/defaulters/defaulters-search";
 import { useAuthContext } from "src/contexts/auth-context";
-import { getAllDefaulters } from "src/services/defaulter";
+import { addDefaulter, getAllDefaulters, importDefaulters } from "src/services/defaulter";
+import CustomModal from "src/components/CustomModal";
 
 const useDefaultersIDs = (customers) => {
   return useMemo(() => {
@@ -28,8 +29,11 @@ const ViewDefaultersPage = () => {
   const [defaulters, setDefaulters] = useState([]);
   const defaultersIds = useDefaultersIDs(defaulters);
   const defaultersSelection = useSelection(defaultersIds);
-
+  const [openAddDefaulterModal, setOpenAddDefaulterModal] = useState(false);
+  const [addDefaulterRollNo, setAddDefaulterRollNo] = useState();
   const [searchQuery, setSearchQuery] = useState("");
+
+  const [importDataFile, setImportDataFile] = useState();
   // const defaultersSelection = useMemo(() => {
   //   return useSelection(defaultersIds);
   // }, [defaultersIds]);
@@ -48,6 +52,21 @@ const ViewDefaultersPage = () => {
     fetchDefaultersData();
   }, [page, searchQuery]);
 
+  const handleFileSelect = async (e) => {
+    // Assuming you have only one file to upload
+    const selectedFile = e.target.files[0];
+
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+
+    try {
+      const res = await importDefaulters(formData, accessToken);
+      console.log(res);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   const handlePageChange = useCallback(
     (event, value) => {
       setPage(value);
@@ -55,9 +74,19 @@ const ViewDefaultersPage = () => {
     [page]
   );
 
-  const handleRowsPerPageChange = useCallback((event) => {
-    setRowsPerPage(event.target.value);
-  }, []);
+  const handleAddDefaulter = async () => {
+    try {
+      const res = await addDefaulter(addDefaulterRollNo, accessToken);
+      if (res.status == 201) {
+        setDefaulters((prev) => [...prev, res?.data]);
+        setAddDefaulterRollNo("");
+        setOpenAddDefaulterModal(false);
+        console.log(res);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   return (
     <>
@@ -82,7 +111,29 @@ const ViewDefaultersPage = () => {
                         <ArrowUpOnSquareIcon />
                       </SvgIcon>
                     }
+                    component="label"
+                    htmlFor="fileInput"
+                    sx={{
+                      cursor: "pointer",
+                      position: "relative",
+                      overflow: "hidden",
+                      "& input": {
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        width: "100%",
+                        height: "100%",
+                        opacity: 0,
+                        cursor: "pointer",
+                      },
+                    }}
                   >
+                    <input
+                      type="file"
+                      id="fileInput"
+                      onChange={handleFileSelect}
+                      accept=".csv, .xlsx"
+                    />
                     Import
                   </Button>
 
@@ -107,6 +158,9 @@ const ViewDefaultersPage = () => {
                     </SvgIcon>
                   }
                   variant="contained"
+                  onClick={() => {
+                    setOpenAddDefaulterModal(true);
+                  }}
                 >
                   Add
                 </Button>
@@ -135,6 +189,32 @@ const ViewDefaultersPage = () => {
             />
           </Stack>
         </Container>
+
+        <CustomModal
+          open={openAddDefaulterModal}
+          onClose={() => {
+            setOpenAddDefaulterModal(false);
+          }}
+          maxWidth={400}
+        >
+          <Stack spacing={2}>
+            <Typography variant="h6" textAlign="center">
+              Add a defaulter
+            </Typography>
+
+            <TextField
+              value={addDefaulterRollNo}
+              onChange={(e) => {
+                setAddDefaulterRollNo(e.target.value);
+              }}
+              label="Enter Roll no."
+            />
+
+            <Button variant="contained" onClick={handleAddDefaulter}>
+              Submit
+            </Button>
+          </Stack>
+        </CustomModal>
       </Box>
     </>
   );

@@ -55,7 +55,7 @@ export const items = [
     ),
   },
   {
-    title: "Manage Batches",
+    title: "Manage Students / Batches",
     path: "/manage-batches",
     icon: (
       <SvgIcon fontSize="small">
@@ -75,6 +75,15 @@ export const items = [
   {
     title: "Manage Defaulters",
     path: "/manage-defaulters",
+    icon: (
+      <SvgIcon fontSize="small">
+        <UsersIcon />
+      </SvgIcon>
+    ),
+  },
+  {
+    title: "Manage All Students",
+    path: "/manage-students",
     icon: (
       <SvgIcon fontSize="small">
         <UsersIcon />

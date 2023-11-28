@@ -58,43 +58,37 @@ export const StudentsTable = (props) => {
                 <TableCell>Roll No.</TableCell>
                 <TableCell>Name</TableCell>
                 <TableCell>Email</TableCell>
-                <TableCell></TableCell>
-                <TableCell>Room Type</TableCell>
-                <TableCell>Average CG</TableCell>
+                <TableCell>Phone</TableCell>
+                <TableCell>Allotted Hostel</TableCell>
+                <TableCell>Allotted Room Type</TableCell>
+                <TableCell>CG</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {items.map((group) => {
-                const isSelected = selected.includes(group.id);
-                const createdAt = format(group.createdAt, "dd/MM/yyyy");
+              {items.map((student) => {
+                const isSelected = selected.includes(student.id);
 
                 return (
-                  <TableRow hover key={group.id} selected={isSelected}>
+                  <TableRow hover key={student.id} selected={isSelected}>
                     <TableCell padding="checkbox">
                       <Checkbox
                         checked={isSelected}
                         onChange={(event) => {
                           if (event.target.checked) {
-                            onSelectOne?.(group.id);
+                            onSelectOne?.(student.id);
                           } else {
-                            onDeselectOne?.(group.id);
+                            onDeselectOne?.(student.id);
                           }
                         }}
                       />
                     </TableCell>
-                    <TableCell>{group.id}</TableCell>
-                    <TableCell>
-                      {/* <Stack alignItems="center" direction="row" spacing={2}> */}
-                      {/* <Avatar src={group.avatar}>{getInitials(group.name)}</Avatar> */}
-                      <Typography variant="subtitle2">{group.name}</Typography>
-                      {/* </Stack> */}
-                    </TableCell>
-                    <TableCell>{group.email}</TableCell>
-                    <TableCell>
-                      {group.address.city}, {group.address.state}, {group.address.country}
-                    </TableCell>
-                    <TableCell>{group.phone}</TableCell>
-                    <TableCell>{createdAt}</TableCell>
+                    <TableCell>{student.rollno}</TableCell>
+                    <TableCell>{student.name}</TableCell>
+                    <TableCell>{student.email}</TableCell>
+                    <TableCell>{student.phone}</TableCell>
+                    <TableCell>{student.allotted_hostel}</TableCell>
+                    <TableCell>{student.allotted_room_type}</TableCell>
+                    <TableCell>{student.cg}</TableCell>
                   </TableRow>
                 );
               })}
@@ -106,10 +100,9 @@ export const StudentsTable = (props) => {
         component="div"
         count={count}
         onPageChange={onPageChange}
-        onRowsPerPageChange={onRowsPerPageChange}
         page={page}
         rowsPerPage={rowsPerPage}
-        rowsPerPageOptions={[5, 10, 25]}
+        rowsPerPageOptions={[5]}
       />
     </Card>
   );

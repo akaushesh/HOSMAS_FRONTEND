@@ -2,7 +2,7 @@ import MagnifyingGlassIcon from "@heroicons/react/24/solid/MagnifyingGlassIcon";
 import { Button, Card, InputAdornment, Stack, OutlinedInput, SvgIcon } from "@mui/material";
 import { useRef } from "react";
 
-export const GroupsSearch = ({ setSearchQuery }) => {
+export const TableSearch = ({ setSearchQuery, placeholder }) => {
   const searchRef = useRef();
 
   return (
@@ -10,7 +10,7 @@ export const GroupsSearch = ({ setSearchQuery }) => {
       <OutlinedInput
         inputRef={searchRef}
         fullWidth
-        placeholder="Enter Name, Email or Roll no."
+        placeholder={placeholder}
         startAdornment={
           <InputAdornment position="start">
             <SvgIcon color="action" fontSize="small">

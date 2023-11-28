@@ -1,8 +1,8 @@
 import { otherApi } from "./api";
 
-export const getAllGroups = async (groups_per_page, page, accessToken) => {
+export const getAllGroups = async (query, groups_per_page, page, accessToken) => {
   const res = await otherApi.get(
-    `dashboard/getGroups?groups_per_page=${groups_per_page}&page=${page}`,
+    `dashboard/getGroups?groups_per_page=${groups_per_page}&page=${page}&q=${query}`,
     {
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -21,9 +21,9 @@ export const getGroupMembers = async (accessToken) => {
   return res;
 };
 
-export const getStudents = async (groups_per_page, page, batch, accessToken) => {
+export const getStudents = async (query, students_per_page, page, batch, accessToken) => {
   const res = await otherApi.get(
-    `dashboard/getStudents?groups_per_page=${groups_per_page}&page=${page}&batch=${batch}`,
+    `dashboard/getStudents?students_per_page=${students_per_page}&page=${page}&batch=${batch}`,
     {
       headers: {
         Authorization: `Bearer ${accessToken}`,

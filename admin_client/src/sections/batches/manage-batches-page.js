@@ -4,8 +4,11 @@ import { useAuthContext } from "src/contexts/auth-context";
 import { createBatch, getAllBatches } from "src/services/batch";
 import BatchesList from "./batches-list";
 import CustomModal from "src/components/CustomModal";
+import { useRouter } from "next/router";
 
 function ManageBatchesPage() {
+  const router = useRouter();
+
   const [batches, setBatches] = useState();
   const [createBatchName, setCreateBatchName] = useState();
   const [openCreateBatchModal, setOpenCreateBatchModal] = useState(false);
@@ -55,28 +58,40 @@ function ManageBatchesPage() {
       }}
     >
       <BatchesList batches={batches} />
-      <Stack alignItems="center" mt={7}>
-        <Button onClick={() => setOpenCreateBatchModal(true)}>+ Add Batch</Button>
-        <CustomModal
-          open={openCreateBatchModal}
-          onClose={() => setOpenCreateBatchModal(false)}
-          maxWidth="200px"
+
+      <Stack direction="row" justifyContent="center" alignItems="center" mt={7} spacing={2}>
+        <Button
+          onClick={() => {
+            router.push("/manage-students");
+          }}
+          variant="contained"
         >
-          <Stack alignItems="center">
-            <Typography mb={2}>Create a Batch</Typography>
-            <TextField
-              name="batch"
-              label="Batch Name"
-              value={createBatchName}
-              onChange={(e) => setCreateBatchName(e.target.value)}
-              sx={{ mb: 2 }}
-            />
-            <Button variant="contained" onClick={handleCreateBatchSubmit}>
-              Submit
-            </Button>
-          </Stack>
-        </CustomModal>
+          View all students
+        </Button>
+        <Button onClick={() => setOpenCreateBatchModal(true)}>+ Add Batch</Button>
       </Stack>
+
+      <CustomModal
+        open={openCreateBatchModal}
+        onClose={() => setOpenCreateBatchModal(false)}
+        maxWidth="200px"
+      >
+        <Stack alignItems="center">
+          <Typography mb={2}>Create a Batch</Typography>
+
+          <TextField
+            name="batch"
+            label="Batch Name"
+            value={createBatchName}
+            onChange={(e) => setCreateBatchName(e.target.value)}
+            sx={{ mb: 2 }}
+          />
+
+          <Button variant="contained" onClick={handleCreateBatchSubmit}>
+            Submit
+          </Button>
+        </Stack>
+      </CustomModal>
     </Box>
   );
 }
