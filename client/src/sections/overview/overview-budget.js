@@ -14,7 +14,7 @@ export const OverviewBudget = (props) => {
               Allotted Hostel
             </Typography>
             <Typography variant="h4">
-              {allotedHostel === "" ? "None" : `Hostel ${allotedHostel}`}
+              {allotedHostel === "" ? "None" : `${allotedHostel}`}
             </Typography>
           </Stack>
           <Avatar

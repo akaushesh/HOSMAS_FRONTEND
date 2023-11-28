@@ -35,7 +35,6 @@ export const AllFAQs = () => {
         setLoading(false);
         return getFAQsResponse?.data;
       } catch (err) {
-        console.log(err);
         setLoading(false);
         return [];
       }

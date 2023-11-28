@@ -78,7 +78,7 @@ export const AcceptRequestConfirmation = ({ product, onClose }) => {
         </Grid>
         <Grid item xs={5.5}>
           <Button onClick={onReject} variant="contained" fullWidth>
-            Reject
+            Cancel
           </Button>
         </Grid>
       </Grid>

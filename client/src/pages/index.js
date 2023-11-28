@@ -11,8 +11,6 @@ const Page = () => {
   const queryClient = useQueryClient();
   const user = queryClient.getQueryData(["getProfile"]);
 
-  console.log(user);
-
   return (
     <Fragment>
       <Head>

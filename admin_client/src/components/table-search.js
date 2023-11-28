@@ -22,7 +22,6 @@ export const TableSearch = ({ setSearchQuery, placeholder }) => {
       />
       <Button
         onClick={() => {
-          console.log("clicked", searchRef.current.value);
           setSearchQuery(searchRef.current.value ?? "");
         }}
       >

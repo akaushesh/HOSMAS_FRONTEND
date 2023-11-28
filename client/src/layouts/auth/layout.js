@@ -1,7 +1,6 @@
 import PropTypes from "prop-types";
 import NextLink from "next/link";
 import { Box, Typography, Unstable_Grid2 as Grid } from "@mui/material";
-import { Logo } from "src/components/logo";
 
 export const Layout = (props) => {
   const { children } = props;
@@ -35,17 +34,18 @@ export const Layout = (props) => {
               width: "100%",
             }}
           >
-            {/* <Box
+            <Box
               component={NextLink}
               href="/"
               sx={{
                 display: "inline-flex",
-                height: 32,
-                width: 32,
+                height: 48,
+                width: 48,
               }}
             >
-              <Logo />
-            </Box> */}
+              {/* <Logo /> */}
+              <img alt="thapar logo" src="/assets/logos/thaparLogo.webp" />
+            </Box>
           </Box>
           {children}
         </Grid>
@@ -54,17 +54,31 @@ export const Layout = (props) => {
           lg={6}
           sx={{
             alignItems: "center",
-            background: "radial-gradient(50% 50% at 50% 50%, #122647 0%, #090E23 100%)",
+            // background: "radial-gradient(50% 50% at 50% 50%, #122647 0%, #090E23 100%)",
+            backgroundImage: "url('/assets/hostels/hostelM.webp')",
             color: "white",
             display: "flex",
             justifyContent: "center",
+            backgroundSize: "cover",
+            position: "relative",
+            "::before": {
+              content: '""',
+              position: "absolute",
+              top: 0,
+              left: 0,
+              zIndex: 1,
+              width: "100%",
+              height: "100%",
+              background: "radial-gradient(50% 50% at 50% 50%, #122647 0%, #090E23 100%)",
+              opacity: 0.95,
+            },
             "& img": {
               maxWidth: "100%",
             },
           }}
         >
-          <Box sx={{ p: 3 }}>
-            {/* <Typography
+          <Box sx={{ p: 3, zIndex: 100 }}>
+            <Typography
               align="center"
               color="inherit"
               sx={{
@@ -78,9 +92,10 @@ export const Layout = (props) => {
               <Box component="a" sx={{ color: "#15B79E" }} target="_blank">
                 Thapar Hostel Management System
               </Box>
-            </Typography> */}
-            {/* <Typography align="center" sx={{ mb: 3 }} variant="subtitle1"></Typography> */}
-            {/* <img alt="" src="/assets/auth-illustration.svg" /> */}
+            </Typography>
+            <Typography align="center" sx={{ mb: 3 }} variant="subtitle1"></Typography>
+            {/* <img alt="" src="/assets/auth-illustration.svg" />
+            <img alt="hostel picture" src="/assets/hostels/hostelM.webp" /> */}
           </Box>
         </Grid>
       </Grid>

@@ -14,6 +14,7 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import { Scrollbar } from "src/components/scrollbar";
 import { items } from "./config";
 import { SideNavItem } from "./side-nav-item";
+import NextLink from "next/link";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { useRouter } from "next/router";
 import { useAuth } from "src/hooks/use-auth";
@@ -64,6 +65,18 @@ export const SideNav = (props) => {
               p: "12px",
             }}
           >
+            <Box
+              component={NextLink}
+              href="/"
+              sx={{
+                display: "inline-flex",
+                height: 48,
+                width: 48,
+              }}
+            >
+              {/* <Logo /> */}
+              <img alt="thapar logo" src="/assets/logos/thaparLogo.webp" />
+            </Box>
             <div>
               <Typography color="inherit" variant="subtitle1">
                 Hostel Management System
