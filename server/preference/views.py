@@ -161,29 +161,39 @@ class Retain(APIView):
 
 
 class getPreferences(APIView):
-    permission_classes = [IsAuthenticated & IsStudent]
+    permission_classes = [IsAuthenticated, IsStudent]
     
     def get(self, request):
         stud = Student.objects.filter(user=request.user).select_related('leader_of_group', 'group').first()
-        if (not IsGroupLeader.has_permission(self, request, self)):
-            group = stud.group
-        else:
+        try:
             group = stud.leader_of_group
+        except ObjectDoesNotExist:
+            group = stud.group
         
-        p = Preference.objects.filter(group = group).order_by('priority').select_related('room_type_choice__room_type__hostel').all()
-        if (p is None):
-            return Response({'error':'No preferences found'},status=status.HTTP_400_BAD_REQUEST)
-        
-        serializer = PreferenceSerializer(p, many=True)
-        res = {
-            'status':'success',
-            'data': {
-                'retain': group.is_retained,
-                'preferences': serializer.data,
+        if group is None:
+            res = {
+                'status': 'success',
+                'data': {
+                    'retain': False,
+                    'preferences': []
+                }
             }
-        }
-        return Response(res, status.HTTP_200_OK)
+        else:
+            p = Preference.objects.filter(group = group).order_by('priority').select_related('room_type_choice__room_type__hostel').all()
+            if (p is None):
+                return Response({'error':'No preferences found'},status=status.HTTP_400_BAD_REQUEST)
             
+            serializer = PreferenceSerializer(p, many=True)
+            res = {
+                'status':'success',
+                'data': {
+                    'retain': group.is_retained,
+                    'preferences': serializer.data,
+                }
+            }
+
+        return Response(res, status.HTTP_200_OK)
+
 
 class deletePreferences(APIView):
     permission_classes = [IsAuthenticated, IsStudent, IsNotGroupMember]
