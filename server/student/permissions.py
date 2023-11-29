@@ -8,7 +8,11 @@ class IsStudent(BasePermission):
       message = 'Only Student is authorized to perform this action'
 
       def has_permission(self, request, view):
-            return request.user.is_student
+            try:
+                  _ = request.user.student
+                  return request.user.is_student
+            except ObjectDoesNotExist:
+                  return False
 
 
 class IsNotDefaulter(BasePermission):
