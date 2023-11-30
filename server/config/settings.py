@@ -192,6 +192,7 @@ CELERY_BROKER_URL = 'redis://127.0.0.1:6379'
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_RESULT_BACKEND = 'django-db'
 CELERY_RESULT_SERIALIZER = 'json'
+CELERY_RESULT_EXTENDED = True
 
 EMAIL_HOST_USERS = config('EMAIL_HOST_USERS', cast=lambda v: [s.strip() for s in v.split(',')])
 EMAIL_HOST_PASSWORDS = config('EMAIL_HOST_PASSWORDS', cast=lambda v: [s.strip() for s in v.split(',')])

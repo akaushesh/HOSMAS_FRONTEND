@@ -25,6 +25,10 @@ from .tasks import allot_hostel, add_users, add_defaulters, send_reminder_mail
 
 from datetime import datetime
 import csv, os
+from openpyxl import Workbook
+from openpyxl.styles import Font
+from collections import OrderedDict
+
 # Create your views here.
 
 
@@ -278,8 +282,8 @@ class ImportStudentsView(APIView):
             
             filename = f"{datetime.now().strftime('%Y%m%d_%H%M')}_{file.name}"
 
-            if filename.split('.')[-1]!='csv':
-                  return Response({'error':'file not csv'}, status=status.HTTP_400_BAD_REQUEST)
+            if filename.split('.')[-1]!='xlsx':
+                  return Response({'error':'Only .xlsx file format supported!'}, status=status.HTTP_400_BAD_REQUEST)
             
             storage = default_storage
             storage.location = os.path.join(settings.BASE_DIR, 'imported-data', 'student')
@@ -418,36 +422,97 @@ class ProfileView(APIView):
 
 
 class ExportGroupsView(APIView):
-      permission_classes = [IsAuthenticated & IsAdmin]
+      permission_classes = [IsAuthenticated, IsAdmin]
 
       def post(self, request):
-            section = Section.objects.filter(id=request.data.get('section')).first()
-            if section is None:
-                  return Response(status=status.HTTP_400_BAD_REQUEST)
-
-            filename = f"export/group/{section.batch.name}_{section.gender}.csv"
+            if request.data.get('section')=='all':
+                  sections = Section.objects.select_related('batch').all()
+                  filename = f"export/group/all.xlsx"
+            else:
+                  section = Section.objects.filter(id=request.data.get('section')).select_related('batch').first()
+                  if section is None:
+                        return Response(status=status.HTTP_400_BAD_REQUEST)
+                  filename = f"export/group/{section.batch.name}_{section.gender}.xlsx"
+                  sections = [section]
+            
+            include = OrderedDict([
+                  ('Roll Number', request.data.get('include_rollno', True)),
+                  ('Email Address', request.data.get('include_email', True)),
+                  ('Name', request.data.get('include_name', True)),
+                  ('Phone Number', request.data.get('include_phoneno', True)),
+                  ('CG', request.data.get('include_cg', True)),
+                  ('Gender', request.data.get('include_gender', True)),
+                  ('Batch', request.data.get('include_batch', True)),
+                  ('Current Hostel', request.data.get('include_current_hostel', True)),
+                  ('Current Room Type', request.data.get('include_current_hostel', True)),
+                  ('Alloted Hostel', request.data.get('include_alloted_hostel', True)),
+                  ('Alloted Room Type', request.data.get('include_alloted_hostel', True)),
+            ])
+            
             path = os.path.join(settings.MEDIA_ROOT, filename)
-            f = open(path, 'w', newline='')
-            
-            writer = csv.writer(f)
-            writer.writerow(['Group ID', 'Group CG', 'Student Roll Number', 'Student Name', 'Student email', 'Student CG', 'Preferences'])
-            queryset = Group.objects.filter(leader__batch=section.batch, leader__gender=section.gender).all()
 
-            for group in queryset:
-                  group_row = [group.id, group.cg]
-                  preference_row = []
-                  for preference in group.preferences.order_by('priority').all():
-                        preference_row.append(f"{preference.room_type_choice.room_type.hostel.name}: {preference.room_type_choice.room_type.name}")
-                  leader_row = [group.leader.rollno, group.leader.name, group.leader.user.email, group.leader.cg]
-                  row = group_row + leader_row + preference_row
-                  writer.writerow(row)
-                  for member in group.members.all():
-                        member_row = [member.rollno, member.name, member.user.email, member.cg]
-                        row = group_row + member_row + preference_row
-                        writer.writerow(row)
-                  writer.writerow([])
+            wb = Workbook()
+            ws = wb.active
             
-            f.close()
+            header = ['Group ID', 'Group Size', 'Group CG']
+            student_fields = []
+            for key in include.keys():
+                  if include[key]:
+                        student_fields.append(key)
+
+            for member_name in ['Leader', 'Member 1', 'Member 2', 'Member 3']:
+                  for field in student_fields:
+                        header.append(f"{member_name} {field}")
+            
+            preferences_cnt = 0
+            for section in sections:
+                  preferences_cnt = max(preferences_cnt, section.choices.count())
+
+            for i in range(1, preferences_cnt+1):
+                  header.append(f'Preference {i} Hostel')            
+                  header.append(f'Preference {i} Room Type')
+                  
+            ws.append(header)
+            for col in ws.iter_cols(min_col=1, max_col=len(header), min_row=1, max_row=1):
+                  col[0].font = Font(bold=True)
+            ws.freeze_panes = 'A2'
+            
+            for section in sections:
+                  queryset = Group.objects.filter(leader__batch=section.batch, leader__gender=section.gender).select_related('leader__user', 'leader__batch', 'leader__current_room__hostel', 'leader__alloted_room__hostel').prefetch_related('members__user', 'members__batch', 'members__current_room__hostel', 'members__alloted_room__hostel', 'preferences__room_type_choice__room_type__hostel').all()
+
+                  for group in queryset:
+                        cnt = 1
+                        row = [group.id, group.cg, group.members.count() + 1]
+                        members_list = [group.leader] + list(group.members.all())
+                        for member in members_list:
+                              if include.get('Roll Number', False):
+                                    row.append(member.rollno)
+                              if include.get('Email Address', False):
+                                    row.append(member.user.email)
+                              if include.get('Name', False):
+                                    row.append(member.name)
+                              if include.get('Phone Number', False):
+                                    row.append(member.phoneno)
+                              if include.get('CG', False):
+                                    row.append(member.cg)
+                              if include.get('Gender', False):
+                                    row.append(member.gender)
+                              if include.get('Batch', False):
+                                    row.append(member.batch.name)
+                              if include.get('Current Hostel', False) and member.current_room is not None:
+                                    row.append(member.current_room.hostel.name)
+                              if include.get('Current Room Type', False) and member.current_room is not None:
+                                    row.append(member.current_room.name)
+                              if include.get('Alloted Hostel', False) and member.alloted_room is not None:
+                                    row.append(member.alloted_room.hostel.name)
+                              if include.get('Alloted Room Type', False) and member.alloted_room is not None:
+                                    row.append(member.alloted_room.name)
+                        for preference in group.preferences.order_by('priority').all():
+                              row.append(preference.room_type_choice.room_type.hostel.name)
+                              row.append(preference.room_type_choice.room_type.name)
+                        ws.append(row)
+                  
+            wb.save(path)
             return Response({
                   'link': f"{settings.MEDIA_URL}{filename}"
             }, status=status.HTTP_200_OK)
@@ -457,25 +522,114 @@ class ExportStudentsView(APIView):
       permission_classes = [IsAuthenticated & IsAdmin]
 
       def post(self, request):
-            batch = Batch.objects.filter(id=request.data.get('batch')).first()
-            if batch is None:
-                  return Response(status=status.HTTP_400_BAD_REQUEST)
+            if request.data.get('batch')=='all':
+                  batches = Batch.objects.prefetch_related('students__user', 'students__batch', 'students__current_room__hostel', 'students__alloted_room__hostel').all()
+                  filename = f"export/student/batch_all.xlsx"
+            else:
+                  batch = Batch.objects.filter(id=request.data.get('batch')).prefetch_related('students__user', 'students__batch', 'students__current_room__hostel', 'students__alloted_room__hostel').first()
+                  if batch is None:
+                        return Response(status=status.HTTP_400_BAD_REQUEST)
+                  filename = f"export/student/batch_{batch.id}.xlsx"
+                  batches = [batch]
             
-            queryset = Student.objects.filter(batch=batch).all()
-
-            filename = f"export/student/batch_{batch.id}.csv"
             path = os.path.join(settings.MEDIA_ROOT, filename)
-            f = open(path, 'w', newline='')
+            wb = Workbook()
+            ws = wb.active
 
-            writer = csv.writer(f)
-            writer.writerow(['Roll Number', 'Name', 'Email', 'Gender', 'CG'])
+            include = OrderedDict([
+                  ('Roll Number', request.data.get('include_rollno', True)),
+                  ('Email Address', request.data.get('include_email', True)),
+                  ('Name', request.data.get('include_name', True)),
+                  ('Phone Number', request.data.get('include_phoneno', True)),
+                  ('CG', request.data.get('include_cg', True)),
+                  ('Gender', request.data.get('include_gender', True)),
+                  ('Batch', request.data.get('include_batch', True)),
+                  ('Current Hostel', request.data.get('include_current_hostel', True)),
+                  ('Current Room Type', request.data.get('include_current_hostel', True)),
+                  ('Alloted Hostel', request.data.get('include_alloted_hostel', True)),
+                  ('Alloted Room Type', request.data.get('include_alloted_hostel', True)),
+            ])
 
-
-            for student in queryset:
-                  writer.writerow([student.rollno, student.name, student.user.email, student.gender, student.cg])
+            header = []
+            for key in include.keys():
+                  if include[key]:
+                        header.append(key)
             
-            f.close()
+            ws.append(header)
+            for col in ws.iter_cols(min_col=1, max_col=len(header), min_row=1, max_row=1):
+                  col[0].font = Font(bold=True)
+            ws.freeze_panes = 'A2'
 
+            for batch in batches:
+                  queryset = batch.students.all()
+
+                  for student in queryset:
+                        row = []
+                        if include.get('Roll Number', False):
+                              row.append(student.rollno)
+                        if include.get('Email Address', False):
+                              row.append(student.user.email)
+                        if include.get('Name', False):
+                              row.append(student.name)
+                        if include.get('Phone Number', False):
+                              row.append(student.phoneno)
+                        if include.get('CG', False):
+                              row.append(student.cg)
+                        if include.get('Gender', False):
+                              row.append(student.gender)
+                        if include.get('Batch', False):
+                              row.append(student.batch.name)
+                        if include.get('Current Hostel', False) and student.current_room is not None:
+                              row.append(student.current_room.hostel.name)
+                        if include.get('Current Room Type', False) and student.current_room is not None:
+                              row.append(student.current_room.name)
+                        if include.get('Alloted Hostel', False) and student.alloted_room is not None:
+                              row.append(student.alloted_room.hostel.name)
+                        if include.get('Alloted Room Type', False) and student.alloted_room is not None:
+                              row.append(student.alloted_room.name)
+                        ws.append(row)
+
+            wb.save(path)
+
+            return Response({
+                  'link': f"{settings.MEDIA_URL}{filename}"
+            }, status=status.HTTP_200_OK)
+
+
+class ExportDefaultersView(APIView):
+      permission_classes = [IsAuthenticated, IsAdmin]
+
+      def get(self, request):
+            filename = f"export/defaulters.xlsx"
+            path = os.path.join(settings.MEDIA_ROOT, filename)
+            queryset = Defaulter.objects.select_related('student__user', 'student__batch', 'student__current_room__hostel', 'student__alloted_room__hostel').all()
+            
+            wb = Workbook()
+            ws = wb.active
+
+            ws.append(['Roll Number', 'Email Address', 'Name', 'Phone Number', 'CG', 'Batch', 'Gender', 'Current Hostel', 'Current Room Type', 'Alloted Hostel', 'Alloted Room Type'])
+            for col in ws.iter_cols(min_col=1, max_col=11, min_row=1, max_row=1):
+                  col[0].font = Font(bold=True)
+            ws.freeze_panes = 'A2'
+
+            for defaulter in queryset:
+                  student = defaulter.student
+                  row = [student.rollno, student.user.email, student.name, student.phoneno, student.cg, student.batch.name, 'Female' if student.gender=='F' else 'Male']
+                  if student.current_room is not None:
+                        row.append(student.current_room.hostel.name)
+                        row.append(student.current_room.name)
+                  else:
+                        row.append('')
+                        row.append('')
+                  if student.alloted_room is not None:
+                        row.append(student.alloted_room.hostel.name)
+                        row.append(student.alloted_room.name)
+                  else:
+                        row.append('')
+                        row.append('')
+                  ws.append(row)
+
+            wb.save(path)
             return Response({
                   'link': f"{settings.MEDIA_URL}{filename}"
             }, status=status.HTTP_200_OK)

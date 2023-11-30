@@ -11,6 +11,7 @@ urlpatterns = [
       path('profile/', views.ProfileView.as_view()),
       path('export/groups/', views.ExportGroupsView.as_view()),
       path('export/students/', views.ExportStudentsView.as_view()),
+      path('export/defaulters/', views.ExportDefaultersView.as_view()),
       path('allocate/', views.AllotmentView.as_view()),
       path('section/update/all-status/', views.UpdateSectionsAllotmentStatusView.as_view(), name='update_sections_allotment_status'),
       path('group/create/', views.CreateGroupView.as_view()),

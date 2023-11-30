@@ -1,62 +1,65 @@
 from __future__ import absolute_import, unicode_literals
 
-from config.celery import app
-from django.db.models import Q
-from student.models import Group, Section, Defaulter
-from preference.models import *
-from .models import AllotmentStatus
-import csv
-from random import choice
-import string
-from user.models import User
-from student.models import Student, Batch, Group
-from django.conf import settings
-import os
 from django.core.files.storage import default_storage
 from django.core.mail import send_mail, get_connection
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.conf import settings
 from django.core.cache import cache
+from django.db.models import Q
+from django.core.exceptions import ValidationError
+
+from config.celery import app
+
+from student.models import Group, Section, Defaulter, Student, Batch
+from preference.models import *
+from user.models import User
+from .models import AllotmentStatus
+
+import csv
+from random import choice
+import string
+import os
+from openpyxl import load_workbook
+from datetime import datetime
+
+studentfileformat = ('rollno', 'email', 'name', 'phoneno', 'cg', 'batch', 'gender', 'current_hostel', 'current_room_type', 'alloted_hostel', 'alloted_room_type')
 
 @app.task(name='add_users')
 def add_users(filename):
-      # storage = default_storage
-      # storage.location = os.path.join(settings.BASE_DIR, 'imported-data', 'student')
-      # userfile = storage.open(filename, 'r')
-      filename = os.path.join(settings.BASE_DIR, 'imported-data', 'student', filename)
-      userfile = open(filename, 'r', encoding='utf-8-sig')
-      reader = csv.DictReader(userfile)
+      with open(os.path.join(settings.LOGS_ROOT, 'add_user_errors.log'), 'a') as f:
+            f.write(f"Processing file {filename}...\n")
 
-      # Check if atleast one out of email or rollno is present in given data
-      headers = reader.fieldnames
-      unique_identifiers = ['email', 'rollno']
+      path = os.path.join(settings.BASE_DIR, 'imported-data', 'student', filename)
+      wb = load_workbook(path)
+      ws = wb.active
 
-      if not any(val for val in unique_identifiers):
-            # Log error
-            with open(os.path.join(settings.LOGS_ROOT, 'add_user_errors.log'), 'a') as f:
-                  f.write(f"Atleast one out of email or rollno must be present! Aborting...")
-                  f.write("\n")
-            return
+      # Check if all fields are present in given data
+      for row in ws.iter_rows(min_row=1, max_row=1, min_col=1, max_col=11):
+            for i in range(len(row)):
+                  if row[i].value!=studentfileformat[i]:
+                        with open(os.path.join(settings.LOGS_ROOT, 'add_user_errors.log'), 'a') as f:
+                              f.write(f"Invalid File Format. Found {row[i].value}, but required was {studentfileformat[i]}\n")
+                              f.write(f"Correct File Format is {str(studentfileformat)}\n")
+                              f.write("\n")
+                        raise Exception(f"Found {row[i]}, but required was {studentfileformat[i]}\n")
 
       successCnt = 0
       failureCnt = 0
       cnt = 1
 
-      for row in reader:
+      for row in ws.iter_rows(min_row=2, min_col=1, max_col=11):
             try:
                   student = None
                   
                   # Extract data into variables and data preprocessing
-                  phoneno = row.get('phoneno')
-                  if phoneno is not None:
-                        phoneno = phoneno.strip()
-                  
-                  cg = row.get('cg')
+                  phoneno = row[3].value
+
+                  cg = row[4].value
                   if cg is not None:
-                        cg = round(float(cg.strip()), 2)
-                  
-                  batch = row.get('batch')
+                        cg = round(float(cg), 2)
+
+                  batch = row[5].value
                   if batch is not None:
                         batch = batch.strip()
                         batch = Batch.objects.filter(name = batch).first()
@@ -64,7 +67,7 @@ def add_users(filename):
                               batch = Batch(name = row['batch'].strip())
                               batch.save()
 
-                  email = row.get('email')
+                  email = row[1].value
                   if email is not None:
                         email = email.strip()
                         user = User.objects.filter(email=email).first()
@@ -78,14 +81,14 @@ def add_users(filename):
                                     student = user.student
                         except:
                               pass
-                  
-                  rollno = row.get('rollno')
+
+                  rollno = row[0].value
                   if rollno is not None:
-                        rollno = rollno.strip()
                         if student is None:
                               student = Student.objects.filter(rollno=rollno).first()
                   
-                  current_room = row.get('current_room_type')
+                  # current_room_type
+                  current_room = row[8].value
                   is_current_room_null = False
                   if current_room is not None:
                         current_room = current_room.strip()
@@ -97,7 +100,7 @@ def add_users(filename):
                         is_current_room_null = True
                   
                   current_roomtype = None
-                  current_hostel = row.get('current_hostel')
+                  current_hostel = row[7].value
                   if current_hostel is not None:
                         if is_current_room_null:
                               current_hostel = None
@@ -110,7 +113,8 @@ def add_users(filename):
                               if current_roomtype is None:
                                     raise Exception(f'Current Room Type {current_room} not found!')
                   
-                  alloted_room = row.get('alloted_room_type')
+                  # alloted_room_type
+                  alloted_room = row[10].value
                   is_alloted_room_null = False
                   if alloted_room is not None:
                         alloted_room = alloted_room.strip()
@@ -122,7 +126,7 @@ def add_users(filename):
                         is_alloted_room_null = True
                         
                   alloted_roomtype = None 
-                  alloted_hostel = row.get('alloted_hostel')
+                  alloted_hostel = row[9].value
                   if alloted_hostel is not None:
                         if is_alloted_room_null:
                               alloted_hostel = None
@@ -134,16 +138,15 @@ def add_users(filename):
                               alloted_roomtype = RoomType.objects.filter(Q(name=alloted_room) & Q(hostel = alloted_hostel)).first()
                               if alloted_roomtype is None:
                                     raise Exception(f'Alloted Room Type {alloted_room} not found!')
-                              
-                  name = row.get('name')
+
+                  name = row[2].value
                   if (name is not None):
                         name = name.strip()
-                  
-                  gender = row.get('gender')
+
+                  gender = row[6].value
                   if gender is not None:
                         gender = gender.strip()
-                        
-                        
+
                   if student is None:
                         # create new student
                         student = Student(
@@ -175,14 +178,6 @@ def add_users(filename):
                               student.cg = cg
                         if batch is not None:
                               student.batch = batch
-                        # if is_current_room_null or current_room is not None:
-                        #       student.current_room = current_room
-                        # if is_current_room_null or current_hostel is not None:
-                        #       student.current_hostel = current_hostel
-                        # if is_alloted_room_null or alloted_room is not None:
-                        #       student.alloted_room = alloted_room
-                        # if is_alloted_room_null or alloted_hostel is not None:
-                        #       student.alloted_hostel = alloted_hostel
                         if current_roomtype is not None:
                               student.current_room = current_roomtype
                         if alloted_roomtype is not None:
@@ -210,53 +205,61 @@ def add_users(filename):
                   # log error
                   with open(os.path.join(settings.LOGS_ROOT, 'add_user_errors.log'), 'a') as f:
                       f.write(f"Creation of item {cnt} unsuccessful.\n")
-                      f.write(f"{str(e)}")
-                      f.write("\n")
+                      f.write(f"{str(e)}\n\n")
                   # print(f"creation of ({row['name']}, {row['email']}) unsuccessful.\n")
                   # print(e)
                   failureCnt += 1
 
             cnt += 1
+      
+      with open(os.path.join(settings.LOGS_ROOT, 'add_user_errors.log'), 'a') as f:
+            f.write(f"{successCnt} users successfully created and {failureCnt} failed.\n\n")
 
       return f"{successCnt} users successfully created and {failureCnt} failed."
 
 
 @app.task(name = "add_defaulters")
 def add_defaulters(filename):
-      filename = os.path.join(settings.BASE_DIR, 'imported-data', 'defaulter', filename)
-      userfile = open(filename, 'r', encoding='utf-8-sig')
-      reader = csv.DictReader(userfile)
+      with open(os.path.join(settings.LOGS_ROOT, 'add_defaulter.log'), 'a') as f:
+            f.write(f"Processing file {filename} at {datetime.now()}.\n")
 
-      fieldnames = reader.fieldnames
-      if len(fieldnames)!=1 or fieldnames[0]!='student':
+      path = os.path.join(settings.BASE_DIR, 'imported-data', 'defaulter', filename)
+      wb = load_workbook(path)
+      ws = wb.active
+
+      # check if required fields are present in data
+      if ws['A1'].value!='student':
             with open(os.path.join(settings.LOGS_ROOT, 'add_defaulter_errors.log'), 'a') as f:
-                  f.write(f"student field must be present! Aborting...")
-                  f.write("\n")
-            return 0
+                  f.write(f"student field must be present for file {filename}! Required 'student' but found {ws['A1']} at cell A1.\n")
+                  f.write("Aborting...\n\n")
+            raise Exception(f"student field missing! Required 'student' but found {ws['A1']} at cell A1.")
       
       cnt = 1
       successCnt = 0
       failureCnt = 0
 
-      for row in reader:
+      for row in ws.iter_rows(min_row=2, min_col=1, max_col=1):
             try:
-                  student = Student.objects.filter(rollno=row['student']).first()
+                  student = Student.objects.filter(rollno=row[0].value).first()
                   if student is None:
-                        raise Exception(f"Student with roll number {row['student']} not found!")
+                        raise Exception(f"Student with roll number {row[0]} not found!")
                   instance = Defaulter.objects.filter(student=student).first()
                   if instance is None:
                         instance = Defaulter(student=student)
                         instance.save()
                   successCnt += 1
             except BaseException as e:
-                  with open(os.path.join(settings.LOGS_ROOT, 'add_defaulter_errors.log'), 'a') as f:
+                  with open(os.path.join(settings.LOGS_ROOT, 'add_defaulter.log'), 'a') as f:
                         f.write(f"Creation of item {cnt} unsuccessful.\n")
                         f.write(str(e))
                         f.write("\n")
                   failureCnt += 1
             cnt += 1
+      
+      with open(os.path.join(settings.LOGS_ROOT, 'add_defaulter.log'), 'a') as f:
+            f.write(f"{successCnt} defaulters successfully created and {failureCnt} failed.\n\n")
 
-      return f"{successCnt} users successfully created and {failureCnt} failed."
+      return f"{successCnt} defaulters successfully created and {failureCnt} failed."
 
 
 @app.task(name = "allot_hostel")
