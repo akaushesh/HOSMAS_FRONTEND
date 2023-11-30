@@ -30,9 +30,7 @@ const statusMap = {
   refunded: "error",
 };
 
-export const HostelListLoading = ({
-  hostels = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18],
-}) => {
+export const HostelListLoading = () => {
   return (
     <Grid container spacing={4}>
       {Array.from({ length: 6 }, (_, index) => (
