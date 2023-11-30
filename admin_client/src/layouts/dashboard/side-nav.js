@@ -8,6 +8,7 @@ import {
   Button,
   Divider,
   Drawer,
+  Link,
   Stack,
   SvgIcon,
   Typography,
@@ -60,17 +61,6 @@ export const SideNav = (props) => {
       >
         <Box sx={{ p: 3 }}>
           <Box
-            component={NextLink}
-            href="/"
-            sx={{
-              display: "inline-flex",
-              height: 32,
-              width: 32,
-            }}
-          >
-            <Logo />
-          </Box>
-          <Box
             sx={{
               alignItems: "center",
               backgroundColor: "rgba(255, 255, 255, 0.04)",
@@ -82,17 +72,23 @@ export const SideNav = (props) => {
               p: "12px",
             }}
           >
+            <Box
+              component={NextLink}
+              href="/"
+              sx={{
+                display: "inline-flex",
+                height: 48,
+                width: 48,
+              }}
+            >
+              {/* <Logo /> */}
+              <img alt="thapar logo" src="/assets/logos/thaparLogo.webp" />
+            </Box>
             <div>
               <Typography color="inherit" variant="subtitle1">
                 Hostel Management System
               </Typography>
-              {/* <Typography color="neutral.400" variant="body2">
-                Management
-              </Typography> */}
             </div>
-            <SvgIcon fontSize="small" sx={{ color: "neutral.500" }}>
-              <ChevronUpDownIcon />
-            </SvgIcon>
           </Box>
         </Box>
         <Divider sx={{ borderColor: "neutral.700" }} />
@@ -138,6 +134,14 @@ export const SideNav = (props) => {
               onClick={handleSignOut}
             />
           </Stack>
+        </Box>
+        <Box marginTop="auto">
+          <Divider sx={{ borderColor: "neutral.700" }} />
+          <Box padding={2}>
+            <Typography textAlign="center">
+              Made by <Link href="https://www.ccstiet.com">Team CCS</Link>
+            </Typography>
+          </Box>
         </Box>
       </Box>
     </Scrollbar>

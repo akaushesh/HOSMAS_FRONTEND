@@ -18,11 +18,13 @@ import {
 } from "@mui/material";
 import { useAuth } from "src/hooks/use-auth";
 import { Layout as AuthLayout } from "src/layouts/auth/layout";
+import { LoadingButton } from "@mui/lab";
 
 const Page = () => {
   const router = useRouter();
   const auth = useAuth();
   const [method, setMethod] = useState("email");
+  const [loading, setLoading] = useState(false);
   const formik = useFormik({
     initialValues: {
       email: "",
@@ -34,6 +36,7 @@ const Page = () => {
       password: Yup.string().max(255).required("Password is required"),
     }),
     onSubmit: async (values, helpers) => {
+      setLoading(true);
       try {
         const res = await auth.signIn(values.email, values.password);
         // console.log(res);
@@ -41,11 +44,14 @@ const Page = () => {
           router.push("/");
         }
       } catch (err) {
-        alert("An error occurred");
         helpers.setStatus({ success: false });
-        helpers.setErrors({ submit: err.message });
         helpers.setSubmitting(false);
+        console.log(err);
+
+        if (err?.response?.data?.detail) helpers.setErrors({ submit: err.response.data.detail });
+        else helpers.setErrors({ submit: "Something went wrong" });
       }
+      setLoading(false);
     },
   });
 
@@ -145,9 +151,16 @@ const Page = () => {
                     {formik.errors.submit}
                   </Typography>
                 )}
-                <Button fullWidth size="large" sx={{ mt: 3 }} type="submit" variant="contained">
+                <LoadingButton
+                  loading={loading}
+                  fullWidth
+                  size="large"
+                  sx={{ mt: 3 }}
+                  type="submit"
+                  variant="contained"
+                >
                   Continue
-                </Button>
+                </LoadingButton>
                 {/* <Button fullWidth size="large" sx={{ mt: 3 }} onClick={handleSkip}>
                   Skip authentication
                 </Button> */}
