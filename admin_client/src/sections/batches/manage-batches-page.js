@@ -5,19 +5,16 @@ import { createBatch, getAllBatches } from "src/services/batch";
 import BatchesList from "./batches-list";
 import CustomModal from "src/components/CustomModal";
 import { useRouter } from "next/router";
-import BatchesListLoading from "./batches-list-loading";
 
 function ManageBatchesPage() {
   const router = useRouter();
 
   const [batches, setBatches] = useState();
-  const [loading, setLoading] = useState(false);
   const [createBatchName, setCreateBatchName] = useState();
   const [openCreateBatchModal, setOpenCreateBatchModal] = useState(false);
   const { accessToken } = useAuthContext();
 
   useEffect(() => {
-    setLoading(true);
     try {
       const getData = async () => {
         const res = await getAllBatches(accessToken);
@@ -29,7 +26,6 @@ function ManageBatchesPage() {
     } catch (err) {
       console.log(err);
     }
-    setLoading(false);
   }, []);
 
   const handleCreateBatchSubmit = async () => {
@@ -61,7 +57,7 @@ function ManageBatchesPage() {
         px: 10,
       }}
     >
-      {loading ? <BatchesListLoading /> : <BatchesList batches={batches} />}
+      <BatchesList batches={batches} />
 
       <Stack direction="row" justifyContent="center" alignItems="center" mt={7} spacing={2}>
         <Button

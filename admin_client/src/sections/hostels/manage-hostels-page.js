@@ -6,11 +6,9 @@ import HostelDetails from "./hostel-details";
 import CustomModal from "src/components/CustomModal";
 import { createHostel, getAllHostels } from "src/services/hostel";
 import { useAuthContext } from "src/contexts/auth-context";
-import { HostelListLoading } from "./hostel-list-loading";
 
 function ManageHostelsPage() {
   const [hostels, setHostels] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [createHostelForm, setCreateHostelForm] = useState({
     hostelName: "",
     gender: "",
@@ -62,7 +60,6 @@ function ManageHostelsPage() {
 
   useEffect(() => {
     try {
-      setLoading(true);
       const fetchAllHostelsData = async () => {
         const res = await getAllHostels(accessToken);
         setHostels(res?.data);
@@ -73,7 +70,6 @@ function ManageHostelsPage() {
     } catch (err) {
       console.log(err);
     }
-    setLoading(false);
   }, []);
 
   return (
@@ -85,7 +81,7 @@ function ManageHostelsPage() {
         px: 10,
       }}
     >
-      {loading ? <HostelListLoading /> : <HostelList hostels={hostels} />}
+      <HostelList hostels={hostels} />
       <Stack alignItems="center" mt={7}>
         <Button onClick={() => setOpenCreateHostelModal(true)}>+ Add Hostel</Button>
       </Stack>

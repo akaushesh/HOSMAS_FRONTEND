@@ -18,6 +18,7 @@ import {
   TableCell,
   TableHead,
   TableRow,
+  Skeleton,
 } from "@mui/material";
 import { Scrollbar } from "src/components/scrollbar";
 import { SeverityPill } from "src/components/severity-pill";
@@ -32,7 +33,14 @@ const statusMap = {
 export const HostelList = ({ hostels = [] }) => {
   return (
     <Grid container spacing={4}>
-      {hostels.length === 0 && <Typography variant="h6">No hostels added!</Typography>}
+      {hostels.length === 0 &&
+        Array.from({ length: 6 }, (_, index) => (
+          <Grid item xs={6} md={4} key={index}>
+            <Card>
+              <Skeleton animation="wave" variant="rounded" width="auto" height={105} />
+            </Card>
+          </Grid>
+        ))}
       {hostels.map((hostel, index) => {
         return (
           <Grid item xs={6} md={4} key={index}>
