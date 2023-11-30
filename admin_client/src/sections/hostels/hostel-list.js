@@ -33,9 +33,9 @@ export const HostelList = ({ hostels = [] }) => {
   return (
     <Grid container spacing={4}>
       {hostels.length === 0 && <Typography variant="h6">No hostels added!</Typography>}
-      {hostels.map((hostel) => {
+      {hostels.map((hostel, index) => {
         return (
-          <Grid item xs={6} md={4}>
+          <Grid item xs={6} md={4} key={index}>
             <Card>
               <Link
                 href={`/manage-hostels/${hostel.id}`}
