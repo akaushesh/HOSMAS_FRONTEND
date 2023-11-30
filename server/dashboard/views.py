@@ -320,16 +320,23 @@ class getStudents(APIView):
       def get(self, request):
             q = request.GET.get('q')
             batch_id = request.GET.get('batch')
-            batch = Batch.objects.filter(id = batch_id).first()
-            
-            if (batch is None):
-                  return Response({'error':'Batch does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
             students_per_page = request.GET.get('students_per_page')
-            if q is not None:
-                  students_list = Student.objects.filter(Q(batch = batch), Q(rollno__startswith = q) | Q(name__contains = q) | Q(user__email__contains = q) )
+            
+            if batch_id=='all':
+                  if q is not None and q.strip()!='':
+                        students_list = Student.objects.filter(Q(rollno__startswith = q) | Q(name__icontains = q) | Q(user__email__icontains = q) ).distinct().order_by('id').all()
+                  else:
+                        students_list = Student.objects.order_by('id').all()
             else:
-                  students_list = Student.objects.filter(batch = batch)
+                  batch = Batch.objects.filter(id = batch_id).first()
+                  if batch is None:
+                        return Response({'error':'Batch does not exist'}, status=status.HTTP_404_NOT_FOUND)
+                  if q is not None and q.strip()!='':
+                        students_list = Student.objects.filter(Q(batch = batch), Q(rollno__startswith = q) | Q(name__icontains = q) | Q(user__email__icontains = q) ).distinct().order_by('id').all()
+                  else:
+                        students_list = Student.objects.filter(batch = batch).order_by('id').all()
+            
             p = Paginator(students_list, students_per_page)
             
             page_number = request.GET.get('page')
@@ -353,10 +360,10 @@ class getGroups(APIView):
             q = request.GET.get('q')
             groups_per_page = request.GET.get('groups_per_page')
             
-            if q is not None:
-                  groups_list = Group.objects.filter(Q(leader__rollno__startswith = q) | Q(leader__name__contains = q) | Q(leader__user__email__contains = q) | Q(members__rollno__startswith = q) | Q(members__name__contains = q) | Q(members__user__email__contains = q) )
+            if q is not None and q.strip()!='':
+                  groups_list = Group.objects.filter(Q(leader__rollno__startswith = q) | Q(leader__name__icontains = q) | Q(leader__user__email__icontains = q) | Q(members__rollno__startswith = q) | Q(members__name__icontains = q) | Q(members__user__email__icontains = q) ).distinct().select_related('leader').prefetch_related('members').order_by('id').all()
             else:
-                  groups_list = Group.objects.all()
+                  groups_list = Group.objects.select_related('leader').prefetch_related('members').order_by('id').all()
             p = Paginator(groups_list, groups_per_page)
             
             page_number = request.GET.get('page')
