@@ -4,9 +4,9 @@ from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
 from preference.models import Hostel, RoomType, RoomTypeChoice
 from student.models import Batch, Section, Student, Group, Defaulter
-from student.serializers import StudentProfileSerializer
+from student.serializers import StudentProfileSerializer, StudentProfileRoomTypeSerializer
 from user.models import User
-from .models import AllotmentStatus, AcademicSession, Faq
+from .models import AllotmentStatus, AcademicSession, Faq, AllotmentLogsGroup, AllotmentLogsStudent
 import json, string
 from .tasks import send_start_allocation_mail
 from random import choice
@@ -116,7 +116,7 @@ class SectionSerializer(serializers.ModelSerializer):
       batch_name = serializers.SerializerMethodField()
       class Meta:
             model = Section
-            fields = ['id', 'batch_name', 'batch', 'gender', 'is_allotment_enabled', 'is_retain_allowed']
+            fields = ['id', 'batch_name', 'batch', 'gender', 'is_allotment_result_public', 'is_allotment_enabled', 'is_retain_allowed']
             extra_kwargs = {
                   'batch': {'write_only': True}
             }
@@ -125,10 +125,11 @@ class SectionSerializer(serializers.ModelSerializer):
             return obj.batch.name
       
       def update(self, instance, validated_data):
+            # Check allotment enable/disable status and if enabled, send mails
             updated_allotment_status = validated_data.get('is_allotment_enabled')
             if updated_allotment_status is not None:
                   if not instance.is_allotment_enabled and updated_allotment_status:
-                        # TODO: Send mails to all section's students    
+                        # Send mails to all section's students    
                         groups = Group.objects.filter(Q(leader__batch = instance.batch)
                                                       & Q(leader__gender = instance.gender)).all()
                         for group in groups:
@@ -137,8 +138,21 @@ class SectionSerializer(serializers.ModelSerializer):
                               send_start_allocation_mail.delay(group.leader.name, group.leader.user.email)
                         print('Send Mails!')
                   instance.is_allotment_enabled = updated_allotment_status
+
+            # Check allotment result status and if made public, finalize result
+            updated_allotment_result_status = validated_data.get('is_allotment_result_public')
+            if updated_allotment_result_status is not None:
+                  if not instance.is_allotment_result_public and updated_allotment_result_status:
+                        students = Student.objects.filter(batch=instance.batch, gender=instance.gender, preview_room__is_null=False, alloted_room__is_null=True).all()
+                        for student in students:
+                              student.alloted_room  = student.preview_room
+                              student.preview_room = None
+                              student.save()
+                  instance.is_allotment_result_public = updated_allotment_result_status
+
             instance.is_retain_allowed = validated_data.get('is_retain_allowed', instance.is_retain_allowed)
             instance.save()
+            
             return instance
       
 
@@ -160,55 +174,30 @@ class ProfileSerializer(serializers.ModelSerializer):
             fields = ['email']
 
 
+class AllotmentLogsStudentSerializer(serializers.ModelSerializer):
+      preview_room_type = StudentProfileRoomTypeSerializer(read_only=True)
+      
+      class Meta:
+            model = AllotmentLogsStudent
+            fields = ['rollno', 'name', 'email', 'phoneno', 'cg', 'preview_room_type']
+
+
+class AllotmentLogsGroupSerializer(serializers.ModelSerializer):
+      leader = AllotmentLogsStudentSerializer(read_only=True)
+      members = AllotmentLogsStudentSerializer(read_only=True, many=True)
+      
+      class Meta:
+            model = AllotmentLogsStudent
+            fields = ['leader', 'cg', 'members']
+
+
 class AllotmentStatusSerializer(serializers.ModelSerializer):
-      student_statistics = serializers.SerializerMethodField()
-      section_statistics = serializers.SerializerMethodField()
+      pending_groups = AllotmentLogsGroupSerializer(read_only=True, many=True)
+      sections = SectionSerializer(read_only=True, many=True)
 
       class Meta:
             model = AllotmentStatus
-            fields = ['is_public', 'student_statistics', 'section_statistics']
-
-      def get_student_statistics(self, obj):
-            if not obj.done:
-                  return {}
-            retain_queryset = Student.objects.filter((Q(leader_of_group__is_null=False) & Q(leader_of_group__is_retained=True)) | (Q(group__is_null=False) & Q(group__is_retained=True)))
-            unsuccessful_retain = retain_queryset.filter(Q(allocated_room__is_null=True)).count()
-            successful_retain = retain_queryset.filter(Q(allocated_room__is_null=False)).count()
-
-            preferences_leader_queryset = Student.objects.filter(Q(leader_of_group__is_null=False)).annotate(
-                  preferences_count = Count('leader_of_group__preferences')
-            ).filter(Q(preferences_count_gt=0))
-            
-            preferences_members_queryset = Student.objects.filter(Q(group__is_null=False)).annotate(
-                  preferences_count = Count('group__preferences')
-            ).filter(Q(preferences_count_gt=0))
-
-            successful_preferences = preferences_leader_queryset.filter(alloted_room__is_null=False).count() + preferences_members_queryset.filter(alloted_room__is_null=False).count()
-            unsuccessful_preferences = preferences_leader_queryset.filter(alloted_room__is_null=True).count() + preferences_members_queryset.filter(alloted_room__is_null=True).count()
-
-            return {
-                  'successful_retain_allotment': successful_retain,
-                  'unsuccessful_retain_allotment': unsuccessful_retain,
-                  'successfully_preference_allotment': successful_preferences,
-                  'unsuccessful_preference_allotment': unsuccessful_preferences,
-            }
-      
-      def get_section_statistics(self, obj):
-            if not obj.done:
-                  return []
-            res = []
-            sections = Section.objects.all()
-            for section in sections:
-                  for choice in section.choices.all():
-                        room_type = choice.room_type
-                        cnt = Student.objects.filter(batch=section.batch, gender=section.gender, alloted_hostel=room_type).count()
-                        res.append({
-                              'batch': section.batch.name,
-                              'gender': section.gender,
-                              'available_count': choice.capacity,
-                              'alloted_count': cnt
-                        })
-            return res
+            fields = '__all__'
 
 
 class AcademicSessionSerializer(serializers.ModelSerializer):

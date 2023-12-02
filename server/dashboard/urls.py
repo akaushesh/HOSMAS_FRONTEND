@@ -2,8 +2,8 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-      path('import-students/', views.ImportStudentsView.as_view(), name='import_students'),
-      path('import-defaulters/', views.ImportDefaultersView.as_view(), name='import_defaulters'),
+      path('import/students/', views.ImportStudentsView.as_view(), name='import_students'),
+      path('import/defaulters/', views.ImportDefaultersView.as_view(), name='import_defaulters'),
       path('getStudents/', views.getStudents.as_view()),
       path('getGroups/', views.getGroups.as_view()),
       path('getGroup/', views.getGroup.as_view()),
