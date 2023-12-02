@@ -52,7 +52,7 @@ class CreateObjectView(APIView):
                         return Response(status=status.HTTP_400_BAD_REQUEST)
                   serializer = DefaulterSerializer(data = {'student': student.id})
             elif model=='student':
-                  serializer = StudentProfileSerializer(data=request.data)
+                  serializer = StudentProfileSerializer(data=request.data, context={'is_admin': True})
             else:
                   return Response(status=status.HTTP_404_NOT_FOUND)
             
@@ -132,7 +132,7 @@ class GetObjectView(APIView):
                   instance = Student.objects.filter(rollno=id).first()
                   if instance is None:
                         return Response(status=status.HTTP_404_NOT_FOUND)
-                  serializer = StudentProfileSerializer(instance)
+                  serializer = StudentProfileSerializer(instance, context={'is_admin': True})
             
             elif model=='search-student':
                   # View to search the student to add it into a group
@@ -214,7 +214,7 @@ class UpdateObjectView(APIView):
                   instance = Student.objects.filter(rollno=id).first()
                   if instance is None:
                         return Response(status=status.HTTP_404_NOT_FOUND)
-                  serializer = StudentProfileSerializer(instance, request.data, partial=True)
+                  serializer = StudentProfileSerializer(instance, request.data, partial=True, context={'is_admin': True})
             else:
                   return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -310,7 +310,7 @@ class getStudents(APIView):
                   return Response({'error':'Page does not exist'}, status=status.HTTP_400_BAD_REQUEST)
             
             students = p.page(page_number)
-            serializer = StudentProfileSerializer(students, many=True)
+            serializer = StudentProfileSerializer(students, many=True, context={'is_admin': True})
             
             return Response({'status':'success', 'data':serializer.data, 'total_pages':total_pages}, status=status.HTTP_200_OK)
 
