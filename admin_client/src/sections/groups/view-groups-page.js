@@ -199,6 +199,7 @@ const ViewGroupsPage = () => {
           onClose={() => {
             setOpenCreateGroupModal(false);
           }}
+          maxWidth={400}
         >
           <Typography>Create a Group</Typography>
           <TextField label="Leader Roll no." />

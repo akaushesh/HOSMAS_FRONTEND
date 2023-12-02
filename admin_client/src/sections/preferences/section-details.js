@@ -189,7 +189,7 @@ function SectionPreference({ sectionId }) {
 
             <Grid xs={6} md={12}>
               <Card
-                sx={{ display: "flex", alignItems: "center" }}
+                sx={{ display: "flex", alignItems: "center", cursor: "pointer" }}
                 onClick={handleDownloadAllotmentData}
               >
                 <CardContent>

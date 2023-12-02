@@ -93,10 +93,12 @@ const ViewBatchDetailsPage = ({ batchId }) => {
                   <Link href="/manage-batches" style={{ transform: "translateY(15%)" }}>
                     <KeyboardBackspaceIcon fontSize="large" />
                   </Link>
+
                   <Typography variant="h4" pl={3}>
                     {batchName}
                   </Typography>
                 </Stack>
+
                 <Stack alignItems="center" direction="row" spacing={1}>
                   <Button
                     color="inherit"
@@ -108,6 +110,7 @@ const ViewBatchDetailsPage = ({ batchId }) => {
                   >
                     Import
                   </Button>
+
                   <Button
                     color="inherit"
                     startIcon={
@@ -120,18 +123,6 @@ const ViewBatchDetailsPage = ({ batchId }) => {
                   </Button>
                 </Stack>
               </Stack>
-              {/* <div>
-                <Button
-                  startIcon={
-                    <SvgIcon fontSize="small">
-                      <PlusIcon />
-                    </SvgIcon>
-                  }
-                  variant="contained"
-                >
-                  Add
-                </Button>
-              </div> */}
             </Stack>
 
             <Card sx={{ p: 2 }}>
@@ -140,6 +131,7 @@ const ViewBatchDetailsPage = ({ batchId }) => {
                   setSearchQuery={setSearchQuery}
                   placeholder={"Enter Name, Email or Roll no."}
                 />
+
                 <Button sx={{ color: "error.main", height: "fit-content" }}>
                   Delete Selected Items
                 </Button>

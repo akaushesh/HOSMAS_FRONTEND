@@ -23,7 +23,7 @@ export const getGroupMembers = async (accessToken) => {
 
 export const getStudents = async (query, students_per_page, page, batch, accessToken) => {
   const res = await otherApi.get(
-    `dashboard/getStudents?students_per_page=${students_per_page}&page=${page}&batch=${batch}`,
+    `dashboard/getStudents?students_per_page=${students_per_page}&page=${page}&batch=${batch}&q=${query}`,
     {
       headers: {
         Authorization: `Bearer ${accessToken}`,

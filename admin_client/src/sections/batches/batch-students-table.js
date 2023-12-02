@@ -84,10 +84,10 @@ export const StudentsTable = (props) => {
                     </TableCell>
                     <TableCell>{student.rollno}</TableCell>
                     <TableCell>{student.name}</TableCell>
-                    <TableCell>{student.email}</TableCell>
-                    <TableCell>{student.phone}</TableCell>
-                    <TableCell>{student.allotted_hostel}</TableCell>
-                    <TableCell>{student.allotted_room_type}</TableCell>
+                    <TableCell>{student?.user?.email}</TableCell>
+                    <TableCell>{student.phoneno}</TableCell>
+                    <TableCell>{student?.alloted_room?.hostel ?? "NA"}</TableCell>
+                    <TableCell>{student?.alloted_room?.name ?? "NA"}</TableCell>
                     <TableCell>{student.cg}</TableCell>
                   </TableRow>
                 );

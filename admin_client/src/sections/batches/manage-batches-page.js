@@ -74,10 +74,12 @@ function ManageBatchesPage() {
       <CustomModal
         open={openCreateBatchModal}
         onClose={() => setOpenCreateBatchModal(false)}
-        maxWidth="200px"
+        maxWidth="300px"
       >
         <Stack alignItems="center">
-          <Typography mb={2}>Create a Batch</Typography>
+          <Typography mb={2} variant="h5">
+            Create a Batch
+          </Typography>
 
           <TextField
             name="batch"
