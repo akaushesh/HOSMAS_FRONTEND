@@ -402,7 +402,7 @@ class createFAQ(APIView):
      
 
 class getFAQ(APIView):
-      permission_classes = [IsAuthenticated, IsAdmin]
+      permission_classes = [IsAuthenticated]
       
       def get(self, request):
             faqs = Faq.objects.all()
