@@ -15,13 +15,13 @@ from .permissions import IsAdmin
 
 from preference.models import Hostel, RoomType, RoomTypeChoice
 from student.models import Batch, Section, Student, Group
-from .models import AllotmentStatus, AcademicSession, Faq
+from .models import AllotmentStatus, AcademicSession, Faq, AllotmentLogsGroup, AllotmentLogsStudent
 
 from .serializers import HostelSerializer, HostelSingleSerializer, RoomTypeSerializer, RoomTypeChoiceSerializer, RoomTypeOptionSerializer, BatchSerializer, BatchUninitializedSerializer, SectionSerializer, ProfileSerializer, AllotmentStatusSerializer, SectionRoomTypeSerializer, AcademicSessionSerializer, FAQSerializer, DefaulterSerializer
 from .serializers import *
 from student.serializers import StudentSerializer, GroupSerializer, StudentProfileSerializer, StudentSerializer
 
-from .tasks import allot_hostel, add_users, add_defaulters, send_reminder_mail
+from .tasks import add_users, add_defaulters, send_reminder_mail
 
 from datetime import datetime
 import csv, os
@@ -52,7 +52,7 @@ class CreateObjectView(APIView):
                         return Response(status=status.HTTP_400_BAD_REQUEST)
                   serializer = DefaulterSerializer(data = {'student': student.id})
             elif model=='student':
-                  serializer = StudentProfileSerializer(data=request.data)
+                  serializer = StudentProfileSerializer(data=request.data, context={'is_admin': True})
             else:
                   return Response(status=status.HTTP_404_NOT_FOUND)
             
@@ -89,6 +89,11 @@ class GetMultipleObjectsView(APIView):
                   if queryset is None:
                         return Response(status=status.HTTP_404_NOT_FOUND)
                   serializer = SectionRoomTypeSerializer(queryset)
+            elif model=='allotment-status':
+                  queryset = AllotmentStatus.objects.prefetch_related('sections', 'pending_groups__members__preview_room__hostel', 'pending_groups__leader__preview_room__hostel').first()
+                  if queryset is None:
+                        return Response(status=status.HTTP_404_NOT_FOUND)
+                  serializer = AllotmentStatusSerializer(queryset, many=True)
             else:
                   return Response(status=status.HTTP_404_NOT_FOUND)
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -111,10 +116,9 @@ class GetObjectView(APIView):
                   serializer = RoomTypeSerializer(instance)
             
             elif model=='allotment-status':
-                  instance = AllotmentStatus.objects.first()
+                  instance = AllotmentStatus.objects.filter(id=id).first()
                   if instance is None:
-                        instance = AllotmentStatus()
-                        instance.save()
+                        return Response(status=status.HTTP_404_NOT_FOUND)
                   serializer = AllotmentStatusSerializer(instance)
             
             elif model=='academic-session':
@@ -128,7 +132,7 @@ class GetObjectView(APIView):
                   instance = Student.objects.filter(rollno=id).first()
                   if instance is None:
                         return Response(status=status.HTTP_404_NOT_FOUND)
-                  serializer = StudentProfileSerializer(instance)
+                  serializer = StudentProfileSerializer(instance, context={'is_admin': True})
             
             elif model=='search-student':
                   # View to search the student to add it into a group
@@ -210,7 +214,7 @@ class UpdateObjectView(APIView):
                   instance = Student.objects.filter(rollno=id).first()
                   if instance is None:
                         return Response(status=status.HTTP_404_NOT_FOUND)
-                  serializer = StudentProfileSerializer(instance, request.data, partial=True)
+                  serializer = StudentProfileSerializer(instance, request.data, partial=True, context={'is_admin': True})
             else:
                   return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -260,8 +264,6 @@ class DeleteObjectsView(APIView):
 
       def delete(self, request, model):
             ids = request.data.get('ids')
-            if isinstance(ids, list):
-                  return Response(status=status.HTTP_400_BAD_REQUEST)
             for id in ids:
                   if model=='defaulter':
                         instance = Defaulter.objects.filter(id=id).first()
@@ -272,46 +274,6 @@ class DeleteObjectsView(APIView):
                   if instance is not None:
                         instance.delete()
             return Response(status=status.HTTP_200_OK)
-
-
-class ImportStudentsView(APIView):
-      permission_classes = [IsAuthenticated & IsAdmin]
-
-      def post(self, request):
-            file = request.data.get('file')
-            
-            filename = f"{datetime.now().strftime('%Y%m%d_%H%M')}_{file.name}"
-
-            if filename.split('.')[-1]!='xlsx':
-                  return Response({'error':'Only .xlsx file format supported!'}, status=status.HTTP_400_BAD_REQUEST)
-            
-            storage = default_storage
-            storage.location = os.path.join(settings.BASE_DIR, 'imported-data', 'student')
-            filename = storage.save(filename, file)
-            
-            add_users.delay(filename)
-
-            return Response(status=status.HTTP_202_ACCEPTED)
-
-
-class ImportDefaultersView(APIView):
-      permission_classes = [IsAuthenticated, IsAdmin]
-
-      def post(self, request):
-            file = request.data.get('file')
-            
-            filename = f"{datetime.now().strftime('%Y%m%d_%H%M')}_{file.name}"
-
-            if filename.split('.')[-1]!='csv':
-                  return Response({'error':'file not csv'}, status=status.HTTP_400_BAD_REQUEST)
-            
-            storage = default_storage
-            storage.location = os.path.join(settings.BASE_DIR, 'imported-data', 'defaulter')
-            filename = storage.save(filename, file)
-            
-            add_defaulters.delay(filename)
-
-            return Response(status=status.HTTP_202_ACCEPTED)
 
 
 class getStudents(APIView):
@@ -348,7 +310,7 @@ class getStudents(APIView):
                   return Response({'error':'Page does not exist'}, status=status.HTTP_400_BAD_REQUEST)
             
             students = p.page(page_number)
-            serializer = StudentSerializer(students, many=True)
+            serializer = StudentProfileSerializer(students, many=True, context={'is_admin': True})
             
             return Response({'status':'success', 'data':serializer.data, 'total_pages':total_pages}, status=status.HTTP_200_OK)
 
@@ -426,228 +388,6 @@ class ProfileView(APIView):
             user = request.user
             serializer = ProfileSerializer(user)
             return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-class ExportGroupsView(APIView):
-      permission_classes = [IsAuthenticated, IsAdmin]
-
-      def post(self, request):
-            if request.data.get('section')=='all':
-                  sections = Section.objects.select_related('batch').all()
-                  filename = f"export/group/all.xlsx"
-            else:
-                  section = Section.objects.filter(id=request.data.get('section')).select_related('batch').first()
-                  if section is None:
-                        return Response(status=status.HTTP_400_BAD_REQUEST)
-                  filename = f"export/group/{section.batch.name}_{section.gender}.xlsx"
-                  sections = [section]
-            
-            include = OrderedDict([
-                  ('Roll Number', request.data.get('include_rollno', True)),
-                  ('Email Address', request.data.get('include_email', True)),
-                  ('Name', request.data.get('include_name', True)),
-                  ('Phone Number', request.data.get('include_phoneno', True)),
-                  ('CG', request.data.get('include_cg', True)),
-                  ('Gender', request.data.get('include_gender', True)),
-                  ('Batch', request.data.get('include_batch', True)),
-                  ('Current Hostel', request.data.get('include_current_hostel', True)),
-                  ('Current Room Type', request.data.get('include_current_hostel', True)),
-                  ('Alloted Hostel', request.data.get('include_alloted_hostel', True)),
-                  ('Alloted Room Type', request.data.get('include_alloted_hostel', True)),
-            ])
-            
-            path = os.path.join(settings.MEDIA_ROOT, filename)
-
-            wb = Workbook()
-            ws = wb.active
-            
-            header = ['Group ID', 'Group Size', 'Group CG']
-            student_fields = []
-            for key in include.keys():
-                  if include[key]:
-                        student_fields.append(key)
-
-            for member_name in ['Leader', 'Member 1', 'Member 2', 'Member 3']:
-                  for field in student_fields:
-                        header.append(f"{member_name} {field}")
-            
-            preferences_cnt = 0
-            for section in sections:
-                  preferences_cnt = max(preferences_cnt, section.choices.count())
-
-            for i in range(1, preferences_cnt+1):
-                  header.append(f'Preference {i} Hostel')            
-                  header.append(f'Preference {i} Room Type')
-                  
-            ws.append(header)
-            for col in ws.iter_cols(min_col=1, max_col=len(header), min_row=1, max_row=1):
-                  col[0].font = Font(bold=True)
-            ws.freeze_panes = 'A2'
-            
-            for section in sections:
-                  queryset = Group.objects.filter(leader__batch=section.batch, leader__gender=section.gender).select_related('leader__user', 'leader__batch', 'leader__current_room__hostel', 'leader__alloted_room__hostel').prefetch_related('members__user', 'members__batch', 'members__current_room__hostel', 'members__alloted_room__hostel', 'preferences__room_type_choice__room_type__hostel').all()
-
-                  for group in queryset:
-                        cnt = 1
-                        row = [group.id, group.cg, group.members.count() + 1]
-                        members_list = [group.leader] + list(group.members.all())
-                        for member in members_list:
-                              if include.get('Roll Number', False):
-                                    row.append(member.rollno)
-                              if include.get('Email Address', False):
-                                    row.append(member.user.email)
-                              if include.get('Name', False):
-                                    row.append(member.name)
-                              if include.get('Phone Number', False):
-                                    row.append(member.phoneno)
-                              if include.get('CG', False):
-                                    row.append(member.cg)
-                              if include.get('Gender', False):
-                                    row.append(member.gender)
-                              if include.get('Batch', False):
-                                    row.append(member.batch.name)
-                              if include.get('Current Hostel', False) and member.current_room is not None:
-                                    row.append(member.current_room.hostel.name)
-                              if include.get('Current Room Type', False) and member.current_room is not None:
-                                    row.append(member.current_room.name)
-                              if include.get('Alloted Hostel', False) and member.alloted_room is not None:
-                                    row.append(member.alloted_room.hostel.name)
-                              if include.get('Alloted Room Type', False) and member.alloted_room is not None:
-                                    row.append(member.alloted_room.name)
-                        for preference in group.preferences.order_by('priority').all():
-                              row.append(preference.room_type_choice.room_type.hostel.name)
-                              row.append(preference.room_type_choice.room_type.name)
-                        ws.append(row)
-                  
-            wb.save(path)
-            return Response({
-                  'link': f"{settings.MEDIA_URL}{filename}"
-            }, status=status.HTTP_200_OK)
-
-
-class ExportStudentsView(APIView):
-      permission_classes = [IsAuthenticated & IsAdmin]
-
-      def post(self, request):
-            if request.data.get('batch')=='all':
-                  batches = Batch.objects.prefetch_related('students__user', 'students__batch', 'students__current_room__hostel', 'students__alloted_room__hostel').all()
-                  filename = f"export/student/batch_all.xlsx"
-            else:
-                  batch = Batch.objects.filter(id=request.data.get('batch')).prefetch_related('students__user', 'students__batch', 'students__current_room__hostel', 'students__alloted_room__hostel').first()
-                  if batch is None:
-                        return Response(status=status.HTTP_400_BAD_REQUEST)
-                  filename = f"export/student/batch_{batch.id}.xlsx"
-                  batches = [batch]
-            
-            path = os.path.join(settings.MEDIA_ROOT, filename)
-            wb = Workbook()
-            ws = wb.active
-
-            include = OrderedDict([
-                  ('Roll Number', request.data.get('include_rollno', True)),
-                  ('Email Address', request.data.get('include_email', True)),
-                  ('Name', request.data.get('include_name', True)),
-                  ('Phone Number', request.data.get('include_phoneno', True)),
-                  ('CG', request.data.get('include_cg', True)),
-                  ('Gender', request.data.get('include_gender', True)),
-                  ('Batch', request.data.get('include_batch', True)),
-                  ('Current Hostel', request.data.get('include_current_hostel', True)),
-                  ('Current Room Type', request.data.get('include_current_hostel', True)),
-                  ('Alloted Hostel', request.data.get('include_alloted_hostel', True)),
-                  ('Alloted Room Type', request.data.get('include_alloted_hostel', True)),
-            ])
-
-            header = []
-            for key in include.keys():
-                  if include[key]:
-                        header.append(key)
-            
-            ws.append(header)
-            for col in ws.iter_cols(min_col=1, max_col=len(header), min_row=1, max_row=1):
-                  col[0].font = Font(bold=True)
-            ws.freeze_panes = 'A2'
-
-            for batch in batches:
-                  queryset = batch.students.all()
-
-                  for student in queryset:
-                        row = []
-                        if include.get('Roll Number', False):
-                              row.append(student.rollno)
-                        if include.get('Email Address', False):
-                              row.append(student.user.email)
-                        if include.get('Name', False):
-                              row.append(student.name)
-                        if include.get('Phone Number', False):
-                              row.append(student.phoneno)
-                        if include.get('CG', False):
-                              row.append(student.cg)
-                        if include.get('Gender', False):
-                              row.append(student.gender)
-                        if include.get('Batch', False):
-                              row.append(student.batch.name)
-                        if include.get('Current Hostel', False) and student.current_room is not None:
-                              row.append(student.current_room.hostel.name)
-                        if include.get('Current Room Type', False) and student.current_room is not None:
-                              row.append(student.current_room.name)
-                        if include.get('Alloted Hostel', False) and student.alloted_room is not None:
-                              row.append(student.alloted_room.hostel.name)
-                        if include.get('Alloted Room Type', False) and student.alloted_room is not None:
-                              row.append(student.alloted_room.name)
-                        ws.append(row)
-
-            wb.save(path)
-
-            return Response({
-                  'link': f"{settings.MEDIA_URL}{filename}"
-            }, status=status.HTTP_200_OK)
-
-
-class ExportDefaultersView(APIView):
-      permission_classes = [IsAuthenticated, IsAdmin]
-
-      def get(self, request):
-            filename = f"export/defaulters.xlsx"
-            path = os.path.join(settings.MEDIA_ROOT, filename)
-            queryset = Defaulter.objects.select_related('student__user', 'student__batch', 'student__current_room__hostel', 'student__alloted_room__hostel').all()
-            
-            wb = Workbook()
-            ws = wb.active
-
-            ws.append(['Roll Number', 'Email Address', 'Name', 'Phone Number', 'CG', 'Batch', 'Gender', 'Current Hostel', 'Current Room Type', 'Alloted Hostel', 'Alloted Room Type'])
-            for col in ws.iter_cols(min_col=1, max_col=11, min_row=1, max_row=1):
-                  col[0].font = Font(bold=True)
-            ws.freeze_panes = 'A2'
-
-            for defaulter in queryset:
-                  student = defaulter.student
-                  row = [student.rollno, student.user.email, student.name, student.phoneno, student.cg, student.batch.name, 'Female' if student.gender=='F' else 'Male']
-                  if student.current_room is not None:
-                        row.append(student.current_room.hostel.name)
-                        row.append(student.current_room.name)
-                  else:
-                        row.append('')
-                        row.append('')
-                  if student.alloted_room is not None:
-                        row.append(student.alloted_room.hostel.name)
-                        row.append(student.alloted_room.name)
-                  else:
-                        row.append('')
-                        row.append('')
-                  ws.append(row)
-
-            wb.save(path)
-            return Response({
-                  'link': f"{settings.MEDIA_URL}{filename}"
-            }, status=status.HTTP_200_OK)
-
-
-class AllotmentView(APIView):
-      permission_classes = [IsAuthenticated & IsAdmin]
-
-      def get(self, request):
-            allot_hostel.delay()
-            return Response(status=status.HTTP_200_OK)
 
 
 class createFAQ(APIView):
@@ -1004,3 +744,396 @@ class DeleteGroupsView(APIView):
                               left_group_mail.delay(member.name, student.name, student.rollno, member.user.email)
 
             return Response(status=status.HTTP_200_OK)
+
+
+class ImportStudentsView(APIView):
+      permission_classes = [IsAuthenticated & IsAdmin]
+
+      def post(self, request):
+            file = request.data.get('file')
+            
+            filename = f"{datetime.now().strftime('%Y%m%d_%H%M')}_{file.name}"
+
+            if filename.split('.')[-1]!='xlsx':
+                  return Response({'error':'Only .xlsx file format supported!'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            storage = default_storage
+            storage.location = os.path.join(settings.BASE_DIR, 'imported-data', 'student')
+            filename = storage.save(filename, file)
+            
+            add_users.delay(filename)
+
+            return Response(status=status.HTTP_202_ACCEPTED)
+
+
+class ImportDefaultersView(APIView):
+      permission_classes = [IsAuthenticated, IsAdmin]
+
+      def post(self, request):
+            file = request.data.get('file')
+            
+            filename = f"{datetime.now().strftime('%Y%m%d_%H%M')}_{file.name}"
+
+            if filename.split('.')[-1]!='xlsx':
+                  return Response({'error':'file not xlsx'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            storage = default_storage
+            storage.location = os.path.join(settings.BASE_DIR, 'imported-data', 'defaulter')
+            filename = storage.save(filename, file)
+            
+            add_defaulters.delay(filename)
+
+            return Response(status=status.HTTP_202_ACCEPTED)
+
+
+class ExportGroupsView(APIView):
+      permission_classes = [IsAuthenticated, IsAdmin]
+
+      def post(self, request):
+            if request.data.get('section')=='all':
+                  sections = Section.objects.select_related('batch').all()
+                  filename = f"export/group/all.xlsx"
+            else:
+                  section = Section.objects.filter(id=request.data.get('section')).select_related('batch').first()
+                  if section is None:
+                        return Response(status=status.HTTP_400_BAD_REQUEST)
+                  filename = f"export/group/{section.batch.name}_{section.gender}.xlsx"
+                  sections = [section]
+            
+            include = OrderedDict([
+                  ('Roll Number', request.data.get('include_rollno', True)),
+                  ('Email Address', request.data.get('include_email', True)),
+                  ('Name', request.data.get('include_name', True)),
+                  ('Phone Number', request.data.get('include_phoneno', True)),
+                  ('CG', request.data.get('include_cg', True)),
+                  ('Gender', request.data.get('include_gender', True)),
+                  ('Batch', request.data.get('include_batch', True)),
+                  ('Current Hostel', request.data.get('include_current_hostel', True)),
+                  ('Current Room Type', request.data.get('include_current_hostel', True)),
+                  ('Alloted Hostel', request.data.get('include_alloted_hostel', True)),
+                  ('Alloted Room Type', request.data.get('include_alloted_hostel', True)),
+            ])
+            
+            path = os.path.join(settings.MEDIA_ROOT, filename)
+
+            wb = Workbook()
+            ws = wb.active
+            
+            header = ['Group ID', 'Group Size', 'Group CG']
+            student_fields = []
+            for key in include.keys():
+                  if include[key]:
+                        student_fields.append(key)
+
+            for member_name in ['Leader', 'Member 1', 'Member 2', 'Member 3']:
+                  for field in student_fields:
+                        header.append(f"{member_name} {field}")
+            
+            preferences_cnt = 0
+            for section in sections:
+                  preferences_cnt = max(preferences_cnt, section.choices.count())
+
+            for i in range(1, preferences_cnt+1):
+                  header.append(f'Preference {i} Hostel')            
+                  header.append(f'Preference {i} Room Type')
+                  
+            ws.append(header)
+            for col in ws.iter_cols(min_col=1, max_col=len(header), min_row=1, max_row=1):
+                  col[0].font = Font(bold=True)
+            ws.freeze_panes = 'A2'
+            
+            for section in sections:
+                  queryset = Group.objects.filter(leader__batch=section.batch, leader__gender=section.gender).select_related('leader__user', 'leader__batch', 'leader__current_room__hostel', 'leader__alloted_room__hostel').prefetch_related('members__user', 'members__batch', 'members__current_room__hostel', 'members__alloted_room__hostel', 'preferences__room_type_choice__room_type__hostel').all()
+
+                  for group in queryset:
+                        cnt = 1
+                        row = [group.id, group.cg, group.members.count() + 1]
+                        members_list = [group.leader] + list(group.members.all())
+                        for member in members_list:
+                              if include.get('Roll Number', False):
+                                    row.append(member.rollno)
+                              if include.get('Email Address', False):
+                                    row.append(member.user.email)
+                              if include.get('Name', False):
+                                    row.append(member.name)
+                              if include.get('Phone Number', False):
+                                    row.append(member.phoneno)
+                              if include.get('CG', False):
+                                    row.append(member.cg)
+                              if include.get('Gender', False):
+                                    row.append(member.gender)
+                              if include.get('Batch', False):
+                                    row.append(member.batch.name)
+                              if include.get('Current Hostel', False) and member.current_room is not None:
+                                    row.append(member.current_room.hostel.name)
+                              if include.get('Current Room Type', False) and member.current_room is not None:
+                                    row.append(member.current_room.name)
+                              if include.get('Alloted Hostel', False) and member.alloted_room is not None:
+                                    row.append(member.alloted_room.hostel.name)
+                              if include.get('Alloted Room Type', False) and member.alloted_room is not None:
+                                    row.append(member.alloted_room.name)
+                        for preference in group.preferences.order_by('priority').all():
+                              row.append(preference.room_type_choice.room_type.hostel.name)
+                              row.append(preference.room_type_choice.room_type.name)
+                        ws.append(row)
+                  
+            wb.save(path)
+            return Response({
+                  'link': f"{settings.MEDIA_URL}{filename}"
+            }, status=status.HTTP_200_OK)
+
+
+class ExportStudentsView(APIView):
+      permission_classes = [IsAuthenticated & IsAdmin]
+
+      def post(self, request):
+            if request.data.get('batch')=='all':
+                  batches = Batch.objects.prefetch_related('students__user', 'students__batch', 'students__current_room__hostel', 'students__alloted_room__hostel').all()
+                  filename = f"export/student/batch_all.xlsx"
+            else:
+                  batch = Batch.objects.filter(id=request.data.get('batch')).prefetch_related('students__user', 'students__batch', 'students__current_room__hostel', 'students__alloted_room__hostel').first()
+                  if batch is None:
+                        return Response(status=status.HTTP_400_BAD_REQUEST)
+                  filename = f"export/student/batch_{batch.id}.xlsx"
+                  batches = [batch]
+            
+            path = os.path.join(settings.MEDIA_ROOT, filename)
+            wb = Workbook()
+            ws = wb.active
+
+            include = OrderedDict([
+                  ('Roll Number', request.data.get('include_rollno', True)),
+                  ('Email Address', request.data.get('include_email', True)),
+                  ('Name', request.data.get('include_name', True)),
+                  ('Phone Number', request.data.get('include_phoneno', True)),
+                  ('CG', request.data.get('include_cg', True)),
+                  ('Gender', request.data.get('include_gender', True)),
+                  ('Batch', request.data.get('include_batch', True)),
+                  ('Current Hostel', request.data.get('include_current_hostel', True)),
+                  ('Current Room Type', request.data.get('include_current_hostel', True)),
+                  ('Alloted Hostel', request.data.get('include_alloted_hostel', True)),
+                  ('Alloted Room Type', request.data.get('include_alloted_hostel', True)),
+            ])
+
+            header = []
+            for key in include.keys():
+                  if include[key]:
+                        header.append(key)
+            
+            ws.append(header)
+            for col in ws.iter_cols(min_col=1, max_col=len(header), min_row=1, max_row=1):
+                  col[0].font = Font(bold=True)
+            ws.freeze_panes = 'A2'
+
+            for batch in batches:
+                  queryset = batch.students.all()
+
+                  for student in queryset:
+                        row = []
+                        if include.get('Roll Number', False):
+                              row.append(student.rollno)
+                        if include.get('Email Address', False):
+                              row.append(student.user.email)
+                        if include.get('Name', False):
+                              row.append(student.name)
+                        if include.get('Phone Number', False):
+                              row.append(student.phoneno)
+                        if include.get('CG', False):
+                              row.append(student.cg)
+                        if include.get('Gender', False):
+                              row.append(student.gender)
+                        if include.get('Batch', False):
+                              row.append(student.batch.name)
+                        if include.get('Current Hostel', False) and student.current_room is not None:
+                              row.append(student.current_room.hostel.name)
+                        if include.get('Current Room Type', False) and student.current_room is not None:
+                              row.append(student.current_room.name)
+                        if include.get('Alloted Hostel', False) and student.alloted_room is not None:
+                              row.append(student.alloted_room.hostel.name)
+                        if include.get('Alloted Room Type', False) and student.alloted_room is not None:
+                              row.append(student.alloted_room.name)
+                        ws.append(row)
+
+            wb.save(path)
+
+            return Response({
+                  'link': f"{settings.MEDIA_URL}{filename}"
+            }, status=status.HTTP_200_OK)
+
+
+class ExportDefaultersView(APIView):
+      permission_classes = [IsAuthenticated, IsAdmin]
+
+      def get(self, request):
+            filename = f"export/defaulters.xlsx"
+            path = os.path.join(settings.MEDIA_ROOT, filename)
+            queryset = Defaulter.objects.select_related('student__user', 'student__batch', 'student__current_room__hostel', 'student__alloted_room__hostel').all()
+            
+            wb = Workbook()
+            ws = wb.active
+
+            ws.append(['Roll Number', 'Email Address', 'Name', 'Phone Number', 'CG', 'Batch', 'Gender', 'Current Hostel', 'Current Room Type', 'Alloted Hostel', 'Alloted Room Type'])
+            for col in ws.iter_cols(min_col=1, max_col=11, min_row=1, max_row=1):
+                  col[0].font = Font(bold=True)
+            ws.freeze_panes = 'A2'
+
+            for defaulter in queryset:
+                  student = defaulter.student
+                  row = [student.rollno, student.user.email, student.name, student.phoneno, student.cg, student.batch.name, 'Female' if student.gender=='F' else 'Male']
+                  if student.current_room is not None:
+                        row.append(student.current_room.hostel.name)
+                        row.append(student.current_room.name)
+                  else:
+                        row.append('')
+                        row.append('')
+                  if student.alloted_room is not None:
+                        row.append(student.alloted_room.hostel.name)
+                        row.append(student.alloted_room.name)
+                  else:
+                        row.append('')
+                        row.append('')
+                  ws.append(row)
+
+            wb.save(path)
+            return Response({
+                  'link': f"{settings.MEDIA_URL}{filename}"
+            }, status=status.HTTP_200_OK)
+
+
+class AllotmentView(APIView):
+      permission_classes = [IsAuthenticated, IsAdmin]
+
+      def post(self, request):
+
+            section_ids = request.data.get('sections')
+
+            retained_students_cnt = 0
+            retained_groups_cnt = 0
+
+            alloted_students_cnt = 0
+            alloted_groups_cnt = 0
+
+            partial_allot_students_cnt = 0
+            partial_allot_groups_cnt = 0
+
+            logs_instance = AllotmentStatus()
+            logs_instance.save()
+
+            if not isinstance(section_ids, list):
+                  return Response({'detail': 'Invalid data type for sections!'}, sttaus=status.HTTP_400_BAD_REQUEST)
+            
+            for section_id in section_ids:
+
+                  section = Section.objects.filter(id=section_id).first()
+
+                  # storing the rooms capacity in a dictionary
+                  choices_queryset = section.choices.all()
+                  choices_size = {}
+                  for choice in choices_queryset:
+                        choices_size[choice.id] = choice.capacity
+                  
+                  # Subtract Manually Alloted Students from capacity
+                  alloted_queryset = Student.objects.filter(batch=section.batch, gender=section.gender, alloted_room__is_null=False).all()
+                  for student in alloted_queryset:
+                        choice = RoomTypeChoice.objects.filter(section=section, room_type=student.alloted_room).first()
+                        choice[choice.id] -= 1
+                  
+                  # Handing groups that retained their previous room
+                  if not section.is_retain_allowed:
+                        retain_groups = Group.objects.filter(is_retained=True, leader__batch=section.batch, leader__gender=section.gender).all()
+                        for group in retain_groups:
+                              if choices_size[group.leader.current_room.id] > 0:
+                                    group.leader.preview_room = group.leader.current_room
+                                    group.leader.save()
+                                    choices_size[group.leader.alloted_room.id] -= 1
+                                    retained_students_cnt += 1
+                              for member in group.members.all():
+                                    if choices_size[member.current_room.id] > 0:
+                                          member.preview_room = member.current_room
+                                          member.save()
+                                          choices_size[member.alloted_room.id] -= 1
+                                          retained_students_cnt += 1
+                              retained_groups_cnt += 1
+
+                  # Handling groups that have filled preferences
+                  unalloted_groups = []
+                  groups = Group.objects.filter(is_retained=False).order_by('-cg').all()
+                  for group in groups:
+                        members = group.members.all()
+                        group_size = len(members) + 1
+                        preferences = Preference.objects.filter(group=group).order_by('priority').all()
+                        got_allotment = False
+                        for preference in preferences:
+                              choice = preference.room_type_choice
+                              if choices_size[choice.id] < group_size:
+                                    continue
+                              room_type = choice.room_type
+                              group.leader.preview_room = room_type
+                              group.leader.save()
+                              for member in group.members.all():
+                                    member.preview_room = room_type
+                                    member.save()
+                              choices_size[choice.id] -= group_size
+                              got_allotment = True
+                              alloted_students_cnt += group_size
+                              alloted_groups_cnt += 1
+                              break
+                        if not got_allotment:
+                              unalloted_groups.append(group)
+                  
+                  # Handle groups that can't get same hostel
+                  for group in unalloted_groups:
+                        students = [group.leader]
+                        for member in group.members.all():
+                              students.append(member)
+                        students.sort(key = lambda x: x.cg, reverse = True)
+                        preferences = Preference.objects.filter(group=group).order_by('priority').all()
+                        ptr = 0
+                        for preference in preferences:
+                              choice = preference.room_type_choice
+                              while choices_size[choice.id] > 1:
+                                    students[ptr].preview_room = choice.room_type
+                                    students[ptr].save()
+                                    choices_size[choice.id] -= 1
+                                    ptr += 1
+                        
+                        logs_leader = AllotmentLogsStudent.objects.create(
+                              name = leader.name,
+                              email = leader.email,
+                              rollno = leader.rollno,
+                              phoneno = leader.phoneno,
+                              cg = leader.cg,
+                              preview_room = leader.preview_room
+                        )
+
+                        logs_group = AllotmentLogsGroup.objects.create(
+                              leader = logs_leader,
+                              cg = group.cg
+                        )
+
+                        for member in group.members.all():
+                              AllotmentLogsStudent.objects.create(
+                                    name = leader.name,
+                                    email = member.email,
+                                    rollno = member.rollno,
+                                    phoneno = member.phoneno,
+                                    cg = member.cg,
+                                    preview_room = member.preview_room,
+                                    group = logs_group
+                              )
+                        
+                        partial_allot_groups_cnt += 1
+                        partial_allot_students_cnt += len(students)
+                  
+                  logs_instance.sections.add(section)
+
+            logs_instance.retained_students_cnt = retained_students_cnt
+            logs_instance.retained_groups_cnt = retained_groups_cnt
+            logs_instance.alloted_students_cnt = alloted_students_cnt
+            logs_instance.alloted_groups_cnt = alloted_groups_cnt
+            logs_instance.partial_allot_students_cnt = partial_allot_students_cnt
+            logs_instance.partial_allot_groups_cnt = partial_allot_groups_cnt
+            logs_instance.save()
+            
+            serializer = AllotmentStatusSerializer(logs_instance)
+            return Response(serializer.data, status=status.HTTP_200_OK)

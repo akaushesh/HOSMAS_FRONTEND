@@ -23,6 +23,7 @@ class Student (models.Model):
     batch = models.ForeignKey('student.Batch', on_delete=models.CASCADE, related_name='students')
 
     current_room = models.ForeignKey('preference.RoomType', on_delete=models.SET_NULL, null=True, blank=True, related_name='current_students')
+    preview_room = models.ForeignKey('preference.RoomType', on_delete=models.SET_NULL, null=True, blank=True, default=None, related_name='preview_students')
     alloted_room = models.ForeignKey('preference.RoomType', on_delete=models.SET_NULL, null=True, blank=True, related_name='alloted_students')
 
     def __str__(self):
@@ -58,6 +59,7 @@ class Section(models.Model):
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
     is_allotment_enabled = models.BooleanField(default=False)
     is_retain_allowed = models.BooleanField(default=False)
+    is_allotment_result_public = models.BooleanField(default=False)
 
     class Meta:
         unique_together = ('batch', 'gender')

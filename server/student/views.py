@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from .permissions import IsStudent, IsNotDefaulter, IsPreferenceFillingLive, IsGroupLeader, IsGroupMember, IsNotGroupLeader, IsNotGroupMember
 
-from .models import Student, Group, Invitation
+from .models import Student, Group, Invitation, Section
 from .serializers import InvitationsReceivedSerializer, InvitationsSentSerializer, StudentSerializer, GroupSerializer, StudentProfileSerializer
 
 from django.core.files.storage import default_storage
