@@ -34,21 +34,3 @@ export const deleteDefaulters = async (rollNos, accessToken) => {
   });
   return res;
 };
-
-export const importDefaulters = async (data, accessToken) => {
-  const res = await defaulterApi.post("import-defaulters/", data, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
-  return res;
-};
-
-export const exportDefaulters = async (accessToken) => {
-  const res = await defaulterApi.get("export/defaulters/", {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
-  return res;
-};

@@ -60,14 +60,6 @@ function ManageBatchesPage() {
       <BatchesList batches={batches} />
 
       <Stack direction="row" justifyContent="center" alignItems="center" mt={7} spacing={2}>
-        <Button
-          onClick={() => {
-            router.push("/manage-students");
-          }}
-          variant="contained"
-        >
-          View all students
-        </Button>
         <Button onClick={() => setOpenCreateBatchModal(true)}>+ Add Batch</Button>
       </Stack>
 

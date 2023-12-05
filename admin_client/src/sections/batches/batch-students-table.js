@@ -42,7 +42,7 @@ export const StudentsTable = (props) => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell padding="checkbox">
+                {/* <TableCell padding="checkbox">
                   <Checkbox
                     checked={selectedAll}
                     indeterminate={selectedSome}
@@ -54,7 +54,7 @@ export const StudentsTable = (props) => {
                       }
                     }}
                   />
-                </TableCell>
+                </TableCell> */}
                 <TableCell>Roll No.</TableCell>
                 <TableCell>Name</TableCell>
                 <TableCell>Email</TableCell>
@@ -66,22 +66,22 @@ export const StudentsTable = (props) => {
             </TableHead>
             <TableBody>
               {items.map((student) => {
-                const isSelected = selected.includes(student.id);
+                const isSelected = selected.includes(student.rollno);
 
                 return (
-                  <TableRow hover key={student.id} selected={isSelected}>
-                    <TableCell padding="checkbox">
+                  <TableRow hover key={student.rollno} selected={isSelected}>
+                    {/* <TableCell padding="checkbox">
                       <Checkbox
                         checked={isSelected}
                         onChange={(event) => {
                           if (event.target.checked) {
-                            onSelectOne?.(student.id);
+                            onSelectOne?.(student.rollno);
                           } else {
-                            onDeselectOne?.(student.id);
+                            onDeselectOne?.(student.rollno);
                           }
                         }}
                       />
-                    </TableCell>
+                    </TableCell> */}
                     <TableCell>{student.rollno}</TableCell>
                     <TableCell>{student.name}</TableCell>
                     <TableCell>{student?.user?.email}</TableCell>

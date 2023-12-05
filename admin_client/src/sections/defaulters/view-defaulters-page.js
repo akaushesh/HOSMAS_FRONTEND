@@ -12,14 +12,10 @@ import { applyPagination } from "src/utils/apply-pagination";
 import { DefaultersTable } from "src/sections/defaulters/defaulters-table";
 import { DefaultersSearch } from "src/sections/defaulters/defaulters-search";
 import { useAuthContext } from "src/contexts/auth-context";
-import {
-  createDefaulter,
-  deleteDefaulters,
-  exportDefaulters,
-  getAllDefaulters,
-  importDefaulters,
-} from "src/services/defaulter";
+import { createDefaulter, deleteDefaulters, getAllDefaulters } from "src/services/defaulter";
 import CustomModal from "src/components/CustomModal";
+import { importDefaulters } from "src/services/import";
+import { exportDefaulters } from "src/services/export";
 
 const useDefaultersIDs = (defaulters) => {
   return useMemo(() => {

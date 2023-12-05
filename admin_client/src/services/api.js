@@ -26,6 +26,10 @@ export const batchApi = axios.create({
   baseURL: url + "dashboard/",
 });
 
+export const studentApi = axios.create({
+  baseURL: url + "dashboard/student/",
+});
+
 export const faqApi = axios.create({
   baseURL: url + "dashboard/",
 });
@@ -36,6 +40,10 @@ export const defaulterApi = axios.create({
 
 export const exportApi = axios.create({
   baseURL: url + "dashboard/export/",
+});
+
+export const importApi = axios.create({
+  baseURL: url + "dashboard/import/",
 });
 
 export const otherApi = axios.create({

@@ -32,12 +32,3 @@ export const getStudents = async (query, students_per_page, page, batch, accessT
   );
   return res;
 };
-
-export const importStudents = async (data, accessToken) => {
-  const res = await otherApi.post("dashboard/import-data", data, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
-  return res;
-};

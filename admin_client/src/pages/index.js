@@ -9,7 +9,6 @@ import { OverviewSales } from "src/sections/overview/overview-sales";
 import { OverviewTasksProgress } from "src/sections/overview/overview-tasks-progress";
 import { OverviewTotalCustomers } from "src/sections/overview/overview-total-customers";
 import { OverviewTotalProfit } from "src/sections/overview/overview-total-profit";
-import { StudentAccountProfilePage } from "src/sections/account/student-account-profile-details";
 import { OverviewTraffic } from "src/sections/overview/overview-traffic";
 import { Fragment } from "react";
 import { AdminAccountProfilePage } from "src/sections/account/admin-account-profile-details";

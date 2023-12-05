@@ -223,7 +223,7 @@ export const PreferencesList = ({ sectionId, preferences, setPreferences }) => {
       <CustomModal
         open={openUpdatePreferenceModal}
         onClose={() => setOpenUpdatePreferenceModal(false)}
-        minWidth={400}
+        maxWidth={400}
       >
         <Box>
           <Stack direction="row" alignItems="center" justifyContent="space-between" mb={3}>

@@ -45,8 +45,11 @@ export const updateBatch = async (id, data, accessToken) => {
   return res;
 };
 
-export const deleteBatch = async (data, accessToken) => {
-  const res = await batchApi.delete("delete/", data, {
+export const deleteBatch = async (batchId, accessToken) => {
+  const data = { id: batchId };
+
+  const res = await batchApi.delete("batch/delete/", {
+    data,
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },

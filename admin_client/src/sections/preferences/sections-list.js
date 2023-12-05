@@ -24,7 +24,7 @@ function SectionsList({ sections = [] }) {
           <Grid item xs={6} md={4}>
             <Card>
               <Link
-                href={`/manage-preferences/${section.id}/`}
+                href={`/manage-sections/${section.id}/`}
                 style={{ textDecoration: "none", color: "black" }}
               >
                 <CardContent>
