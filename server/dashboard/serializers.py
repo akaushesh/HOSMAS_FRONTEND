@@ -116,7 +116,7 @@ class SectionSerializer(serializers.ModelSerializer):
       batch_name = serializers.SerializerMethodField()
       class Meta:
             model = Section
-            fields = ['id', 'batch_name', 'batch', 'gender', 'is_allotment_result_public', 'is_allotment_enabled', 'is_retain_allowed']
+            fields = ['id', 'batch_name', 'batch', 'gender', 'is_allotment_result_public', 'is_allotment_enabled', 'is_retain_allowed', 'group_size_limit']
             extra_kwargs = {
                   'batch': {'write_only': True}
             }

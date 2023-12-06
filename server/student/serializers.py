@@ -114,14 +114,16 @@ class StudentProfileSerializer(serializers.ModelSerializer):
       group = SerializerMethodField()
       is_preference_filled = SerializerMethodField()
       academic_session = SerializerMethodField()
+      group_size_limit = SerializerMethodField()
 
       class Meta:
             model = Student
-            fields = ['rollno', 'name', 'phoneno', 'gender', 'cg', 'batch', 'current_room', 'alloted_room', 'user', 'group', 'is_preference_filled', 'academic_session', 'current_hostel', 'preview_hostel', 'alloted_hostel']
+            fields = ['rollno', 'name', 'phoneno', 'gender', 'cg', 'batch', 'current_room', 'alloted_room', 'user', 'group', 'is_preference_filled', 'academic_session', 'current_hostel', 'preview_hostel', 'alloted_hostel', 'group_size_limit']
             extra_kwargs = {
                   'alloted_room': {'write_only': True},
                   'current_room': {'write_only': True},
             }
+
       def get_group(self, obj):
             try:
                   group = obj.leader_of_group
@@ -171,6 +173,12 @@ class StudentProfileSerializer(serializers.ModelSerializer):
                         return None
             serializer = StudentProfileRoomTypeSerializer(obj.alloted_room)
             return serializer.data
+      
+      def get_group_size_limit(self, obj):
+            section = Section.objects.filter(batch=obj.batch, gender=obj.gender).first()
+            if section is None:
+                  return 1
+            return section.group_size_limit
       
       @transaction.atomic
       def create(self, validated_data):

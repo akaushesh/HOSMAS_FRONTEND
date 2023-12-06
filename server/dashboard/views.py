@@ -823,14 +823,21 @@ class ExportGroupsView(APIView):
             for key in include.keys():
                   if include[key]:
                         student_fields.append(key)
-
-            for member_name in ['Leader', 'Member 1', 'Member 2', 'Member 3']:
-                  for field in student_fields:
-                        header.append(f"{member_name} {field}")
             
             preferences_cnt = 0
             for section in sections:
                   preferences_cnt = max(preferences_cnt, section.choices.count())
+                  group_size_limit = max(group_size_limit, section.group_size_limit)
+            
+            if group_size_limit==1:
+                  header_student_stakeholders = ['Student']
+            else:
+                  header_student_stakeholders = ['Leader']
+                  for i in range(1, group_size_limit):
+                        header_student_stakeholders.append(f'Member {i}')
+            for member_name in header_student_stakeholders:
+                  for field in student_fields:
+                        header.append(f"{member_name} {field}")
 
             for i in range(1, preferences_cnt+1):
                   header.append(f'Preference {i} Hostel')            
