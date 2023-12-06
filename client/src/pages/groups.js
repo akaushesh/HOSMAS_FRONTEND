@@ -1,12 +1,23 @@
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
 import Head from "next/head";
 import { Box, Button, Container, Grid, Stack, SvgIcon, Typography } from "@mui/material";
 import { Layout as DashboardLayout } from "src/layouts/dashboard/layout";
 import { CustomersTable } from "src/sections/customer/customers-table";
 import { CustomersSearch } from "src/sections/customer/customers-search";
 import { OverviewLatestProducts } from "src/sections/overview/overview-latest-products";
+import { useRouter } from "next/router";
+import { useAuthContext } from "src/contexts/auth-context";
 
 const Page = () => {
+  const router = useRouter();
+  const auth = useAuthContext();
+
+  useEffect(() => {
+    if (auth.user.group_size == 1) {
+      router.push("/404");
+    }
+  }, []);
+
   return (
     <Fragment>
       <Head>

@@ -135,6 +135,7 @@ export const AuthProvider = (props) => {
         alloted_hostel: userProfile?.alloted_hostel,
         alloted_room: userProfile?.alloted_room,
         preference_filled: userProfile?.preference_filled,
+        group_size: 4,
       };
 
       dispatch({
@@ -202,6 +203,7 @@ export const AuthProvider = (props) => {
         alloted_hostel: userProfile?.alloted_hostel,
         alloted_room: userProfile?.alloted_room,
         preference_filled: userProfile?.preference_filled,
+        group_size: 4,
       };
 
       dispatch({

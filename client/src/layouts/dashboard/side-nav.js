@@ -106,6 +106,8 @@ export const SideNav = (props) => {
             }}
           >
             {items.map((item) => {
+              if (auth.user.group_size == 1 && item.title == "Group") return;
+
               const active = item.path ? pathname === item.path : false;
 
               return (

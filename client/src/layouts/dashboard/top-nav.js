@@ -18,11 +18,13 @@ import {
 import { alpha } from "@mui/material/styles";
 import { usePopover } from "src/hooks/use-popover";
 import { AccountPopover } from "./account-popover";
+import { useAuthContext } from "src/contexts/auth-context";
 
 const SIDE_NAV_WIDTH = 280;
 const TOP_NAV_HEIGHT = 64;
 
 export const TopNav = (props) => {
+  const auth = useAuthContext();
   const { onNavOpen } = props;
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
   const accountPopover = usePopover();
@@ -81,13 +83,16 @@ export const TopNav = (props) => {
             </Tooltip> */}
           </Stack>
           <Stack alignItems="center" direction="row" spacing={2}>
-            <Tooltip title="Group" onClick={redirectToGroup}>
-              <IconButton>
-                <SvgIcon fontSize="small">
-                  <UsersIcon />
-                </SvgIcon>
-              </IconButton>
-            </Tooltip>
+            {auth.user.group_size != 1 && (
+              <Tooltip title="Group" onClick={redirectToGroup}>
+                <IconButton>
+                  <SvgIcon fontSize="small">
+                    <UsersIcon />
+                  </SvgIcon>
+                </IconButton>
+              </Tooltip>
+            )}
+
             {/* <Tooltip title="Notifications">
               <IconButton>
                 <Badge badgeContent={4} color="success" variant="dot">

@@ -6,10 +6,12 @@ import { OverviewTotalCustomers } from "src/sections/overview/overview-total-cus
 import { AccountProfileDetails } from "src/sections/account/account-profile-details";
 import { Fragment } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { useAuthContext } from "src/contexts/auth-context";
 
 const Page = () => {
   const queryClient = useQueryClient();
   const user = queryClient.getQueryData(["getProfile"]);
+  const auth = useAuthContext();
 
   return (
     <Fragment>
@@ -47,13 +49,16 @@ const Page = () => {
                   sx={{ height: "100%" }}
                 />
               </Grid>
-              <Grid>
-                <OverviewTotalCustomers
-                  memberCount={user?.group?.size}
-                  preferenceFilled={user?.preferenceFilled}
-                  sx={{ height: "100%" }}
-                />
-              </Grid>
+
+              {auth.user.group_size != 1 && (
+                <Grid>
+                  <OverviewTotalCustomers
+                    memberCount={user?.group?.size}
+                    preferenceFilled={user?.preferenceFilled}
+                    sx={{ height: "100%" }}
+                  />
+                </Grid>
+              )}
             </Grid>
           </Grid>
         </Container>

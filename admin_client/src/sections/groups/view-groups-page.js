@@ -20,7 +20,6 @@ import { useSelection } from "src/hooks/use-selection";
 import { Layout as DashboardLayout } from "src/layouts/dashboard/layout";
 import { applyPagination } from "src/utils/apply-pagination";
 import { GroupsTable } from "src/sections/groups/groups-table";
-import { GroupsSearch } from "src/sections/groups/groups-search";
 import { getAllGroups } from "src/services/others";
 import { useAuthContext } from "src/contexts/auth-context";
 import CustomModal from "src/components/CustomModal";
