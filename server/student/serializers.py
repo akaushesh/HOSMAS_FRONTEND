@@ -114,11 +114,12 @@ class StudentProfileSerializer(serializers.ModelSerializer):
       group = SerializerMethodField()
       is_preference_filled = SerializerMethodField()
       academic_session = SerializerMethodField()
+      fee_structure_url = SerializerMethodField()
       group_size_limit = SerializerMethodField()
 
       class Meta:
             model = Student
-            fields = ['rollno', 'name', 'phoneno', 'gender', 'cg', 'batch', 'current_room', 'alloted_room', 'user', 'group', 'is_preference_filled', 'academic_session', 'current_hostel', 'preview_hostel', 'alloted_hostel', 'group_size_limit']
+            fields = ['rollno', 'name', 'phoneno', 'gender', 'cg', 'batch', 'current_room', 'alloted_room', 'user', 'group', 'is_preference_filled', 'academic_session', 'fee_structure_url', 'current_hostel', 'preview_hostel', 'alloted_hostel', 'group_size_limit']
             extra_kwargs = {
                   'alloted_room': {'write_only': True},
                   'current_room': {'write_only': True},
@@ -161,6 +162,17 @@ class StudentProfileSerializer(serializers.ModelSerializer):
                   instance.save()
             cache.set('academicSession', instance.name)
             return instance.name
+
+      def get_fee_structure_url(self, obj):
+            cachedObj = cache.get('feeStructureUrl')
+            if cachedObj is not None:
+                  return cachedObj
+            instance = AcademicSession.objects.first()
+            if instance is None:
+                  instance = AcademicSession(name='')
+                  instance.save()
+            cache.set('feeStructureUrl', instance.fee_structure_url)
+            return instance.fee_structure_url
       
       def get_preview_hostel(self, obj):
             if obj.preview_room is None or not self.context.get('is_admin', False):
