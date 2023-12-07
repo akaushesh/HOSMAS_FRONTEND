@@ -20,6 +20,7 @@ import { useRouter } from "next/router";
 import { useAuth } from "src/hooks/use-auth";
 import { useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import PaidIcon from "@mui/icons-material/Paid";
 
 export const SideNav = (props) => {
   const { open, onClose } = props;
@@ -126,6 +127,17 @@ export const SideNav = (props) => {
                 />
               );
             })}
+            <SideNavItem
+              icon={
+                <SvgIcon fontSize="small">
+                  <PaidIcon />
+                </SvgIcon>
+              }
+              title={"Fee structure"}
+              onClick={() => {
+                window.open(user?.fee_structure_url, "_blank");
+              }}
+            />
             <SideNavItem
               icon={
                 <SvgIcon fontSize="small">
