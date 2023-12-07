@@ -451,7 +451,7 @@ class UpdateSectionsAllotmentStatusView(APIView):
                   instance = Section.objects.filter(id=item.get('id')).first()
                   if instance is None:
                         return Response(status=status.HTTP_400_BAD_REQUEST)
-                  instance.is_allotment_enabled = item.get('is_allotment_enabled', item.is_allotment_enabled)
+                  instance.is_allotment_enabled = item.get('is_allotment_enabled', instance.is_allotment_enabled)
                   instance.save()
             return Response(status=status.HTTP_200_OK)
 
