@@ -41,7 +41,8 @@ export const FormConfirmation = ({ onClose, preferences, retain }) => {
           router.push("/preferences");
         })
         .catch(function (error) {
-          setError("Something went wrong");
+          if (error?.response?.data?.detail) setError(error?.response?.data?.detail);
+          else setError("Something went wrong");
         });
     } else {
       const url = URL + "preferences/createPreference/";
