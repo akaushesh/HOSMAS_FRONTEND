@@ -767,7 +767,7 @@ class ImportStudentsView(APIView):
             filename = f"{datetime.now().strftime('%Y%m%d_%H%M')}_{file.name}"
 
             if filename.split('.')[-1]!='xlsx':
-                  return Response({'error':'Only .xlsx file format supported!'}, status=status.HTTP_400_BAD_REQUEST)
+                  return Response({'detail': 'Only xlsx file format supported!'}, status=status.HTTP_400_BAD_REQUEST)
             
             storage = default_storage
             storage.location = os.path.join(settings.BASE_DIR, 'imported-data', 'student')
@@ -971,7 +971,7 @@ class ImportDefaultersView(APIView):
             filename = f"{datetime.now().strftime('%Y%m%d_%H%M')}_{file.name}"
 
             if filename.split('.')[-1]!='xlsx':
-                  return Response({'error':'file not xlsx'}, status=status.HTTP_400_BAD_REQUEST)
+                  return Response({'error': 'Only xlsx file format supported!'}, status=status.HTTP_400_BAD_REQUEST)
             
             storage = default_storage
             storage.location = os.path.join(settings.BASE_DIR, 'imported-data', 'defaulter')
@@ -1020,12 +1020,12 @@ class ExportGroupsView(APIView):
       def post(self, request):
             if request.data.get('section')=='all':
                   sections = Section.objects.select_related('batch').all()
-                  filename = f"export/group/all.xlsx"
+                  filename = f"export/group/all_{''.join(choice(string.ascii_letters + string.digits) for _ in range(40))}.xlsx"
             else:
                   section = Section.objects.filter(id=request.data.get('section')).select_related('batch').first()
                   if section is None:
                         return Response(status=status.HTTP_400_BAD_REQUEST)
-                  filename = f"export/group/{section.batch.name}_{section.gender}.xlsx"
+                  filename = f"export/group/{section.batch.name}_{section.gender}_{''.join(choice(string.ascii_letters + string.digits) for _ in range(40))}.xlsx"
                   sections = [section]
             
             include = OrderedDict([
@@ -1054,6 +1054,7 @@ class ExportGroupsView(APIView):
                         student_fields.append(key)
             
             preferences_cnt = 0
+            group_size_limit = 1
             for section in sections:
                   preferences_cnt = max(preferences_cnt, section.choices.count())
                   group_size_limit = max(group_size_limit, section.group_size_limit)
@@ -1124,12 +1125,12 @@ class ExportStudentsView(APIView):
       def post(self, request):
             if request.data.get('batch')=='all':
                   batches = Batch.objects.prefetch_related('students__user', 'students__batch', 'students__current_room__hostel', 'students__alloted_room__hostel').all()
-                  filename = f"export/student/batch_all.xlsx"
+                  filename = f"export/student/batch_all_{''.join(choice(string.ascii_letters + string.digits) for _ in range(40))}.xlsx"
             else:
                   batch = Batch.objects.filter(id=request.data.get('batch')).prefetch_related('students__user', 'students__batch', 'students__current_room__hostel', 'students__alloted_room__hostel').first()
                   if batch is None:
                         return Response(status=status.HTTP_400_BAD_REQUEST)
-                  filename = f"export/student/batch_{batch.id}.xlsx"
+                  filename = f"export/student/batch_{batch.id}_{''.join(choice(string.ascii_letters + string.digits) for _ in range(40))}.xlsx"
                   batches = [batch]
             
             path = os.path.join(settings.MEDIA_ROOT, filename)
@@ -1200,7 +1201,7 @@ class ExportDefaultersView(APIView):
       permission_classes = [IsAuthenticated, IsAdmin]
 
       def get(self, request):
-            filename = f"export/defaulters.xlsx"
+            filename = f"export/defaulter/{''.join(choice(string.ascii_letters + string.digits) for _ in range(40))}.xlsx"
             path = os.path.join(settings.MEDIA_ROOT, filename)
             queryset = Defaulter.objects.select_related('student__user', 'student__batch', 'student__current_room__hostel', 'student__alloted_room__hostel').all()
             
