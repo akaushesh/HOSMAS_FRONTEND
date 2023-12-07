@@ -15,6 +15,9 @@ import {
   Typography,
   TextField,
   MenuItem,
+  Grid,
+  FormControlLabel,
+  FormHelperText,
 } from "@mui/material";
 import { useSelection } from "src/hooks/use-selection";
 import { Layout as DashboardLayout } from "src/layouts/dashboard/layout";
@@ -27,6 +30,7 @@ import CustomModal from "src/components/CustomModal";
 import { exportGroups } from "src/services/export";
 import { getAllSections } from "src/services/section";
 import { TableSearch } from "src/components/table-search";
+import { AddGroup } from "./add-grooup";
 
 const useGroupsIDs = (customers) => {
   return useMemo(() => {
@@ -199,11 +203,13 @@ const ViewGroupsPage = () => {
           onClose={() => {
             setOpenCreateGroupModal(false);
           }}
+          maxWidth={400}
         >
-          <Typography>Create a Group</Typography>
-          <TextField label="Leader Roll no." />
-
-          {}
+          <AddGroup
+            onClose={() => {
+              setOpenCreateGroupModal(false);
+            }}
+          />
         </CustomModal>
 
         <CustomModal
