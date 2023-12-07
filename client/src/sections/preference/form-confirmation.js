@@ -68,14 +68,15 @@ export const FormConfirmation = ({ onClose, preferences, retain }) => {
       axios(createPreferencesConfig)
         .then(function (response) {
           queryClient.invalidateQueries(["getAvailablePreferences"]);
+          onClose();
           router.push("/preferences");
         })
         .catch(function (error) {
-          setError("Something went wrong");
+          if (error?.response?.data?.detail) setError(error?.response?.data?.detail);
+          else setError("Something went wrong");
         });
     }
     setLoading(false);
-    onClose();
   };
 
   return (
