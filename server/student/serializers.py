@@ -1,11 +1,14 @@
 from django.db import transaction
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.cache import cache
 from rest_framework.serializers import ModelSerializer, SerializerMethodField, SlugRelatedField
 from rest_framework import serializers
-from .models import Invitation, Student, Group, Batch
+from .models import Invitation, Student, Group, Batch, Section
 from dashboard.models import AllotmentStatus, AcademicSession
 from preference.models import RoomType
 from user.models import User
+from random import choice
+import string
 
 
 class InvitationsReceivedSerializer(ModelSerializer):
@@ -87,63 +90,86 @@ class StudentProfileRoomTypeSerializer(serializers.ModelSerializer):
       # nested serializer for handling current and alloted hostels in admin side student view
 
       hostel = serializers.SerializerMethodField()
+      hostel_id = serializers.SerializerMethodField()
+      room_type = serializers.SerializerMethodField()
+      room_type_id = serializers.SerializerMethodField()
       
       class Meta:
             model = RoomType
-            fields = ['id', 'name', 'hostel']
+            fields = ['id', 'room_type_id', 'room_type', 'hostel_id', 'hostel']
             extra_kwargs = {
-                  'name': {'read_only': True},
-                  'id': {'read_only': False}
+                  'id': {'read_only': False, 'write_only': True}
             }
       
       def get_hostel(self, obj):
             return obj.hostel.name
+      
+      def get_hostel_id(self, obj):
+            return obj.hostel.id
+      
+      def get_room_type(self, obj):
+            return obj.name
+      
+      def get_room_type_id(self, obj):
+            return obj.id
 
 
 class StudentProfileSerializer(serializers.ModelSerializer):
       # Serializer to represent student profile data on admin side
 
       batch = StudentProfileBatchSerializer()
-      current_room = StudentProfileRoomTypeSerializer(allow_null=True)
-      alloted_room = StudentProfileRoomTypeSerializer(allow_null=True)
       user = UserSerializer()
+      current_hostel = StudentProfileRoomTypeSerializer(read_only=True, source='current_room')
+      preview_hostel = serializers.SerializerMethodField()
+      alloted_hostel = serializers.SerializerMethodField()
       
       group = SerializerMethodField()
       is_preference_filled = SerializerMethodField()
       academic_session = SerializerMethodField()
+      fee_structure_url = SerializerMethodField()
+      group_size_limit = SerializerMethodField()
 
       class Meta:
             model = Student
-            fields = ['rollno', 'name', 'phoneno', 'gender', 'cg', 'batch', 'current_room', 'alloted_room', 'user', 'group', 'is_preference_filled', 'academic_session']
+            fields = ['rollno', 'name', 'phoneno', 'gender', 'cg', 'batch', 'current_room', 'alloted_room', 'user', 'group', 'is_preference_filled', 'academic_session', 'fee_structure_url', 'current_hostel', 'preview_hostel', 'alloted_hostel', 'group_size_limit']
+            extra_kwargs = {
+                  'alloted_room': {'write_only': True},
+                  'current_room': {'write_only': True},
+            }
 
       def get_group(self, obj):
             try:
                   group = obj.leader_of_group
-                  return {
+                  res = {
                         'leader_name': obj.name,
                         'leader_email': obj.user.email,
                         'size': group.members.count() + 1
                   }
-            except:
+            except ObjectDoesNotExist:
                   group = obj.group
                   if group is None:
                         return None
-                  return {
+                  res = {
                         'leader_name': group.leader.name,
                         'leader_email': group.leader.user.email,
                         'size': group.members.count() + 1
                   }
+            if self.context.get('is_admin', False):
+                  res['id'] = group.id
+            return res
       
       def get_is_preference_filled(self, obj):
             try:
                   group = obj.leader_of_group
-            except:
+            except ObjectDoesNotExist:
                   group = obj.group
                   if group is None:
                         return False
             return group.preferences.count() > 0
       
       def get_academic_session(self, obj):
+            if self.context.get('is_admin', False):
+                  return None
             cachedObj = cache.get('academicSession')
             if cachedObj is not None:
                   return cachedObj
@@ -153,6 +179,39 @@ class StudentProfileSerializer(serializers.ModelSerializer):
                   instance.save()
             cache.set('academicSession', instance.name)
             return instance.name
+
+      def get_fee_structure_url(self, obj):
+            if self.context.get('is_admin', False):
+                  return None
+            cachedObj = cache.get('feeStructureUrl')
+            if cachedObj is not None:
+                  return cachedObj
+            instance = AcademicSession.objects.first()
+            if instance is None:
+                  instance = AcademicSession(name='')
+                  instance.save()
+            cache.set('feeStructureUrl', instance.fee_structure_url)
+            return instance.fee_structure_url
+      
+      def get_preview_hostel(self, obj):
+            if obj.preview_room is None or not self.context.get('is_admin', False):
+                  return None
+            serializer = StudentProfileRoomTypeSerializer(obj.preview_room)
+            return serializer.data
+      
+      def get_alloted_hostel(self, obj):
+            if obj.alloted_room is None or not self.context.get('is_admin', False) and not Section.objects.filter(batch=obj.batch, gender=obj.gender, is_allotment_result_public=True).exists():
+                        return None
+            serializer = StudentProfileRoomTypeSerializer(obj.alloted_room)
+            return serializer.data
+      
+      def get_group_size_limit(self, obj):
+            if self.context.get('is_admin', False):
+                  return None
+            section = Section.objects.filter(batch=obj.batch, gender=obj.gender).first()
+            if section is None:
+                  return 1
+            return section.group_size_limit
       
       @transaction.atomic
       def create(self, validated_data):
@@ -168,23 +227,7 @@ class StudentProfileSerializer(serializers.ModelSerializer):
             if batch is None:
                   raise serializers.ValidationError({'batch': {'id': 'No Batch Found!'}})
 
-            current_room_data = validated_data.pop('current_room')
-            if current_room_data is not None:
-                  current_room = RoomType.objects.filter(id=current_room_data.get('id')).first()
-                  if current_room is None:
-                        raise serializers.ValidationError({'current_room': {'id': 'No Room Type Found!'}})
-            else:
-                  current_room = None
-            
-            alloted_room_data = validated_data.pop('alloted_room')
-            if alloted_room_data is not None:
-                  alloted_room = RoomType.objects.filter(id=alloted_room_data.get('id')).first()
-                  if alloted_room is None:
-                        raise serializers.ValidationError({'alloted_room': {'id': 'No Room Type Found!'}})
-            else:
-                  alloted_room = None
-
-            instance = Student.objects.create(user=user, batch=batch, current_room=current_room, alloted_room=alloted_room, **validated_data)
+            instance = Student.objects.create(user=user, batch=batch, **validated_data)
 
             return instance
 

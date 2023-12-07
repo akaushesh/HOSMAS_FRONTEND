@@ -7,6 +7,7 @@ from .models import User, ResetSlug
 
 from random import choice
 import string
+from .tasks import send_password_reset_mail
 
 # Create your views here.
 
@@ -39,7 +40,13 @@ class EmailResetPasswordView(APIView):
                   slug_instance = ResetSlug(user=user, slug=slug)
                   slug_instance.save()
 
-            # TODO: send a password reset email to user
+            try:
+                  name = user.student.name
+            except:
+                  name = "Admin"
+            #TODO: add url
+            url = "https://hosmas.ccstiet.com/forgot-password/"+slug_instance.slug
+            send_password_reset_mail.delay(name, url, user.email)
 
             return Response(status=status.HTTP_200_OK)
 

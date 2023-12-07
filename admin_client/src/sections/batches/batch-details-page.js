@@ -5,7 +5,17 @@ import { subDays, subHours } from "date-fns";
 import ArrowDownOnSquareIcon from "@heroicons/react/24/solid/ArrowDownOnSquareIcon";
 import ArrowUpOnSquareIcon from "@heroicons/react/24/solid/ArrowUpOnSquareIcon";
 import PlusIcon from "@heroicons/react/24/solid/PlusIcon";
-import { Box, Button, Container, Stack, SvgIcon, Typography, Card } from "@mui/material";
+import {
+  Box,
+  Button,
+  Container,
+  Stack,
+  SvgIcon,
+  Typography,
+  Card,
+  CardContent,
+  Grid,
+} from "@mui/material";
 import { useSelection } from "src/hooks/use-selection";
 import { Layout as DashboardLayout } from "src/layouts/dashboard/layout";
 import { applyPagination } from "src/utils/apply-pagination";
@@ -14,17 +24,20 @@ import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
 import Link from "next/link";
 import { useAuthContext } from "src/contexts/auth-context";
 import { getStudents } from "src/services/others";
-import { getBatch } from "src/services/batch";
+import { deleteBatch, getBatch } from "src/services/batch";
 import { TableSearch } from "src/components/table-search";
+import ConfirmationModal from "src/components/ConfirmationModal";
+import { useRouter } from "next/router";
 
-const useStudentsIDs = (customers) => {
+const useStudentsIDs = (students) => {
   return useMemo(() => {
-    return customers.map((customer) => customer.id);
-  }, [customers]);
+    return students.map((student) => student.rollno);
+  }, [students]);
 };
 
 const ViewBatchDetailsPage = ({ batchId }) => {
   const { accessToken } = useAuthContext();
+  const router = useRouter();
 
   const [batchName, setBatchName] = useState("");
 
@@ -33,6 +46,7 @@ const ViewBatchDetailsPage = ({ batchId }) => {
   const [students, setStudents] = useState([]);
   const studentsIds = useStudentsIDs(students);
   const studentsSelection = useSelection(studentsIds);
+  const [confirmationModalOpen, setConfirmationModalOpen] = useState();
 
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -76,6 +90,20 @@ const ViewBatchDetailsPage = ({ batchId }) => {
     setRowsPerPage(event.target.value);
   }, []);
 
+  const handleDeleteBatch = async () => {
+    try {
+      const res = await deleteBatch(batchId, accessToken);
+      console.log(res);
+
+      if (res.status == 200) {
+        setConfirmationModalOpen(false);
+        router.push("/manage-batches");
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   return (
     <>
       <Box
@@ -86,80 +114,68 @@ const ViewBatchDetailsPage = ({ batchId }) => {
         }}
       >
         <Container maxWidth="xl">
-          <Stack spacing={3}>
-            <Stack direction="row" justifyContent="space-between" spacing={4}>
-              <Stack spacing={1}>
-                <Stack direction="row" alignItems="center" mb={3}>
-                  <Link href="/manage-batches" style={{ transform: "translateY(15%)" }}>
-                    <KeyboardBackspaceIcon fontSize="large" />
-                  </Link>
-                  <Typography variant="h4" pl={3}>
-                    {batchName}
-                  </Typography>
-                </Stack>
-                <Stack alignItems="center" direction="row" spacing={1}>
-                  <Button
-                    color="inherit"
-                    startIcon={
-                      <SvgIcon fontSize="small">
-                        <ArrowUpOnSquareIcon />
-                      </SvgIcon>
-                    }
-                  >
-                    Import
-                  </Button>
-                  <Button
-                    color="inherit"
-                    startIcon={
-                      <SvgIcon fontSize="small">
-                        <ArrowDownOnSquareIcon />
-                      </SvgIcon>
-                    }
-                  >
-                    Export
-                  </Button>
-                </Stack>
-              </Stack>
-              {/* <div>
-                <Button
-                  startIcon={
-                    <SvgIcon fontSize="small">
-                      <PlusIcon />
-                    </SvgIcon>
-                  }
-                  variant="contained"
-                >
-                  Add
-                </Button>
-              </div> */}
+          <Stack direction="row" alignItems="center" mb={8} justifyContent="space-between">
+            <Stack direction="row" alignItems="center">
+              <Link href="/manage-batches" style={{ transform: "translateY(15%)" }}>
+                <KeyboardBackspaceIcon fontSize="large" />
+              </Link>
+
+              <Typography variant="h3" pl={3}>
+                {batchName}
+              </Typography>
             </Stack>
 
-            <Card sx={{ p: 2 }}>
-              <Stack direction="row" justifyContent="space-between" alignItems="center">
-                <TableSearch
-                  setSearchQuery={setSearchQuery}
-                  placeholder={"Enter Name, Email or Roll no."}
-                />
-                <Button sx={{ color: "error.main", height: "fit-content" }}>
-                  Delete Selected Items
-                </Button>
-              </Stack>
-            </Card>
-
-            <StudentsTable
-              count={students.length}
-              items={students}
-              onDeselectAll={studentsSelection.handleDeselectAll}
-              onDeselectOne={studentsSelection.handleDeselectOne}
-              onPageChange={handlePageChange}
-              onSelectAll={studentsSelection.handleSelectAll}
-              onSelectOne={studentsSelection.handleSelectOne}
-              page={page}
-              rowsPerPage={rowsPerPage}
-              selected={studentsSelection.selected}
-            />
+            <Button
+              variant="contained"
+              sx={{
+                backgroundColor: "error.main",
+                "&:hover": {
+                  backgroundColor: "error.dark",
+                },
+              }}
+              onClick={() => {
+                setConfirmationModalOpen(true);
+              }}
+            >
+              Delete Batch
+            </Button>
           </Stack>
+
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={4}>
+              <Card>
+                <CardContent>
+                  <Stack direction="row" justifyContent="space-evenly">
+                    <Typography variant="h5">Total Students: </Typography>
+                    <Typography variant="h5">83</Typography>
+                  </Stack>
+                </CardContent>
+              </Card>
+            </Grid>
+
+            <Grid item xs={12} md={4}>
+              <Card>
+                <CardContent>
+                  <Stack direction="row" justifyContent="space-evenly">
+                    <Typography variant="h5">Total Students: </Typography>
+                    <Typography variant="h5">83</Typography>
+                  </Stack>
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
         </Container>
+
+        <ConfirmationModal
+          open={confirmationModalOpen}
+          onClose={() => {
+            setConfirmationModalOpen(false);
+          }}
+          message="Are you sure you want to delete this secton?"
+          noMessage="No, leave it"
+          yesMessage="Yes, delete it"
+          execFunction={handleDeleteBatch}
+        />
       </Box>
     </>
   );

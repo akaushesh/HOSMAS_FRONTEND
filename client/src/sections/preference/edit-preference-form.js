@@ -107,7 +107,7 @@ export const EditPreferenceForm = (props) => {
                   </MenuItem>
                   {availableChoices.map((choice, index) => (
                     <MenuItem key={index} value={choice}>
-                      {choice.room_name}
+                      {choice.room_hostel} {choice.room_name}
                     </MenuItem>
                   ))}
                 </Select>

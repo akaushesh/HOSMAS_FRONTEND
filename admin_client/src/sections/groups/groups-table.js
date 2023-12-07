@@ -30,12 +30,19 @@ export const GroupsTable = (props) => {
     page = 0,
     rowsPerPage = 0,
     selected = [],
+    setGroupDetailsModalOpen,
+    setSelectedGroup,
   } = props;
 
   console.log(items);
 
   const selectedSome = selected.length > 0 && selected.length < items.length;
   const selectedAll = items.length > 0 && selected.length === items.length;
+
+  const handleGroupSelection = (id) => {
+    setSelectedGroup(items.filter((item) => item.id == id)[0]);
+    setGroupDetailsModalOpen(true);
+  };
 
   return (
     <Card>
@@ -70,7 +77,13 @@ export const GroupsTable = (props) => {
                 const isSelected = selected.includes(group.id);
 
                 return (
-                  <TableRow hover key={group.id} selected={isSelected}>
+                  <TableRow
+                    hover
+                    key={group.id}
+                    selected={isSelected}
+                    onClick={() => handleGroupSelection(group.id)}
+                    sx={{ cursor: "pointer" }}
+                  >
                     <TableCell padding="checkbox">
                       <Checkbox
                         checked={isSelected}

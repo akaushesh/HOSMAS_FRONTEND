@@ -201,7 +201,7 @@ export const AdminAccountProfilePage = () => {
           </Grid>
           <Grid xs={12} md={6} lg={4}>
             <Card>
-              <Link href="/manage-preferences" style={{ color: "black", textDecoration: "none" }}>
+              <Link href="/manage-sections" style={{ color: "black", textDecoration: "none" }}>
                 <CardContent>
                   <Stack direction="row" alignItems="center" justifyContent="space-evenly">
                     <Avatar

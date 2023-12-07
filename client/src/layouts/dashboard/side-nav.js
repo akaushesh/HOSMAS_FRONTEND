@@ -19,6 +19,8 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import { useRouter } from "next/router";
 import { useAuth } from "src/hooks/use-auth";
 import { useCallback } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import PaidIcon from "@mui/icons-material/Paid";
 
 export const SideNav = (props) => {
   const { open, onClose } = props;
@@ -27,6 +29,9 @@ export const SideNav = (props) => {
 
   const router = useRouter();
   const auth = useAuth();
+
+  const queryClient = useQueryClient();
+  const user = queryClient.getQueryData(["getProfile"]);
 
   const handleSignOut = useCallback(() => {
     auth.signOut();
@@ -106,6 +111,8 @@ export const SideNav = (props) => {
             }}
           >
             {items.map((item) => {
+              if (user?.group_size_limit == 1 && item.title == "Group") return;
+
               const active = item.path ? pathname === item.path : false;
 
               return (
@@ -120,6 +127,17 @@ export const SideNav = (props) => {
                 />
               );
             })}
+            <SideNavItem
+              icon={
+                <SvgIcon fontSize="small">
+                  <PaidIcon />
+                </SvgIcon>
+              }
+              title={"Fee structure"}
+              onClick={() => {
+                window.open(user?.fee_structure_url, "_blank");
+              }}
+            />
             <SideNavItem
               icon={
                 <SvgIcon fontSize="small">

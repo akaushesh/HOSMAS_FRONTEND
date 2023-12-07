@@ -26,6 +26,14 @@ export const batchApi = axios.create({
   baseURL: url + "dashboard/",
 });
 
+export const studentApi = axios.create({
+  baseURL: url + "dashboard/student/",
+});
+
+export const groupApi = axios.create({
+  baseURL: url + "dashboard/group/",
+});
+
 export const faqApi = axios.create({
   baseURL: url + "dashboard/",
 });
@@ -38,16 +46,10 @@ export const exportApi = axios.create({
   baseURL: url + "dashboard/export/",
 });
 
+export const importApi = axios.create({
+  baseURL: url + "dashboard/import/",
+});
+
 export const otherApi = axios.create({
   baseURL: url,
 });
-
-// export const addAccessTokenToRequests = (accessToken) => {
-//   console.log("Tokens added");
-//   authApi.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
-//   hostelApi.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
-//   roomTypeApi.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
-//   choiceApi.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
-//   sectionApi.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
-//   batchApi.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
-// };

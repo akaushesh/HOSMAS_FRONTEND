@@ -47,13 +47,16 @@ const Page = () => {
                   sx={{ height: "100%" }}
                 />
               </Grid>
-              <Grid>
-                <OverviewTotalCustomers
-                  memberCount={user?.group?.size}
-                  preferenceFilled={user?.preferenceFilled}
-                  sx={{ height: "100%" }}
-                />
-              </Grid>
+
+              {user?.group_size_limit != 1 && (
+                <Grid>
+                  <OverviewTotalCustomers
+                    memberCount={user?.group?.size}
+                    preferenceFilled={user?.preferenceFilled}
+                    sx={{ height: "100%" }}
+                  />
+                </Grid>
+              )}
             </Grid>
           </Grid>
         </Container>

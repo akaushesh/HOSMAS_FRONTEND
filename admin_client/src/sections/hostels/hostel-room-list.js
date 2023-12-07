@@ -216,7 +216,7 @@ export const HostelRoomList = ({ rooms, setHostelData, hostelId }) => {
         </Scrollbar>
       </Card>
 
-      <CustomModal open={showHostelRoomModal} onClose={onHostelRoomModalClose} minWidth={400}>
+      <CustomModal open={showHostelRoomModal} onClose={onHostelRoomModalClose} maxWidth={400}>
         <Box>
           <Stack direction="row" alignItems="center" justifyContent="space-between" mb={3}>
             <Typography variant="h5">{updateRoomTypeForm.roomTypeName}</Typography>

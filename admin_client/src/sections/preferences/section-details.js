@@ -67,7 +67,7 @@ function SectionPreference({ sectionId }) {
 
       if (res.status == 200) {
         setConfirmationModalOpen(false);
-        router.push("/manage-preferences");
+        router.push("/manage-sections");
       }
     } catch (err) {
       console.log(err);
@@ -120,7 +120,7 @@ function SectionPreference({ sectionId }) {
       <Container maxWidth="xl">
         <Stack direction="row" alignItems="center" mb={3} justifyContent="space-between">
           <Stack direction="row" alignItems="center">
-            <Link href="/manage-preferences" style={{ transform: "translateY(15%)" }}>
+            <Link href="/manage-sections" style={{ transform: "translateY(15%)" }}>
               <KeyboardBackspaceIcon fontSize="large" />
             </Link>
 
@@ -189,7 +189,7 @@ function SectionPreference({ sectionId }) {
 
             <Grid xs={6} md={12}>
               <Card
-                sx={{ display: "flex", alignItems: "center" }}
+                sx={{ display: "flex", alignItems: "center", cursor: "pointer" }}
                 onClick={handleDownloadAllotmentData}
               >
                 <CardContent>

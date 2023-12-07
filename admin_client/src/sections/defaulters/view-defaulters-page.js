@@ -12,13 +12,15 @@ import { applyPagination } from "src/utils/apply-pagination";
 import { DefaultersTable } from "src/sections/defaulters/defaulters-table";
 import { DefaultersSearch } from "src/sections/defaulters/defaulters-search";
 import { useAuthContext } from "src/contexts/auth-context";
-import { addDefaulter, getAllDefaulters, importDefaulters } from "src/services/defaulter";
+import { createDefaulter, deleteDefaulters, getAllDefaulters } from "src/services/defaulter";
 import CustomModal from "src/components/CustomModal";
+import { importDefaulters } from "src/services/import";
+import { exportDefaulters } from "src/services/export";
 
-const useDefaultersIDs = (customers) => {
+const useDefaultersIDs = (defaulters) => {
   return useMemo(() => {
-    return customers.map((customer) => customer.id);
-  }, [customers]);
+    return defaulters.map((defaulter) => defaulter.id);
+  }, [defaulters]);
 };
 
 const ViewDefaultersPage = () => {
@@ -32,13 +34,6 @@ const ViewDefaultersPage = () => {
   const [openAddDefaulterModal, setOpenAddDefaulterModal] = useState(false);
   const [addDefaulterRollNo, setAddDefaulterRollNo] = useState();
   const [searchQuery, setSearchQuery] = useState("");
-
-  const [importDataFile, setImportDataFile] = useState();
-  // const defaultersSelection = useMemo(() => {
-  //   return useSelection(defaultersIds);
-  // }, [defaultersIds]);
-
-  console.log(searchQuery);
 
   useEffect(() => {
     const fetchDefaultersData = async () => {
@@ -61,6 +56,12 @@ const ViewDefaultersPage = () => {
 
     try {
       const res = await importDefaulters(formData, accessToken);
+      if (res.status == 202) {
+        const res1 = await getAllDefaulters(searchQuery, 20, page + 1, accessToken);
+        if (res1.status == 200) {
+          setDefaulters(res1.data.data);
+        }
+      }
       console.log(res);
     } catch (err) {
       console.log(err);
@@ -76,12 +77,36 @@ const ViewDefaultersPage = () => {
 
   const handleAddDefaulter = async () => {
     try {
-      const res = await addDefaulter(addDefaulterRollNo, accessToken);
+      const res = await createDefaulter(addDefaulterRollNo, accessToken);
       if (res.status == 201) {
         setDefaulters((prev) => [...prev, res?.data]);
         setAddDefaulterRollNo("");
         setOpenAddDefaulterModal(false);
         console.log(res);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleExportDefaulters = async () => {
+    try {
+      const res = await exportDefaulters(accessToken);
+      if (res.status == 200) {
+        window.open(res?.data?.link, "_blank");
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleDeleteDefaulters = async () => {
+    try {
+      const res = await deleteDefaulters(defaultersSelection.selected, accessToken);
+      if (res.status === 200) {
+        setDefaulters((prev) =>
+          prev.filter((defaulter) => !defaultersSelection.selected.includes(defaulter.id))
+        );
       }
     } catch (err) {
       console.log(err);
@@ -128,12 +153,7 @@ const ViewDefaultersPage = () => {
                       },
                     }}
                   >
-                    <input
-                      type="file"
-                      id="fileInput"
-                      onChange={handleFileSelect}
-                      accept=".csv, .xlsx"
-                    />
+                    <input type="file" id="fileInput" onChange={handleFileSelect} accept=".xlsx" />
                     Import
                   </Button>
 
@@ -144,6 +164,7 @@ const ViewDefaultersPage = () => {
                         <ArrowDownOnSquareIcon />
                       </SvgIcon>
                     }
+                    onClick={handleExportDefaulters}
                   >
                     Export
                   </Button>
@@ -169,7 +190,10 @@ const ViewDefaultersPage = () => {
             <Card sx={{ p: 2 }}>
               <Stack direction="row" justifyContent="space-between" alignItems="center">
                 <DefaultersSearch setSearchQuery={setSearchQuery} />
-                <Button sx={{ color: "error.main", height: "fit-content" }}>
+                <Button
+                  sx={{ color: "error.main", height: "fit-content" }}
+                  onClick={handleDeleteDefaulters}
+                >
                   Delete Selected Items
                 </Button>
               </Stack>

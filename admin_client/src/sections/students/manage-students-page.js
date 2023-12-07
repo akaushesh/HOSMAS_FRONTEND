@@ -17,21 +17,21 @@ import {
   MenuItem,
 } from "@mui/material";
 import { useSelection } from "src/hooks/use-selection";
-import { Layout as DashboardLayout } from "src/layouts/dashboard/layout";
 import { applyPagination } from "src/utils/apply-pagination";
-import { GroupsSearch } from "src/sections/groups/groups-search";
-import { getAllGroups, getStudents } from "src/services/others";
+import { getStudents } from "src/services/others";
 import { useAuthContext } from "src/contexts/auth-context";
 import CustomModal from "src/components/CustomModal";
-import { exportGroups } from "src/services/export";
-import { getAllSections } from "src/services/section";
+import { exportStudents } from "src/services/export";
+import { getAllBatches } from "src/services/batch";
 import { TableSearch } from "src/components/table-search";
 import { StudentsTable } from "./students-table";
+import { createStudent } from "src/services/student";
+import { importStudents } from "src/services/import";
 
-const useGroupsIDs = (customers) => {
+const useStudentsIDs = (students) => {
   return useMemo(() => {
-    return customers.map((customer) => customer.id);
-  }, [customers]);
+    return students.map((student) => student.rollno);
+  }, [students]);
 };
 
 const ViewStudentsPage = () => {
@@ -39,69 +39,101 @@ const ViewStudentsPage = () => {
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(20);
-  const [groups, setGroups] = useState([]);
-  const groupsIds = useGroupsIDs(groups);
-  const groupsSelection = useSelection(groupsIds);
-  // const groupsSelection = useMemo(() => {
-  //   return useSelection(groupsIds);
-  // }, [groupsIds]);
-  const [openCreateGroupModal, setOpenCreateGroupModal] = useState(false);
+  const [students, setStudents] = useState([]);
+  const studentsIds = useStudentsIDs(students);
+  const studentsSelection = useSelection(studentsIds);
+  const [openCreateStudentModal, setOpenCreateStudentModal] = useState(false);
 
-  const [openExportGroupsModal, setOpenExportsGroupsModal] = useState(false);
-  const [sections, setSections] = useState([]);
-  const [exportSectionId, setExportSectionId] = useState();
+  const [openExportStudentsModal, setOpenExportStudentModal] = useState(false);
+  const [batches, setBatches] = useState([]);
+  const [exportBatchId, setExportBatchId] = useState();
 
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     try {
-      const fetchGroupsData = async () => {
-        const res = await getStudents(searchQuery, 20, page + 1, "", accessToken);
+      const fetchStudentsData = async () => {
+        const res = await getStudents(searchQuery, 20, page + 1, "all", accessToken);
         if (res.status == 200) {
-          setGroups(res.data.data);
+          setStudents(res.data.data);
         }
         console.log(res);
       };
 
-      fetchGroupsData();
+      fetchStudentsData();
     } catch (err) {
       console.log(err);
     }
   }, [page, searchQuery]);
 
   useEffect(() => {
-    if (openExportGroupsModal == true) {
+    if (openExportStudentsModal == true) {
       try {
-        const fetchAllSections = async () => {
-          const res = await getAllSections(accessToken);
+        const fetchAllBatches = async () => {
+          const res = await getAllBatches(accessToken);
           if (res.status == 200) {
-            setSections(res.data);
+            setBatches([...res.data, { id: "all", name: "All" }]);
           }
           console.log(res);
         };
 
-        fetchAllSections();
+        fetchAllBatches();
       } catch (err) {
         console.log(err);
       }
     }
-  }, [openExportGroupsModal]);
+  }, [openExportStudentsModal]);
+
+  const handleFileSelect = async (e) => {
+    // Assuming you have only one file to upload
+    const selectedFile = e.target.files[0];
+
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+
+    try {
+      const res = await importStudents(formData, accessToken);
+      if (res.status == 202) {
+        const res1 = await getStudents(searchQuery, 20, page + 1, "all", accessToken);
+        if (res1.status == 200) {
+          setDefaulters(res1.data.data);
+        }
+      }
+      console.log(res);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   const handlePageChange = useCallback((event, value) => {
     setPage(value);
   }, []);
 
+  const handleAddStudent = async () => {
+    try {
+      const res = await createStudent(addDefaulterRollNo, accessToken);
+      if (res.status == 201) {
+        setDefaulters((prev) => [...prev, res?.data]);
+        setAddDefaulterRollNo("");
+        setOpenAddDefaulterModal(false);
+        console.log(res);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   const handleExportGroupData = () => {
     try {
-      const fetchExportGroupsLink = async () => {
-        const res = await exportGroups(exportSectionId, accessToken);
+      const fetchExportStudentsLink = async () => {
+        const res = await exportStudents(exportBatchId, accessToken);
         if (res.status == 200) {
           window.open(res?.data?.link, "_blank");
         }
-        setOpenExportsGroupsModal(false);
+        setOpenExportStudentModal(false);
       };
 
-      fetchExportGroupsLink();
+      fetchExportStudentsLink();
     } catch (err) {
       console.log(err);
     }
@@ -130,7 +162,24 @@ const ViewStudentsPage = () => {
                         <ArrowUpOnSquareIcon />
                       </SvgIcon>
                     }
+                    component="label"
+                    htmlFor="fileInput"
+                    sx={{
+                      cursor: "pointer",
+                      position: "relative",
+                      overflow: "hidden",
+                      "& input": {
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        width: "100%",
+                        height: "100%",
+                        opacity: 0,
+                        cursor: "pointer",
+                      },
+                    }}
                   >
+                    <input type="file" id="fileInput" onChange={handleFileSelect} accept=".xlsx" />
                     Import
                   </Button>
 
@@ -142,7 +191,7 @@ const ViewStudentsPage = () => {
                       </SvgIcon>
                     }
                     onClick={() => {
-                      setOpenExportsGroupsModal(true);
+                      setOpenExportStudentModal(true);
                     }}
                   >
                     Export
@@ -159,7 +208,7 @@ const ViewStudentsPage = () => {
                   }
                   variant="contained"
                   onClick={() => {
-                    setOpenCreateGroupModal(true);
+                    setOpenCreateStudentModal(true);
                   }}
                 >
                   Add
@@ -180,36 +229,35 @@ const ViewStudentsPage = () => {
             </Card>
 
             <StudentsTable
-              count={groups.length}
-              items={groups}
-              onDeselectAll={groupsSelection.handleDeselectAll}
-              onDeselectOne={groupsSelection.handleDeselectOne}
+              count={students.length}
+              items={students}
+              onDeselectAll={studentsSelection.handleDeselectAll}
+              onDeselectOne={studentsSelection.handleDeselectOne}
               onPageChange={handlePageChange}
-              onSelectAll={groupsSelection.handleSelectAll}
-              onSelectOne={groupsSelection.handleSelectOne}
+              onSelectAll={studentsSelection.handleSelectAll}
+              onSelectOne={studentsSelection.handleSelectOne}
               page={page}
               rowsPerPage={rowsPerPage}
-              selected={groupsSelection.selected}
+              selected={studentsSelection.selected}
             />
           </Stack>
         </Container>
 
         <CustomModal
-          open={openCreateGroupModal}
+          open={openCreateStudentModal}
           onClose={() => {
-            setOpenCreateGroupModal(false);
+            setOpenCreateStudentModal(false);
           }}
+          maxWidth={400}
         >
-          <Typography>Create a Group</Typography>
+          <Typography variant="h5">Add a Student</Typography>
           <TextField label="Leader Roll no." />
-
-          {}
         </CustomModal>
 
         <CustomModal
-          open={openExportGroupsModal}
+          open={openExportStudentsModal}
           onClose={() => {
-            setOpenExportsGroupsModal(false);
+            setOpenExportStudentModal(false);
           }}
           maxWidth={400}
         >
@@ -218,19 +266,19 @@ const ViewStudentsPage = () => {
           </Typography>
 
           <TextField
-            value={exportSectionId}
+            value={exportBatchId}
             onChange={(e) => {
-              setExportSectionId(e.target.value);
+              setExportBatchId(e.target.value);
             }}
             select
-            label="Choose a Section"
+            label="Choose a Batch"
             fullWidth
             sx={{ mb: 2 }}
           >
-            {sections.map((section) => {
+            {batches.map((batch) => {
               return (
-                <MenuItem key={section.id} value={section.id}>
-                  {section.batch_name} {section.gender}
+                <MenuItem key={batch.id} value={batch.id}>
+                  {batch.name}
                 </MenuItem>
               );
             })}

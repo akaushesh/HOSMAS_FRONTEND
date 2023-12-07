@@ -58,6 +58,8 @@ export const StudentsTable = (props) => {
                 <TableCell>Roll No.</TableCell>
                 <TableCell>Name</TableCell>
                 <TableCell>Email</TableCell>
+                <TableCell>Gender</TableCell>
+                <TableCell>Batch</TableCell>
                 <TableCell>Phone</TableCell>
                 <TableCell>Allotted Hostel</TableCell>
                 <TableCell>Allotted Room Type</TableCell>
@@ -66,28 +68,30 @@ export const StudentsTable = (props) => {
             </TableHead>
             <TableBody>
               {items.map((student) => {
-                const isSelected = selected.includes(student.id);
+                const isSelected = selected.includes(student.rollno);
 
                 return (
-                  <TableRow hover key={student.id} selected={isSelected}>
+                  <TableRow hover key={student.rollno} selected={isSelected}>
                     <TableCell padding="checkbox">
                       <Checkbox
                         checked={isSelected}
                         onChange={(event) => {
                           if (event.target.checked) {
-                            onSelectOne?.(student.id);
+                            onSelectOne?.(student.rollno);
                           } else {
-                            onDeselectOne?.(student.id);
+                            onDeselectOne?.(student.rollno);
                           }
                         }}
                       />
                     </TableCell>
                     <TableCell>{student.rollno}</TableCell>
                     <TableCell>{student.name}</TableCell>
-                    <TableCell>{student.email}</TableCell>
-                    <TableCell>{student.phone}</TableCell>
-                    <TableCell>{student.allotted_hostel}</TableCell>
-                    <TableCell>{student.allotted_room_type}</TableCell>
+                    <TableCell>{student?.user?.email}</TableCell>
+                    <TableCell>{student?.gender == "M" ? "Male" : "Female"}</TableCell>
+                    <TableCell>{student?.batch?.name}</TableCell>
+                    <TableCell>{student?.phoneno}</TableCell>
+                    <TableCell>{student.allotted_room?.hostel ?? "NA"}</TableCell>
+                    <TableCell>{student.allotted_room?.name ?? "NA"}</TableCell>
                     <TableCell>{student.cg}</TableCell>
                   </TableRow>
                 );

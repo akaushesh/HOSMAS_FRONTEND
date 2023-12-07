@@ -16,7 +16,7 @@ class IsStudent(BasePermission):
 
 
 class IsNotDefaulter(BasePermission):
-      message = 'You are currently suspended from Hostel Allocation Process'
+      message = 'You are currently suspended from Hostel Allocation Process due to disciplinary actions. You can contact with DOSA Office for further clarification.'
 
       def has_permission(self, request, view):
             try:

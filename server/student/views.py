@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from .permissions import IsStudent, IsNotDefaulter, IsPreferenceFillingLive, IsGroupLeader, IsGroupMember, IsNotGroupLeader, IsNotGroupMember
 
-from .models import Student, Group, Invitation
+from .models import Student, Group, Invitation, Section
 from .serializers import InvitationsReceivedSerializer, InvitationsSentSerializer, StudentSerializer, GroupSerializer, StudentProfileSerializer
 
 from django.core.files.storage import default_storage
@@ -59,8 +59,9 @@ class SearchStudentView(APIView):
                   if Invitation.objects.filter(for_group=group, to=resultant).exists():
                         return Response({'detail': 'You\'ve already sent an invitation to this student!'}, status=status.HTTP_403_FORBIDDEN)
             
+                  section = Section.objects.filter(batch=student.batch, gender=student.gender).first()
                   members_count = group.members.count()
-                  if members_count >= 3:
+                  if section is None or members_count >= section.group_size_limit-1:
                         return Response({'detail': 'You\'re group is already full!'}, status=status.HTTP_400_BAD_REQUEST)
             
             except ObjectDoesNotExist:
@@ -78,8 +79,9 @@ class SendInvitationView(APIView):
             
             try:
                   group = student.leader_of_group
+                  section = Section.objects.filter(batch=student.batch, gender=student.gender).first()
                   members_count = group.members.count()
-                  if members_count >= 3:
+                  if section is None or members_count >= section.group_size_limit-1:
                         return Response({'detail': 'You\'re group is already full!'}, status=status.HTTP_400_BAD_REQUEST)
             except ObjectDoesNotExist:
                   group = Group(leader=student, cg=student.cg)
@@ -155,14 +157,14 @@ class AcceptInvitationView(APIView):
             if invitation is None:
                   return Response({'detail': 'Invalid invitation id!'}, status=status.HTTP_403_FORBIDDEN)
 
-            student = Student.objects.filter(user=request.user).select_related('leader_of_group', 'group__leader').prefetch_related('group__members').first()  
+            student = Student.objects.filter(user=request.user).select_related('leader_of_group', 'group__leader', 'batch').prefetch_related('group__members').first()  
 
             if invitation.to != student:
                   return Response({'detail': 'You\'re not authorized to accept someone\'s invitation!'}, status=status.HTTP_403_FORBIDDEN)
 
             group = invitation.for_group
-
-            if group.members.count() >= 3:
+            section = Section.objects.filter(batch=student.batch, gender=student.gender).first()
+            if section is None or group.members.count()>=section.group_size_limit-1:
                   return Response({'detail': 'Unable to accept this invitation because the group is already full!'}, status=status.HTTP_403_FORBIDDEN)
             
             try:
