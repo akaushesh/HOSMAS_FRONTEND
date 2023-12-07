@@ -1,6 +1,6 @@
 from django.core.files.storage import default_storage
 from django.core.paginator import Paginator
-from django.db.models import Count, Q
+from django.db.models import Count, Q, Sum
 from django.conf import settings
 from django.db import transaction
 
@@ -288,16 +288,20 @@ class getStudents(APIView):
             if batch_id=='all':
                   if q is not None and q.strip()!='':
                         students_list = Student.objects.filter(Q(rollno__startswith = q) | Q(name__icontains = q) | Q(user__email__icontains = q) ).distinct().order_by('id').all()
+                        total_cnt = Student.objects.filter(Q(rollno__startswith = q) | Q(name__icontains = q) | Q(user__email__icontains = q) ).distinct().order_by('id').count()
                   else:
                         students_list = Student.objects.order_by('id').all()
+                        total_cnt = Student.objects.order_by('id').count()
             else:
                   batch = Batch.objects.filter(id = batch_id).first()
                   if batch is None:
                         return Response({'error':'Batch does not exist'}, status=status.HTTP_404_NOT_FOUND)
                   if q is not None and q.strip()!='':
                         students_list = Student.objects.filter(Q(batch = batch), Q(rollno__startswith = q) | Q(name__icontains = q) | Q(user__email__icontains = q) ).distinct().order_by('id').all()
+                        total_cnt = Student.objects.filter(Q(batch = batch), Q(rollno__startswith = q) | Q(name__icontains = q) | Q(user__email__icontains = q) ).distinct().order_by('id').count()
                   else:
                         students_list = Student.objects.filter(batch = batch).order_by('id').all()
+                        total_cnt = Student.objects.filter(batch = batch).order_by('id').count()
             
             p = Paginator(students_list, students_per_page)
             
@@ -312,7 +316,7 @@ class getStudents(APIView):
             students = p.page(page_number)
             serializer = StudentProfileSerializer(students, many=True, context={'is_admin': True})
             
-            return Response({'status':'success', 'data':serializer.data, 'total_pages':total_pages}, status=status.HTTP_200_OK)
+            return Response({'status':'success', 'data':serializer.data, 'total_pages':total_pages, 'total_entries': total_cnt}, status=status.HTTP_200_OK)
 
 
 class getGroups(APIView):
@@ -324,8 +328,10 @@ class getGroups(APIView):
             
             if q is not None and q.strip()!='':
                   groups_list = Group.objects.filter(Q(leader__rollno__startswith = q) | Q(leader__name__icontains = q) | Q(leader__user__email__icontains = q) | Q(members__rollno__startswith = q) | Q(members__name__icontains = q) | Q(members__user__email__icontains = q) ).distinct().select_related('leader').prefetch_related('members').order_by('id').all()
+                  total_cnt = Group.objects.filter(Q(leader__rollno__startswith = q) | Q(leader__name__icontains = q) | Q(leader__user__email__icontains = q) | Q(members__rollno__startswith = q) | Q(members__name__icontains = q) | Q(members__user__email__icontains = q) ).distinct().count()
             else:
                   groups_list = Group.objects.select_related('leader').prefetch_related('members').order_by('id').all()
+                  total_cnt = Group.objects.count()
             p = Paginator(groups_list, groups_per_page)
             
             page_number = request.GET.get('page')
@@ -339,7 +345,7 @@ class getGroups(APIView):
             groups = p.page(page_number)
             serializer = GroupSerializer(groups, many=True)
             
-            return Response({'status':'success', 'data':serializer.data, 'total_pages':total_pages}, status=status.HTTP_200_OK)
+            return Response({'status':'success', 'data':serializer.data, 'total_pages':total_pages, 'total_entries': total_cnt}, status=status.HTTP_200_OK)
 
 
 class getGroup(APIView):
@@ -363,8 +369,10 @@ class getDefaulters(APIView):
             
             if q is not None:
                   defaulters_list = Defaulter.objects.filter(Q(student__rollno__startswith = q) | Q(student__name__contains = q) | Q(student__user__email__contains = q) )
+                  total_cnt = Defaulter.objects.filter(Q(student__rollno__startswith = q) | Q(student__name__contains = q) | Q(student__user__email__contains = q) ).count()
             else:
                   defaulters_list = Defaulter.objects.all()
+                  total_cnt = Defaulter.objects.count()
             p = Paginator(defaulters_list, defaulters_per_page)
             
             page_number = request.GET.get('page')
@@ -378,7 +386,7 @@ class getDefaulters(APIView):
             defaulters = p.page(page_number)
             serializer = DefaulterSerializer(defaulters, many=True)
             
-            return Response({'status':'success', 'data':serializer.data, 'total_pages':total_pages}, status=status.HTTP_200_OK)
+            return Response({'status':'success', 'data':serializer.data, 'total_pages':total_pages, 'total_entries': total_cnt}, status=status.HTTP_200_OK)
 
 
 class ProfileView(APIView):
@@ -1143,3 +1151,66 @@ class AllotmentView(APIView):
             
             serializer = AllotmentStatusSerializer(logs_instance)
             return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class BatchAnalyticsView(APIView):
+      permission_classes = [IsAuthenticated, IsAdmin]
+
+      def get(self, request):
+            batch_id = request.GET.get('batch')
+            if batch_id is None:
+                  return Response(status=status.HTTP_404_NOT_FOUND)
+            
+            batch_id = batch_id.strip()
+            if not batch_id.isnumeric():
+                  return Response(status=status.HTTP_400_BAD_REQUEST)
+            
+            batch = Batch.objects.filter(id=batch_id).first()
+            if batch is None:
+                  return Response(status=status.HTTP_404_NOT_FOUND)
+
+            total_students_cnt = batch.students.count()
+            male_students_cnt = batch.students.filter(gender='M').count()
+            female_students_cnt = batch.students.filter(gender='F').count()
+
+            total_preferences_filled = Group.objects.filter(leader__batch=batch).annotate(
+                  preferences_count = Count('preferences'),
+                  members_count = Count('members') + 1
+            ).filter(preferences_count__gt=0).aggregate(Sum('members_count', default=0))
+            male_preferences_filled = Group.objects.filter(leader__batch=batch, leader__gender='M').annotate(
+                  preferences_count = Count('preferences'),
+                  members_count = Count('members') + 1
+            ).filter(preferences_count__gt=0).aggregate(Sum('members_count', default=0))
+            female_preferences_filled = Group.objects.filter(leader__batch=batch, leader__gender='F').annotate(
+                  preferences_count = Count('preferences'),
+                  members_count = Count('members') + 1
+            ).filter(preferences_count__gt=0).aggregate(Sum('members_count', default=0))
+
+            choice_analytics = {}
+
+            for gender in ['M', 'F']:
+                  section = Section.objects.filter(batch=batch, gender=gender).first()
+                  if section is None:
+                        choice_analytics[gender] = None
+                  else:
+                        choice_analytics[gender] = {}
+                        choices = section.choices.all()
+                        for choice in choices:
+                              choice_analytics[gender][choice.room_type.name] = {}
+                              for p in range(1, section.choices.count()+1):
+                                    choice_priority_students = Group.objects.filter(leader__batch=batch, leader__gender=gender, preferences__priority=p, preferences__room_type_choice=choice).annotate(
+                                          members_count = Count('members') + 1
+                                    ).aggregate(Sum('members_count', default=0))
+                                    choice_analytics[gender][choice.room_type.name][p] = choice_priority_students.get('members_count__sum', 0)
+
+            res = {
+                  'total_students': total_students_cnt,
+                  'male_students': male_students_cnt,
+                  'female_students': female_students_cnt,
+                  'total_preferences_filled': total_preferences_filled.get('members_count__sum', 0),
+                  'male_preferences_filled': male_preferences_filled.get('members_count__sum', 0),
+                  'female_preferences_filled': female_preferences_filled.get('members_count__sum', 0),
+                  'choice_analytics': choice_analytics
+            }
+
+            return Response(res, status=status.HTTP_200_OK)
