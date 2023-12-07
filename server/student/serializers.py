@@ -90,17 +90,28 @@ class StudentProfileRoomTypeSerializer(serializers.ModelSerializer):
       # nested serializer for handling current and alloted hostels in admin side student view
 
       hostel = serializers.SerializerMethodField()
+      hostel_id = serializers.SerializerMethodField()
+      room_type = serializers.SerializerMethodField()
+      room_type_id = serializers.SerializerMethodField()
       
       class Meta:
             model = RoomType
-            fields = ['id', 'name', 'hostel']
+            fields = ['id', 'room_type_id', 'room_type', 'hostel_id', 'hostel']
             extra_kwargs = {
-                  'name': {'read_only': True},
-                  'id': {'read_only': False}
+                  'id': {'read_only': False, 'write_only': True}
             }
       
       def get_hostel(self, obj):
             return obj.hostel.name
+      
+      def get_hostel_id(self, obj):
+            return obj.hostel.id
+      
+      def get_room_type(self, obj):
+            return obj.name
+      
+      def get_room_type_id(self, obj):
+            return obj.id
 
 
 class StudentProfileSerializer(serializers.ModelSerializer):
