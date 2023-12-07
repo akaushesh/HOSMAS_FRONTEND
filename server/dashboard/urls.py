@@ -23,7 +23,7 @@ urlpatterns = [
       path('group/edit/add-member/', views.AddToGroupView.as_view()),
       path('group/edit/change-leader/', views.ChangeGroupLeaderView.as_view()),
       path('group/edit/remove-member/', views.RemoveFromGroupView.as_view()),
-      path('groups/delete/', views.DeleteGroupsView.as_view()),
+      path('group/delete/multiple/', views.DeleteGroupsView.as_view()),
       path('<slug:model>/create/', views.CreateObjectView.as_view(), name='create_object'),
       path('<slug:model>/view/multiple/', views.GetMultipleObjectsView.as_view(), name='view_multiple_objects'),
       path('<slug:model>/view/<int:id>/', views.GetObjectView.as_view(), name='view_object'),

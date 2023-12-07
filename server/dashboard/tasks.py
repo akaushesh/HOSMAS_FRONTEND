@@ -103,10 +103,10 @@ def add_users(filename):
                               current_hostel = None
                         else:
                               current_hostel = current_hostel.strip()
-                              current_hostel = Hostel.objects.filter(name=current_hostel).first()
+                              current_hostel = Hostel.objects.filter(name__iexact=current_hostel).first()
                               if current_hostel is None:
                                     raise Exception(f'Current Hostel {current_hostel} not found!')
-                              current_roomtype = RoomType.objects.filter(Q(name=current_room) & Q(hostel = current_hostel)).first()
+                              current_roomtype = RoomType.objects.filter(Q(name__iexact=current_room) & Q(hostel = current_hostel)).first()
                               if current_roomtype is None:
                                     raise Exception(f'Current Room Type {current_room} not found!')
                   
@@ -129,10 +129,10 @@ def add_users(filename):
                               alloted_hostel = None
                         else:
                               alloted_hostel = alloted_hostel.strip()
-                              alloted_hostel = Hostel.objects.filter(name=alloted_hostel).first()
+                              alloted_hostel = Hostel.objects.filter(name__iexact=alloted_hostel).first()
                               if alloted_hostel is None:
                                     raise Exception(f'Alloted Hostel {alloted_hostel} not found!')
-                              alloted_roomtype = RoomType.objects.filter(Q(name=alloted_room) & Q(hostel = alloted_hostel)).first()
+                              alloted_roomtype = RoomType.objects.filter(Q(name__iexact=alloted_room) & Q(hostel = alloted_hostel)).first()
                               if alloted_roomtype is None:
                                     raise Exception(f'Alloted Room Type {alloted_room} not found!')
 

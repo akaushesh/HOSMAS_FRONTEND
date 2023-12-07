@@ -1,6 +1,15 @@
 from django.contrib import admin
-from .models import Faq, AllotmentLogsGroup, AllotmentLogsStudent, AllotmentStatus
+from .models import AcademicSession, Faq, AllotmentLogsGroup, AllotmentLogsStudent, AllotmentStatus
 # Register your models here.
+
+
+class AcademicSessionAdmin(admin.ModelAdmin):
+      list_display = ('id', 'name', 'fee_structure_url')
+
+      def delete_queryset(self, request, queryset):
+            cache.delete('academicSession')
+            cache.delete('feeStructureUrl')
+            queryset.delete()
 
 
 class FAQAdmin(admin.ModelAdmin):
@@ -16,3 +25,4 @@ class AllotmentStatusAdmin(admin.ModelAdmin):
 
 admin.site.register(Faq, FAQAdmin)
 admin.site.register(AllotmentStatus, AllotmentStatusAdmin)
+admin.site.register(AcademicSession, AcademicSessionAdmin)
