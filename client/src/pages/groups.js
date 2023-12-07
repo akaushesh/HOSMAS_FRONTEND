@@ -7,13 +7,17 @@ import { CustomersSearch } from "src/sections/customer/customers-search";
 import { OverviewLatestProducts } from "src/sections/overview/overview-latest-products";
 import { useRouter } from "next/router";
 import { useAuthContext } from "src/contexts/auth-context";
+import { useQueryClient } from "@tanstack/react-query";
 
 const Page = () => {
   const router = useRouter();
   const auth = useAuthContext();
 
+  const queryClient = useQueryClient();
+  const user = queryClient.getQueryData(["getProfile"]);
+
   useEffect(() => {
-    if (auth.user.group_size == 1) {
+    if (user?.group_size_limit == 1) {
       router.push("/404");
     }
   }, []);

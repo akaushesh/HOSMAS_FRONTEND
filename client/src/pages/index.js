@@ -6,12 +6,10 @@ import { OverviewTotalCustomers } from "src/sections/overview/overview-total-cus
 import { AccountProfileDetails } from "src/sections/account/account-profile-details";
 import { Fragment } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { useAuthContext } from "src/contexts/auth-context";
 
 const Page = () => {
   const queryClient = useQueryClient();
   const user = queryClient.getQueryData(["getProfile"]);
-  const auth = useAuthContext();
 
   return (
     <Fragment>
@@ -50,7 +48,7 @@ const Page = () => {
                 />
               </Grid>
 
-              {auth.user.group_size != 1 && (
+              {user?.group_size_limit != 1 && (
                 <Grid>
                   <OverviewTotalCustomers
                     memberCount={user?.group?.size}

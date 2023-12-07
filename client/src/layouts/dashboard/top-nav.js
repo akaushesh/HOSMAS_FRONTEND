@@ -19,6 +19,7 @@ import { alpha } from "@mui/material/styles";
 import { usePopover } from "src/hooks/use-popover";
 import { AccountPopover } from "./account-popover";
 import { useAuthContext } from "src/contexts/auth-context";
+import { useQueryClient } from "@tanstack/react-query";
 
 const SIDE_NAV_WIDTH = 280;
 const TOP_NAV_HEIGHT = 64;
@@ -29,6 +30,9 @@ export const TopNav = (props) => {
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
   const accountPopover = usePopover();
   const router = useRouter();
+
+  const queryClient = useQueryClient();
+  const user = queryClient.getQueryData(["getProfile"]);
 
   const redirectToSettings = () => {
     router.push("/settings");
@@ -83,7 +87,7 @@ export const TopNav = (props) => {
             </Tooltip> */}
           </Stack>
           <Stack alignItems="center" direction="row" spacing={2}>
-            {auth.user.group_size != 1 && (
+            {user?.group_size_limit != 1 && (
               <Tooltip title="Group" onClick={redirectToGroup}>
                 <IconButton>
                   <SvgIcon fontSize="small">

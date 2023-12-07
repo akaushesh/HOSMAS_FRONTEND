@@ -19,6 +19,7 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import { useRouter } from "next/router";
 import { useAuth } from "src/hooks/use-auth";
 import { useCallback } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const SideNav = (props) => {
   const { open, onClose } = props;
@@ -27,6 +28,9 @@ export const SideNav = (props) => {
 
   const router = useRouter();
   const auth = useAuth();
+
+  const queryClient = useQueryClient();
+  const user = queryClient.getQueryData(["getProfile"]);
 
   const handleSignOut = useCallback(() => {
     auth.signOut();
@@ -106,7 +110,7 @@ export const SideNav = (props) => {
             }}
           >
             {items.map((item) => {
-              if (auth.user.group_size == 1 && item.title == "Group") return;
+              if (user?.group_size_limit == 1 && item.title == "Group") return;
 
               const active = item.path ? pathname === item.path : false;
 
