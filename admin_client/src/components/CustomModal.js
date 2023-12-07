@@ -1,7 +1,7 @@
 import React from "react";
 import { Modal, Box } from "@mui/material";
 
-function CustomModal({ open, onClose, maxWidth, minWidth, children }) {
+function CustomModal({ open, onClose, maxWidth, minWidth, styles = {}, children }) {
   const style = {
     position: "absolute",
     top: "50%",
@@ -15,6 +15,7 @@ function CustomModal({ open, onClose, maxWidth, minWidth, children }) {
     pt: 2,
     px: 4,
     pb: 2,
+    ...styles,
   };
 
   return (

@@ -32,3 +32,12 @@ export const getStudents = async (query, students_per_page, page, batch, accessT
   );
   return res;
 };
+
+export const searchStudent = async (rollNo, accessToken) => {
+  const res = await otherApi.get(`dashboard/search-student/view/${rollNo}`, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+  return res;
+};

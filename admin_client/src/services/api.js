@@ -30,6 +30,10 @@ export const studentApi = axios.create({
   baseURL: url + "dashboard/student/",
 });
 
+export const groupApi = axios.create({
+  baseURL: url + "dashboard/group/",
+});
+
 export const faqApi = axios.create({
   baseURL: url + "dashboard/",
 });

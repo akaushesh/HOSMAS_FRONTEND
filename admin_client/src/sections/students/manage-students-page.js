@@ -72,8 +72,7 @@ const ViewStudentsPage = () => {
         const fetchAllBatches = async () => {
           const res = await getAllBatches(accessToken);
           if (res.status == 200) {
-            setBatches(res.data);
-            setBatches((prev) => [...prev, { id: "all", name: "All" }]);
+            setBatches([...res.data, { id: "all", name: "All" }]);
           }
           console.log(res);
         };
