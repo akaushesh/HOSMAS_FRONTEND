@@ -225,6 +225,7 @@ class PreferenceFillingStatusView(APIView):
             student = Student.objects.filter(user=request.user).select_related('batch').first()
             section = Section.objects.filter(batch=student.batch, gender=student.gender).first()
             result = {
-                  'is_live': section is not None and section.is_allotment_enabled
+                  'is_live': section is not None and section.is_allotment_enabled,
+                  'can_retain': section is not None and section.is_retain_allowed
             }
             return Response(result, status=status.HTTP_200_OK)

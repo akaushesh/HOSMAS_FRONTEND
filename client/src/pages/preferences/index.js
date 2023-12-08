@@ -4,32 +4,12 @@ import { Box, Container, Grid, Stack, Typography } from "@mui/material";
 import { Layout as DashboardLayout } from "src/layouts/dashboard/layout";
 import { PreferenceForm } from "src/sections/preference/preference-form";
 import { useQuery } from "@tanstack/react-query";
+import { useIsPreferenceFillingLive } from "src/hooks/use-is-preference-live";
 import axios from "axios";
 import { URL } from "config";
 
 const Page = () => {
-  const { data: isLive } = useQuery({
-    queryFn: async () => {
-      try {
-        const url = URL + "preferences/status/";
-        const jwt = sessionStorage.getItem("jwt");
-
-        const getPreferenceStatusConfig = {
-          maxBodyLength: Infinity,
-          url: url,
-          headers: {
-            Authorization: "Bearer " + jwt,
-          },
-        };
-
-        const getPreferenceStatusResponse = await axios.get(url, getPreferenceStatusConfig);
-        return getPreferenceStatusResponse?.data?.is_live;
-      } catch (err) {
-        return false;
-      }
-    },
-    queryKey: ["isPreferenceFillingLive"],
-  });
+  const { isLive } = useIsPreferenceFillingLive();
 
   const { data: availableChoices, isLoading } = useQuery({
     queryFn: async () => {
