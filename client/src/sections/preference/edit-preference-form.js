@@ -80,7 +80,7 @@ export const EditPreferenceForm = (props) => {
   });
 
   const [preferences, setPreferences] = useState(
-    Array.from({ length: availableChoices.length }, () => "")
+    Array.from({ length: availableChoices?.length }, () => "")
   );
 
   const [error, setError] = useState("");
@@ -92,7 +92,7 @@ export const EditPreferenceForm = (props) => {
           <Typography variant="h4" paddingBottom="1rem">
             Edit Preferences
           </Typography>
-          {availableChoices.map((_, index) => (
+          {availableChoices?.map((_, index) => (
             <Grid container justifyContent="center" alignItems="center" key={index}>
               <FormControl required variant="filled" sx={{ m: 1, width: "100%" }}>
                 <InputLabel id={`${index + 1}`}>Preference {index + 1}</InputLabel>

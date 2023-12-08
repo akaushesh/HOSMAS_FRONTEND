@@ -1,6 +1,6 @@
 from django.core.files.storage import default_storage
 from django.core.paginator import Paginator
-from django.db.models import Count, Q
+from django.db.models import Count, Q, Sum
 from django.conf import settings
 from django.db import transaction
 
@@ -25,9 +25,11 @@ from .tasks import add_users, add_defaulters, send_reminder_mail
 
 from datetime import datetime
 import csv, os
-from openpyxl import Workbook
+from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Font
 from collections import OrderedDict
+
+studentfileformat = ('rollno', 'email', 'name', 'phoneno', 'cg', 'batch', 'gender', 'current_hostel', 'current_room_type', 'alloted_hostel', 'alloted_room_type')
 
 # Create your views here.
 
@@ -288,16 +290,20 @@ class getStudents(APIView):
             if batch_id=='all':
                   if q is not None and q.strip()!='':
                         students_list = Student.objects.filter(Q(rollno__startswith = q) | Q(name__icontains = q) | Q(user__email__icontains = q) ).distinct().order_by('id').all()
+                        total_cnt = Student.objects.filter(Q(rollno__startswith = q) | Q(name__icontains = q) | Q(user__email__icontains = q) ).distinct().order_by('id').count()
                   else:
                         students_list = Student.objects.order_by('id').all()
+                        total_cnt = Student.objects.order_by('id').count()
             else:
                   batch = Batch.objects.filter(id = batch_id).first()
                   if batch is None:
                         return Response({'error':'Batch does not exist'}, status=status.HTTP_404_NOT_FOUND)
                   if q is not None and q.strip()!='':
                         students_list = Student.objects.filter(Q(batch = batch), Q(rollno__startswith = q) | Q(name__icontains = q) | Q(user__email__icontains = q) ).distinct().order_by('id').all()
+                        total_cnt = Student.objects.filter(Q(batch = batch), Q(rollno__startswith = q) | Q(name__icontains = q) | Q(user__email__icontains = q) ).distinct().order_by('id').count()
                   else:
                         students_list = Student.objects.filter(batch = batch).order_by('id').all()
+                        total_cnt = Student.objects.filter(batch = batch).order_by('id').count()
             
             p = Paginator(students_list, students_per_page)
             
@@ -312,7 +318,7 @@ class getStudents(APIView):
             students = p.page(page_number)
             serializer = StudentProfileSerializer(students, many=True, context={'is_admin': True})
             
-            return Response({'status':'success', 'data':serializer.data, 'total_pages':total_pages}, status=status.HTTP_200_OK)
+            return Response({'status':'success', 'data':serializer.data, 'total_pages':total_pages, 'total_entries': total_cnt}, status=status.HTTP_200_OK)
 
 
 class getGroups(APIView):
@@ -324,8 +330,10 @@ class getGroups(APIView):
             
             if q is not None and q.strip()!='':
                   groups_list = Group.objects.filter(Q(leader__rollno__startswith = q) | Q(leader__name__icontains = q) | Q(leader__user__email__icontains = q) | Q(members__rollno__startswith = q) | Q(members__name__icontains = q) | Q(members__user__email__icontains = q) ).distinct().select_related('leader').prefetch_related('members').order_by('id').all()
+                  total_cnt = Group.objects.filter(Q(leader__rollno__startswith = q) | Q(leader__name__icontains = q) | Q(leader__user__email__icontains = q) | Q(members__rollno__startswith = q) | Q(members__name__icontains = q) | Q(members__user__email__icontains = q) ).distinct().count()
             else:
                   groups_list = Group.objects.select_related('leader').prefetch_related('members').order_by('id').all()
+                  total_cnt = Group.objects.count()
             p = Paginator(groups_list, groups_per_page)
             
             page_number = request.GET.get('page')
@@ -339,7 +347,7 @@ class getGroups(APIView):
             groups = p.page(page_number)
             serializer = GroupSerializer(groups, many=True)
             
-            return Response({'status':'success', 'data':serializer.data, 'total_pages':total_pages}, status=status.HTTP_200_OK)
+            return Response({'status':'success', 'data':serializer.data, 'total_pages':total_pages, 'total_entries': total_cnt}, status=status.HTTP_200_OK)
 
 
 class getGroup(APIView):
@@ -363,8 +371,10 @@ class getDefaulters(APIView):
             
             if q is not None:
                   defaulters_list = Defaulter.objects.filter(Q(student__rollno__startswith = q) | Q(student__name__contains = q) | Q(student__user__email__contains = q) )
+                  total_cnt = Defaulter.objects.filter(Q(student__rollno__startswith = q) | Q(student__name__contains = q) | Q(student__user__email__contains = q) ).count()
             else:
                   defaulters_list = Defaulter.objects.all()
+                  total_cnt = Defaulter.objects.count()
             p = Paginator(defaulters_list, defaulters_per_page)
             
             page_number = request.GET.get('page')
@@ -378,7 +388,7 @@ class getDefaulters(APIView):
             defaulters = p.page(page_number)
             serializer = DefaulterSerializer(defaulters, many=True)
             
-            return Response({'status':'success', 'data':serializer.data, 'total_pages':total_pages}, status=status.HTTP_200_OK)
+            return Response({'status':'success', 'data':serializer.data, 'total_pages':total_pages, 'total_entries': total_cnt}, status=status.HTTP_200_OK)
 
 
 class ProfileView(APIView):
@@ -451,7 +461,7 @@ class UpdateSectionsAllotmentStatusView(APIView):
                   instance = Section.objects.filter(id=item.get('id')).first()
                   if instance is None:
                         return Response(status=status.HTTP_400_BAD_REQUEST)
-                  instance.is_allotment_enabled = item.get('is_allotment_enabled', item.is_allotment_enabled)
+                  instance.is_allotment_enabled = item.get('is_allotment_enabled', instance.is_allotment_enabled)
                   instance.save()
             return Response(status=status.HTTP_200_OK)
 
@@ -750,19 +760,206 @@ class ImportStudentsView(APIView):
 
       def post(self, request):
             file = request.data.get('file')
+
+            if file is None:
+                  return Response({'detail': 'File Not Found!'}, status=status.HTTP_400_BAD_REQUEST)
             
             filename = f"{datetime.now().strftime('%Y%m%d_%H%M')}_{file.name}"
 
             if filename.split('.')[-1]!='xlsx':
-                  return Response({'error':'Only .xlsx file format supported!'}, status=status.HTTP_400_BAD_REQUEST)
+                  return Response({'detail': 'Only xlsx file format supported!'}, status=status.HTTP_400_BAD_REQUEST)
             
             storage = default_storage
             storage.location = os.path.join(settings.BASE_DIR, 'imported-data', 'student')
             filename = storage.save(filename, file)
-            
-            add_users.delay(filename)
 
-            return Response(status=status.HTTP_202_ACCEPTED)
+            path = os.path.join(settings.BASE_DIR, 'imported-data', 'student', filename)
+            wb = load_workbook(path)
+            ws = wb.active
+
+            # Check if all fields are present in given data
+            for row in ws.iter_rows(min_row=1, max_row=1, min_col=1, max_col=11):
+                  for i in range(len(row)):
+                        if row[i].value!=studentfileformat[i]:
+                              return Response({
+                                    'detail': f"Invalid File Format. Found {row[i].value}, but required was {studentfileformat[i]}, Correct File Format is {str(studentfileformat)}"
+                              }, status=status.HTTP_400_BAD_REQUEST)
+
+            successCnt = 0
+            failureCnt = 0
+            cnt = 1
+            errors = []
+
+            for row in ws.iter_rows(min_row=2, min_col=1, max_col=11):
+                  try:
+                        with transaction.atomic():
+                              student = None
+                              
+                              # Extract data into variables and data preprocessing
+                              phoneno = row[3].value
+
+                              cg = row[4].value
+                              if cg is not None:
+                                    cg = round(float(cg), 2)
+
+                              batch = row[5].value
+                              if batch is not None:
+                                    batch = batch.strip()
+                                    batch = Batch.objects.filter(name__iexact = batch).first()
+                                    if batch is None:
+                                          batch = Batch(name = row[5].value.strip())
+                                          batch.save()
+                              
+                              rollno = row[0].value
+                              if rollno is not None:
+                                    student = Student.objects.filter(rollno=rollno).first()
+
+                              email = row[1].value
+                              if email is not None:
+                                    email = email.strip()
+                                    if student is not None:
+                                          user = student.user
+                                          user.email = email
+                                          user.save()
+                                    else:
+                                          user = User.objects.filter(email=email).first()
+                                          if user is None:
+                                                user = User(email=email)
+                                                password = ''.join(choice(string.ascii_letters + string.digits) for _ in range(8))
+                                                user.set_password(password)
+                                                user.save()
+                                          try:
+                                                if user.student is not None:
+                                                      student = user.student
+                                          except:
+                                                pass
+                              
+                              # current_room_type
+                              current_room = row[8].value
+                              is_current_room_null = False
+                              if current_room is not None:
+                                    current_room = current_room.strip()
+                                    if current_room=='':
+                                          # check if admin wants to make current room related field null
+                                          is_current_room_null = True
+                                          current_room = None
+                              else:
+                                    is_current_room_null = True
+                              
+                              current_roomtype = None
+                              current_hostel = row[7].value
+                              if current_hostel is not None:
+                                    if is_current_room_null:
+                                          current_hostel = None
+                                    else:
+                                          current_hostel = current_hostel.strip()
+                                          current_hostel = Hostel.objects.filter(name__iexact=current_hostel).first()
+                                          if current_hostel is None:
+                                                raise Exception(f'Current Hostel {current_hostel} not found!')
+                                          current_roomtype = RoomType.objects.filter(Q(name__iexact=current_room) & Q(hostel = current_hostel)).first()
+                                          if current_roomtype is None:
+                                                raise Exception(f'Current Room Type {current_room} not found!')
+                              
+                              # alloted_room_type
+                              alloted_room = row[10].value
+                              is_alloted_room_null = False
+                              if alloted_room is not None:
+                                    alloted_room = alloted_room.strip()
+                                    if alloted_room=='':
+                                          # check if admin wants to make allocated room related details null
+                                          is_alloted_room_null = True
+                                          alloted_room = None
+                              else:
+                                    is_alloted_room_null = True
+                                    
+                              alloted_roomtype = None 
+                              alloted_hostel = row[9].value
+                              if alloted_hostel is not None:
+                                    if is_alloted_room_null:
+                                          alloted_hostel = None
+                                    else:
+                                          alloted_hostel = alloted_hostel.strip()
+                                          alloted_hostel = Hostel.objects.filter(name__iexact=alloted_hostel).first()
+                                          if alloted_hostel is None:
+                                                raise Exception(f'Alloted Hostel {alloted_hostel} not found!')
+                                          alloted_roomtype = RoomType.objects.filter(Q(name__iexact=alloted_room) & Q(hostel = alloted_hostel)).first()
+                                          if alloted_roomtype is None:
+                                                raise Exception(f'Alloted Room Type {alloted_room} not found!')
+
+                              name = row[2].value
+                              if (name is not None):
+                                    name = name.strip()
+
+                              gender = row[6].value
+                              if gender is not None:
+                                    gender = gender.strip()
+
+                              if student is None:
+                                    # create new student
+                                    student = Student(
+                                          name = name, 
+                                          rollno = rollno, 
+                                          phoneno = phoneno, 
+                                          gender = gender, 
+                                          cg = cg, 
+                                          batch = batch, 
+                                          user = user,
+                                          current_room = current_roomtype,
+                                          alloted_room = alloted_roomtype
+                                          )
+                                    student.save()
+
+                                    group = Group(leader = student, cg = student.cg)
+                                    group.save()
+                              else:
+                                    # update details of existing student
+                                    if name is not None:
+                                          student.name = name
+                                    if rollno is not None:
+                                          student.rollno = rollno
+                                    if phoneno is not None:
+                                          student.phoneno = phoneno
+                                    if gender is not None:
+                                          student.gender = gender
+                                    if cg is not None:
+                                          student.cg = cg
+                                    if batch is not None:
+                                          student.batch = batch
+                                    if current_roomtype is not None:
+                                          student.current_room = current_roomtype
+                                    if alloted_roomtype is not None:
+                                          student.alloted_room = alloted_roomtype
+                                    student.save()
+
+                                    group = Group.objects.filter(leader=student).first()
+                                    if group is None:
+                                          group = Group(leader=student, cg=student.cg)
+                                          group.save()
+                                    else:
+                                          # update group cg
+                                          updatedcg = student.cg
+                                          groupSize = 1
+                                          for member in group.members.all():
+                                                updatedcg += member.cg
+                                                groupSize += 1
+                                          updatedcg /= groupSize
+                                          group.cg = round(updatedcg, 2)
+                                          group.save()
+
+                              successCnt += 1
+                  
+                  except Exception as e:
+                        # log error
+                        errors.append(f'Creation of item {cnt} unsuccessful! Error: {str(e)}')
+                        failureCnt += 1
+
+                  cnt += 1
+
+            return Response({
+                  'successful': successCnt,
+                  'unsuccessful': failureCnt,
+                  'errors': errors
+            }, status=status.HTTP_200_OK)
 
 
 class ImportDefaultersView(APIView):
@@ -774,15 +971,47 @@ class ImportDefaultersView(APIView):
             filename = f"{datetime.now().strftime('%Y%m%d_%H%M')}_{file.name}"
 
             if filename.split('.')[-1]!='xlsx':
-                  return Response({'error':'file not xlsx'}, status=status.HTTP_400_BAD_REQUEST)
+                  return Response({'error': 'Only xlsx file format supported!'}, status=status.HTTP_400_BAD_REQUEST)
             
             storage = default_storage
             storage.location = os.path.join(settings.BASE_DIR, 'imported-data', 'defaulter')
             filename = storage.save(filename, file)
             
-            add_defaulters.delay(filename)
+            path = os.path.join(settings.BASE_DIR, 'imported-data', 'defaulter', filename)
+            wb = load_workbook(path)
+            ws = wb.active
 
-            return Response(status=status.HTTP_202_ACCEPTED)
+            # check if required fields are present in data
+            if ws['A1'].value!='student':
+                  return Response({
+                        'detail': f"'student' field missing! Required 'student' but found '{ws['A1'].value}' at cell A1."
+                  }, status=status.HTTP_400_BAD_REQUEST)
+            
+            cnt = 1
+            successCnt = 0
+            failureCnt = 0
+            errors = []
+
+            for row in ws.iter_rows(min_row=2, min_col=1, max_col=1):
+                  try:
+                        student = Student.objects.filter(rollno=row[0].value).first()
+                        if student is None:
+                              raise Exception(f"Student with roll number {row[0].value} not found!")
+                        instance = Defaulter.objects.filter(student=student).first()
+                        if instance is None:
+                              instance = Defaulter(student=student)
+                              instance.save()
+                        successCnt += 1
+                  except BaseException as e:
+                        errors.append(f"Creation of item {cnt} unsuccessful. Error: {str(e)}")
+                        failureCnt += 1
+                  cnt += 1
+
+            return Response({
+                  'successful': successCnt,
+                  'unsuccessful': failureCnt,
+                  'errors': errors
+            }, status=status.HTTP_200_OK)
 
 
 class ExportGroupsView(APIView):
@@ -791,12 +1020,12 @@ class ExportGroupsView(APIView):
       def post(self, request):
             if request.data.get('section')=='all':
                   sections = Section.objects.select_related('batch').all()
-                  filename = f"export/group/all.xlsx"
+                  filename = f"export/group/all_{''.join(choice(string.ascii_letters + string.digits) for _ in range(40))}.xlsx"
             else:
                   section = Section.objects.filter(id=request.data.get('section')).select_related('batch').first()
                   if section is None:
                         return Response(status=status.HTTP_400_BAD_REQUEST)
-                  filename = f"export/group/{section.batch.name}_{section.gender}.xlsx"
+                  filename = f"export/group/{section.batch.name}_{section.gender}_{''.join(choice(string.ascii_letters + string.digits) for _ in range(40))}.xlsx"
                   sections = [section]
             
             include = OrderedDict([
@@ -825,6 +1054,7 @@ class ExportGroupsView(APIView):
                         student_fields.append(key)
             
             preferences_cnt = 0
+            group_size_limit = 1
             for section in sections:
                   preferences_cnt = max(preferences_cnt, section.choices.count())
                   group_size_limit = max(group_size_limit, section.group_size_limit)
@@ -895,12 +1125,12 @@ class ExportStudentsView(APIView):
       def post(self, request):
             if request.data.get('batch')=='all':
                   batches = Batch.objects.prefetch_related('students__user', 'students__batch', 'students__current_room__hostel', 'students__alloted_room__hostel').all()
-                  filename = f"export/student/batch_all.xlsx"
+                  filename = f"export/student/batch_all_{''.join(choice(string.ascii_letters + string.digits) for _ in range(40))}.xlsx"
             else:
                   batch = Batch.objects.filter(id=request.data.get('batch')).prefetch_related('students__user', 'students__batch', 'students__current_room__hostel', 'students__alloted_room__hostel').first()
                   if batch is None:
                         return Response(status=status.HTTP_400_BAD_REQUEST)
-                  filename = f"export/student/batch_{batch.id}.xlsx"
+                  filename = f"export/student/batch_{batch.id}_{''.join(choice(string.ascii_letters + string.digits) for _ in range(40))}.xlsx"
                   batches = [batch]
             
             path = os.path.join(settings.MEDIA_ROOT, filename)
@@ -971,7 +1201,7 @@ class ExportDefaultersView(APIView):
       permission_classes = [IsAuthenticated, IsAdmin]
 
       def get(self, request):
-            filename = f"export/defaulters.xlsx"
+            filename = f"export/defaulter/{''.join(choice(string.ascii_letters + string.digits) for _ in range(40))}.xlsx"
             path = os.path.join(settings.MEDIA_ROOT, filename)
             queryset = Defaulter.objects.select_related('student__user', 'student__batch', 'student__current_room__hostel', 'student__alloted_room__hostel').all()
             
@@ -1143,3 +1373,66 @@ class AllotmentView(APIView):
             
             serializer = AllotmentStatusSerializer(logs_instance)
             return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class BatchAnalyticsView(APIView):
+      permission_classes = [IsAuthenticated, IsAdmin]
+
+      def get(self, request):
+            batch_id = request.GET.get('batch')
+            if batch_id is None:
+                  return Response(status=status.HTTP_404_NOT_FOUND)
+            
+            batch_id = batch_id.strip()
+            if not batch_id.isnumeric():
+                  return Response(status=status.HTTP_400_BAD_REQUEST)
+            
+            batch = Batch.objects.filter(id=batch_id).first()
+            if batch is None:
+                  return Response(status=status.HTTP_404_NOT_FOUND)
+
+            total_students_cnt = batch.students.count()
+            male_students_cnt = batch.students.filter(gender='M').count()
+            female_students_cnt = batch.students.filter(gender='F').count()
+
+            total_preferences_filled = Group.objects.filter(leader__batch=batch).annotate(
+                  preferences_count = Count('preferences'),
+                  members_count = Count('members') + 1
+            ).filter(preferences_count__gt=0).aggregate(Sum('members_count', default=0))
+            male_preferences_filled = Group.objects.filter(leader__batch=batch, leader__gender='M').annotate(
+                  preferences_count = Count('preferences'),
+                  members_count = Count('members') + 1
+            ).filter(preferences_count__gt=0).aggregate(Sum('members_count', default=0))
+            female_preferences_filled = Group.objects.filter(leader__batch=batch, leader__gender='F').annotate(
+                  preferences_count = Count('preferences'),
+                  members_count = Count('members') + 1
+            ).filter(preferences_count__gt=0).aggregate(Sum('members_count', default=0))
+
+            choice_analytics = {}
+
+            for gender in ['M', 'F']:
+                  section = Section.objects.filter(batch=batch, gender=gender).first()
+                  if section is None:
+                        choice_analytics[gender] = None
+                  else:
+                        choice_analytics[gender] = {}
+                        choices = section.choices.all()
+                        for choice in choices:
+                              choice_analytics[gender][choice.room_type.name] = {}
+                              for p in range(1, section.choices.count()+1):
+                                    choice_priority_students = Group.objects.filter(leader__batch=batch, leader__gender=gender, preferences__priority=p, preferences__room_type_choice=choice).annotate(
+                                          members_count = Count('members') + 1
+                                    ).aggregate(Sum('members_count', default=0))
+                                    choice_analytics[gender][choice.room_type.name][p] = choice_priority_students.get('members_count__sum', 0)
+
+            res = {
+                  'total_students': total_students_cnt,
+                  'male_students': male_students_cnt,
+                  'female_students': female_students_cnt,
+                  'total_preferences_filled': total_preferences_filled.get('members_count__sum', 0),
+                  'male_preferences_filled': male_preferences_filled.get('members_count__sum', 0),
+                  'female_preferences_filled': female_preferences_filled.get('members_count__sum', 0),
+                  'choice_analytics': choice_analytics
+            }
+
+            return Response(res, status=status.HTTP_200_OK)

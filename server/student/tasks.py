@@ -24,10 +24,6 @@ def send_invitation_mail(leader_name, leader_email, leader_roll, invitee_name, i
     idx = cache.get('emailIdIndex', 0)
     cache.set('emailIdIndex', (idx + 1) % settings.EMAIL_HOST_USERS_COUNT)
 
-    print(idx,settings.EMAIL_HOST_USERS[idx], settings.EMAIL_HOST_PASSWORDS[idx])
-    print(settings.EMAIL_HOST_USERS)
-    print(settings.EMAIL_HOST_PASSWORDS)
-
     connection = get_connection(username=settings.EMAIL_HOST_USERS[idx], password=settings.EMAIL_HOST_PASSWORDS[idx], fail_silently=False)
     connection.open()
     

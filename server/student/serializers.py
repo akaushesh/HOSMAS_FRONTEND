@@ -1,4 +1,5 @@
 from django.db import transaction
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.cache import cache
 from rest_framework.serializers import ModelSerializer, SerializerMethodField, SlugRelatedField
 from rest_framework import serializers
@@ -89,17 +90,28 @@ class StudentProfileRoomTypeSerializer(serializers.ModelSerializer):
       # nested serializer for handling current and alloted hostels in admin side student view
 
       hostel = serializers.SerializerMethodField()
+      hostel_id = serializers.SerializerMethodField()
+      room_type = serializers.SerializerMethodField()
+      room_type_id = serializers.SerializerMethodField()
       
       class Meta:
             model = RoomType
-            fields = ['id', 'name', 'hostel']
+            fields = ['id', 'room_type_id', 'room_type', 'hostel_id', 'hostel']
             extra_kwargs = {
-                  'name': {'read_only': True},
-                  'id': {'read_only': False}
+                  'id': {'read_only': False, 'write_only': True}
             }
       
       def get_hostel(self, obj):
             return obj.hostel.name
+      
+      def get_hostel_id(self, obj):
+            return obj.hostel.id
+      
+      def get_room_type(self, obj):
+            return obj.name
+      
+      def get_room_type_id(self, obj):
+            return obj.id
 
 
 class StudentProfileSerializer(serializers.ModelSerializer):
@@ -128,31 +140,36 @@ class StudentProfileSerializer(serializers.ModelSerializer):
       def get_group(self, obj):
             try:
                   group = obj.leader_of_group
-                  return {
+                  res = {
                         'leader_name': obj.name,
                         'leader_email': obj.user.email,
                         'size': group.members.count() + 1
                   }
-            except:
+            except ObjectDoesNotExist:
                   group = obj.group
                   if group is None:
                         return None
-                  return {
+                  res = {
                         'leader_name': group.leader.name,
                         'leader_email': group.leader.user.email,
                         'size': group.members.count() + 1
                   }
+            if self.context.get('is_admin', False):
+                  res['id'] = group.id
+            return res
       
       def get_is_preference_filled(self, obj):
             try:
                   group = obj.leader_of_group
-            except:
+            except ObjectDoesNotExist:
                   group = obj.group
                   if group is None:
                         return False
             return group.preferences.count() > 0
       
       def get_academic_session(self, obj):
+            if self.context.get('is_admin', False):
+                  return None
             cachedObj = cache.get('academicSession')
             if cachedObj is not None:
                   return cachedObj
@@ -164,6 +181,8 @@ class StudentProfileSerializer(serializers.ModelSerializer):
             return instance.name
 
       def get_fee_structure_url(self, obj):
+            if self.context.get('is_admin', False):
+                  return None
             cachedObj = cache.get('feeStructureUrl')
             if cachedObj is not None:
                   return cachedObj
@@ -187,6 +206,8 @@ class StudentProfileSerializer(serializers.ModelSerializer):
             return serializer.data
       
       def get_group_size_limit(self, obj):
+            if self.context.get('is_admin', False):
+                  return None
             section = Section.objects.filter(batch=obj.batch, gender=obj.gender).first()
             if section is None:
                   return 1
@@ -219,21 +240,21 @@ class StudentProfileSerializer(serializers.ModelSerializer):
                         user.email = user_data.get('email')
                         user.save()
             
-            current_room = None
-            if validated_data.get('current_room') is not None:
-                  current_room_data = validated_data.pop('current_room')
-                  if current_room_data.get('id') is not None:
-                        current_room = RoomType.objects.filter(id=current_room_data.get('id')).first()
-                        if current_room is None:
-                              raise serializers.ValidationError({'current_room': {'id': 'No Room Type found!'}})
+            # current_room = None
+            # if validated_data.get('current_room') is not None:
+            #       current_room_data = validated_data.pop('current_room')
+            #       if current_room_data.get('id') is not None:
+            #             current_room = RoomType.objects.filter(id=current_room_data.get('id')).first()
+            #             if current_room is None:
+            #                   raise serializers.ValidationError({'current_room': {'id': 'No Room Type found!'}})
                   
-            alloted_room = None
-            if validated_data.get('alloted_room') is not None:
-                  alloted_room_data = validated_data.pop('alloted_room')
-                  if alloted_room_data.get('id') is not None:
-                        alloted_room = RoomType.objects.filter(id=alloted_room_data.get('id')).first()
-                        if alloted_room is None:
-                              raise serializers.ValidationError({'alloted_room': {'id': 'No Room Type found!'}})
+            # alloted_room = None
+            # if validated_data.get('alloted_room') is not None:
+            #       alloted_room_data = validated_data.pop('alloted_room')
+            #       if alloted_room_data.get('id') is not None:
+            #             alloted_room = RoomType.objects.filter(id=alloted_room_data.get('id')).first()
+            #             if alloted_room is None:
+            #                   raise serializers.ValidationError({'alloted_room': {'id': 'No Room Type found!'}})
             
             batch = None
             if validated_data.get('batch') is not None:
@@ -249,11 +270,13 @@ class StudentProfileSerializer(serializers.ModelSerializer):
             instance.phoneno = validated_data.get('phoneno', instance.phoneno)
             instance.gender = validated_data.get('gender', instance.gender)
             instance.cg = validated_data.get('cg', instance.cg)
+            instance.current_room = validated_data.get('current_room', instance.current_room)
+            instance.alloted_room = validated_data.get('alloted_room', instance.alloted_room)
             
-            if current_room is not None:
-                  instance.current_room = current_room
-            if alloted_room is not None:
-                  instance.alloted_room = alloted_room
+            # if current_room is not None:
+            #       instance.current_room = current_room
+            # if alloted_room is not None:
+            #       instance.alloted_room = alloted_room
             
             if batch is not None:
                   instance.batch = batch
