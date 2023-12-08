@@ -11,7 +11,7 @@ import json, string
 from .tasks import send_start_allocation_mail
 from random import choice
 from collections import OrderedDict
-
+from user.models import ResetSlug
 
 class HostelSerializer(serializers.ModelSerializer):
       # Serializer for representing data of all hostels
@@ -134,8 +134,29 @@ class SectionSerializer(serializers.ModelSerializer):
                                                       & Q(leader__gender = instance.gender)).all()
                         for group in groups:
                               for student in group.members.all():
-                                    send_start_allocation_mail.delay(student.name, student.user.email)
-                              send_start_allocation_mail.delay(group.leader.name, group.leader.user.email)
+                                    user = student.user
+                                    slug_instance = ResetSlug.objects.filter(user=user).first()
+                                    if slug_instance is None:
+                                          while True:
+                                                slug = ''.join(choice(string.ascii_letters + string.digits + '-') for _ in range(135))
+                                                if not ResetSlug.objects.filter(slug=slug).exists():
+                                                      break
+                                          slug_instance = ResetSlug(user=user, slug=slug)
+                                          slug_instance.save()
+                                    user_slug = slug_instance.slug
+                                    send_start_allocation_mail.delay(student.name, user.email, user_slug)
+                              lead = group.leader
+                              user = lead.user
+                              slug_instance = ResetSlug.objects.filter(user=user).first()
+                              if slug_instance is None:
+                                    while True:
+                                          slug = ''.join(choice(string.ascii_letters + string.digits + '-') for _ in range(135))
+                                          if not ResetSlug.objects.filter(slug=slug).exists():
+                                                break
+                                    slug_instance = ResetSlug(user=user, slug=slug)
+                                    slug_instance.save()
+                              user_slug = slug_instance.slug
+                              send_start_allocation_mail.delay(lead.name, user.email, user_slug)
                         print('Send Mails!')
                   instance.is_allotment_enabled = updated_allotment_status
 

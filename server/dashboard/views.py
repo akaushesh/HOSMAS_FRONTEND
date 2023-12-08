@@ -29,6 +29,8 @@ from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Font
 from collections import OrderedDict
 
+from preference.models import Preference
+
 studentfileformat = ('rollno', 'email', 'name', 'phoneno', 'cg', 'batch', 'gender', 'current_hostel', 'current_room_type', 'alloted_hostel', 'alloted_room_type')
 
 # Create your views here.

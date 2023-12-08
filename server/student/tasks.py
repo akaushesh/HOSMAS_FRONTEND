@@ -27,7 +27,7 @@ def send_invitation_mail(leader_name, leader_email, leader_roll, invitee_name, i
     connection = get_connection(username=settings.EMAIL_HOST_USERS[idx], password=settings.EMAIL_HOST_PASSWORDS[idx], fail_silently=False)
     connection.open()
     
-    subject = "Invitation to join a group for hostel allotment"
+    subject = f"Hi {invitee_name}, Invitation to join a group for hostel allotment"
     
     context = {
         'name':invitee_name,
@@ -53,7 +53,7 @@ def joined_group_mail(leader_name, leader_email, leader_roll, member_name, membe
     connection = get_connection(username=settings.EMAIL_HOST_USERS[idx], password=settings.EMAIL_HOST_PASSWORDS[idx], fail_silently=False)
     connection.open()
     
-    subject = f"Successfully joined group for hostel allotment"
+    subject = f"Hi {member_name}, You Successfully joined group for hostel allotment"
     
     context = {
         'name':member_name,
@@ -79,7 +79,7 @@ def joined_group_to_members(leader_name,newmember_name, newmember_roll, member_e
     connection = get_connection(username=settings.EMAIL_HOST_USERS[idx], password=settings.EMAIL_HOST_PASSWORDS[idx], fail_silently=False)
     connection.open()
     
-    subject = f"{newmember_name} joined your group for hostel alotment"
+    subject = f"Hi {leader_name}, {newmember_name} joined your group for hostel alotment"
     context = {
         'leader_name':leader_name,
         'name':newmember_name,
@@ -104,7 +104,7 @@ def left_group_mail(leader_name, exmember_name, exmember_roll, member_email):
     connection = get_connection(username=settings.EMAIL_HOST_USERS[idx], password=settings.EMAIL_HOST_PASSWORDS[idx], fail_silently=False)
     connection.open()
     
-    subject = f"{exmember_name} left your group for hostel allotment"
+    subject = f"Hi {leader_name} ,{exmember_name} left your group for hostel allotment"
     context = {
         'leader_name':leader_name,
         'name':exmember_name,
@@ -151,7 +151,7 @@ def send_retain_mail(email, name):
         connection = get_connection(username=settings.EMAIL_HOST_USERS[idx], password=settings.EMAIL_HOST_PASSWORDS[idx], fail_silently=False)
         connection.open()
         
-        subject = "Hostel Allotment Preferences filled for your group"
+        subject = "Hi {name}, Hostel Allotment Preferences filled for your group"
         context = {
             'name':name,
         }
@@ -164,7 +164,7 @@ def send_retain_mail(email, name):
         return f"\nPreferences mail sent to {email}\n"
     
 @app.task(name = "send_teamleader_change_mail")
-def send_teamleader_change_mail(newName, newRoll, email):
+def send_teamleader_change_mail(newName, newRoll, email, name):
             
             idx = cache.get('emailIdIndex', 0)
             cache.set('emailIdIndex', (idx + 1) % settings.EMAIL_HOST_USERS_COUNT)
@@ -172,8 +172,9 @@ def send_teamleader_change_mail(newName, newRoll, email):
             connection = get_connection(username=settings.EMAIL_HOST_USERS[idx], password=settings.EMAIL_HOST_PASSWORDS[idx], fail_silently=False)
             connection.open()
             
-            subject = "Group Leader for your Hostel Allocation was changed"
+            subject = f"Hi {name} ,Group Leader for your Hostel Allocation was changed"
             context = {
+                'name' : name,
                 'newName':newName,
                 'newRoll':newRoll,
             }
@@ -195,7 +196,7 @@ def send_preferences_deleted_mail(email, name):
                 connection = get_connection(username=settings.EMAIL_HOST_USERS[idx], password=settings.EMAIL_HOST_PASSWORDS[idx], fail_silently=False)
                 connection.open()
                 
-                subject = "Hostel Allotment Preferences deleted for your group"
+                subject = f"Hi {name}, Hostel Allotment Preferences deleted for your group"
                 context = {
                     'name':name,
                 }
