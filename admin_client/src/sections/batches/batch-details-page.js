@@ -24,7 +24,7 @@ import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
 import Link from "next/link";
 import { useAuthContext } from "src/contexts/auth-context";
 import { getStudents } from "src/services/others";
-import { deleteBatch, getBatch } from "src/services/batch";
+import { deleteBatch, getBatch, getBatchAnalytics } from "src/services/batch";
 import { TableSearch } from "src/components/table-search";
 import ConfirmationModal from "src/components/ConfirmationModal";
 import { useRouter } from "next/router";
@@ -48,6 +48,8 @@ const ViewBatchDetailsPage = ({ batchId }) => {
   const studentsSelection = useSelection(studentsIds);
   const [confirmationModalOpen, setConfirmationModalOpen] = useState();
 
+  const [batchAnalytics, setBatchAnalytics] = useState();
+
   const [searchQuery, setSearchQuery] = useState("");
 
   console.log(batchId);
@@ -61,6 +63,20 @@ const ViewBatchDetailsPage = ({ batchId }) => {
       };
 
       fetchBatchDetails();
+    } catch (err) {
+      console.log(err);
+    }
+  }, []);
+
+  useEffect(() => {
+    try {
+      const fetchBatchAnalytics = async () => {
+        const res = await getBatchAnalytics(batchId, accessToken);
+        setBatchAnalytics(res?.data);
+        console.log(res);
+      };
+
+      fetchBatchAnalytics();
     } catch (err) {
       console.log(err);
     }
@@ -141,13 +157,73 @@ const ViewBatchDetailsPage = ({ batchId }) => {
             </Button>
           </Stack>
 
+          <Typography variant="h5" mb={2}>
+            All
+          </Typography>
+
+          <Grid container spacing={3} mb={3}>
+            <Grid item xs={12} md={4}>
+              <Card>
+                <CardContent>
+                  <Stack direction="row" justifyContent="space-evenly">
+                    <Typography variant="h5">Total Students: </Typography>
+                    <Typography variant="h5">{batchAnalytics?.total_students}</Typography>
+                  </Stack>
+                </CardContent>
+              </Card>
+            </Grid>
+
+            <Grid item xs={12} md={4}>
+              <Card>
+                <CardContent>
+                  <Stack direction="row" justifyContent="space-evenly">
+                    <Typography variant="h5">Preferences Filled: </Typography>
+                    <Typography variant="h5">{batchAnalytics?.total_preferences_filled}</Typography>
+                  </Stack>
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
+
+          <Typography variant="h5" mb={2}>
+            Male
+          </Typography>
+
+          <Grid container spacing={3} mb={3}>
+            <Grid item xs={12} md={4}>
+              <Card>
+                <CardContent>
+                  <Stack direction="row" justifyContent="space-evenly">
+                    <Typography variant="h5">Total Students: </Typography>
+                    <Typography variant="h5">{batchAnalytics?.male_students}</Typography>
+                  </Stack>
+                </CardContent>
+              </Card>
+            </Grid>
+
+            <Grid item xs={12} md={4}>
+              <Card>
+                <CardContent>
+                  <Stack direction="row" justifyContent="space-evenly">
+                    <Typography variant="h5">Prefernces Students: </Typography>
+                    <Typography variant="h5">{batchAnalytics?.male_preferences_filled}</Typography>
+                  </Stack>
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
+
+          <Typography variant="h5" mb={2}>
+            Female
+          </Typography>
+
           <Grid container spacing={3}>
             <Grid item xs={12} md={4}>
               <Card>
                 <CardContent>
                   <Stack direction="row" justifyContent="space-evenly">
                     <Typography variant="h5">Total Students: </Typography>
-                    <Typography variant="h5">83</Typography>
+                    <Typography variant="h5">{batchAnalytics?.female_students}</Typography>
                   </Stack>
                 </CardContent>
               </Card>
@@ -158,7 +234,9 @@ const ViewBatchDetailsPage = ({ batchId }) => {
                 <CardContent>
                   <Stack direction="row" justifyContent="space-evenly">
                     <Typography variant="h5">Total Students: </Typography>
-                    <Typography variant="h5">83</Typography>
+                    <Typography variant="h5">
+                      {batchAnalytics?.female_preferences_filled}
+                    </Typography>
                   </Stack>
                 </CardContent>
               </Card>
