@@ -25,7 +25,7 @@ export const EditPreferenceForm = (props) => {
   const queryClient = useQueryClient();
 
   const user = queryClient.getQueryData(["getProfile"]);
-  const { can_retain } = useIsPreferenceFillingLive();
+  const { canRetain } = useIsPreferenceFillingLive();
   const { availableChoices } = useAvailableChoices();
   const isLeader = !user?.group || user?.user?.email === user?.group?.leader_email;
 
@@ -94,7 +94,7 @@ export const EditPreferenceForm = (props) => {
               </FormControl>
             </Grid>
           ))}
-          {can_retain && (
+          {canRetain && (
             <Grid container justifyContent="left">
               <FormControlLabel
                 control={<Checkbox onChange={handleRetentionChange} />}

@@ -10,10 +10,12 @@ import {
 } from "@mui/material";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/router";
+import { useIsPreferenceFillingLive } from "src/hooks/use-is-preference-live";
 
 export const PreferenceForm = ({ sx, availableChoices = [], currentPreferences = [] }) => {
   const queryClient = useQueryClient();
   const user = queryClient.getQueryData(["getProfile"]);
+  const { canRetain } = useIsPreferenceFillingLive();
   const isLeader = !user?.group || user?.user?.email === user?.group?.leader_email;
 
   const router = useRouter();
@@ -52,12 +54,14 @@ export const PreferenceForm = ({ sx, availableChoices = [], currentPreferences =
               />
             </Grid>
           ))}
-          <Grid container justifyContent="left">
-            <FormControlLabel
-              control={<Checkbox checked={checked} disabled />}
-              label="Retain current room instead"
-            />
-          </Grid>
+          {canRetain && (
+            <Grid container justifyContent="left">
+              <FormControlLabel
+                control={<Checkbox checked={checked} disabled />}
+                label="Retain current room instead"
+              />
+            </Grid>
+          )}
 
           <Button
             disabled={!isLeader}

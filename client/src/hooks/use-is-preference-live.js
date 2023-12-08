@@ -26,6 +26,7 @@ export const useIsPreferenceFillingLive = () => {
     },
     queryKey: ["isPreferenceFillingLive"],
   });
+  console.log(preferenceConfig);
 
   return { isLive: preferenceConfig?.is_live, canRetain: preferenceConfig?.can_retain, isLoading };
 };
