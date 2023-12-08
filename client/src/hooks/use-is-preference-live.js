@@ -3,7 +3,7 @@ import axios from "axios";
 import { URL } from "config";
 
 export const useIsPreferenceFillingLive = () => {
-  const { data: isLive } = useQuery({
+  const { data: preferenceConfig, isLoading } = useQuery({
     queryFn: async () => {
       try {
         const url = URL + "preferences/status/";
@@ -18,7 +18,8 @@ export const useIsPreferenceFillingLive = () => {
         };
 
         const getPreferenceStatusResponse = await axios.get(url, getPreferenceStatusConfig);
-        return getPreferenceStatusResponse?.data?.is_live;
+        console.log(getPreferenceStatusResponse);
+        return getPreferenceStatusResponse?.data;
       } catch (err) {
         return false;
       }
@@ -26,5 +27,5 @@ export const useIsPreferenceFillingLive = () => {
     queryKey: ["isPreferenceFillingLive"],
   });
 
-  return { isLive };
+  return { isLive: preferenceConfig?.is_live, canRetain: preferenceConfig?.can_retain, isLoading };
 };
