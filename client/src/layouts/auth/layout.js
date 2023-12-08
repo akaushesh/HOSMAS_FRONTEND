@@ -90,7 +90,7 @@ export const Layout = (props) => {
             >
               Welcome to{" "}
               <Box component="a" sx={{ color: "#15B79E" }} target="_blank">
-                Thapar Hostel Management System
+                Thapar Hostel Allocation System
               </Box>
             </Typography>
             <Typography align="center" sx={{ mb: 3 }} variant="subtitle1"></Typography>

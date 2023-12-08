@@ -25,7 +25,7 @@ const Page = () => {
   return (
     <Fragment>
       <Head>
-        <title>Group | Thapar Hostel Management System</title>
+        <title>Group | Thapar Hostel Allocation System</title>
       </Head>
       <Box
         component="main"

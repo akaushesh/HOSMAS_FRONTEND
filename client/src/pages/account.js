@@ -7,7 +7,7 @@ import { AccountProfileDetails } from "src/sections/account/account-profile-deta
 const Page = () => (
   <>
     <Head>
-      <title>Account | Thapar Hostel Management System</title>
+      <title>Account | Thapar Hostel Allocation System</title>
     </Head>
     <Box
       component="main"

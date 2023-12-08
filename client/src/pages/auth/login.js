@@ -51,7 +51,7 @@ const Page = () => {
   return (
     <>
       <Head>
-        <title>Login | Thapar Hostel Management System</title>
+        <title>Login | Thapar Hostel Allocation System</title>
       </Head>
       <Box
         sx={{
