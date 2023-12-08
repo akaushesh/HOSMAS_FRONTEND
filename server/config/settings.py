@@ -188,7 +188,7 @@ if config('FILE_LOGGING', cast=bool, default=False):
     }
 
 
-CELERY_BROKER_URL = 'redis://127.0.0.1:6379'
+# CELERY_BROKER_URL = 'redis://127.0.0.1:6379'
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_RESULT_BACKEND = 'django-db'
 CELERY_RESULT_SERIALIZER = 'json'
@@ -201,10 +201,16 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
+# CACHES = {
+#     "default": {
+#         "BACKEND": "django.core.cache.backends.redis.RedisCache",
+#         "LOCATION": "redis://127.0.0.1:6379",
+#     }
+# }
 CACHES = {
     "default": {
-        "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379",
+        "BACKEND": "django.core.cache.backends.memcached.PyMemcacheCache",
+        "LOCATION": "127.0.0.1:11211",
     }
 }
 
