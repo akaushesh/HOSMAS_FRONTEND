@@ -101,7 +101,7 @@ export const AuthProvider = (props) => {
     try {
       isAuthenticated = window.sessionStorage.getItem("authenticated") === "true";
     } catch (err) {
-      console.error(err);
+      // console.error(err);
     }
 
     if (isAuthenticated) {
@@ -157,7 +157,7 @@ export const AuthProvider = (props) => {
     try {
       window.sessionStorage.setItem("authenticated", "true");
     } catch (err) {
-      console.error(err);
+      // console.error(err);
     }
 
     dispatch({
@@ -211,7 +211,7 @@ export const AuthProvider = (props) => {
         payload: user,
       });
     } catch (err) {
-      console.error(err);
+      // console.error(err);
       if (err?.response?.status === 401) {
         throw new Error(err?.response?.data?.detail);
       }
@@ -229,7 +229,7 @@ export const AuthProvider = (props) => {
       window.sessionStorage.removeItem("jwt");
       window.sessionStorage.removeItem("refresh");
     } catch (err) {
-      console.error(err);
+      // console.error(err);
     }
 
     dispatch({

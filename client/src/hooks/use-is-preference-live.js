@@ -18,7 +18,6 @@ export const useIsPreferenceFillingLive = () => {
         };
 
         const getPreferenceStatusResponse = await axios.get(url, getPreferenceStatusConfig);
-        console.log(getPreferenceStatusResponse);
         return getPreferenceStatusResponse?.data;
       } catch (err) {
         return false;
@@ -26,7 +25,6 @@ export const useIsPreferenceFillingLive = () => {
     },
     queryKey: ["isPreferenceFillingLive"],
   });
-  console.log(preferenceConfig);
 
   return { isLive: preferenceConfig?.is_live, canRetain: preferenceConfig?.can_retain, isLoading };
 };
