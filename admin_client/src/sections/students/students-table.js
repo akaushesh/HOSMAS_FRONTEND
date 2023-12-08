@@ -30,6 +30,7 @@ export const StudentsTable = (props) => {
     page = 0,
     rowsPerPage = 0,
     selected = [],
+    handleStudentSelection,
   } = props;
 
   const selectedSome = selected.length > 0 && selected.length < items.length;
@@ -61,6 +62,10 @@ export const StudentsTable = (props) => {
                 <TableCell>Gender</TableCell>
                 <TableCell>Batch</TableCell>
                 <TableCell>Phone</TableCell>
+                <TableCell>Current Hostel</TableCell>
+                <TableCell>Current Room Type</TableCell>
+                <TableCell>Preview Hostel</TableCell>
+                <TableCell>Preview Room Type</TableCell>
                 <TableCell>Allotted Hostel</TableCell>
                 <TableCell>Allotted Room Type</TableCell>
                 <TableCell>CG</TableCell>
@@ -84,15 +89,24 @@ export const StudentsTable = (props) => {
                         }}
                       />
                     </TableCell>
-                    <TableCell>{student.rollno}</TableCell>
-                    <TableCell>{student.name}</TableCell>
+                    <TableCell
+                      onClick={() => handleStudentSelection(student)}
+                      sx={{ textDecoration: "underline", cursor: "pointer" }}
+                    >
+                      {student?.rollno}
+                    </TableCell>
+                    <TableCell>{student?.name}</TableCell>
                     <TableCell>{student?.user?.email}</TableCell>
                     <TableCell>{student?.gender == "M" ? "Male" : "Female"}</TableCell>
                     <TableCell>{student?.batch?.name}</TableCell>
                     <TableCell>{student?.phoneno}</TableCell>
-                    <TableCell>{student.allotted_room?.hostel ?? "NA"}</TableCell>
-                    <TableCell>{student.allotted_room?.name ?? "NA"}</TableCell>
-                    <TableCell>{student.cg}</TableCell>
+                    <TableCell>{student?.current_hostel?.hostel ?? "NA"}</TableCell>
+                    <TableCell>{student?.current_hostel?.room_type ?? "NA"}</TableCell>
+                    <TableCell>{student?.preview_hostel?.hostel ?? "NA"}</TableCell>
+                    <TableCell>{student?.preview_hostel?.room_type ?? "NA"}</TableCell>
+                    <TableCell>{student?.alloted_hostel?.hostel ?? "NA"}</TableCell>
+                    <TableCell>{student?.alloted_hostel?.room_type ?? "NA"}</TableCell>
+                    <TableCell>{student?.cg}</TableCell>
                   </TableRow>
                 );
               })}
@@ -106,7 +120,7 @@ export const StudentsTable = (props) => {
         onPageChange={onPageChange}
         page={page}
         rowsPerPage={rowsPerPage}
-        rowsPerPageOptions={[5]}
+        rowsPerPageOptions={[20]}
       />
     </Card>
   );

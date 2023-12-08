@@ -37,3 +37,14 @@ export const deleteStudent = async (id, accessToken) => {
   });
   return res;
 };
+
+export const deleteMultipleStudents = async (ids, accessToken) => {
+  console.log("test ", accessToken);
+  const res = await studentApi.delete("delete/multiple", {
+    data: { ids: ids },
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+  return res;
+};

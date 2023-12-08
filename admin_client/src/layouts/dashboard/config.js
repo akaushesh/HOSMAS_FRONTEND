@@ -37,8 +37,8 @@ export const items = [
     ),
   },
   {
-    title: "View Groups",
-    path: "/view-groups",
+    title: "Manage Groups",
+    path: "/manage-groups",
     icon: (
       <SvgIcon fontSize="small">
         <UsersIcon />

@@ -39,8 +39,8 @@ export const GroupsTable = (props) => {
   const selectedSome = selected.length > 0 && selected.length < items.length;
   const selectedAll = items.length > 0 && selected.length === items.length;
 
-  const handleGroupSelection = (id) => {
-    setSelectedGroup(items.filter((item) => item.id == id)[0]);
+  const handleGroupSelection = (group) => {
+    setSelectedGroup(group);
     setGroupDetailsModalOpen(true);
   };
 
@@ -81,7 +81,7 @@ export const GroupsTable = (props) => {
                     hover
                     key={group.id}
                     selected={isSelected}
-                    onClick={() => handleGroupSelection(group.id)}
+                    onClick={() => handleGroupSelection(group)}
                     sx={{ cursor: "pointer" }}
                   >
                     <TableCell padding="checkbox">

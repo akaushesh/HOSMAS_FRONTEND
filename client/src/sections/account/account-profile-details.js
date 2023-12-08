@@ -20,7 +20,10 @@ export const AccountProfileDetails = (props) => {
 
   return (
     <Card>
-      <CardHeader subheader="Contact caretaker for any discrepancy" title="Profile" />
+      <CardHeader
+        subheader="Contact queries_studentaffairs@thapar.edu for any discrepancy"
+        title="Profile"
+      />
       <CardContent sx={{ pt: 0 }}>
         <Box sx={{ m: -1.5 }}>
           <Grid container spacing={3}>

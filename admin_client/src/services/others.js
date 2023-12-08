@@ -41,3 +41,21 @@ export const searchStudent = async (rollNo, accessToken) => {
   });
   return res;
 };
+
+export const getAcademicSession = async (accessToken) => {
+  const res = await otherApi.get(`dashboard/academic-session/view/1/`, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+  return res;
+};
+
+export const updateAcademicSession = async (data, accessToken) => {
+  const res = await otherApi.put(`dashboard/academic-session/update/1/`, data, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+  return res;
+};

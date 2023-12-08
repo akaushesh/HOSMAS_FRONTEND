@@ -26,6 +26,8 @@ import { getProfile } from "src/services/auth";
 import { useAuthContext } from "src/contexts/auth-context";
 import CustomModal from "src/components/CustomModal";
 import { getAllSections, updateSectionsAllotmentStatus } from "src/services/section";
+import EmailIcon from "@mui/icons-material/Email";
+import { getAcademicSession, updateAcademicSession } from "src/services/others";
 // import { OverviewBudget } from "../overview/overview-budget";
 // import { OverviewTotalCustomers } from "../overview/overview-total-customers";
 
@@ -71,22 +73,54 @@ const AdminAccountProfileDetails = ({ email }) => {
 export const AdminAccountProfilePage = () => {
   const { accessToken } = useAuthContext();
 
-  const [openUpdatePreferenceModal, setOpenUpdatePreferenceModal] = useState();
   const [email, setEmail] = useState();
   const [sections, setSections] = useState([]);
+  const [openUpdatePreferenceModal, setOpenUpdatePreferenceModal] = useState(false);
+  const [openAcademicSessionModal, setOpenAcademicSessionModal] = useState(false);
+  const [openFeeStructureLinkModal, setOpenFeeStructureLinkModal] = useState(false);
+  const [academicSession, setAcademicSession] = useState("");
+  const [feeStructureLink, setFeeStructureLink] = useState("");
 
   useEffect(() => {
     const getData = async () => {
       try {
         const res = await getProfile(accessToken);
         setEmail(res?.data?.email);
+        // setAcademicSession(res?.data?.)
       } catch (err) {
-        alert("An error occurred");
+        console.log(err);
       }
     };
 
     getData();
   }, []);
+
+  useEffect(() => {
+    const fetchAcademicSession = async () => {
+      try {
+        const res = await getAcademicSession(accessToken);
+        setAcademicSession(res?.data?.name);
+        setFeeStructureLink(res?.data?.fee_structure_url);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    fetchAcademicSession();
+  }, [openAcademicSessionModal]);
+
+  const handleAcademicSessionUpdate = async () => {
+    const data = {
+      name: academicSession,
+      fee_structure_url: feeStructureLink,
+    };
+
+    try {
+      const res = updateAcademicSession(data, accessToken);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   const handleUpdatePreferenceSelectionClick = async () => {
     try {
@@ -127,8 +161,6 @@ export const AdminAccountProfilePage = () => {
       });
     });
   };
-
-  const allotmentStarted = false;
 
   return (
     <Box
@@ -216,7 +248,7 @@ export const AdminAccountProfilePage = () => {
                       </SvgIcon>
                     </Avatar>
                     <Typography sx={{ color: "text.primary" }} textDecoration="none">
-                      Manage Preferences
+                      Manage Sections
                     </Typography>
                     <EastIcon fontSize="large" />
                   </Stack>
@@ -227,7 +259,7 @@ export const AdminAccountProfilePage = () => {
           </Grid>
           <Grid xs={12} md={6} lg={4}>
             <Card>
-              <Link href="/view-groups" style={{ color: "black", textDecoration: "none" }}>
+              <Link href="/manage-groups" style={{ color: "black", textDecoration: "none" }}>
                 <CardContent>
                   <Stack direction="row" alignItems="center" justifyContent="space-evenly">
                     <Avatar
@@ -241,7 +273,7 @@ export const AdminAccountProfilePage = () => {
                         <UsersIcon />
                       </SvgIcon>
                     </Avatar>
-                    <Typography>View Groups</Typography>
+                    <Typography>Manage Groups</Typography>
                     <EastIcon fontSize="large" />
                   </Stack>
                 </CardContent>
@@ -271,9 +303,9 @@ export const AdminAccountProfilePage = () => {
               </CardContent>
             </Card>
           </Grid>
-          <Grid xs={12} md={6} lg={4}>
+          {/* <Grid xs={12} md={6} lg={4}>
             <Card>
-              <Link href="/view-groups" style={{ color: "black", textDecoration: "none" }}>
+              <Link href="/manage-groups" style={{ color: "black", textDecoration: "none" }}>
                 <CardContent>
                   <Stack direction="row" alignItems="center" justifyContent="space-evenly">
                     <Avatar
@@ -293,10 +325,10 @@ export const AdminAccountProfilePage = () => {
                 </CardContent>
               </Link>
             </Card>
-          </Grid>
+          </Grid> */}
           <Grid xs={12} md={6} lg={4}>
             <Card>
-              <Link href="/view-groups" style={{ color: "black", textDecoration: "none" }}>
+              <Link href="/manage-groups" style={{ color: "black", textDecoration: "none" }}>
                 <CardContent>
                   <Stack direction="row" alignItems="center" justifyContent="space-evenly">
                     <Avatar
@@ -319,55 +351,120 @@ export const AdminAccountProfilePage = () => {
           </Grid>
           <Grid xs={12} md={6} lg={4}>
             <Card>
-              <Link href="/view-groups" style={{ color: "black", textDecoration: "none" }}>
+              <Link href="/manage-groups" style={{ color: "black", textDecoration: "none" }}>
                 <CardContent>
                   <Stack direction="row" alignItems="center" justifyContent="space-evenly">
                     <Avatar
                       sx={{
-                        backgroundColor: "brown",
+                        backgroundColor: "#0f3923",
                         height: 56,
                         width: 56,
                       }}
                     >
                       <SvgIcon>
-                        <UsersIcon />
+                        <EmailIcon />
                       </SvgIcon>
                     </Avatar>
-                    <Typography>Send Reminder Email</Typography>
+                    <Typography textAlign="center">
+                      Send Reminder <br /> Email
+                    </Typography>
                     <EastIcon fontSize="large" />
                   </Stack>
                 </CardContent>
               </Link>
             </Card>
           </Grid>
-          {/* <Grid xs={12} md={6} lg={4}>
-            <Card>
-              {!allotmentStarted ? (
-                <CardContent
-                  sx={{
-                    "&:hover": { backgroundColor: "green", color: "white", cursor: "pointer" },
-                  }}
-                >
-                  <Stack alignItems="center" justifyContent="space-between">
-                    <Typography>Start Allotment</Typography>
-                    <PlayCircleFilledWhiteIcon fontSize="large" />
-                  </Stack>
-                </CardContent>
-              ) : (
-                <CardContent
-                  sx={{
-                    "&:hover": { backgroundColor: "red", color: "white", cursor: "pointer" },
-                  }}
-                >
-                  <Stack alignItems="center" justifyContent="space-between">
-                    <Typography>Stop Allotment</Typography>
-                    <StopCircleIcon fontSize="large" />
-                  </Stack>
-                </CardContent>
-              )}
+
+          <Grid xs={12} md={6} lg={4}>
+            <Card onClick={() => setOpenAcademicSessionModal(true)}>
+              <CardContent sx={{ cursor: "pointer" }}>
+                <Stack direction="row" alignItems="center" justifyContent="space-evenly">
+                  <Avatar
+                    sx={{
+                      backgroundColor: "brown",
+                      height: 56,
+                      width: 56,
+                    }}
+                  >
+                    <SvgIcon>
+                      <UsersIcon />
+                    </SvgIcon>
+                  </Avatar>
+                  <Typography textAlign="center">
+                    Change Academic
+                    <br /> Session
+                  </Typography>
+                  <EastIcon fontSize="large" />
+                </Stack>
+              </CardContent>
             </Card>
-          </Grid> */}
+          </Grid>
+
+          <Grid xs={12} md={6} lg={4}>
+            <Card onClick={() => setOpenFeeStructureLinkModal(true)}>
+              <CardContent sx={{ cursor: "pointer" }}>
+                <Stack direction="row" alignItems="center" justifyContent="space-evenly">
+                  <Avatar
+                    sx={{
+                      backgroundColor: "brown",
+                      height: 56,
+                      width: 56,
+                    }}
+                  >
+                    <SvgIcon>
+                      <UsersIcon />
+                    </SvgIcon>
+                  </Avatar>
+                  <Typography textAlign="center">
+                    Set Fee Structure
+                    <br /> Link
+                  </Typography>
+                  <EastIcon fontSize="large" />
+                </Stack>
+              </CardContent>
+            </Card>
+          </Grid>
         </Grid>
+
+        <CustomModal
+          open={openAcademicSessionModal}
+          onClose={() => setOpenAcademicSessionModal(false)}
+          maxWidth={400}
+        >
+          <Stack alignItems="center" spacing={3}>
+            <Typography variant="h5" textAlign="center">
+              Set academic session
+            </Typography>
+            <TextField
+              label="Academic Session"
+              value={academicSession}
+              onChange={(e) => setAcademicSession(e.target.value)}
+            />
+            <Button variant="contained" onClick={handleAcademicSessionUpdate}>
+              Submit
+            </Button>
+          </Stack>
+        </CustomModal>
+
+        <CustomModal
+          open={openFeeStructureLinkModal}
+          onClose={() => setOpenFeeStructureLinkModal(false)}
+          maxWidth={400}
+        >
+          <Stack alignItems="center" spacing={3}>
+            <Typography variant="h5" textAlign="center">
+              Set Fee Structure Link
+            </Typography>
+            <TextField
+              label="Link"
+              value={feeStructureLink}
+              onChange={(e) => setFeeStructureLink(e.target.value)}
+            />
+            <Button variant="contained" onClick={handleAcademicSessionUpdate}>
+              Submit
+            </Button>
+          </Stack>
+        </CustomModal>
 
         <CustomModal
           open={openUpdatePreferenceModal}

@@ -103,7 +103,7 @@ export const OverviewLatestProducts = (props) => {
         },
       };
 
-      const newURL = URL + "student/invitation/view/received";
+      const newURL = URL + "student/invitation/view/received/";
 
       const getProfileResponse = await axios.get(newURL, getProfileConfig);
       setRequests(getProfileResponse?.data);
