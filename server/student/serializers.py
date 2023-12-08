@@ -240,21 +240,21 @@ class StudentProfileSerializer(serializers.ModelSerializer):
                         user.email = user_data.get('email')
                         user.save()
             
-            current_room = None
-            if validated_data.get('current_room') is not None:
-                  current_room_data = validated_data.pop('current_room')
-                  if current_room_data.get('id') is not None:
-                        current_room = RoomType.objects.filter(id=current_room_data.get('id')).first()
-                        if current_room is None:
-                              raise serializers.ValidationError({'current_room': {'id': 'No Room Type found!'}})
+            # current_room = None
+            # if validated_data.get('current_room') is not None:
+            #       current_room_data = validated_data.pop('current_room')
+            #       if current_room_data.get('id') is not None:
+            #             current_room = RoomType.objects.filter(id=current_room_data.get('id')).first()
+            #             if current_room is None:
+            #                   raise serializers.ValidationError({'current_room': {'id': 'No Room Type found!'}})
                   
-            alloted_room = None
-            if validated_data.get('alloted_room') is not None:
-                  alloted_room_data = validated_data.pop('alloted_room')
-                  if alloted_room_data.get('id') is not None:
-                        alloted_room = RoomType.objects.filter(id=alloted_room_data.get('id')).first()
-                        if alloted_room is None:
-                              raise serializers.ValidationError({'alloted_room': {'id': 'No Room Type found!'}})
+            # alloted_room = None
+            # if validated_data.get('alloted_room') is not None:
+            #       alloted_room_data = validated_data.pop('alloted_room')
+            #       if alloted_room_data.get('id') is not None:
+            #             alloted_room = RoomType.objects.filter(id=alloted_room_data.get('id')).first()
+            #             if alloted_room is None:
+            #                   raise serializers.ValidationError({'alloted_room': {'id': 'No Room Type found!'}})
             
             batch = None
             if validated_data.get('batch') is not None:
@@ -270,11 +270,13 @@ class StudentProfileSerializer(serializers.ModelSerializer):
             instance.phoneno = validated_data.get('phoneno', instance.phoneno)
             instance.gender = validated_data.get('gender', instance.gender)
             instance.cg = validated_data.get('cg', instance.cg)
+            instance.current_room = validated_data.get('current_room', instance.current_room)
+            instance.alloted_room = validated_data.get('alloted_room', instance.alloted_room)
             
-            if current_room is not None:
-                  instance.current_room = current_room
-            if alloted_room is not None:
-                  instance.alloted_room = alloted_room
+            # if current_room is not None:
+            #       instance.current_room = current_room
+            # if alloted_room is not None:
+            #       instance.alloted_room = alloted_room
             
             if batch is not None:
                   instance.batch = batch
