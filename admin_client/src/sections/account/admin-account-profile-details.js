@@ -28,6 +28,7 @@ import CustomModal from "src/components/CustomModal";
 import { getAllSections, updateSectionsAllotmentStatus } from "src/services/section";
 import EmailIcon from "@mui/icons-material/Email";
 import { getAcademicSession, updateAcademicSession } from "src/services/others";
+import ConfirmationModal from "src/components/ConfirmationModal";
 // import { OverviewBudget } from "../overview/overview-budget";
 // import { OverviewTotalCustomers } from "../overview/overview-total-customers";
 
@@ -80,6 +81,8 @@ export const AdminAccountProfilePage = () => {
   const [openFeeStructureLinkModal, setOpenFeeStructureLinkModal] = useState(false);
   const [academicSession, setAcademicSession] = useState("");
   const [feeStructureLink, setFeeStructureLink] = useState("");
+  const [enableAllotmentConfirmationModalOpen, setEnableAllotmentConfirmationModalOpen] =
+    useState(false);
 
   useEffect(() => {
     const getData = async () => {
@@ -146,6 +149,7 @@ export const AdminAccountProfilePage = () => {
       const res = await updateSectionsAllotmentStatus(allotmentStatusData, accessToken);
       if (res.status == 200) {
         setOpenUpdatePreferenceModal(false);
+        setEnableAllotmentConfirmationModalOpen(false);
       }
       console.log(res);
     } catch (err) {
@@ -497,12 +501,23 @@ export const AdminAccountProfilePage = () => {
           </Grid>
           <Button
             variant="contained"
-            onClick={handleUpdatePrefernceSelection}
+            onClick={() => setEnableAllotmentConfirmationModalOpen(true)}
             sx={{ display: "block", margin: "0 auto" }}
           >
             Update Preference Selection
           </Button>
         </CustomModal>
+
+        <ConfirmationModal
+          open={enableAllotmentConfirmationModalOpen}
+          onClose={() => {
+            setEnableAllotmentConfirmationModalOpen(false);
+          }}
+          message="Are you sure you want to update allotments? This action will email all the students of the newly enabled allotments."
+          noMessage="No, leave it"
+          yesMessage="Yes, update"
+          execFunction={handleUpdatePrefernceSelection}
+        />
       </Container>
     </Box>
   );

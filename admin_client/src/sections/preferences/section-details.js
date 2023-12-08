@@ -30,6 +30,8 @@ function SectionPreference({ sectionId }) {
   const [isAllotmentEnabled, setIsAllotmentEnabled] = useState(false);
   const [isRetainEnabled, setIsRetainEnabled] = useState(false);
   const [confirmationModalOpen, setConfirmationModalOpen] = useState();
+  const [enableAllotmentConfirmationModalOpen, setEnableAllotmentConfirmationModalOpen] =
+    useState();
 
   console.log(sectionData);
 
@@ -74,10 +76,23 @@ function SectionPreference({ sectionId }) {
     }
   };
 
-  const handleAllotmentEnableChange = async (e) => {
+  const handleAllotmentEnable = async () => {
     try {
-      setIsAllotmentEnabled(e.target.checked);
-      const updateData = { is_allotment_enabled: e.target.checked };
+      setIsAllotmentEnabled(true);
+      const updateData = { is_allotment_enabled: true };
+
+      const res = await updateSection(sectionId, updateData, accessToken);
+      if (res.status == 200) {
+        setEnableAllotmentConfirmationModalOpen(false);
+      }
+      console.log(res);
+    } catch (err) {}
+  };
+
+  const handleAllotmentDisable = async () => {
+    try {
+      setIsAllotmentEnabled(false);
+      const updateData = { is_allotment_enabled: false };
 
       const res = await updateSection(sectionId, updateData, accessToken);
       console.log(res);
@@ -165,7 +180,13 @@ function SectionPreference({ sectionId }) {
                     <Switch
                       sx={{ transform: "translateY(5%)" }}
                       checked={isAllotmentEnabled}
-                      onChange={handleAllotmentEnableChange}
+                      onChange={(e) => {
+                        if (e.target.checked == true) {
+                          setEnableAllotmentConfirmationModalOpen(true);
+                        } else {
+                          handleAllotmentDisable();
+                        }
+                      }}
                     />
                   </Stack>
                 </CardContent>
@@ -211,6 +232,17 @@ function SectionPreference({ sectionId }) {
           noMessage="No, leave it"
           yesMessage="Yes, delete it"
           execFunction={handleDeleteSection}
+        />
+
+        <ConfirmationModal
+          open={enableAllotmentConfirmationModalOpen}
+          onClose={() => {
+            setEnableAllotmentConfirmationModalOpen(false);
+          }}
+          message="Are you sure you want to enable allotment? This action will email all the students of this section."
+          noMessage="No, leave it"
+          yesMessage="Yes, enable it"
+          execFunction={handleAllotmentEnable}
         />
       </Container>
     </Box>
