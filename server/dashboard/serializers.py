@@ -203,7 +203,7 @@ class AllotmentStatusSerializer(serializers.ModelSerializer):
 class AcademicSessionSerializer(serializers.ModelSerializer):
       class Meta:
             model = AcademicSession
-            fields = ['name']
+            fields = ['name', 'fee_structure_url']
 
 
 class FAQSerializer(serializers.ModelSerializer):
