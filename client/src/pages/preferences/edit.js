@@ -8,7 +8,7 @@ const Page = () => {
   return (
     <Fragment>
       <Head>
-        <title>Edit Preference | Thapar Hostel Management System</title>
+        <title>Edit Preference | Thapar Hostel Allocation System</title>
       </Head>
       <Box
         component="main"

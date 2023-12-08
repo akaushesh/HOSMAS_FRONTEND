@@ -7,7 +7,7 @@ import { Layout as DashboardLayout } from "src/layouts/dashboard/layout";
 const Page = () => (
   <>
     <Head>
-      <title>Settings | Thapar Hostel Management System</title>
+      <title>Settings | Thapar Hostel Allocation System</title>
     </Head>
     <Box
       component="main"

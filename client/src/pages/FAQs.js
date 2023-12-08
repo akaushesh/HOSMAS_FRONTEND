@@ -7,7 +7,7 @@ import { Fragment } from "react";
 const Page = () => (
   <Fragment>
     <Head>
-      <title>FAQs | Thapar Hostel Management System</title>
+      <title>FAQs | Thapar Hostel Allocation System</title>
     </Head>
     <Box
       component="main"

@@ -2,7 +2,7 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Button,
   Card,
@@ -14,9 +14,9 @@ import {
 } from "@mui/material";
 import CustomModal from "src/components/customModal";
 import { FormConfirmation } from "./form-confirmation";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { URL } from "config";
-import axios from "axios";
+import { useQueryClient } from "@tanstack/react-query";
+import { useAvailableChoices } from "src/hooks/user-available-choices";
+import { useIsPreferenceFillingLive } from "src/hooks/use-is-preference-live";
 
 export const EditPreferenceForm = (props) => {
   const { sx } = props;
@@ -25,6 +25,8 @@ export const EditPreferenceForm = (props) => {
   const queryClient = useQueryClient();
 
   const user = queryClient.getQueryData(["getProfile"]);
+  const { can_retain } = useIsPreferenceFillingLive();
+  const { availableChoices } = useAvailableChoices();
   const isLeader = !user?.group || user?.user?.email === user?.group?.leader_email;
 
   const onCloseModal = () => {
@@ -56,28 +58,6 @@ export const EditPreferenceForm = (props) => {
   const handleRetentionChange = (event) => {
     setRetain(event.target.checked);
   };
-
-  const { data: availableChoices, isLoading } = useQuery({
-    queryFn: async () => {
-      try {
-        const url = URL + "preferences/getChoices/";
-        const jwt = sessionStorage.getItem("jwt");
-
-        const getAvailableChoicesConfig = {
-          maxBodyLength: Infinity,
-          headers: {
-            Authorization: "Bearer " + jwt,
-          },
-        };
-
-        const availableChoicesResponse = await axios.get(url, getAvailableChoicesConfig);
-        return availableChoicesResponse?.data;
-      } catch (err) {
-        return [];
-      }
-    },
-    queryKey: ["getAvailablePreferences"],
-  });
 
   const [preferences, setPreferences] = useState(
     Array.from({ length: availableChoices?.length }, () => "")
@@ -114,12 +94,14 @@ export const EditPreferenceForm = (props) => {
               </FormControl>
             </Grid>
           ))}
-          <Grid container justifyContent="left">
-            <FormControlLabel
-              control={<Checkbox onChange={handleRetentionChange} />}
-              label="Retain current room instead"
-            />
-          </Grid>
+          {can_retain && (
+            <Grid container justifyContent="left">
+              <FormControlLabel
+                control={<Checkbox onChange={handleRetentionChange} />}
+                label="Retain current room instead"
+              />
+            </Grid>
+          )}
 
           <Button
             disabled={!isLeader}

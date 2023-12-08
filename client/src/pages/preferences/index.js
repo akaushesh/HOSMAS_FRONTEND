@@ -1,65 +1,24 @@
 import { Fragment } from "react";
 import Head from "next/head";
-import { Box, Container, Grid, Stack, Typography } from "@mui/material";
+import { Box, CircularProgress, Container, Grid, Stack, Typography } from "@mui/material";
 import { Layout as DashboardLayout } from "src/layouts/dashboard/layout";
 import { PreferenceForm } from "src/sections/preference/preference-form";
 import { useQuery } from "@tanstack/react-query";
 import { useIsPreferenceFillingLive } from "src/hooks/use-is-preference-live";
 import axios from "axios";
 import { URL } from "config";
+import { useCurrentPreference } from "src/hooks/use-current-preference";
+import { useAvailableChoices } from "src/hooks/user-available-choices";
 
 const Page = () => {
-  const { isLive } = useIsPreferenceFillingLive();
-
-  const { data: availableChoices, isLoading } = useQuery({
-    queryFn: async () => {
-      try {
-        const url = URL + "preferences/getChoices/";
-        const jwt = sessionStorage.getItem("jwt");
-
-        const getAvailableChoicesConfig = {
-          maxBodyLength: Infinity,
-          headers: {
-            Authorization: "Bearer " + jwt,
-          },
-        };
-
-        const availableChoicesResponse = await axios.get(url, getAvailableChoicesConfig);
-        return availableChoicesResponse?.data;
-      } catch (err) {
-        return [];
-      }
-    },
-    queryKey: ["getAvailablePreferences"],
-  });
-
-  const { data: currentPreferences } = useQuery({
-    queryFn: async () => {
-      try {
-        const url = URL + "preferences/getPreference/";
-        const jwt = sessionStorage.getItem("jwt");
-
-        const getCurrentPreferencesConfig = {
-          maxBodyLength: Infinity,
-          headers: {
-            Authorization: "Bearer " + jwt,
-          },
-        };
-
-        const getCurrentPreferencesResponse = await axios.get(url, getCurrentPreferencesConfig);
-        return getCurrentPreferencesResponse?.data?.data;
-      } catch (err) {
-        return [];
-      }
-    },
-    queryKey: ["getCurrentPreferences"],
-    staleTime: Infinity,
-  });
+  const { isLive, isLoading: isLiveLoading } = useIsPreferenceFillingLive();
+  const { currentPreferences } = useCurrentPreference();
+  const { availableChoices } = useAvailableChoices();
 
   return (
     <Fragment>
       <Head>
-        <title>Preference | Thapar Hostel Management System</title>
+        <title>Preference | Thapar Hostel Allocation System</title>
       </Head>
       <Box
         component="main"
@@ -71,7 +30,18 @@ const Page = () => {
         position="relative"
       >
         <Container maxWidth="xl">
-          {isLive ? (
+          {isLiveLoading ? (
+            <Box
+              sx={{
+                position: "absolute",
+                top: "47%",
+                left: "50%",
+                transform: "translate(-50%,-50%)",
+              }}
+            >
+              <CircularProgress />
+            </Box>
+          ) : isLive ? (
             <Stack>
               <Grid container paddingTop="1rem" justifyContent="center" alignItems="center">
                 <PreferenceForm

@@ -84,7 +84,7 @@ export const SideNav = (props) => {
             </Box>
             <div>
               <Typography color="inherit" variant="subtitle1">
-                Hostel Management System
+                Hostel Allocation System
               </Typography>
             </div>
             {/* <SvgIcon fontSize="small" sx={{ color: "neutral.500" }}>

@@ -52,7 +52,7 @@ const Page = () => {
   return (
     <>
       <Head>
-        <title>Forgot Password | Thapar Hostel Management System</title>
+        <title>Forgot Password | Thapar Hostel Allocation System</title>
       </Head>
       <Box
         sx={{

@@ -29,7 +29,7 @@ const App = (props) => {
     <QueryClientProvider client={queryClient}>
       <CacheProvider value={emotionCache}>
         <Head>
-          <title>Thapar Hostel Management System</title>
+          <title>Thapar Hostel Allocation System</title>
           <meta name="viewport" content="initial-scale=1, width=device-width" />
         </Head>
         <LocalizationProvider dateAdapter={AdapterDateFns}>
