@@ -102,7 +102,7 @@ function SectionPreference({ sectionId }) {
   const handleRetainEnableChange = async (e) => {
     try {
       setIsRetainEnabled(e.target.checked);
-      const updateData = { is_retain_enabled: e.target.checked };
+      const updateData = { is_retain_allowed: e.target.checked };
 
       const res = await updateSection(sectionId, updateData, accessToken);
       console.log(res);
