@@ -77,13 +77,7 @@ export const GroupsTable = (props) => {
                 const isSelected = selected.includes(group.id);
 
                 return (
-                  <TableRow
-                    hover
-                    key={group.id}
-                    selected={isSelected}
-                    onClick={() => handleGroupSelection(group)}
-                    sx={{ cursor: "pointer" }}
-                  >
+                  <TableRow hover key={group.id} selected={isSelected}>
                     <TableCell padding="checkbox">
                       <Checkbox
                         checked={isSelected}
@@ -96,7 +90,12 @@ export const GroupsTable = (props) => {
                         }}
                       />
                     </TableCell>
-                    <TableCell>{group.id}</TableCell>
+                    <TableCell
+                      onClick={() => handleGroupSelection(group)}
+                      sx={{ cursor: "pointer", textDecoration: "underline" }}
+                    >
+                      {group.id}
+                    </TableCell>
                     <TableCell>
                       {/* <Stack alignItems="center" direction="row" spacing={2}> */}
                       {/* <Avatar src={group.avatar}>{getInitials(group.name)}</Avatar> */}

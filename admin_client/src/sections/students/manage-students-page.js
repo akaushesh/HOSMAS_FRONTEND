@@ -29,6 +29,7 @@ import { createStudent, deleteMultipleStudents, updateStudent } from "src/servic
 import { importStudents } from "src/services/import";
 import { getAllHostels, getHostel } from "src/services/hostel";
 import { getRoomType } from "src/services/roomType";
+import ConfirmationModal from "src/components/ConfirmationModal";
 
 const useStudentsIDs = (students) => {
   return useMemo(() => {
@@ -54,6 +55,9 @@ const ViewStudentsPage = () => {
   const [editBatchId, setEditBatchId] = useState();
   const [editRoomTypeId, setEditRoomTypeId] = useState();
   const [editCg, setEditCg] = useState();
+  const [totalStudents, setTotalStudents] = useState();
+
+  const [deleteConfirmationModalOpen, setDeleteConfirmationModalOpen] = useState();
 
   const [openExportStudentsModal, setOpenExportStudentModal] = useState(false);
   const [exportBatchId, setExportBatchId] = useState();
@@ -66,6 +70,7 @@ const ViewStudentsPage = () => {
         const res = await getStudents(searchQuery, 20, page + 1, "all", accessToken);
         if (res.status == 200) {
           setStudents(res.data.data);
+          setTotalStudents(res.data.total_entries);
         }
         console.log(res);
       };
@@ -128,7 +133,8 @@ const ViewStudentsPage = () => {
       if (res.status == 202) {
         const res1 = await getStudents(searchQuery, 20, page + 1, "all", accessToken);
         if (res1.status == 200) {
-          setDefaulters(res1.data.data);
+          setStudents(res1.data.data);
+          setTotalStudents(res.data.total_entries);
         }
       }
       console.log(res);
@@ -153,6 +159,7 @@ const ViewStudentsPage = () => {
         const res1 = await getStudents(searchQuery, 20, page + 1, "all", accessToken);
         if (res1.status == 200) {
           setStudents(res1.data.data);
+          setTotalStudents(res1.data.total_entries);
         }
       }
       setOpenEditStudentModal(false);
@@ -204,18 +211,17 @@ const ViewStudentsPage = () => {
     try {
       const res = await deleteMultipleStudents(studentsSelection.selected, accessToken);
       if (res.status === 200) {
-        setStudents((prev) =>
-          prev.filter((student) => !studentsSelection.selected.includes(student.rollno))
-        );
+        const res1 = await getStudents(searchQuery, 20, page + 1, "all", accessToken);
+        if (res1.status == 200) {
+          setStudents(res1.data.data);
+          setTotalStudents(res1.data.total_entries);
+        }
+        setDeleteConfirmationModalOpen(false);
       }
     } catch (err) {
       console.log(err);
     }
   };
-
-  useEffect(() => {
-    console.log(selectedStudent);
-  }, [selectedStudent]);
 
   return (
     <>
@@ -277,7 +283,7 @@ const ViewStudentsPage = () => {
                 </Stack>
               </Stack>
 
-              <div>
+              {/* <div>
                 <Button
                   startIcon={
                     <SvgIcon fontSize="small">
@@ -291,7 +297,7 @@ const ViewStudentsPage = () => {
                 >
                   Add
                 </Button>
-              </div>
+              </div> */}
             </Stack>
 
             <Card sx={{ p: 2 }}>
@@ -302,7 +308,7 @@ const ViewStudentsPage = () => {
                 />
                 <Button
                   sx={{ color: "error.main", height: "fit-content" }}
-                  onClick={handleDeleteStudents}
+                  onClick={() => setDeleteConfirmationModalOpen(true)}
                 >
                   Delete Selected Items
                 </Button>
@@ -310,7 +316,7 @@ const ViewStudentsPage = () => {
             </Card>
 
             <StudentsTable
-              count={100}
+              count={totalStudents}
               items={students}
               onDeselectAll={studentsSelection.handleDeselectAll}
               onDeselectOne={studentsSelection.handleDeselectOne}
@@ -472,6 +478,17 @@ const ViewStudentsPage = () => {
             Submit
           </Button>
         </CustomModal>
+
+        <ConfirmationModal
+          open={deleteConfirmationModalOpen}
+          onClose={() => {
+            setDeleteConfirmationModalOpen(false);
+          }}
+          message="Are you sure you want to delete the selected students?"
+          noMessage="No, leave it"
+          yesMessage="Yes, delete it"
+          execFunction={handleDeleteStudents}
+        />
       </Box>
     </>
   );

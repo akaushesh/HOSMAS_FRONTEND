@@ -36,3 +36,12 @@ export const deleteGroups = async (id, accessToken) => {
   });
   return res;
 };
+
+export const addStudentToGroup = async (data, accessToken) => {
+  const res = await groupApi.post("edit/add-member/", data, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+  return res;
+};
