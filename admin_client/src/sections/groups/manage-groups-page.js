@@ -35,7 +35,7 @@ import CustomModal from "src/components/CustomModal";
 import { exportGroups } from "src/services/export";
 import { getAllSections } from "src/services/section";
 import { TableSearch } from "src/components/table-search";
-import { deleteGroups } from "src/services/group";
+import { addStudentToGroup, deleteGroups } from "src/services/group";
 import GetStudentTextField from "src/components/GetStudentTextField";
 
 const useGroupsIDs = (customers) => {
@@ -61,6 +61,7 @@ const ViewGroupsPage = () => {
   const [addGroupMember1RollNo, setAddGroupMember1RollNo] = useState();
   const [addGroupMember2RollNo, setAddGroupMember2RollNo] = useState();
   const [addGroupMember3RollNo, setAddGroupMember3RollNo] = useState();
+  const [addGroupMemberRollNo, setAddGroupMemberRollNo] = useState();
   const [selectedGroup, setSelectedGroup] = useState({ id: "", leader: "", members: [] });
   const [groupDetailsModalOpen, setGroupDetailsModalOpen] = useState();
   const [anchorEl, setAnchorEl] = useState(null); // popover
@@ -134,6 +135,16 @@ const ViewGroupsPage = () => {
     }
   };
 
+  const handleAddStudentToGroup = async (rollno, group) => {
+    // const data = {
+    //   rollno: ,
+    //   group: ,
+    // }
+
+    // const res = await addStudentToGroup();
+    console.log("Adding");
+  };
+
   const open = Boolean(anchorEl);
   const id = open ? "simple-popover" : undefined;
 
@@ -169,7 +180,7 @@ const ViewGroupsPage = () => {
                 </Stack>
               </Stack>
 
-              <div>
+              {/* <div>
                 <Button
                   startIcon={
                     <SvgIcon fontSize="small">
@@ -183,7 +194,7 @@ const ViewGroupsPage = () => {
                 >
                   Add
                 </Button>
-              </div>
+              </div> */}
             </Stack>
 
             <Card sx={{ p: 2 }}>
@@ -319,7 +330,7 @@ const ViewGroupsPage = () => {
           <Typography variant="h5" textAlign="center" mb={2}>
             Group details
           </Typography>
-          <Table>
+          <Table sx={{ mb: 3 }}>
             <TableHead>
               <TableRow>
                 <TableCell>Name</TableCell>
@@ -379,15 +390,6 @@ const ViewGroupsPage = () => {
                         >
                           Make Group Leader
                         </Button>
-                        {/* <CustomModal
-                          onClose={onCloseOwnerTransferModal}
-                          open={openOwnerTransferModal}
-                        >
-                          <TransferOwnershipConfirmation
-                            member={modalMember}
-                            onClose={onCloseOwnerTransferModal}
-                          />
-                        </CustomModal> */}
                       </Popover>
                     </TableCell>
                   </TableRow>
@@ -395,6 +397,24 @@ const ViewGroupsPage = () => {
               })}
             </TableBody>
           </Table>
+
+          <GetStudentTextField
+            value={addGroupLeaderRollNo}
+            onChange={(e, value) => {
+              setAddGroupLeaderRollNo(value);
+            }}
+            label="Enter Roll No."
+            fullWidth
+            sx={{ mb: 3 }}
+          />
+
+          <Button
+            sx={{ display: "block", margin: "0 auto" }}
+            variant="contained"
+            onClick={handleAddStudentToGroup}
+          >
+            Add Student
+          </Button>
         </CustomModal>
       </Box>
     </>

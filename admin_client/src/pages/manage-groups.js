@@ -1,6 +1,6 @@
 import React from "react";
 import { Layout as DashboardLayout } from "src/layouts/dashboard/layout";
-import ViewGroupsPage from "src/sections/groups/view-groups-page";
+import ViewGroupsPage from "src/sections/groups/manage-groups-page";
 
 function Page() {
   return <ViewGroupsPage />;

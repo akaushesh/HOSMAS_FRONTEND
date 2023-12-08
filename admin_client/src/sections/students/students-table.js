@@ -59,6 +59,7 @@ export const StudentsTable = (props) => {
                 <TableCell>Roll No.</TableCell>
                 <TableCell>Name</TableCell>
                 <TableCell>Email</TableCell>
+                <TableCell sx={{ textAlign: "center" }}>Group Id</TableCell>
                 <TableCell>Gender</TableCell>
                 <TableCell>Batch</TableCell>
                 <TableCell>Phone</TableCell>
@@ -97,6 +98,7 @@ export const StudentsTable = (props) => {
                     </TableCell>
                     <TableCell>{student?.name}</TableCell>
                     <TableCell>{student?.user?.email}</TableCell>
+                    <TableCell>{student?.group?.id}</TableCell>
                     <TableCell>{student?.gender == "M" ? "Male" : "Female"}</TableCell>
                     <TableCell>{student?.batch?.name}</TableCell>
                     <TableCell>{student?.phoneno}</TableCell>
