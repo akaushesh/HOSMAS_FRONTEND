@@ -13,7 +13,6 @@ from .serializers import InvitationsReceivedSerializer, InvitationsSentSerialize
 from django.core.files.storage import default_storage
 from datetime import datetime
 
-from dashboard.tasks import add_users
 from .tasks import *
 # Create your views here.
 

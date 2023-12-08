@@ -21,7 +21,7 @@ from .serializers import HostelSerializer, HostelSingleSerializer, RoomTypeSeria
 from .serializers import *
 from student.serializers import StudentSerializer, GroupSerializer, StudentProfileSerializer, StudentSerializer
 
-from .tasks import add_users, add_defaulters, send_reminder_mail
+from .tasks import send_reminder_mail
 
 from datetime import datetime
 import csv, os
