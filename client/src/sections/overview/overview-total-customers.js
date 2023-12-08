@@ -1,9 +1,11 @@
 import PropTypes from "prop-types";
 import UsersIcon from "@heroicons/react/24/solid/UsersIcon";
+import { useIsPreferenceFillingLive } from "src/hooks/use-is-preference-live";
 import { Avatar, Card, CardContent, Stack, SvgIcon, Typography } from "@mui/material";
 
 export const OverviewTotalCustomers = (props) => {
   const { sx, memberCount = 0, preferenceFilled = false } = props;
+  const { isLive } = useIsPreferenceFillingLive();
 
   return (
     <Card sx={sx}>
@@ -30,9 +32,17 @@ export const OverviewTotalCustomers = (props) => {
           </Avatar>
         </Stack>
         <Stack alignItems="center" direction="row" spacing={2} sx={{ mt: 2 }}>
-          <Typography color={preferenceFilled ? "success.main" : "error.main"} variant="caption">
-            {preferenceFilled ? "Preferences have been filled" : "Preferences have not been filled"}
-          </Typography>
+          {!isLive ? (
+            <Typography color="error.main" variant="caption">
+              Preference filling not live
+            </Typography>
+          ) : (
+            <Typography color={preferenceFilled ? "success.main" : "error.main"} variant="caption">
+              {preferenceFilled
+                ? "Preferences have been filled"
+                : "Preferences have not been filled"}
+            </Typography>
+          )}
         </Stack>
       </CardContent>
     </Card>

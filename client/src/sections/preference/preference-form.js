@@ -45,7 +45,9 @@ export const PreferenceForm = ({ sx, availableChoices = [], currentPreferences =
                 name="CGPA"
                 disabled
                 SelectProps={{ native: true }}
-                value={preferences[index]?.room_type_name || ""}
+                value={
+                  `${preferences[index]?.hostel_name} ${preferences[index]?.room_type_name}` || ""
+                }
                 sx={{ m: 1, width: "100%" }}
               />
             </Grid>
