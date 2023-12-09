@@ -183,7 +183,7 @@ class SectionRoomTypeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Section
-        fields = ['id', 'batch_name', 'gender', 'room_choices', 'is_allotment_enabled']
+        fields = ['id', 'batch_name', 'gender', 'room_choices', 'is_allotment_enabled', 'is_retain_allowed']
 
     def get_batch_name(self, obj):
         return obj.batch.name
