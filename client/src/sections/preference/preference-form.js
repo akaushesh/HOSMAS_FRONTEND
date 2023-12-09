@@ -26,9 +26,7 @@ export const PreferenceForm = ({ sx, availableChoices = [], currentPreferences =
   };
 
   const preferences =
-    currentPreferences?.preferences?.length > 0
-      ? currentPreferences?.preferences
-      : Array.from({ length: availableChoices.length }, () => "");
+    currentPreferences?.preferences?.length > 0 ? currentPreferences?.preferences : "";
 
   const checked = !!currentPreferences?.retain;
 
@@ -48,7 +46,9 @@ export const PreferenceForm = ({ sx, availableChoices = [], currentPreferences =
                 disabled
                 SelectProps={{ native: true }}
                 value={
-                  `${preferences[index]?.hostel_name} ${preferences[index]?.room_type_name}` || ""
+                  preferences.length != 0
+                    ? `${preferences[index]?.hostel_name} ${preferences[index]?.room_type_name}`
+                    : ""
                 }
                 sx={{ m: 1, width: "100%" }}
               />
