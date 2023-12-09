@@ -18,7 +18,6 @@ export const useIsPreferenceFillingLive = () => {
         };
 
         const getPreferenceStatusResponse = await axios.get(url, getPreferenceStatusConfig);
-        console.log(getPreferenceStatusResponse);
         return getPreferenceStatusResponse?.data;
       } catch (err) {
         return false;
