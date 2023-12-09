@@ -142,15 +142,15 @@ class Retain(APIView):
             for q in p:
                 q.delete()
         
-        lead_curr = stud.current_room
-        if (lead_curr is None or lead_curr.id not in roomChoices):
-            return Response({'error':group.leader.name + ' is unable to retain'}, status=status.HTTP_400_BAD_REQUEST)
+        # lead_curr = stud.current_room
+        # if (lead_curr is None or lead_curr.id not in roomChoices):
+        #     return Response({'error':group.leader.name + ' is unable to retain'}, status=status.HTTP_400_BAD_REQUEST)
 
-        members = group.members.all()
-        for member in members:
-            member_curr = member.current_room
-            if (member_curr is None or member_curr.id not in roomChoices):
-                return Response({'error':member.name + ' is unable to retain'}, status=status.HTTP_400_BAD_REQUEST)
+        # members = group.members.all()
+        # for member in members:
+        #     member_curr = member.current_room
+        #     if (member_curr is None or member_curr.id not in roomChoices):
+        #         return Response({'error':member.name + ' is unable to retain'}, status=status.HTTP_400_BAD_REQUEST)
 
         group.is_retained = True
         group.save()
