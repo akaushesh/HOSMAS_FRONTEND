@@ -46,6 +46,7 @@ function SectionPreference({ sectionId }) {
           gender: res?.data?.gender,
         });
         setIsAllotmentEnabled(res?.data?.is_allotment_enabled);
+        setIsRetainEnabled(res?.data?.is_retain_allowed);
         setPreferences(
           res?.data?.room_choices.map((item) => ({
             id: item.id,
