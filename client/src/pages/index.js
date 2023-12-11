@@ -52,7 +52,7 @@ const Page = () => {
                 <Grid>
                   <OverviewTotalCustomers
                     memberCount={user?.group?.size}
-                    preferenceFilled={user?.preferenceFilled}
+                    preferenceFilled={user?.is_preference_filled}
                     sx={{ height: "100%" }}
                   />
                 </Grid>
