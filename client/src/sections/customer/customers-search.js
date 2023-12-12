@@ -1,7 +1,17 @@
-import { Autocomplete, Button, Card, CircularProgress, Grid, TextField } from "@mui/material";
+import {
+  Autocomplete,
+  Button,
+  Card,
+  CircularProgress,
+  Grid,
+  IconButton,
+  Snackbar,
+  TextField,
+} from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
+import CloseIcon from "@mui/icons-material/Close";
 import { Stack } from "@mui/system";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import CustomModal from "src/components/customModal";
 import { CustomerConfirmation } from "./customer-confirmation";
 import axios from "axios";
@@ -16,6 +26,7 @@ export const CustomersSearch = () => {
   const [loading, setLoading] = useState(false);
   const [infoText, setInfoText] = useState("Enter complete enrollment number");
   const [openModal, setOpenModal] = useState(false);
+  const [openSnackBar, setOpenSnackBar] = useState(false);
   const [entryIsCorrect, setEntryIsCorrect] = useState(false);
 
   const user = queryClient.getQueryData(["getProfile"]);
@@ -28,6 +39,14 @@ export const CustomersSearch = () => {
 
   const onCloseModal = () => {
     setOpenModal(false);
+  };
+
+  const onOpenSnackBar = () => {
+    setOpenSnackBar(true);
+  };
+
+  const onCloseSnackBar = () => {
+    setOpenSnackBar(false);
   };
 
   const onSubmitHandler = (event) => {
@@ -86,6 +105,14 @@ export const CustomersSearch = () => {
     })();
   };
 
+  const action = (
+    <Fragment>
+      <IconButton size="small" aria-label="close" color="inherit" onClick={onCloseSnackBar}>
+        <CloseIcon fontSize="small" />
+      </IconButton>
+    </Fragment>
+  );
+
   return (
     <Card sx={{ p: 2 }}>
       <form onSubmit={onSubmitHandler}>
@@ -133,8 +160,16 @@ export const CustomersSearch = () => {
               name={option[0]?.name}
               enrollmentNumber={option[0]?.enrollmentNumber}
               onClose={onCloseModal}
+              onOpenSnackBar={onOpenSnackBar}
             />
           </CustomModal>
+          <Snackbar
+            open={openSnackBar}
+            autoHideDuration={6000}
+            onClose={onCloseSnackBar}
+            message="Invite Sent Successfully!"
+            action={action}
+          />
           <Button disabled={!isLeader} type="submit">
             <SendIcon color="primary" />
           </Button>
