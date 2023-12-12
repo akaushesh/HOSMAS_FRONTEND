@@ -66,9 +66,6 @@ const Page = () => {
 
   return (
     <>
-      <Head>
-        <title>Login | Devias Kit</title>
-      </Head>
       <Box
         sx={{
           backgroundColor: "background.paper",

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const url = "https://api.hosmas.ccstiet.com/";
+export const url = "https://api.allotment.onlinehostel.in/";
 
 export const authApi = axios.create({
   baseURL: url,
