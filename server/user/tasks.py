@@ -25,8 +25,10 @@ def send_password_reset_mail(name, url, email):
     }
     html_message = render_to_string('dashboard/password_reset.html', context)
     msg = strip_tags(html_message)
-    
-    send_mail(subject, msg, settings.EMAIL_HOST_USERS[idx], (email, ), html_message=html_message, connection=connection, fail_silently=False)
+    email = EmailMultiAlternatives(subject, msg, settings.EMAIL_HOST_USERS[idx], [email], reply_to = ['queries_studentaffairs@thapar.edu'], connection=connection)
+    email.attach_alternative(html_message, "text/html")
+    email.send()
+    # send_mail(subject, msg, settings.EMAIL_HOST_USERS[idx], (email, ), html_message=html_message, connection=connection, fail_silently=False)
     connection.close()
     
     return f"\n password reset mail sent to {email}\n"

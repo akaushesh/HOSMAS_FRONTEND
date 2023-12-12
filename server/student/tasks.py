@@ -38,7 +38,10 @@ def send_invitation_mail(leader_name, leader_email, leader_roll, invitee_name, i
     html_message = render_to_string('dashboard/sendInvitation.html', context)
     msg = strip_tags(html_message)
     
-    send_mail(subject, msg, settings.EMAIL_HOST_USERS[idx], (invitee_email, ), html_message=html_message, connection=connection, fail_silently=False)
+    email = EmailMultiAlternatives(subject, msg, settings.EMAIL_HOST_USERS[idx], [invitee_email], reply_to = ['queries_studentaffairs@thapar.edu'], connection=connection)
+    email.attach_alternative(html_message, "text/html")
+    email.send()
+    # send_mail(subject, msg, settings.EMAIL_HOST_USERS[idx], (invitee_email, ), html_message=html_message, connection=connection, fail_silently=False)
     connection.close()
     
     return f"\n send invitation mail sent to {invitee_email}\n"
@@ -63,8 +66,10 @@ def joined_group_mail(leader_name, leader_email, leader_roll, member_name, membe
     }
     html_message = render_to_string('dashboard/joined_group_mail.html', context)
     msg = strip_tags(html_message)
-    
-    send_mail(subject, msg, settings.EMAIL_HOST_USERS[idx], (member_email, ), html_message=html_message, connection=connection, fail_silently=False)
+    email = EmailMultiAlternatives(subject, msg, settings.EMAIL_HOST_USERS[idx], [member_email], reply_to = ['queries_studentaffairs@thapar.edu'], connection=connection)
+    email.attach_alternative(html_message, "text/html")
+    email.send()
+    # send_mail(subject, msg, settings.EMAIL_HOST_USERS[idx], (member_email, ), html_message=html_message, connection=connection, fail_silently=False)
     connection.close()
     
     return f"\nJoined group mail sent to {member_email}\n"
@@ -88,8 +93,11 @@ def joined_group_to_members(leader_name,newmember_name, newmember_roll, member_e
     
     html_message = render_to_string('dashboard/joinedgrouptomembers.html', context)
     msg = strip_tags(html_message)
+    email = EmailMultiAlternatives(subject, msg, settings.EMAIL_HOST_USERS[idx], [member_email], reply_to = ['queries_studentaffairs@thapar.edu'], connection=connection)
+    email.attach_alternative(html_message, "text/html")
+    email.send()
     
-    send_mail(subject, msg, settings.EMAIL_HOST_USERS[idx], (member_email, ), html_message=html_message, connection=connection, fail_silently=False)
+    # send_mail(subject, msg, settings.EMAIL_HOST_USERS[idx], (member_email, ), html_message=html_message, connection=connection, fail_silently=False)
     connection.close()
     
     return f"\nJoined group to member mail sent to {member_email}\n"
@@ -112,8 +120,10 @@ def left_group_mail(leader_name, exmember_name, exmember_roll, member_email):
     }
     html_message = render_to_string('dashboard/leftgroupmail.html', context)
     msg = strip_tags(html_message)
-    
-    send_mail(subject, msg, settings.EMAIL_HOST_USERS[idx], (member_email, ), html_message=html_message, connection=connection, fail_silently=False)
+    email = EmailMultiAlternatives(subject, msg, settings.EMAIL_HOST_USERS[idx], [member_email], reply_to = ['queries_studentaffairs@thapar.edu'], connection=connection)
+    email.attach_alternative(html_message, "text/html")
+    email.send()
+    # send_mail(subject, msg, settings.EMAIL_HOST_USERS[idx], (member_email, ), html_message=html_message, connection=connection, fail_silently=False)
     connection.close()
 
     return f"\nleft group mail sent to {member_email}\n"
@@ -135,8 +145,10 @@ def send_preferences_mail(email, name, d):
         }
         html_message = render_to_string('dashboard/preferences.html', context)
         msg = strip_tags(html_message)
-        
-        send_mail(subject, msg, settings.EMAIL_HOST_USERS[idx], (email, ), html_message=html_message, connection=connection, fail_silently=False)
+        email = EmailMultiAlternatives(subject, msg, settings.EMAIL_HOST_USERS[idx], [email], reply_to = ['queries_studentaffairs@thapar.edu'], connection=connection)
+        email.attach_alternative(html_message, "text/html")
+        email.send()
+        # send_mail(subject, msg, settings.EMAIL_HOST_USERS[idx], (email, ), html_message=html_message, connection=connection, fail_silently=False)
         connection.close()
         
         return f"\nPreferences mail sent to {email}\n"
@@ -157,8 +169,10 @@ def send_retain_mail(email, name):
         }
         html_message = render_to_string('dashboard/retain.html', context)
         msg = strip_tags(html_message)
-        
-        send_mail(subject, msg, settings.EMAIL_HOST_USERS[idx], (email, ), html_message=html_message, connection=connection, fail_silently=False)
+        email = EmailMultiAlternatives(subject, msg, settings.EMAIL_HOST_USERS[idx], [email], reply_to = ['queries_studentaffairs@thapar.edu'], connection=connection)
+        email.attach_alternative(html_message, "text/html")
+        email.send()
+        # send_mail(subject, msg, settings.EMAIL_HOST_USERS[idx], (email, ), html_message=html_message, connection=connection, fail_silently=False)
         connection.close()
         
         return f"\nPreferences mail sent to {email}\n"
@@ -180,8 +194,11 @@ def send_teamleader_change_mail(newName, newRoll, email, name):
             }
             html_message = render_to_string('dashboard/teamleaderchange.html', context)
             msg = strip_tags(html_message)
+            email = EmailMultiAlternatives(subject, msg, settings.EMAIL_HOST_USERS[idx], [email], reply_to = ['queries_studentaffairs@thapar.edu'], connection=connection)
+            email.attach_alternative(html_message, "text/html")
+            email.send()
             
-            send_mail(subject, msg, settings.EMAIL_HOST_USERS[idx], (email, ), html_message=html_message, connection=connection, fail_silently=False)
+            # send_mail(subject, msg, settings.EMAIL_HOST_USERS[idx], (email, ), html_message=html_message, connection=connection, fail_silently=False)
             connection.close()
             
             return f"\nTeam Leader Change mail sent to {email}\n"
@@ -202,8 +219,10 @@ def send_preferences_deleted_mail(email, name):
                 }
                 html_message = render_to_string('dashboard/deletepreferences.html', context)
                 msg = strip_tags(html_message)
-                
-                send_mail(subject, msg, settings.EMAIL_HOST_USERS[idx], (email, ), html_message=html_message, connection=connection, fail_silently=False)
+                email = EmailMultiAlternatives(subject, msg, settings.EMAIL_HOST_USERS[idx], [email], reply_to = ['queries_studentaffairs@thapar.edu'], connection=connection)
+                email.attach_alternative(html_message, "text/html")
+                email.send()
+                # send_mail(subject, msg, settings.EMAIL_HOST_USERS[idx], (email, ), html_message=html_message, connection=connection, fail_silently=False)
                 connection.close()
                 
                 return f"\nPreferences mail sent to {email}\n"
