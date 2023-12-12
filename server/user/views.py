@@ -44,8 +44,8 @@ class EmailResetPasswordView(APIView):
                   name = user.student.name
             except:
                   name = "Admin"
-            #TODO: add url
-            url = "https://hosmas.ccstiet.com/auth/forgot-password/"+slug_instance.slug
+            
+            url = "https://allotment.onlinehostel.in/auth/forgot-password/"+slug_instance.slug
             send_password_reset_mail.delay(name, url, user.email)
 
             return Response(status=status.HTTP_200_OK)

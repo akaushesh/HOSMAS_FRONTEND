@@ -128,7 +128,7 @@ def send_preferences_mail(email, name, d):
         connection = get_connection(username=settings.EMAIL_HOST_USERS[idx], password=settings.EMAIL_HOST_PASSWORDS[idx], fail_silently=False)
         connection.open()
         
-        subject = "Hostel Allotment Preferences filled for your group"
+        subject = f"Hi {name}, Hostel Allotment Preferences filled for your group"
         context = {
             'name':name,
             'data':d,
@@ -151,7 +151,7 @@ def send_retain_mail(email, name):
         connection = get_connection(username=settings.EMAIL_HOST_USERS[idx], password=settings.EMAIL_HOST_PASSWORDS[idx], fail_silently=False)
         connection.open()
         
-        subject = "Hi {name}, Hostel Allotment Preferences filled for your group"
+        subject = f"Hi {name}, Hostel Allotment Preferences filled for your group"
         context = {
             'name':name,
         }
