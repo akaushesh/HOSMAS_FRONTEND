@@ -261,8 +261,8 @@ class TranferGroupLeadershipView(APIView):
             
             members = group.members.all()
             for member in members:
-                  send_teamleader_change_mail.delay(group.leader.name,group.leader.rollno,member.user.email)
-            send_teamleader_change_mail.delay(group.leader.name,group.leader.rollno,group.leader.user.email)
+                  send_teamleader_change_mail.delay(group.leader.name, group.leader.rollno, member.user.email, member.name)
+            send_teamleader_change_mail.delay(group.leader.name, group.leader.rollno, group.leader.user.email, group.leader.name)
             
             return Response(status=status.HTTP_200_OK)
 
