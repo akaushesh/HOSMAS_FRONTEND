@@ -280,13 +280,13 @@ def send_reminder_mail(name,email,last_date):
 
 @app.task(name = "send_start_allocation_mail")
 def send_start_allocation_mail(name,email, slug):
-      subject = f"Hi {name} Hostel Allotment has Started"
+      subject = f"Hi {name}, Hostel Allotment has Started"
       idx = cache.get('emailIdIndex', 0)
       connection = get_connection(username=settings.EMAIL_HOST_USERS[idx], password=settings.EMAIL_HOST_PASSWORDS[idx], fail_silently=False)
       connection.open()
       context = {
             "name" : name,
-            "url": "https://hosmas.ccstiet.com/forgot-password/" + slug,
+            "url": "https://allotment.onlinehostel.in/auth/forgot-password/" + slug,
       }
       html_message = render_to_string('dashboard/startallocationmail.html', context)
       msg = strip_tags(html_message)
