@@ -472,30 +472,25 @@ class sendReminderMail(APIView):
       permission_classes = [IsAuthenticated, IsAdmin]
       
       def post(self, request):
-            data = request.data
-            last_date = data.get('last_date')
-            # if (batch_name is None):
-            #       return Response(status=status.HTTP_400_BAD_REQUEST)
-            # batch = Batch.objects.filter(name=batch_name).first()
-            # if (batch is None):
-            #       return Response(status=status.HTTP_400_BAD_REQUEST)
-            # students = Student.objects.filter(batch=batch).all()
+            section_ids = request.data.get('sections')
+            if section_ids is None:
+                  return Response({'detail': 'Invalid data!'}, status=status.HTTP_400_BAD_REQUEST)
             
-            sections = Section.objects.filter(is_allotment_enabled=True).select_related('batch').all()
-            for section in sections:
+            for section_id in section_ids:
+                  section = Section.objects.filter(id=section_id).select_related('batch').first()
+                  if section is None or not section.is_allotment_enabled:
+                        continue
                   groups = Group.objects.filter(
                         Q(leader__batch = section.batch) 
                         & Q(leader__gender = section.gender)
                         & Q(is_retained = False)
                         & Q(is_preferences_filled = False)
-                  ).all()
+                  ).select_related('leader').prefetch_related('members').all()
                   for group in groups:
                         for student in group.members.all():
-                              send_reminder_mail.delay(student.name, student.user.email, last_date)
-                        send_reminder_mail.delay(group.leader.name, group.leader.user.email, last_date)
+                              send_reminder_mail.delay(student.name, student.user.email)
+                        send_reminder_mail.delay(group.leader.name, group.leader.user.email)
             
-            # for student in students:
-            #       send_reminder_mail.delay(student.name, student.user.email, last_date)
             return Response(status=status.HTTP_200_OK)
 
 

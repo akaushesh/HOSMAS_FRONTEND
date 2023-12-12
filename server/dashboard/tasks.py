@@ -11,14 +11,13 @@ from config.celery import app
 
 
 @app.task(name = "send_reminder_mail")
-def send_reminder_mail(name, email, last_date):
+def send_reminder_mail(name, email):
       subject = "Hi " + name +", Reminder for filling Hostel Preferences"
       idx = cache.get('emailIdIndex', 0)
       connection = get_connection(username=settings.EMAIL_HOST_USERS[idx], password=settings.EMAIL_HOST_PASSWORDS[idx], fail_silently=False)
       connection.open()
       context = {
-            "name" : name,
-            "last_date":last_date
+            "name" : name
       }
       html_message = render_to_string('dashboard/remindermail.html', context)
       msg = strip_tags(html_message)
