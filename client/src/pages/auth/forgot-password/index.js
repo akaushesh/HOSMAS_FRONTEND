@@ -11,6 +11,7 @@ import { LoadingButton } from "@mui/lab";
 const Page = () => {
   const [loading, setLoading] = useState(false);
   const [helperText, setHelperText] = useState("You will receive a link on this email address");
+  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const [method, setMethod] = useState("email");
   const formik = useFormik({
     initialValues: {
@@ -22,6 +23,7 @@ const Page = () => {
       email: Yup.string().email("Must be a valid email").max(255).required("Email is required"),
     }),
     onSubmit: async (values, helpers) => {
+      let emailSent = false;
       try {
         setLoading(true);
         const loginURL = URL + "auth/initiate-reset-password/";
@@ -37,7 +39,8 @@ const Page = () => {
           initiateResetPasswordConfig,
         });
         values.email = "";
-        setHelperText("Check your email for the link!");
+        setHelperText("Reset link sent to email! Don't forget to check your spam!");
+        emailSent = true;
       } catch (err) {
         helpers.setStatus({ success: false });
         helpers.setSubmitting(false);
@@ -46,6 +49,7 @@ const Page = () => {
         else helpers.setErrors({ submit: "Something went wrong" });
       }
       setLoading(false);
+      if (emailSent) setIsButtonDisabled(true);
     },
   });
 
@@ -99,6 +103,7 @@ const Page = () => {
                   fullWidth
                   size="large"
                   loading={loading}
+                  disabled={isButtonDisabled}
                   sx={{ mt: 3 }}
                   type="submit"
                   variant="contained"
