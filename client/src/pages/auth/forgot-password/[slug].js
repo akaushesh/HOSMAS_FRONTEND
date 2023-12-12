@@ -13,17 +13,20 @@ import { LoadingButton } from "@mui/lab";
 
 const Page = () => {
   const router = useRouter();
+  const [method, setMethod] = useState("reset password");
   const { slug } = router.query;
   const [loading, setLoading] = useState(false);
-  const [method, setMethod] = useState("password");
   const formik = useFormik({
     initialValues: {
-      email: "",
       password: "",
+      confirmPassword: "",
       submit: null,
     },
     validationSchema: Yup.object({
-      password: Yup.string().min(6).max(255).required("Password is required"),
+      password: Yup.string().max(255).required("Password is required"),
+      confirmPassword: Yup.string()
+        .oneOf([Yup.ref("password"), null], "Passwords must match")
+        .required("Confirm Password is required"),
     }),
     onSubmit: async (values, helpers) => {
       try {
@@ -43,8 +46,8 @@ const Page = () => {
         helpers.setStatus({ success: false });
         helpers.setSubmitting(false);
 
-        if (err.response.status == 400) helpers.setErrors({ submit: "Invalid link" });
-        else helpers.setErrors({ submit: err.message });
+        if (err?.response?.status == 400) helpers.setErrors({ submit: "Invalid link" });
+        else helpers.setErrors({ submit: err?.message });
       }
       setLoading(false);
     },
@@ -53,7 +56,7 @@ const Page = () => {
   return (
     <>
       <Head>
-        <title>Set New Password | Thapar Hostel Allocation System</title>
+        <title>Login | Thapar Hostel Allocation System</title>
       </Head>
       <Box
         sx={{
@@ -76,34 +79,41 @@ const Page = () => {
             <Stack spacing={1} sx={{ mb: 3 }}>
               <Typography variant="h4">New Password</Typography>
             </Stack>
-            {method === "password" && (
+            {method === "reset password" && (
               <form noValidate onSubmit={formik.handleSubmit}>
-                <TextField
-                  error={!!(formik.touched.password && formik.errors.password)}
-                  fullWidth
-                  helperText={formik.touched.password && formik.errors.password}
-                  label="Password"
-                  name="password"
-                  onBlur={formik.handleBlur}
-                  onChange={formik.handleChange}
-                  type="password"
-                  value={formik.values.password}
-                />
-                {/* <FormHelperText sx={{ mt: 1 }}>
-                  password has been reset&nbsp;
-                  <Link style={{ color: "#6366E9" }} href="/auth/forgot-password">
-                    login
-                  </Link>
-                </FormHelperText> */}
+                <Stack spacing={3}>
+                  <TextField
+                    error={!!(formik.touched.password && formik.errors.password)}
+                    fullWidth
+                    helperText={formik.touched.password && formik.errors.password}
+                    label="Password"
+                    name="password"
+                    onBlur={formik.handleBlur}
+                    onChange={formik.handleChange}
+                    type="password"
+                    value={formik.values.password}
+                  />
+                  <TextField
+                    error={!!(formik.touched.confirmPassword && formik.errors.confirmPassword)}
+                    fullWidth
+                    helperText={formik.touched.confirmPassword && formik.errors.confirmPassword}
+                    label="Confirm Password"
+                    name="confirmPassword"
+                    onBlur={formik.handleBlur}
+                    onChange={formik.handleChange}
+                    type="password"
+                    value={formik.values.confirmPassword}
+                  />
+                </Stack>
                 {formik.errors.submit && (
                   <Typography color="error" sx={{ mt: 3 }} variant="body2">
                     {formik.errors.submit}
                   </Typography>
                 )}
                 <LoadingButton
-                  loading={loading}
                   fullWidth
                   size="large"
+                  loading={loading}
                   sx={{ mt: 3 }}
                   type="submit"
                   variant="contained"
