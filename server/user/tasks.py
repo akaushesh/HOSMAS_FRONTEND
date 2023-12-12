@@ -17,7 +17,7 @@ def send_password_reset_mail(name, url, email):
     connection = get_connection(username=settings.EMAIL_HOST_USERS[idx], password=settings.EMAIL_HOST_PASSWORDS[idx], fail_silently=False)
     connection.open()
     
-    subject = f"Password reset link of Online Hostel Allotment System for {name}"
+    subject = f"Password Reset Link of Online Hostel Allocation System for {name}"
     
     context = {
         'name':name,
