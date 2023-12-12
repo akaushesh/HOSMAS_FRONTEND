@@ -35,8 +35,14 @@ import CustomModal from "src/components/CustomModal";
 import { exportGroups } from "src/services/export";
 import { getAllSections } from "src/services/section";
 import { TableSearch } from "src/components/table-search";
-import { addStudentToGroup, deleteGroups } from "src/services/group";
+import {
+  addStudentToGroup,
+  changeGroupLeader,
+  deleteGroups,
+  removeMemberFromGroup,
+} from "src/services/group";
 import GetStudentTextField from "src/components/GetStudentTextField";
+import ConfirmationModal from "src/components/ConfirmationModal";
 
 const useGroupsIDs = (customers) => {
   return useMemo(() => {
@@ -57,34 +63,38 @@ const ViewGroupsPage = () => {
   const [sections, setSections] = useState([]);
   const [exportSectionId, setExportSectionId] = useState();
   const [searchQuery, setSearchQuery] = useState("");
-  const [addGroupLeaderRollNo, setAddGroupLeaderRollNo] = useState();
-  const [addGroupMember1RollNo, setAddGroupMember1RollNo] = useState();
-  const [addGroupMember2RollNo, setAddGroupMember2RollNo] = useState();
-  const [addGroupMember3RollNo, setAddGroupMember3RollNo] = useState();
-  const [addGroupMemberRollNo, setAddGroupMemberRollNo] = useState();
+  const [addGroupMemberDetails, setAddGroupMemberDetails] = useState();
   const [selectedGroup, setSelectedGroup] = useState({ id: "", leader: "", members: [] });
-  const [groupDetailsModalOpen, setGroupDetailsModalOpen] = useState();
+  const [groupDetailsModalOpen, setGroupDetailsModalOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null); // popover
+  const [removeMemberConfirmationBoxOpen, setRemoveMemberConfirmationBoxOpen] = useState(false);
+  const [memberToBeRemoved, setMemberToBeRemoved] = useState();
 
   useEffect(() => {
-    console.log("Group leader changed", addGroupLeaderRollNo);
-  }, [addGroupLeaderRollNo]);
+    console.log("Group leader changed", addGroupMemberDetails);
+  }, [addGroupMemberDetails]);
 
-  useEffect(() => {
+  const fetchGroupsData = async () => {
     try {
-      const fetchGroupsData = async () => {
-        const res = await getAllGroups(searchQuery, 20, page + 1, accessToken);
-        if (res.status == 200) {
-          setGroups(res.data.data);
-        }
-        console.log(res);
-      };
-
-      fetchGroupsData();
+      const res = await getAllGroups(searchQuery, 20, page + 1, accessToken);
+      if (res.status == 200) {
+        setGroups(res.data.data);
+      }
+      console.log(res);
     } catch (err) {
       console.log(err);
     }
-  }, [page, searchQuery]);
+  };
+
+  useEffect(() => {
+    if (groupDetailsModalOpen == false) {
+      try {
+        fetchGroupsData();
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  }, [page, searchQuery, groupDetailsModalOpen]);
 
   useEffect(() => {
     if (openExportGroupsModal == true) {
@@ -128,296 +138,290 @@ const ViewGroupsPage = () => {
     try {
       const res = await deleteGroups(groupsSelection.selected, accessToken);
       if (res.status === 200) {
-        setGroups((prev) => prev.filter((group) => !groupsSelection.selected.includes(group.id)));
+        fetchGroupsData();
       }
     } catch (err) {
       console.log(err);
     }
   };
 
-  const handleAddStudentToGroup = async (rollno, group) => {
-    // const data = {
-    //   rollno: ,
-    //   group: ,
-    // }
+  const handleAddStudentToGroup = async () => {
+    try {
+      const res = await addStudentToGroup(
+        addGroupMemberDetails?.rollno,
+        selectedGroup?.id,
+        accessToken
+      );
+      console.log(res);
 
-    // const res = await addStudentToGroup();
+      if (res.status == 200) {
+        setSelectedGroup((prev) => ({
+          ...prev,
+          members: [
+            ...prev.members,
+            { name: addGroupMemberDetails?.name, rollno: addGroupMemberDetails?.rollno },
+          ],
+        }));
+      }
+    } catch (err) {
+      console.log(err);
+    }
     console.log("Adding");
+  };
+
+  const handleRemoveMemberFromGroup = async (rollno) => {
+    try {
+      const res = await removeMemberFromGroup(rollno, accessToken);
+      console.log(res);
+
+      if (res.status == 200) {
+        setSelectedGroup((prev) => ({
+          ...prev,
+          members: prev.members.filter((member) => member?.rollno != rollno),
+        }));
+        setAnchorEl(null);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleChangeGroupLeader = async (member) => {
+    try {
+      const res = await changeGroupLeader(member?.rollno, selectedGroup?.id, accessToken);
+      console.log(res);
+
+      if (res.status == 200) {
+        const leader = selectedGroup?.leader;
+
+        setSelectedGroup((prev) => ({
+          ...prev,
+          leader: { name: member?.name, rollno: member?.rollno },
+          members: [
+            prev.members.filter((member) => member?.rollno != rollno),
+            { name: leader?.name, rollno: leader?.rollno },
+          ],
+        }));
+      }
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const open = Boolean(anchorEl);
   const id = open ? "simple-popover" : undefined;
 
   return (
-    <>
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          py: 8,
-        }}
-      >
-        <Container maxWidth="xl">
-          <Stack spacing={3}>
-            <Stack direction="row" justifyContent="space-between" spacing={4}>
-              <Stack spacing={1}>
-                <Typography variant="h4">Groups</Typography>
+    <Box
+      component="main"
+      sx={{
+        flexGrow: 1,
+        py: 8,
+      }}
+    >
+      <Container maxWidth="xl">
+        <Stack spacing={3}>
+          <Stack direction="row" justifyContent="space-between" spacing={4}>
+            <Stack spacing={1}>
+              <Typography variant="h4">Groups</Typography>
 
-                <Stack alignItems="center" direction="row" spacing={1}>
-                  <Button
-                    color="inherit"
-                    startIcon={
-                      <SvgIcon fontSize="small">
-                        <ArrowDownOnSquareIcon />
-                      </SvgIcon>
-                    }
-                    onClick={() => {
-                      setOpenExportsGroupsModal(true);
-                    }}
-                  >
-                    Export
-                  </Button>
-                </Stack>
-              </Stack>
-
-              {/* <div>
+              <Stack alignItems="center" direction="row" spacing={1}>
                 <Button
+                  color="inherit"
                   startIcon={
                     <SvgIcon fontSize="small">
-                      <PlusIcon />
+                      <ArrowDownOnSquareIcon />
                     </SvgIcon>
                   }
-                  variant="contained"
                   onClick={() => {
-                    setOpenCreateGroupModal(true);
+                    setOpenExportsGroupsModal(true);
                   }}
                 >
-                  Add
-                </Button>
-              </div> */}
-            </Stack>
-
-            <Card sx={{ p: 2 }}>
-              <Stack direction="row" justifyContent="space-between" alignItems="center">
-                <TableSearch
-                  setSearchQuery={setSearchQuery}
-                  placeholder={"Enter Name, Email or Roll no."}
-                />
-                <Button
-                  sx={{ color: "error.main", height: "fit-content" }}
-                  onClick={handleDeleteGroups}
-                >
-                  Delete Selected Items
+                  Export
                 </Button>
               </Stack>
-            </Card>
-
-            <GroupsTable
-              count={groups.length}
-              items={groups}
-              onDeselectAll={groupsSelection.handleDeselectAll}
-              onDeselectOne={groupsSelection.handleDeselectOne}
-              onPageChange={handlePageChange}
-              onSelectAll={groupsSelection.handleSelectAll}
-              onSelectOne={groupsSelection.handleSelectOne}
-              page={page}
-              rowsPerPage={rowsPerPage}
-              selected={groupsSelection.selected}
-              setGroupDetailsModalOpen={setGroupDetailsModalOpen}
-              setSelectedGroup={setSelectedGroup}
-            />
+            </Stack>
           </Stack>
-        </Container>
 
-        <CustomModal
-          open={openCreateGroupModal}
-          onClose={() => {
-            setOpenCreateGroupModal(false);
+          <Card sx={{ p: 2 }}>
+            <Stack direction="row" justifyContent="space-between" alignItems="center">
+              <TableSearch
+                setSearchQuery={setSearchQuery}
+                placeholder={"Enter Name, Email or Roll no."}
+              />
+              <Button
+                sx={{ color: "error.main", height: "fit-content" }}
+                onClick={handleDeleteGroups}
+              >
+                Delete Selected Items
+              </Button>
+            </Stack>
+          </Card>
+
+          <GroupsTable
+            count={groups.length}
+            items={groups}
+            onDeselectAll={groupsSelection.handleDeselectAll}
+            onDeselectOne={groupsSelection.handleDeselectOne}
+            onPageChange={handlePageChange}
+            onSelectAll={groupsSelection.handleSelectAll}
+            onSelectOne={groupsSelection.handleSelectOne}
+            page={page}
+            rowsPerPage={rowsPerPage}
+            selected={groupsSelection.selected}
+            setGroupDetailsModalOpen={setGroupDetailsModalOpen}
+            setSelectedGroup={setSelectedGroup}
+          />
+        </Stack>
+      </Container>
+
+      <CustomModal
+        open={openExportGroupsModal}
+        onClose={() => {
+          setOpenExportsGroupsModal(false);
+        }}
+        maxWidth={400}
+      >
+        <Typography variant="h5" textAlign="center" mb={2}>
+          Export Data
+        </Typography>
+
+        <TextField
+          value={exportSectionId}
+          onChange={(e) => {
+            setExportSectionId(e.target.value);
           }}
-          maxWidth={400}
+          select
+          label="Choose a Section"
+          fullWidth
+          sx={{ mb: 2 }}
         >
-          <Stack alignItems="center">
-            <Typography variant="h5" mb={3}>
-              Create a Group
-            </Typography>
-            <GetStudentTextField
-              value={addGroupLeaderRollNo}
-              onChange={(e, value) => {
-                setAddGroupLeaderRollNo(value);
-              }}
-              label="Leader Roll no."
-              fullWidth
-              sx={{ marginBottom: "10px" }}
-            />
-            <GetStudentTextField
-              value={addGroupMember1RollNo}
-              onChange={(e, value) => {
-                setAddGroupMember1RollNo(value);
-              }}
-              label="Member 1 Roll no."
-              fullWidth
-              sx={{ marginBottom: "10px" }}
-            />
-            <GetStudentTextField
-              value={addGroupMember2RollNo}
-              onChange={(e, value) => {
-                setAddGroupMember2RollNo(value);
-              }}
-              label="Member 2 Roll no."
-              fullWidth
-              sx={{ marginBottom: "10px" }}
-            />
-            <GetStudentTextField
-              value={addGroupMember3RollNo}
-              onChange={(e, value) => {
-                setAddGroupMember3RollNo(value);
-              }}
-              label="Member 3 Roll no."
-              fullWidth
-              sx={{ marginBottom: "10px" }}
-            />
-            <Button variant="contained">Submit</Button>
-          </Stack>
-        </CustomModal>
+          {sections.map((section) => {
+            return (
+              <MenuItem key={section.id} value={section.id}>
+                {section.batch_name} {section.gender}
+              </MenuItem>
+            );
+          })}
+        </TextField>
 
-        <CustomModal
-          open={openExportGroupsModal}
-          onClose={() => {
-            setOpenExportsGroupsModal(false);
-          }}
-          maxWidth={400}
+        <Button
+          sx={{ display: "block", margin: "0 auto" }}
+          variant="contained"
+          onClick={handleExportGroupData}
         >
-          <Typography variant="h5" textAlign="center" mb={2}>
-            Export Data
-          </Typography>
+          Submit
+        </Button>
+      </CustomModal>
 
-          <TextField
-            value={exportSectionId}
-            onChange={(e) => {
-              setExportSectionId(e.target.value);
-            }}
-            select
-            label="Choose a Section"
-            fullWidth
-            sx={{ mb: 2 }}
-          >
-            {sections.map((section) => {
+      <CustomModal
+        open={groupDetailsModalOpen}
+        onClose={() => {
+          setGroupDetailsModalOpen(false);
+        }}
+        maxWidth={500}
+        styles={{ padding: "10px" }}
+      >
+        <Typography variant="h5" textAlign="center" mb={2}>
+          Group details
+        </Typography>
+        <Table sx={{ mb: 3 }}>
+          <TableHead>
+            <TableRow>
+              <TableCell>Name</TableCell>
+              <TableCell>Roll No</TableCell>
+              <TableCell>&nbsp;</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            <TableRow>
+              <TableCell>{selectedGroup?.leader?.name}</TableCell>
+              <TableCell>{selectedGroup?.leader?.rollno}</TableCell>
+              <TableCell sx={{ textAlign: "right" }}>
+                <Grid container justifyContent="flex-end">
+                  <Button sx={{ padding: "0.1rem", borderRadius: "4rem" }} variant="outlined">
+                    Leader
+                  </Button>
+                </Grid>
+              </TableCell>
+            </TableRow>
+
+            {selectedGroup.members.map((member, index) => {
               return (
-                <MenuItem key={section.id} value={section.id}>
-                  {section.batch_name} {section.gender}
-                </MenuItem>
-              );
-            })}
-          </TextField>
-
-          <Button
-            sx={{ display: "block", margin: "0 auto" }}
-            variant="contained"
-            onClick={handleExportGroupData}
-          >
-            Submit
-          </Button>
-        </CustomModal>
-
-        <CustomModal
-          open={groupDetailsModalOpen}
-          onClose={() => {
-            setGroupDetailsModalOpen(false);
-          }}
-          maxWidth={400}
-          styles={{ padding: "10px" }}
-        >
-          <Typography variant="h5" textAlign="center" mb={2}>
-            Group details
-          </Typography>
-          <Table sx={{ mb: 3 }}>
-            <TableHead>
-              <TableRow>
-                <TableCell>Name</TableCell>
-                <TableCell sx={{ textAlign: "center" }}>Roll No</TableCell>
-                <TableCell>&nbsp;</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              <TableRow>
-                <TableCell>{selectedGroup?.leader?.name}</TableCell>
-                <TableCell>{selectedGroup?.leader?.rollno}</TableCell>
-                <TableCell sx={{ textAlign: "right" }}>
-                  <Grid container justifyContent="flex-end">
-                    <Button sx={{ padding: "0.1rem", borderRadius: "4rem" }} variant="outlined">
-                      Leader
-                    </Button>
-                  </Grid>
-                </TableCell>
-              </TableRow>
-
-              {selectedGroup.members.map((member, index) => {
-                return (
-                  <TableRow hover key={member?.rollno}>
-                    <TableCell>
-                      <Stack alignItems="center" direction="row" spacing={2}>
-                        <Typography variant="subtitle2">{member?.name}</Typography>
-                      </Stack>
-                    </TableCell>
-                    <TableCell sx={{ textAlign: "center" }}>{member?.rollno}</TableCell>
-                    {/* {!isLeader && index !== 0 && (
+                <TableRow hover key={member?.rollno}>
+                  <TableCell>
+                    <Stack alignItems="center" direction="row" spacing={2}>
+                      <Typography variant="subtitle2">{member?.name}</Typography>
+                    </Stack>
+                  </TableCell>
+                  <TableCell>{member?.rollno}</TableCell>
+                  {/* {!isLeader && index !== 0 && (
                       <TableCell sx={{ textAlign: "right" }}>&nbsp;</TableCell>
                     )} */}
-                    <TableCell sx={{ textAlign: "right" }}>
-                      <IconButton
-                        sx={{ padding: "0" }}
-                        aria-describedby={id}
-                        onClick={(e) => setAnchorEl(e.currentTarget)}
-                      >
-                        <SvgIcon>
-                          <MoreVertIcon />
-                        </SvgIcon>
-                      </IconButton>
-                      <Popover
-                        id={id}
-                        open={open}
-                        anchorEl={anchorEl}
-                        onClose={() => setAnchorEl(null)}
-                        anchorOrigin={{
-                          vertical: "bottom",
-                          horizontal: "left",
-                        }}
-                      >
+                  <TableCell sx={{ textAlign: "right" }}>
+                    <IconButton
+                      sx={{ padding: "0" }}
+                      aria-describedby={id}
+                      onClick={(e) => setAnchorEl(e.currentTarget)}
+                    >
+                      <SvgIcon>
+                        <MoreVertIcon />
+                      </SvgIcon>
+                    </IconButton>
+                    <Popover
+                      id={id}
+                      open={open}
+                      anchorEl={anchorEl}
+                      onClose={() => setAnchorEl(null)}
+                      anchorOrigin={{
+                        vertical: "bottom",
+                        horizontal: "left",
+                      }}
+                    >
+                      <Stack>
                         <Button
                           onClick={() => {
-                            console.log("hello world");
+                            handleChangeGroupLeader(member);
                           }}
                         >
                           Make Group Leader
                         </Button>
-                      </Popover>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
+                        <Button
+                          onClick={() => {
+                            handleRemoveMemberFromGroup(member?.rollno);
+                          }}
+                          sx={{ color: "red" }}
+                        >
+                          Remove
+                        </Button>
+                      </Stack>
+                    </Popover>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
 
-          <GetStudentTextField
-            value={addGroupLeaderRollNo}
-            onChange={(e, value) => {
-              setAddGroupLeaderRollNo(value);
-            }}
-            label="Enter Roll No."
-            fullWidth
-            sx={{ mb: 3 }}
-          />
+        <GetStudentTextField
+          value={addGroupMemberDetails}
+          onChange={(e, value) => {
+            setAddGroupMemberDetails(value);
+          }}
+          label="Enter Roll No."
+          fullWidth
+          sx={{ mb: 3 }}
+        />
 
-          <Button
-            sx={{ display: "block", margin: "0 auto" }}
-            variant="contained"
-            onClick={handleAddStudentToGroup}
-          >
-            Add Student
-          </Button>
-        </CustomModal>
-      </Box>
-    </>
+        <Button
+          sx={{ display: "block", margin: "0 auto" }}
+          variant="contained"
+          onClick={handleAddStudentToGroup}
+        >
+          Add Student
+        </Button>
+      </CustomModal>
+    </Box>
   );
 };
 export default ViewGroupsPage;

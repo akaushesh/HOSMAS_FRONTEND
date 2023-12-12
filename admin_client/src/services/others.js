@@ -13,7 +13,7 @@ export const getAllGroups = async (query, groups_per_page, page, accessToken) =>
 };
 
 export const getGroupMembers = async (accessToken) => {
-  const res = await otherApi.get("dashboard/getGroups", {
+  const res = await otherApi.get("dashboard/getGroups/", {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
@@ -34,7 +34,7 @@ export const getStudents = async (query, students_per_page, page, batch, accessT
 };
 
 export const searchStudent = async (rollNo, accessToken) => {
-  const res = await otherApi.get(`dashboard/search-student/view/${rollNo}`, {
+  const res = await otherApi.get(`dashboard/search-student/view/${rollNo}/`, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },

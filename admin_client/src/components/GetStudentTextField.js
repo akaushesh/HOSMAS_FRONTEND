@@ -5,7 +5,12 @@ import { searchStudent } from "src/services/others";
 
 function GetStudentTextField(props) {
   const [student, setStudent] = useState([]);
+  const [infoText, setInfoText] = useState("Enter a valid Roll no.");
   const { accessToken } = useAuth();
+
+  useEffect(() => {
+    console.log(student);
+  }, [student]);
 
   const handleRollNoChange = async (e) => {
     const inputValue = e.target.value;
@@ -16,6 +21,7 @@ function GetStudentTextField(props) {
           setStudent([res.data]);
         }
       } catch (err) {
+        setInfoText(err?.response?.data?.detail || "Enter a valid Roll no.");
         console.error(err);
       }
     }
@@ -24,6 +30,10 @@ function GetStudentTextField(props) {
   useEffect(() => {
     console.log(student);
   }, [student]);
+
+  useEffect(() => {
+    console.log(infoText);
+  }, [infoText]);
 
   return (
     <Autocomplete
@@ -40,6 +50,7 @@ function GetStudentTextField(props) {
       filterOptions={(x) => x}
       fullWidth={props?.fullWidth}
       sx={props?.sx}
+      noOptionsText={infoText}
     />
   );
 }
