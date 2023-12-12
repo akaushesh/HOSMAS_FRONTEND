@@ -9,7 +9,7 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.conf import settings
 
-@app.task(name = "send_password_reset_mail")
+@app.task(name = "send_password_reset_mail", queue='hms-priority')
 def send_password_reset_mail(name, url, email):
     idx = cache.get('emailIdIndex', 0)
     cache.set('emailIdIndex', (idx + 1) % settings.EMAIL_HOST_USERS_COUNT)

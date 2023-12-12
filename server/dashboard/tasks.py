@@ -13,7 +13,10 @@ from config.celery import app
 @app.task(name = "send_reminder_mail")
 def send_reminder_mail(name, email):
       subject = "Hi " + name +", Reminder for filling Hostel Preferences"
+      
       idx = cache.get('emailIdIndex', 0)
+      cache.set('emailIdIndex', (idx + 1) % settings.EMAIL_HOST_USERS_COUNT)
+      
       connection = get_connection(username=settings.EMAIL_HOST_USERS[idx], password=settings.EMAIL_HOST_PASSWORDS[idx], fail_silently=False)
       connection.open()
       context = {
@@ -31,7 +34,10 @@ def send_reminder_mail(name, email):
 @app.task(name = "send_start_allocation_mail")
 def send_start_allocation_mail(name,email, slug):
       subject = f"Hi {name}, Hostel Preference Filling Process has Started"
+      
       idx = cache.get('emailIdIndex', 0)
+      cache.set('emailIdIndex', (idx + 1) % settings.EMAIL_HOST_USERS_COUNT)
+      
       connection = get_connection(username=settings.EMAIL_HOST_USERS[idx], password=settings.EMAIL_HOST_PASSWORDS[idx], fail_silently=False)
       connection.open()
       context = {

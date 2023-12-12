@@ -743,11 +743,11 @@ class DeleteGroupsView(APIView):
                         for preference in group.preferences.all():
                               preference.delete()
             
-                        left_group_mail.delay(group.leader.name, student.name, student.rollno, group.leader.user.email)
+                        # left_group_mail.delay(group.leader.name, student.name, student.rollno, group.leader.user.email)
                         
-                        members = group.members.all()
-                        for member in members:
-                              left_group_mail.delay(member.name, student.name, student.rollno, member.user.email)
+                        # members = group.members.all()
+                        # for member in members:
+                        #       left_group_mail.delay(member.name, student.name, student.rollno, member.user.email)
 
             return Response(status=status.HTTP_200_OK)
 
