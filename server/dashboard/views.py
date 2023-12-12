@@ -474,7 +474,7 @@ class sendReminderMail(APIView):
       def post(self, request):
             section_ids = request.data.get('sections')
             if section_ids is None:
-                  return Response({'detail'; 'Invalid data!'}, status=status.HTTP_400_BAD_REQUEST)
+                  return Response({'detail': 'Invalid data!'}, status=status.HTTP_400_BAD_REQUEST)
             
             for section_id in section_ids:
                   section = Section.objects.filter(id=section_id).select_related('batch').first()
