@@ -5,7 +5,12 @@ import axios from "axios";
 import { URL } from "config";
 import { useState } from "react";
 
-export const CustomerConfirmation = ({ name = "", enrollmentNumber = "", onClose }) => {
+export const CustomerConfirmation = ({
+  name = "",
+  enrollmentNumber = "",
+  onClose,
+  onOpenSnackBar,
+}) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -28,6 +33,7 @@ export const CustomerConfirmation = ({ name = "", enrollmentNumber = "", onClose
       const url = URL + "student/invitation/send/";
 
       const sendInvitationResponse = await axios.post(url, data, sendInvitationConfig);
+      onOpenSnackBar();
       onClose();
     } catch (err) {
       setError(err?.response?.data?.detail);

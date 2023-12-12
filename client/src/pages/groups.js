@@ -11,7 +11,6 @@ import { useQueryClient } from "@tanstack/react-query";
 
 const Page = () => {
   const router = useRouter();
-  const auth = useAuthContext();
 
   const queryClient = useQueryClient();
   const user = queryClient.getQueryData(["getProfile"]);
