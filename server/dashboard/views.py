@@ -662,7 +662,7 @@ class ChangeGroupLeaderView(APIView):
             if newleader is None:
                   return Response({'detail': 'No Student Found!'}, status=status.HTTP_404_NOT_FOUND)
             
-            group = Group.objects.filter(id=request.data.get('group')).prefetch_related('members').first()
+            group = Group.objects.filter(id=request.data.get('group')).select_related('leader').prefetch_related('members').first()
             if group is None:
                   return Response({'detail': 'No Group Found!'}, status=status.HTTP_404_NOT_FOUND)
             
@@ -685,8 +685,8 @@ class ChangeGroupLeaderView(APIView):
             
             members = group.members.all()
             for member in members:
-                  send_teamleader_change_mail.delay(group.leader.name,group.leader.rollno,member.user.email)
-            send_teamleader_change_mail.delay(group.leader.name,group.leader.rollno,group.leader.user.email)
+                  send_teamleader_change_mail.delay(group.leader.name, group.leader.rollno, member.user.email, member.name)
+            send_teamleader_change_mail.delay(group.leader.name, group.leader.rollno, group.leader.user.email, group.leader.name)
             
             serializer = GroupDetailSerializer(group)
             return Response(serializer.data, status=status.HTTP_200_OK)
