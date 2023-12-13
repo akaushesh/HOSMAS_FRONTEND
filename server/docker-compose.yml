@@ -22,7 +22,7 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile
-    command: celery -A config worker -l info --pool=threads --concurrency=1 -E -Q hms-default
+    command: celery -A config worker -l info --pool=threads --concurrency=1 -E -Q hms-default -n worker-default@%h
     network_mode: "host"
     restart: always
   
@@ -31,6 +31,6 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile
-    command: celery -A config worker -l info --pool=threads --concurrency=1 -E -Q hms-priority
+    command: celery -A config worker -l info --pool=threads --concurrency=1 -E -Q hms-priority -n worker-priority@%h
     network_mode: "host"
     restart: always
