@@ -27,7 +27,7 @@ import { useAuthContext } from "src/contexts/auth-context";
 import CustomModal from "src/components/CustomModal";
 import { getAllSections, updateSectionsAllotmentStatus } from "src/services/section";
 import EmailIcon from "@mui/icons-material/Email";
-import { getAcademicSession, updateAcademicSession } from "src/services/others";
+import { getAcademicSession, sendReminderMail, updateAcademicSession } from "src/services/others";
 import ConfirmationModal from "src/components/ConfirmationModal";
 // import { OverviewBudget } from "../overview/overview-budget";
 // import { OverviewTotalCustomers } from "../overview/overview-total-customers";
@@ -83,6 +83,9 @@ export const AdminAccountProfilePage = () => {
   const [feeStructureLink, setFeeStructureLink] = useState("");
   const [enableAllotmentConfirmationModalOpen, setEnableAllotmentConfirmationModalOpen] =
     useState(false);
+  const [openReminderMailModal, setOpenReminderMailModal] = useState(false);
+  const [reminderMailConfirmationModalOpen, setReminderMailConfirmationModalOpen] = useState(false);
+  const [reminderEmailSections, setReminderEmailSections] = useState([]);
 
   useEffect(() => {
     const getData = async () => {
@@ -127,13 +130,13 @@ export const AdminAccountProfilePage = () => {
 
   const handleUpdatePreferenceSelectionClick = async () => {
     try {
-      const fetchHostelData = async () => {
+      const fetchSectionsData = async () => {
         const res = await getAllSections(accessToken);
         console.log(res);
         setSections(res?.data);
       };
 
-      fetchHostelData();
+      fetchSectionsData();
       setOpenUpdatePreferenceModal(true);
     } catch (err) {
       console.log(err);
@@ -164,6 +167,52 @@ export const AdminAccountProfilePage = () => {
         return section;
       });
     });
+  };
+
+  const handleSendReminderEmailClick = async () => {
+    try {
+      const fetchSectionsData = async () => {
+        const res = await getAllSections(accessToken);
+        console.log(res);
+        setReminderEmailSections(
+          res?.data
+            ?.filter((section) => section?.is_allotment_enabled)
+            .map((section) => ({ ...section, send_reminder_mail: false }))
+        );
+      };
+
+      fetchSectionsData();
+      setOpenReminderMailModal(true);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const updateReminderEmailStatus = async (id, checked) => {
+    setReminderEmailSections((prev) => {
+      return prev.map((section) => {
+        if (section.id == id) return { ...section, send_reminder_mail: checked };
+        return section;
+      });
+    });
+  };
+
+  const handleSendReminderEmail = async () => {
+    const ids = reminderEmailSections
+      .filter((section) => section.send_reminder_mail == true)
+      .map((section) => section?.id);
+
+    try {
+      const res = await sendReminderMail(ids, accessToken);
+
+      if (res.status == 200) {
+        setReminderMailConfirmationModalOpen(false);
+        setOpenReminderMailModal(false);
+      }
+      console.log(res);
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
@@ -354,28 +403,26 @@ export const AdminAccountProfilePage = () => {
             </Card>
           </Grid>
           <Grid xs={12} md={6} lg={4}>
-            <Card>
-              <Link href="/manage-groups" style={{ color: "black", textDecoration: "none" }}>
-                <CardContent>
-                  <Stack direction="row" alignItems="center" justifyContent="space-evenly">
-                    <Avatar
-                      sx={{
-                        backgroundColor: "#0f3923",
-                        height: 56,
-                        width: 56,
-                      }}
-                    >
-                      <SvgIcon>
-                        <EmailIcon />
-                      </SvgIcon>
-                    </Avatar>
-                    <Typography textAlign="center">
-                      Send Reminder <br /> Email
-                    </Typography>
-                    <EastIcon fontSize="large" />
-                  </Stack>
-                </CardContent>
-              </Link>
+            <Card onClick={handleSendReminderEmailClick}>
+              <CardContent sx={{ cursor: "pointer" }}>
+                <Stack direction="row" alignItems="center" justifyContent="space-evenly">
+                  <Avatar
+                    sx={{
+                      backgroundColor: "#0f3923",
+                      height: 56,
+                      width: 56,
+                    }}
+                  >
+                    <SvgIcon>
+                      <EmailIcon />
+                    </SvgIcon>
+                  </Avatar>
+                  <Typography textAlign="center">
+                    Send Reminder <br /> Email
+                  </Typography>
+                  <EastIcon fontSize="large" />
+                </Stack>
+              </CardContent>
             </Card>
           </Grid>
 
@@ -471,6 +518,44 @@ export const AdminAccountProfilePage = () => {
         </CustomModal>
 
         <CustomModal
+          open={openReminderMailModal}
+          onClose={() => setOpenReminderMailModal(false)}
+          maxWidth={700}
+        >
+          <Grid container spacing={2} mb={2}>
+            {reminderEmailSections.map((section) => {
+              console.log(section);
+              return (
+                <Grid item xs={12} sm={6} md={4}>
+                  <Card>
+                    <CardContent>
+                      <Stack direction="row" alignItems="center" justifyContent="center">
+                        <Typography>
+                          {section.batch_name} {section.gender === "M" ? "BOYS" : "GIRLS"}
+                        </Typography>
+                        <Checkbox
+                          checked={section?.send_reminder_mail}
+                          onChange={(e) => {
+                            updateReminderEmailStatus(section.id, e.target.checked);
+                          }}
+                        />
+                      </Stack>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              );
+            })}
+          </Grid>
+          <Button
+            variant="contained"
+            onClick={() => setReminderMailConfirmationModalOpen(true)}
+            sx={{ display: "block", margin: "0 auto" }}
+          >
+            Send Reminder Mail
+          </Button>
+        </CustomModal>
+
+        <CustomModal
           open={openUpdatePreferenceModal}
           onClose={() => setOpenUpdatePreferenceModal(false)}
           maxWidth={700}
@@ -487,7 +572,7 @@ export const AdminAccountProfilePage = () => {
                           {section.batch_name} {section.gender === "M" ? "BOYS" : "GIRLS"}
                         </Typography>
                         <Checkbox
-                          checked={section.is_allotment_enabled}
+                          checked={section?.is_allotment_enabled}
                           onChange={(e) => {
                             updateAllotmentStatus(section.id, e.target.checked);
                           }}
@@ -517,6 +602,17 @@ export const AdminAccountProfilePage = () => {
           noMessage="No, leave it"
           yesMessage="Yes, update"
           execFunction={handleUpdatePrefernceSelection}
+        />
+
+        <ConfirmationModal
+          open={reminderMailConfirmationModalOpen}
+          onClose={() => {
+            setReminderMailConfirmationModalOpen(false);
+          }}
+          message="Are you sure you want to send reminder emails to the students of these selected sections?"
+          noMessage="No, leave it"
+          yesMessage="Yes, Send"
+          execFunction={handleSendReminderEmail}
         />
       </Container>
     </Box>

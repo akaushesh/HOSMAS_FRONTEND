@@ -59,3 +59,14 @@ export const updateAcademicSession = async (data, accessToken) => {
   });
   return res;
 };
+
+export const sendReminderMail = async (ids, accessToken) => {
+  const data = { sections: ids };
+
+  const res = await otherApi.post(`dashboard/sendReminderMail/`, data, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+  return res;
+};
