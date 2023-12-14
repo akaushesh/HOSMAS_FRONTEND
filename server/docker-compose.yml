@@ -7,22 +7,30 @@ services:
       context: .
       dockerfile: ./Dockerfile
     depends_on:
-      - hosmas-celery
+      - hosmas-celery-default
+      - hosmas-celery-priority
     volumes:
       - ./static/:/app/static/
       - ./logs/:/app/logs/
       - ./media/:/app/media/
       - ./imported-data/:/app/imported-data/
     network_mode: "host"
+    restart: always
   
-  hosmas-celery:
-    image: ccs/hosmas-celery
+  hosmas-celery-default:
+    image: ccs/hosmas-celery-default
     build:
       context: .
       dockerfile: ./Dockerfile
-    volumes:
-      - ./imported-data/:/app/imported-data/
-      - ./logs/:/app/logs/
-    command: celery -A config worker -l info
+    command: celery -A config worker -l info --pool=threads --concurrency=1 -E -Q hms-default -n worker-default@%h
+    network_mode: "host"
+    restart: always
+  
+  hosmas-celery-priority:
+    image: ccs/hosmas-celery-priority
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    command: celery -A config worker -l info --pool=threads --concurrency=1 -E -Q hms-priority -n worker-priority@%h
     network_mode: "host"
     restart: always

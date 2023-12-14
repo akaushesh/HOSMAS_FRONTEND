@@ -24,7 +24,7 @@ from student.serializers import StudentSerializer, GroupSerializer, StudentProfi
 from .tasks import send_reminder_mail
 
 from datetime import datetime
-import csv, os
+import csv, os, json
 from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Font
 from collections import OrderedDict
@@ -662,7 +662,7 @@ class ChangeGroupLeaderView(APIView):
             if newleader is None:
                   return Response({'detail': 'No Student Found!'}, status=status.HTTP_404_NOT_FOUND)
             
-            group = Group.objects.filter(id=request.data.get('group')).prefetch_related('members').first()
+            group = Group.objects.filter(id=request.data.get('group')).select_related('leader').prefetch_related('members').first()
             if group is None:
                   return Response({'detail': 'No Group Found!'}, status=status.HTTP_404_NOT_FOUND)
             
@@ -685,8 +685,8 @@ class ChangeGroupLeaderView(APIView):
             
             members = group.members.all()
             for member in members:
-                  send_teamleader_change_mail.delay(group.leader.name,group.leader.rollno,member.user.email)
-            send_teamleader_change_mail.delay(group.leader.name,group.leader.rollno,group.leader.user.email)
+                  send_teamleader_change_mail.delay(group.leader.name, group.leader.rollno, member.user.email, member.name)
+            send_teamleader_change_mail.delay(group.leader.name, group.leader.rollno, group.leader.user.email, group.leader.name)
             
             serializer = GroupDetailSerializer(group)
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -743,11 +743,11 @@ class DeleteGroupsView(APIView):
                         for preference in group.preferences.all():
                               preference.delete()
             
-                        left_group_mail.delay(group.leader.name, student.name, student.rollno, group.leader.user.email)
+                        # left_group_mail.delay(group.leader.name, student.name, student.rollno, group.leader.user.email)
                         
-                        members = group.members.all()
-                        for member in members:
-                              left_group_mail.delay(member.name, student.name, student.rollno, member.user.email)
+                        # members = group.members.all()
+                        # for member in members:
+                        #       left_group_mail.delay(member.name, student.name, student.rollno, member.user.email)
 
             return Response(status=status.HTTP_200_OK)
 
@@ -951,12 +951,20 @@ class ImportStudentsView(APIView):
                         failureCnt += 1
 
                   cnt += 1
-
-            return Response({
+            
+            res = {
                   'successful': successCnt,
                   'unsuccessful': failureCnt,
                   'errors': errors
-            }, status=status.HTTP_200_OK)
+            }
+            
+            log_file_path = os.path.join(settings.LOGS_ROOT, 'import_students.log')
+            with open(log_file_path, 'a') as f:
+                  f.write(f'\n{filename}\n{str(datetime.now())}\n')
+                  f.write(json.dumps(res, indent=2))
+                  f.write('\n')
+
+            return Response(res, status=status.HTTP_200_OK)
 
 
 class ImportDefaultersView(APIView):
