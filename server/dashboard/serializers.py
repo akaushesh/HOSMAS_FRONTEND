@@ -157,7 +157,7 @@ class SectionSerializer(serializers.ModelSerializer):
                                     slug_instance.save()
                               user_slug = slug_instance.slug
                               send_start_allocation_mail.delay(lead.name, user.email, user_slug)
-                        print('Send Mails!')
+                        
                   instance.is_allotment_enabled = updated_allotment_status
 
             # Check allotment result status and if made public, finalize result
@@ -172,6 +172,8 @@ class SectionSerializer(serializers.ModelSerializer):
                   instance.is_allotment_result_public = updated_allotment_result_status
 
             instance.is_retain_allowed = validated_data.get('is_retain_allowed', instance.is_retain_allowed)
+            instance.group_size_limit = validated_data.get('group_size_limit', instance.group_size_limit)
+            
             instance.save()
             
             return instance
