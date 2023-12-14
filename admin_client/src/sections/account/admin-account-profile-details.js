@@ -123,6 +123,11 @@ export const AdminAccountProfilePage = () => {
 
     try {
       const res = updateAcademicSession(data, accessToken);
+
+      if (res.status == 200) {
+        setOpenAcademicSessionModal(false);
+        setOpenFeeStructureLinkModal(false);
+      }
     } catch (err) {
       console.log(err);
     }

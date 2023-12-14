@@ -15,6 +15,7 @@ import {
   Typography,
   TextField,
   MenuItem,
+  CardContent,
 } from "@mui/material";
 import { useSelection } from "src/hooks/use-selection";
 import { applyPagination } from "src/utils/apply-pagination";
@@ -61,6 +62,8 @@ const ViewStudentsPage = () => {
 
   const [openExportStudentsModal, setOpenExportStudentModal] = useState(false);
   const [exportBatchId, setExportBatchId] = useState();
+
+  const [uploadStudentLog, setUploadStudentLog] = useState();
 
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -130,7 +133,12 @@ const ViewStudentsPage = () => {
 
     try {
       const res = await importStudents(formData, accessToken);
-      if (res.status == 202) {
+      if (res.status == 200) {
+        setUploadStudentLog({
+          errors: res.data.errors,
+          successful: res.data.successful,
+          unsuccessful: res.data.unsuccessful,
+        });
         const res1 = await getStudents(searchQuery, 20, page + 1, "all", accessToken);
         if (res1.status == 200) {
           setStudents(res1.data.data);
@@ -314,6 +322,18 @@ const ViewStudentsPage = () => {
                 </Button>
               </Stack>
             </Card>
+
+            {uploadStudentLog && (
+              <Card>
+                <CardContent sx={{ maxHeight: "100px", overflow: "scroll" }}>
+                  <Typography>Successful: {uploadStudentLog.successful}</Typography>
+                  <Typography>Unsuccessful: {uploadStudentLog.unsuccessful}</Typography>
+                  {uploadStudentLog.errors.map((error) => (
+                    <Typography>- {error}</Typography>
+                  ))}
+                </CardContent>
+              </Card>
+            )}
 
             <StudentsTable
               count={totalStudents}

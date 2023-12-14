@@ -9,6 +9,7 @@ import {
   CardContent,
   Switch,
   Button,
+  TextField,
 } from "@mui/material";
 import Link from "next/link";
 import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
@@ -19,6 +20,7 @@ import { useRouter } from "next/router";
 import ConfirmationModal from "src/components/ConfirmationModal";
 import { deleteSection, updateSection } from "src/services/section";
 import { exportGroups } from "src/services/export";
+import CustomModal from "src/components/CustomModal";
 
 function SectionPreference({ sectionId }) {
   const { accessToken } = useAuthContext();
@@ -32,6 +34,9 @@ function SectionPreference({ sectionId }) {
   const [confirmationModalOpen, setConfirmationModalOpen] = useState();
   const [enableAllotmentConfirmationModalOpen, setEnableAllotmentConfirmationModalOpen] =
     useState();
+  const [groupSize, setGroupSize] = useState();
+  const [openGroupSizeModal, setOpenGroupSizeModal] = useState(false);
+  const [isAllotmentPublic, setIsAllotmentPublic] = useState(false);
 
   console.log(sectionData);
 
@@ -47,6 +52,8 @@ function SectionPreference({ sectionId }) {
         });
         setIsAllotmentEnabled(res?.data?.is_allotment_enabled);
         setIsRetainEnabled(res?.data?.is_retain_allowed);
+        setIsAllotmentPublic(res?.data?.is_allotment_result_public);
+        setGroupSize(res?.data?.group_size_limit);
         setPreferences(
           res?.data?.room_choices.map((item) => ({
             id: item.id,
@@ -125,6 +132,20 @@ function SectionPreference({ sectionId }) {
     }
   };
 
+  const handleGroupSizeUpdate = async () => {
+    try {
+      const updateData = { group_size_limit: groupSize };
+
+      const res = await updateSection(sectionId, updateData, accessToken);
+
+      if (res.status == 200) {
+        setOpenGroupSizeModal(false);
+      }
+
+      console.log(res);
+    } catch (err) {}
+  };
+
   return (
     <Box
       component="main"
@@ -145,20 +166,25 @@ function SectionPreference({ sectionId }) {
             </Typography>
           </Stack>
 
-          <Button
-            variant="contained"
-            sx={{
-              backgroundColor: "error.main",
-              "&:hover": {
-                backgroundColor: "error.dark",
-              },
-            }}
-            onClick={() => {
-              setConfirmationModalOpen(true);
-            }}
-          >
-            Delete Section
-          </Button>
+          <Stack direction="row" gap={1}>
+            <Button variant="contained" onClick={handleDownloadAllotmentData}>
+              Download Allotment Data
+            </Button>
+            <Button
+              variant="contained"
+              sx={{
+                backgroundColor: "error.main",
+                "&:hover": {
+                  backgroundColor: "error.dark",
+                },
+              }}
+              onClick={() => {
+                setConfirmationModalOpen(true);
+              }}
+            >
+              Delete Section
+            </Button>
+          </Stack>
         </Stack>
 
         <Grid container spacing={3} justifyContent="space-between">
@@ -173,7 +199,7 @@ function SectionPreference({ sectionId }) {
           </Grid>
 
           <Grid container xs={12} md={4}>
-            <Grid xs={6} md={12}>
+            <Grid xs={12} sm={6} md={12}>
               <Card sx={{ display: "flex", alignItems: "center" }}>
                 <CardContent>
                   <Stack direction="row" spacing={1} alignItems="center">
@@ -194,7 +220,22 @@ function SectionPreference({ sectionId }) {
               </Card>
             </Grid>
 
-            <Grid xs={6} md={12}>
+            {/* <Grid xs={12} sm={6} md={12}>
+              <Card sx={{ display: "flex", alignItems: "center" }}>
+                <CardContent>
+                  <Stack direction="row" spacing={1} alignItems="center">
+                    <Typography variant="h5">Allow Retaining</Typography>
+                    <Switch
+                      sx={{ transform: "translateY(5%)" }}
+                      checked={isRetainEnabled}
+                      onChange={handleRetainEnableChange}
+                    />
+                  </Stack>
+                </CardContent>
+              </Card>
+            </Grid> */}
+
+            <Grid xs={12} sm={6} md={12}>
               <Card sx={{ display: "flex", alignItems: "center" }}>
                 <CardContent>
                   <Stack direction="row" spacing={1} alignItems="center">
@@ -209,20 +250,40 @@ function SectionPreference({ sectionId }) {
               </Card>
             </Grid>
 
-            <Grid xs={6} md={12}>
+            <Grid xs={4} md={12}>
               <Card
                 sx={{ display: "flex", alignItems: "center", cursor: "pointer" }}
-                onClick={handleDownloadAllotmentData}
+                onClick={() => setOpenGroupSizeModal(true)}
               >
                 <CardContent>
                   <Stack direction="row" spacing={1} alignItems="center">
-                    <Typography variant="h5">Download Allotment Data</Typography>
+                    <Typography variant="h5">Group size: {groupSize}</Typography>
                   </Stack>
                 </CardContent>
               </Card>
             </Grid>
           </Grid>
         </Grid>
+
+        <CustomModal
+          open={openGroupSizeModal}
+          onClose={() => setOpenGroupSizeModal(false)}
+          maxWidth={400}
+        >
+          <Stack alignItems="center" spacing={3}>
+            <Typography variant="h5" textAlign="center">
+              Set Group Size
+            </Typography>
+            <TextField
+              label="Group Size"
+              value={groupSize}
+              onChange={(e) => setGroupSize(e.target.value)}
+            />
+            <Button variant="contained" onClick={handleGroupSizeUpdate}>
+              Submit
+            </Button>
+          </Stack>
+        </CustomModal>
 
         <ConfirmationModal
           open={confirmationModalOpen}
