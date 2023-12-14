@@ -24,7 +24,7 @@ from student.serializers import StudentSerializer, GroupSerializer, StudentProfi
 from .tasks import send_reminder_mail
 
 from datetime import datetime
-import csv, os
+import csv, os, json
 from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Font
 from collections import OrderedDict
@@ -951,12 +951,20 @@ class ImportStudentsView(APIView):
                         failureCnt += 1
 
                   cnt += 1
-
-            return Response({
+            
+            res = {
                   'successful': successCnt,
                   'unsuccessful': failureCnt,
                   'errors': errors
-            }, status=status.HTTP_200_OK)
+            }
+            
+            log_file_path = os.path.join(settings.LOGS_ROOT, 'import_students.log')
+            with open(log_file_path, 'a') as f:
+                  f.write(f'\n{filename}\n{str(datetime.now())}\n')
+                  f.write(json.dumps(res, indent=2))
+                  f.write('\n')
+
+            return Response(res, status=status.HTTP_200_OK)
 
 
 class ImportDefaultersView(APIView):
