@@ -9,6 +9,7 @@ services:
     depends_on:
       - hosmas-celery-default
       - hosmas-celery-priority
+      - hosmas-celery-admin-task
     volumes:
       - ./static/:/app/static/
       - ./logs/:/app/logs/
@@ -32,5 +33,14 @@ services:
       context: .
       dockerfile: ./Dockerfile
     command: celery -A config worker -l info --pool=threads --concurrency=1 -E -Q hms-priority -n worker-priority@%h
+    network_mode: "host"
+    restart: always
+  
+  hosmas-celery-admin-task:
+    image: ccs/hosmas-celery-admin-task
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    command: celery -A config worker -l info --pool=gevent --concurrency=2 -E -Q hms-admin-task -n worker-admin-task@%h
     network_mode: "host"
     restart: always

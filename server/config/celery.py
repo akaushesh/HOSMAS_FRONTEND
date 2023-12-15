@@ -10,7 +10,8 @@ app = Celery('config')
 
 app.conf.task_queues = [
       Queue('hms-default'),
-      Queue('hms-priority')
+      Queue('hms-priority'),
+      Queue('hms-admin-task'),
 ]
 
 app.conf.task_default_queue = 'hms-default'

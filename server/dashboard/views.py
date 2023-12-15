@@ -21,7 +21,7 @@ from .serializers import HostelSerializer, HostelSingleSerializer, RoomTypeSeria
 from .serializers import *
 from student.serializers import StudentSerializer, GroupSerializer, StudentProfileSerializer, StudentSerializer
 
-from .tasks import send_reminder_mail
+from .tasks import send_reminder_mail, import_students, import_defaulters
 
 from datetime import datetime
 import csv, os, json
@@ -782,189 +782,9 @@ class ImportStudentsView(APIView):
                                     'detail': f"Invalid File Format. Found {row[i].value}, but required was {studentfileformat[i]}, Correct File Format is {str(studentfileformat)}"
                               }, status=status.HTTP_400_BAD_REQUEST)
 
-            successCnt = 0
-            failureCnt = 0
-            cnt = 1
-            errors = []
+            import_students.delay(filename)
 
-            for row in ws.iter_rows(min_row=2, min_col=1, max_col=11):
-                  try:
-                        with transaction.atomic():
-                              student = None
-                              
-                              # Extract data into variables and data preprocessing
-                              phoneno = row[3].value
-
-                              cg = row[4].value
-                              if cg is not None:
-                                    cg = round(float(cg), 2)
-
-                              batch = row[5].value
-                              if batch is not None:
-                                    batch = batch.strip()
-                                    batch = Batch.objects.filter(name__iexact = batch).first()
-                                    if batch is None:
-                                          batch = Batch(name = row[5].value.strip())
-                                          batch.save()
-                              
-                              rollno = row[0].value
-                              if rollno is not None:
-                                    student = Student.objects.filter(rollno=rollno).first()
-
-                              email = row[1].value
-                              if email is not None:
-                                    email = email.strip()
-                                    if student is not None:
-                                          user = student.user
-                                          user.email = email
-                                          user.save()
-                                    else:
-                                          user = User.objects.filter(email=email).first()
-                                          if user is None:
-                                                user = User(email=email)
-                                                password = ''.join(choice(string.ascii_letters + string.digits) for _ in range(8))
-                                                user.set_password(password)
-                                                user.save()
-                                          try:
-                                                if user.student is not None:
-                                                      student = user.student
-                                          except:
-                                                pass
-                              
-                              # current_room_type
-                              current_room = row[8].value
-                              is_current_room_null = False
-                              if current_room is not None:
-                                    current_room = current_room.strip()
-                                    if current_room=='':
-                                          # check if admin wants to make current room related field null
-                                          is_current_room_null = True
-                                          current_room = None
-                              else:
-                                    is_current_room_null = True
-                              
-                              current_roomtype = None
-                              current_hostel = row[7].value
-                              if current_hostel is not None:
-                                    if is_current_room_null:
-                                          current_hostel = None
-                                    else:
-                                          current_hostel = current_hostel.strip()
-                                          current_hostel = Hostel.objects.filter(name__iexact=current_hostel).first()
-                                          if current_hostel is None:
-                                                raise Exception(f'Current Hostel {current_hostel} not found!')
-                                          current_roomtype = RoomType.objects.filter(Q(name__iexact=current_room) & Q(hostel = current_hostel)).first()
-                                          if current_roomtype is None:
-                                                raise Exception(f'Current Room Type {current_room} not found!')
-                              
-                              # alloted_room_type
-                              alloted_room = row[10].value
-                              is_alloted_room_null = False
-                              if alloted_room is not None:
-                                    alloted_room = alloted_room.strip()
-                                    if alloted_room=='':
-                                          # check if admin wants to make allocated room related details null
-                                          is_alloted_room_null = True
-                                          alloted_room = None
-                              else:
-                                    is_alloted_room_null = True
-                                    
-                              alloted_roomtype = None 
-                              alloted_hostel = row[9].value
-                              if alloted_hostel is not None:
-                                    if is_alloted_room_null:
-                                          alloted_hostel = None
-                                    else:
-                                          alloted_hostel = alloted_hostel.strip()
-                                          alloted_hostel = Hostel.objects.filter(name__iexact=alloted_hostel).first()
-                                          if alloted_hostel is None:
-                                                raise Exception(f'Alloted Hostel {alloted_hostel} not found!')
-                                          alloted_roomtype = RoomType.objects.filter(Q(name__iexact=alloted_room) & Q(hostel = alloted_hostel)).first()
-                                          if alloted_roomtype is None:
-                                                raise Exception(f'Alloted Room Type {alloted_room} not found!')
-
-                              name = row[2].value
-                              if (name is not None):
-                                    name = name.strip()
-
-                              gender = row[6].value
-                              if gender is not None:
-                                    gender = gender.strip()
-
-                              if student is None:
-                                    # create new student
-                                    student = Student(
-                                          name = name, 
-                                          rollno = rollno, 
-                                          phoneno = phoneno, 
-                                          gender = gender, 
-                                          cg = cg, 
-                                          batch = batch, 
-                                          user = user,
-                                          current_room = current_roomtype,
-                                          alloted_room = alloted_roomtype
-                                          )
-                                    student.save()
-
-                                    group = Group(leader = student, cg = student.cg)
-                                    group.save()
-                              else:
-                                    # update details of existing student
-                                    if name is not None:
-                                          student.name = name
-                                    if rollno is not None:
-                                          student.rollno = rollno
-                                    if phoneno is not None:
-                                          student.phoneno = phoneno
-                                    if gender is not None:
-                                          student.gender = gender
-                                    if cg is not None:
-                                          student.cg = cg
-                                    if batch is not None:
-                                          student.batch = batch
-                                    if current_roomtype is not None:
-                                          student.current_room = current_roomtype
-                                    if alloted_roomtype is not None:
-                                          student.alloted_room = alloted_roomtype
-                                    student.save()
-
-                                    group = Group.objects.filter(leader=student).first()
-                                    if group is None:
-                                          group = Group(leader=student, cg=student.cg)
-                                          group.save()
-                                    else:
-                                          # update group cg
-                                          updatedcg = student.cg
-                                          groupSize = 1
-                                          for member in group.members.all():
-                                                updatedcg += member.cg
-                                                groupSize += 1
-                                          updatedcg /= groupSize
-                                          group.cg = round(updatedcg, 2)
-                                          group.save()
-
-                              successCnt += 1
-                  
-                  except Exception as e:
-                        # log error
-                        errors.append(f'Creation of item {cnt} unsuccessful! Error: {str(e)}')
-                        failureCnt += 1
-
-                  cnt += 1
-            
-            res = {
-                  'successful': successCnt,
-                  'unsuccessful': failureCnt,
-                  'errors': errors
-            }
-            
-            log_file_path = os.path.join(settings.LOGS_ROOT, 'import_students.log')
-            with open(log_file_path, 'a') as f:
-                  f.write(f'\n{filename}\n{str(datetime.now())}\n')
-                  f.write(json.dumps(res, indent=2))
-                  f.write('\n')
-
-            return Response(res, status=status.HTTP_200_OK)
+            return Response(status=status.HTTP_202_ACCEPTED)
 
 
 class ImportDefaultersView(APIView):
@@ -992,31 +812,9 @@ class ImportDefaultersView(APIView):
                         'detail': f"'student' field missing! Required 'student' but found '{ws['A1'].value}' at cell A1."
                   }, status=status.HTTP_400_BAD_REQUEST)
             
-            cnt = 1
-            successCnt = 0
-            failureCnt = 0
-            errors = []
-
-            for row in ws.iter_rows(min_row=2, min_col=1, max_col=1):
-                  try:
-                        student = Student.objects.filter(rollno=row[0].value).first()
-                        if student is None:
-                              raise Exception(f"Student with roll number {row[0].value} not found!")
-                        instance = Defaulter.objects.filter(student=student).first()
-                        if instance is None:
-                              instance = Defaulter(student=student)
-                              instance.save()
-                        successCnt += 1
-                  except BaseException as e:
-                        errors.append(f"Creation of item {cnt} unsuccessful. Error: {str(e)}")
-                        failureCnt += 1
-                  cnt += 1
-
-            return Response({
-                  'successful': successCnt,
-                  'unsuccessful': failureCnt,
-                  'errors': errors
-            }, status=status.HTTP_200_OK)
+            import_defaulters.delay(filename)
+            
+            return Response(status=status.HTTP_202_ACCEPTED)
 
 
 class ExportGroupsView(APIView):

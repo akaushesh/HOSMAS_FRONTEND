@@ -188,7 +188,7 @@ if config('FILE_LOGGING', cast=bool, default=False):
     }
 
 
-# CELERY_BROKER_URL = 'redis://127.0.0.1:6379'
+CELERY_BROKER_URL = 'amqp://localhost:5672'
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_RESULT_BACKEND = 'django-db'
 CELERY_RESULT_SERIALIZER = 'json'
@@ -215,3 +215,6 @@ CACHES = {
 }
 
 LOGS_ROOT = os.path.join(BASE_DIR, config('LOGS_ROOT', default='logs'))
+
+ADMIN_EMAIL = config('ADMIN_EMAIL', default='creativecomputingsociety@gmail.com')
+DEVELOPER_EMAIL = config('DEVELOPER_EMAIL', default='creativecomputingsociety@gmail.com')
