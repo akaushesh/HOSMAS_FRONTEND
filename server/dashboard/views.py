@@ -1122,6 +1122,7 @@ class AllotmentView(APIView):
                   
                   # Handle groups that can't get same hostel
                   for group in unalloted_groups:
+                        leader = group.leader
                         students = [group.leader]
                         for member in group.members.all():
                               students.append(member)
