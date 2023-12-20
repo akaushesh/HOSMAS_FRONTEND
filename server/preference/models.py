@@ -37,7 +37,7 @@ class RoomTypeChoice(models.Model):
         unique_together = ('room_type', 'section')
 
     def __str__(self):
-        return f"{self.room_type.name}-{self.section}"
+        return f"{self.room_type.hostel.name}: {self.room_type.name} - {self.section}"
     
     def save(self, *args, **kwargs):
         cache.delete(f"choices-{self.section.id}")

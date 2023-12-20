@@ -7,6 +7,7 @@ from .models import Invitation, Student, Group, Batch, Section
 from dashboard.models import AllotmentStatus, AcademicSession
 from preference.models import RoomType
 from user.models import User
+from .tasks import send_teamleader_change_mail, left_group_mail
 from random import choice
 import string
 
@@ -271,7 +272,64 @@ class StudentProfileSerializer(serializers.ModelSerializer):
             instance.gender = validated_data.get('gender', instance.gender)
             instance.cg = validated_data.get('cg', instance.cg)
             instance.current_room = validated_data.get('current_room', instance.current_room)
-            instance.alloted_room = validated_data.get('alloted_room', instance.alloted_room)
+
+            updated_alloted_room = validated_data.get('alloted_room', instance.alloted_room)
+
+            if updated_alloted_room is not None and instance.alloted_room != updated_alloted_room:
+                  if instance.preview_room is not None:
+                        instance.preview_room = None
+                  try:
+                        gp = instance.leader_of_group
+                        if gp.members.count() > 0:
+                              newleader = gp.members.first()
+                              gp.leader = newleader
+
+                              ms = gp.members.all()
+
+                              updatedcg = gp.leader.cg  - instance.cg
+                              cnt = 0
+                              for member in ms:
+                                    updatedcg += member.cg
+                                    cnt += 1
+                              updatedcg /= cnt
+                              gp.cg = round(updatedcg, 2)
+                              gp.save()
+
+                              newleader.group = None
+                              newleader.save()
+
+                              for member in ms:
+                                    send_teamleader_change_mail.delay(gp.leader.name, gp.leader.rollno, member.user.email, member.name)
+                              send_teamleader_change_mail.delay(gp.leader.name, gp.leader.rollno, gp.leader.user.email, gp.leader.name)
+
+                              Group.objects.create(leader=instance, cg=instance.cg)
+                  
+                  except ObjectDoesNotExist:
+                        if instance.group is not None:
+                              gp = instance.group
+
+                              left_group_mail.delay(gp.leader.name, instance.name, instance.rollno, gp.leader.user.email)
+                              ms = gp.members.all()
+                              for m in ms:
+                                    if m != instance:
+                                          left_group_mail.delay(m.name, instance.name, instance.rollno, m.user.email)
+                              
+                              # due to prefetch, members were fetched before execution of above statement, so adjust cg of removed student
+                              updatedcg = gp.leader.cg  - instance.cg
+                              cnt = 0
+                              for member in ms:
+                                    updatedcg += member.cg
+                                    cnt += 1
+                              updatedcg /= cnt
+                              gp.cg = round(updatedcg, 2)
+                              gp.save()
+
+                              instance.group = None
+                              instance.save()
+
+                              Group.objects.create(leader=instance, cg=instance.cg)
+
+            instance.alloted_room = updated_alloted_room
             
             # if current_room is not None:
             #       instance.current_room = current_room

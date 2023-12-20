@@ -5,12 +5,13 @@ from django.db import models
 
 
 class AllotmentLogsStudent(models.Model):
+      name = models.CharField(max_length=200)
       email = models.CharField(max_length=200)
       phoneno = models.CharField(max_length=15)
       rollno = models.CharField(max_length=15)
       cg = models.FloatField()
-      preview_room = models.ForeignKey('preference.RoomType', on_delete=models.CASCADE)
-      group = models.ForeignKey('dashboard.AllotmentLogsGroup', on_delete=models.CASCADE, related_name='members')
+      preview_room = models.ForeignKey('preference.RoomType', on_delete=models.CASCADE, null=True, default=None)
+      group = models.ForeignKey('dashboard.AllotmentLogsGroup', on_delete=models.CASCADE, related_name='members', null=True, default=None)
 
       def __str__(self):
             return self.email

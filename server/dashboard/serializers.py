@@ -164,7 +164,7 @@ class SectionSerializer(serializers.ModelSerializer):
             updated_allotment_result_status = validated_data.get('is_allotment_result_public')
             if updated_allotment_result_status is not None:
                   if not instance.is_allotment_result_public and updated_allotment_result_status:
-                        students = Student.objects.filter(batch=instance.batch, gender=instance.gender, preview_room__is_null=False, alloted_room__is_null=True).all()
+                        students = Student.objects.filter(batch=instance.batch, gender=instance.gender, preview_room__isnull=False, alloted_room__isnull=True).all()
                         for student in students:
                               student.alloted_room  = student.preview_room
                               student.preview_room = None
@@ -198,7 +198,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 
 class AllotmentLogsStudentSerializer(serializers.ModelSerializer):
-      preview_room_type = StudentProfileRoomTypeSerializer(read_only=True)
+      preview_room_type = StudentProfileRoomTypeSerializer(read_only=True, source='preview_room')
       
       class Meta:
             model = AllotmentLogsStudent

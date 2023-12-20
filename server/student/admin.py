@@ -7,8 +7,23 @@ class StudentAdmin(admin.ModelAdmin):
 
       def batch__name(self, obj):
             return obj.batch.name
+      
+      def current_hostel(self, obj):
+            if obj.current_room is None:
+                  return None
+            return f"{obj.current_room.hostel.name}: {obj.current_room.name}"
+      
+      def preview_hostel(self, obj):
+            if obj.preview_room is None:
+                  return None
+            return f"{obj.preview_room.hostel.name}: {obj.preview_room.name}"
+      
+      def alloted_hostel(self, obj):
+            if obj.alloted_room is None:
+                  return None
+            return f"{obj.alloted_room.hostel.name}: {obj.alloted_room.name}"
 
-      list_display = ('id', 'user', 'name', 'rollno', 'phoneno', 'gender', 'cg', 'batch__name')
+      list_display = ('id', 'user', 'name', 'rollno', 'phoneno', 'gender', 'cg', 'batch__name', 'current_hostel', 'preview_hostel', 'alloted_hostel')
       list_filter = ('gender', 'batch')
       search_fields = ('user__email', 'name', 'rollno', 'phoneno')
 
@@ -39,7 +54,7 @@ class SectionAdmin(admin.ModelAdmin):
       def batch__name(self, obj):
             return obj.batch.name
 
-      list_display = ('id', 'batch__name', 'gender', 'is_allotment_enabled', 'is_retain_allowed', 'is_allotment_result_public')
+      list_display = ('id', 'batch__name', 'gender', 'is_allotment_enabled', 'is_retain_allowed', 'group_size_limit', 'is_allotment_result_public')
       list_filter = ('gender', )
       search_fields = ('batch__name', )
 

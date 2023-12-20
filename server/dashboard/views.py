@@ -599,7 +599,7 @@ class AddToGroupView(APIView):
       permission_classes = [IsAuthenticated, IsAdmin]
 
       def post(sef, request):
-            student = Student.objects.filter(rollno=request.data.get('rollno')).select_related('leader_of_group', 'defaulter').first()
+            student = Student.objects.filter(rollno=request.data.get('rollno')).select_related('leader_of_group', 'defaulter', 'group').prefetch_related('group__members').first()
             if student is None:
                   return Response({'detail': 'No Student Found!'}, status=status.HTTP_404_NOT_FOUND)
             
@@ -612,30 +612,43 @@ class AddToGroupView(APIView):
                   return Response({"detail": "This student is currently suspended from Hostel Allocation Process"}, status=status.HTTP_403_FORBIDDEN)
             except ObjectDoesNotExist:
                   pass
-            
-            try:
-                  gp = student.leader_of_group
-                  if gp==group:
-                        return Response({'detail': 'This student is already leader of this group.'}, status=status.HTTP_403_FORBIDDEN)
-                  if gp.members.count()>0:
-                        return Response({'detail': 'This student is leader of some another group! First transfer ownership of that group.'}, status=status.HTTP_403_FORBIDDEN)
-                  gp.delete()
-            except ObjectDoesNotExist:
-                  if student.group is not None:
-                        if student.group==group:
-                              return Response({'detail': 'This student is already a member of this group.'}, status=status.HTTP_403_FORBIDDEN)
-                        gp = student.group
-                        left_group_mail.delay(gp.leader.name, student.name, student.rollno, gp.leader.user.email)
-                        ms = gp.members.all()
-                        for m in ms:
-                              left_group_mail.delay(m.name, student.name, student.rollno, m.user.email)
-            
+
             with transaction.atomic():
+                  try:
+                        gp = student.leader_of_group
+                        if gp==group:
+                              return Response({'detail': 'This student is already leader of this group.'}, status=status.HTTP_403_FORBIDDEN)
+                        if gp.members.count()>0:
+                              return Response({'detail': 'This student is leader of some another group! First transfer ownership of that group.'}, status=status.HTTP_403_FORBIDDEN)
+                        gp.delete()
+                  except ObjectDoesNotExist:
+                        if student.group is not None:
+                              if student.group==group:
+                                    return Response({'detail': 'This student is already a member of this group.'}, status=status.HTTP_403_FORBIDDEN)
+                              
+                              gp = student.group
+                              left_group_mail.delay(gp.leader.name, student.name, student.rollno, gp.leader.user.email)
+                              ms = gp.members.all()
+                              for m in ms:
+                                    if m != student:
+                                          left_group_mail.delay(m.name, student.name, student.rollno, m.user.email)
+                              
+                              # due to prefetch, members were fetched before execution of above statement, so adjust cg of removed student
+                              updatedcg = gp.leader.cg  - student.cg
+                              cnt = 0
+                              for member in ms:
+                                    updatedcg += member.cg
+                                    cnt += 1
+                              updatedcg /= cnt
+                              gp.cg = round(updatedcg, 2)
+                              gp.save()
+
                   student.group = group
                   student.save()
 
-                  updatedcg = group.leader.cg
-                  cnt = 1
+                  # due to prefetch, members were fetched before execution of above statement, so adjust cg of added student
+                  updatedcg = group.leader.cg + student.cg
+                  cnt = 2
                   for member in group.members.all():
                         updatedcg += member.cg
                         cnt += 1
@@ -696,7 +709,7 @@ class RemoveFromGroupView(APIView):
       permission_classes = [IsAuthenticated, IsAdmin]
 
       def post(self, request):
-            student = Student.objects.filter(rollno=request.data.get('rollno')).select_related('leader_of_group', 'defaulter').first()
+            student = Student.objects.filter(rollno=request.data.get('rollno')).select_related('leader_of_group', 'defaulter', 'group').prefetch_related('group__members').first()
             if student is None:
                   return Response({'detail': 'No Student Found!'}, status=status.HTTP_404_NOT_FOUND)
             
@@ -711,6 +724,17 @@ class RemoveFromGroupView(APIView):
             with transaction.atomic():
                   student.group = None
                   student.save()
+
+                  # due to prefetch, members were fetched before execution of above statement, so adjust cg of removed student
+                  updatedcg = group.leader.cg - student.cg
+                  cnt = 0
+                  for member in group.members.all():
+                        updatedcg += member.cg
+                        cnt += 1
+                  updatedcg /= cnt
+                  group.cg = round(updatedcg, 2)
+                  group.save()
+
                   indvgroup = Group(leader = student, cg = student.cg)
                   indvgroup.save()
             
@@ -841,6 +865,8 @@ class ExportGroupsView(APIView):
                   ('Batch', request.data.get('include_batch', True)),
                   ('Current Hostel', request.data.get('include_current_hostel', True)),
                   ('Current Room Type', request.data.get('include_current_hostel', True)),
+                  ('Preview Hostel', request.data.get('include_preview_hostel', True)),
+                  ('Preview Room Type', request.data.get('include_preview_hostel', True)),
                   ('Alloted Hostel', request.data.get('include_alloted_hostel', True)),
                   ('Alloted Room Type', request.data.get('include_alloted_hostel', True)),
             ])
@@ -872,6 +898,8 @@ class ExportGroupsView(APIView):
                   for field in student_fields:
                         header.append(f"{member_name} {field}")
 
+            header.append('Is Retaining')
+
             for i in range(1, preferences_cnt+1):
                   header.append(f'Preference {i} Hostel')            
                   header.append(f'Preference {i} Room Type')
@@ -885,8 +913,8 @@ class ExportGroupsView(APIView):
                   queryset = Group.objects.filter(leader__batch=section.batch, leader__gender=section.gender).select_related('leader__user', 'leader__batch', 'leader__current_room__hostel', 'leader__alloted_room__hostel').prefetch_related('members__user', 'members__batch', 'members__current_room__hostel', 'members__alloted_room__hostel', 'preferences__room_type_choice__room_type__hostel').all()
 
                   for group in queryset:
-                        cnt = 1
-                        row = [group.id, group.cg, group.members.count() + 1]
+                        cnt = 0
+                        row = [group.id, group.members.count() + 1, group.cg]
                         members_list = [group.leader] + list(group.members.all())
                         for member in members_list:
                               if include.get('Roll Number', False):
@@ -903,14 +931,72 @@ class ExportGroupsView(APIView):
                                     row.append(member.gender)
                               if include.get('Batch', False):
                                     row.append(member.batch.name)
-                              if include.get('Current Hostel', False) and member.current_room is not None:
-                                    row.append(member.current_room.hostel.name)
-                              if include.get('Current Room Type', False) and member.current_room is not None:
-                                    row.append(member.current_room.name)
-                              if include.get('Alloted Hostel', False) and member.alloted_room is not None:
-                                    row.append(member.alloted_room.hostel.name)
-                              if include.get('Alloted Room Type', False) and member.alloted_room is not None:
-                                    row.append(member.alloted_room.name)
+                              if include.get('Current Hostel', False):
+                                    if member.current_room is None:
+                                          row.append('')
+                                    else:
+                                          row.append(member.current_room.hostel.name)
+                              if include.get('Current Room Type', False):
+                                    if member.current_room is None:
+                                          row.append('')
+                                    else:
+                                          row.append(member.current_room.name)
+                              if include.get('Preview Hostel', False):
+                                    if member.preview_room is None:
+                                          row.append('')
+                                    else:
+                                          row.append(member.preview_room.hostel.name)
+                              if include.get('Preview Room Type', False):
+                                    if member.preview_room is None:
+                                          row.append('')
+                                    else:
+                                          row.append(member.preview_room.name)
+                              if include.get('Alloted Hostel', False):
+                                    if member.alloted_room is None:
+                                          row.append('')
+                                    else:
+                                          row.append(member.alloted_room.hostel.name)
+                              if include.get('Alloted Room Type', False):
+                                    if member.alloted_room is None:
+                                          row.append('')
+                                    else:
+                                          row.append(member.alloted_room.name)
+                              cnt += 1
+
+                        while cnt < group_size_limit:
+                              if include.get('Roll Number', False):
+                                    row.append('')
+                              if include.get('Email Address', False):
+                                    row.append('')
+                              if include.get('Name', False):
+                                    row.append('')
+                              if include.get('Phone Number', False):
+                                    row.append('')
+                              if include.get('CG', False):
+                                    row.append('')
+                              if include.get('Gender', False):
+                                    row.append('')
+                              if include.get('Batch', False):
+                                    row.append('')
+                              if include.get('Current Hostel', False):
+                                    row.append('')
+                              if include.get('Current Room Type', False):
+                                    row.append('')
+                              if include.get('Preview Hostel', False):
+                                    row.append('')
+                              if include.get('Preview Room Type', False):
+                                    row.append('')
+                              if include.get('Alloted Hostel', False):
+                                    row.append('')
+                              if include.get('Alloted Room Type', False):
+                                    row.append('')
+                              cnt += 1
+
+                        if group.is_retained:
+                              row.append(True)
+                        else:
+                              row.append(False)
+
                         for preference in group.preferences.order_by('priority').all():
                               row.append(preference.room_type_choice.room_type.hostel.name)
                               row.append(preference.room_type_choice.room_type.name)
@@ -950,6 +1036,8 @@ class ExportStudentsView(APIView):
                   ('Batch', request.data.get('include_batch', True)),
                   ('Current Hostel', request.data.get('include_current_hostel', True)),
                   ('Current Room Type', request.data.get('include_current_hostel', True)),
+                  ('Preview Hostel', request.data.get('include_preview_hostel', True)),
+                  ('Preview Room Type', request.data.get('include_preview_hostel', True)),
                   ('Alloted Hostel', request.data.get('include_alloted_hostel', True)),
                   ('Alloted Room Type', request.data.get('include_alloted_hostel', True)),
             ])
@@ -983,14 +1071,36 @@ class ExportStudentsView(APIView):
                               row.append(student.gender)
                         if include.get('Batch', False):
                               row.append(student.batch.name)
-                        if include.get('Current Hostel', False) and student.current_room is not None:
-                              row.append(student.current_room.hostel.name)
-                        if include.get('Current Room Type', False) and student.current_room is not None:
-                              row.append(student.current_room.name)
-                        if include.get('Alloted Hostel', False) and student.alloted_room is not None:
-                              row.append(student.alloted_room.hostel.name)
-                        if include.get('Alloted Room Type', False) and student.alloted_room is not None:
-                              row.append(student.alloted_room.name)
+                        if include.get('Current Hostel', False):
+                              if student.current_room is None:
+                                    row.append('')
+                              else:
+                                    row.append(student.current_room.hostel.name)
+                        if include.get('Current Room Type', False):
+                              if student.current_room is None:
+                                    row.append('')
+                              else:
+                                    row.append(student.current_room.name)
+                        if include.get('Preview Hostel', False):
+                              if student.preview_room is None:
+                                    row.append('')
+                              else:
+                                    row.append(student.preview_room.hostel.name)
+                        if include.get('Preview Room Type', False):
+                              if student.preview_room is None:
+                                    row.append('')
+                              else:
+                                    row.append(student.preview_room.name)
+                        if include.get('Alloted Hostel', False):
+                              if student.alloted_room is None:
+                                    row.append('')
+                              else:
+                                    row.append(student.alloted_room.hostel.name)
+                        if include.get('Alloted Room Type', False):
+                              if student.alloted_room is None:
+                                    row.append('')
+                              else:
+                                    row.append(student.alloted_room.name)
                         ws.append(row)
 
             wb.save(path)
@@ -1059,7 +1169,7 @@ class AllotmentView(APIView):
             logs_instance.save()
 
             if not isinstance(section_ids, list):
-                  return Response({'detail': 'Invalid data type for sections!'}, sttaus=status.HTTP_400_BAD_REQUEST)
+                  return Response({'detail': 'Invalid data type for sections!'}, status=status.HTTP_400_BAD_REQUEST)
             
             for section_id in section_ids:
 
@@ -1067,36 +1177,89 @@ class AllotmentView(APIView):
 
                   # storing the rooms capacity in a dictionary
                   choices_queryset = section.choices.all()
-                  choices_size = {}
+                  offered_room_types_capacity = {}
                   for choice in choices_queryset:
-                        choices_size[choice.id] = choice.capacity
+                        offered_room_types_capacity[choice.room_type.id] = choice.capacity
                   
                   # Subtract Manually Alloted Students from capacity
-                  alloted_queryset = Student.objects.filter(batch=section.batch, gender=section.gender, alloted_room__is_null=False).all()
+                  alloted_queryset = Student.objects.filter(batch=section.batch, gender=section.gender, alloted_room__isnull=False).select_related('leader_of_group', 'group').prefetch_related('leader_of_group__members', 'group__members').all()
+                  alloted_students_map = {}
                   for student in alloted_queryset:
-                        choice = RoomTypeChoice.objects.filter(section=section, room_type=student.alloted_room).first()
-                        choice[choice.id] -= 1
+                        try:
+                              gp = student.leader_of_group
+                              if gp.members.count() > 0:
+                                    newleader = gp.members.first()
+                                    gp.leader = newleader
+
+                                    ms = gp.members.all()
+
+                                    updatedcg = gp.leader.cg  - student.cg
+                                    cnt = 0
+                                    for member in ms:
+                                          updatedcg += member.cg
+                                          cnt += 1
+                                    updatedcg /= cnt
+                                    gp.cg = round(updatedcg, 2)
+                                    gp.save()
+
+                                    newleader.group = None
+                                    newleader.save()
+
+                                    for member in ms:
+                                          send_teamleader_change_mail.delay(gp.leader.name, gp.leader.rollno, member.user.email, member.name)
+                                    send_teamleader_change_mail.delay(gp.leader.name, gp.leader.rollno, gp.leader.user.email, gp.leader.name)
+
+                                    Group.objects.create(leader=student, cg=student.cg)
+                        
+                        except ObjectDoesNotExist:
+                              if student.group is not None:
+                                    gp = student.group
+
+                                    left_group_mail.delay(gp.leader.name, student.name, student.rollno, gp.leader.user.email)
+                                    ms = gp.members.all()
+                                    for m in ms:
+                                          if m != student:
+                                                left_group_mail.delay(m.name, student.name, student.rollno, m.user.email)
+                                    
+                                    # due to prefetch, members were fetched before execution of above statement, so adjust cg of removed student
+                                    updatedcg = gp.leader.cg  - student.cg
+                                    cnt = 0
+                                    for member in ms:
+                                          updatedcg += member.cg
+                                          cnt += 1
+                                    updatedcg /= cnt
+                                    gp.cg = round(updatedcg, 2)
+                                    gp.save()
+
+                                    student.group = None
+                                    student.save()
+
+                                    Group.objects.create(leader=student, cg=student.cg)
+
+                        offered_room_types_capacity[student.alloted_room.id] -= 1
+                        alloted_students_map[student.id] = True
                   
                   # Handing groups that retained their previous room
-                  if not section.is_retain_allowed:
-                        retain_groups = Group.objects.filter(is_retained=True, leader__batch=section.batch, leader__gender=section.gender).all()
-                        for group in retain_groups:
-                              if choices_size[group.leader.current_room.id] > 0:
-                                    group.leader.preview_room = group.leader.current_room
-                                    group.leader.save()
-                                    choices_size[group.leader.alloted_room.id] -= 1
+                  retain_groups = Group.objects.filter(is_retained=True, leader__batch=section.batch, leader__gender=section.gender).all()
+                  for group in retain_groups:
+                        if offered_room_types_capacity[group.leader.current_room.id] > 0 and not alloted_students_map.get(group.leader.id, False):
+                              group.leader.preview_room = group.leader.current_room
+                              group.leader.save()
+                              offered_room_types_capacity[group.leader.current_room.id] -= 1
+                              retained_students_cnt += 1
+                        for member in group.members.all():
+                              if offered_room_types_capacity[member.current_room.id] > 0 and not alloted_students_map.get(member.id, False):
+                                    member.preview_room = member.current_room
+                                    member.save()
+                                    offered_room_types_capacity[member.current_room.id] -= 1
                                     retained_students_cnt += 1
-                              for member in group.members.all():
-                                    if choices_size[member.current_room.id] > 0:
-                                          member.preview_room = member.current_room
-                                          member.save()
-                                          choices_size[member.alloted_room.id] -= 1
-                                          retained_students_cnt += 1
-                              retained_groups_cnt += 1
+                        retained_groups_cnt += 1
 
                   # Handling groups that have filled preferences
                   unalloted_groups = []
-                  groups = Group.objects.filter(is_retained=False).order_by('-cg').all()
+                  groups = Group.objects.filter(is_retained=False).annotate(
+                        preferences_count = Count('preferences')
+                  ).filter(preferences_count__gt=0).order_by('-cg').all()
                   for group in groups:
                         members = group.members.all()
                         group_size = len(members) + 1
@@ -1104,17 +1267,22 @@ class AllotmentView(APIView):
                         got_allotment = False
                         for preference in preferences:
                               choice = preference.room_type_choice
-                              if choices_size[choice.id] < group_size:
+                              cnt = 0
+                              if offered_room_types_capacity[choice.room_type.id] < group_size:
                                     continue
-                              room_type = choice.room_type
-                              group.leader.preview_room = room_type
-                              group.leader.save()
+                              if not alloted_students_map.get(group.leader.id, False):
+                                    room_type = choice.room_type
+                                    group.leader.preview_room = room_type
+                                    group.leader.save()
+                                    cnt += 1
                               for member in group.members.all():
-                                    member.preview_room = room_type
-                                    member.save()
-                              choices_size[choice.id] -= group_size
+                                    if not alloted_students_map.get(group.leader.id, False):
+                                          member.preview_room = room_type
+                                          member.save()
+                                          cnt += 1
+                              offered_room_types_capacity[choice.room_type.id] -= cnt
                               got_allotment = True
-                              alloted_students_cnt += group_size
+                              alloted_students_cnt += cnt
                               alloted_groups_cnt += 1
                               break
                         if not got_allotment:
@@ -1127,19 +1295,20 @@ class AllotmentView(APIView):
                         for member in group.members.all():
                               students.append(member)
                         students.sort(key = lambda x: x.cg, reverse = True)
-                        preferences = Preference.objects.filter(group=group).order_by('priority').all()
+                        preferences = group.preferences.order_by('priority').all()
                         ptr = 0
+                        
                         for preference in preferences:
-                              choice = preference.room_type_choice
-                              while choices_size[choice.id] > 1:
-                                    students[ptr].preview_room = choice.room_type
+                              room_type = preference.room_type_choice.room_type
+                              while ptr < len(students) and offered_room_types_capacity[room_type.id] > 0:
+                                    students[ptr].preview_room = room_type
                                     students[ptr].save()
-                                    choices_size[choice.id] -= 1
+                                    offered_room_types_capacity[room_type.id] -= 1
                                     ptr += 1
                         
                         logs_leader = AllotmentLogsStudent.objects.create(
                               name = leader.name,
-                              email = leader.email,
+                              email = leader.user.email,
                               rollno = leader.rollno,
                               phoneno = leader.phoneno,
                               cg = leader.cg,
@@ -1148,13 +1317,14 @@ class AllotmentView(APIView):
 
                         logs_group = AllotmentLogsGroup.objects.create(
                               leader = logs_leader,
-                              cg = group.cg
+                              cg = group.cg,
+                              status = logs_instance
                         )
 
                         for member in group.members.all():
                               AllotmentLogsStudent.objects.create(
                                     name = leader.name,
-                                    email = member.email,
+                                    email = member.user.email,
                                     rollno = member.rollno,
                                     phoneno = member.phoneno,
                                     cg = member.cg,

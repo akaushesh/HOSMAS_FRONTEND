@@ -25,7 +25,7 @@ class RoomTypeChoiceAdmin(admin.ModelAdmin):
         return obj.section.gender
     
     def room_type__name(self, obj):
-        return obj.room_type.name
+        return f"{obj.room_type.hostel.name}: {obj.room_type.name}"
 
     list_display = ('id', 'section', 'batch', 'gender', 'room_type__name', 'capacity')
 
