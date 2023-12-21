@@ -1,4 +1,5 @@
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import transaction
 
 from rest_framework.views import APIView
 from rest_framework import status
@@ -152,7 +153,7 @@ class AcceptInvitationView(APIView):
       permission_classes = [IsAuthenticated, IsStudent, IsNotDefaulter, IsPreferenceFillingLive]
 
       def post(self,request):
-            invitation = Invitation.objects.filter(id=request.data.get('id')).select_related('for_group').first()
+            invitation = Invitation.objects.filter(id=request.data.get('id')).select_related('for_group').prefetch_related('for_group__members').first()
             if invitation is None:
                   return Response({'detail': 'Invalid invitation id!'}, status=status.HTTP_403_FORBIDDEN)
 
@@ -166,48 +167,49 @@ class AcceptInvitationView(APIView):
             if section is None or group.members.count()>=section.group_size_limit-1:
                   return Response({'detail': 'Unable to accept this invitation because the group is already full!'}, status=status.HTTP_403_FORBIDDEN)
             
-            try:
-                  curr_group = student.leader_of_group
-                  if (curr_group.members.count()>0):
-                        return Response({'detail': 'You\'re a group leader! First tranfer your group ownership in order to accept any invitation.'}, status=status.HTTP_403_FORBIDDEN)
-                  
-                  rev_invitation = Invitation.objects.filter(to=group.leader, for_group=curr_group).first()
-                  if rev_invitation is not None:
-                        rev_invitation.delete()
-                  
-                  curr_group.delete()
-            except ObjectDoesNotExist:
-                  pass
+            with transaction.atomic():
+                  try:
+                        curr_group = student.leader_of_group
+                        if (curr_group.members.count()>0):
+                              return Response({'detail': 'You\'re a group leader! First tranfer your group ownership in order to accept any invitation.'}, status=status.HTTP_403_FORBIDDEN)
+                        
+                        rev_invitation = Invitation.objects.filter(to=group.leader, for_group=curr_group).first()
+                        if rev_invitation is not None:
+                              rev_invitation.delete()
+                        
+                        curr_group.delete()
+                  except ObjectDoesNotExist:
+                        pass
 
-            if student.group is not None:
-                  prevgroup = student.group
-                  updatedcg = prevgroup.leader.cg
-                  cnt = 1
-                  for member in prevgroup.members.all():
+                  if student.group is not None:
+                        prevgroup = student.group
+                        updatedcg = prevgroup.leader.cg - student.cg
+                        cnt = 0
+                        for member in prevgroup.members.all():
+                              updatedcg += member.cg
+                              cnt += 1
+                        updatedcg /= cnt
+                        prevgroup.cg = round(updatedcg, 2)
+                        prevgroup.save()
+                        # inform all previous group members to say goodbye
+                        members = prevgroup.members.all()
+                        for member in members:
+                              left_group_mail.delay(member.name, student.name, student.rollno, member.user.email)
+                        left_group_mail.delay(prevgroup.leader.name, student.name, student.rollno, prevgroup.leader.user.email )
+
+                  student.group = group
+                  student.save()
+
+                  invitation.delete()
+
+                  updatedcg = group.leader.cg + student.cg
+                  cnt = 2
+                  for member in group.members.all():
                         updatedcg += member.cg
                         cnt += 1
                   updatedcg /= cnt
-                  prevgroup.cg = round(updatedcg, 2)
-                  prevgroup.save()
-                  # inform all previous group members to say goodbye
-                  members = prevgroup.members.all()
-                  for member in members:
-                        left_group_mail.delay(member.name, student.name, student.rollno, member.user.email)
-                  left_group_mail.delay(prevgroup.leader.name, student.name, student.rollno, prevgroup.leader.user.email )
-
-            student.group = group
-            student.save()
-
-            invitation.delete()
-
-            updatedcg = group.leader.cg
-            cnt = 1
-            for member in group.members.all():
-                  updatedcg += member.cg
-                  cnt += 1
-            updatedcg /= cnt
-            group.cg = round(updatedcg, 2)
-            group.save()
+                  group.cg = round(updatedcg, 2)
+                  group.save()
             
             # email to leader and members
             lead = group.leader
@@ -250,14 +252,15 @@ class TranferGroupLeadershipView(APIView):
             if newleader.group is None or newleader.group!=group:
                   return Response({'detail': 'You can only tranfer ownership to one of your group member!'}, status=status.HTTP_403_FORBIDDEN)
 
-            newleader.group = None
-            newleader.save()
+            with transaction.atomic():
+                  newleader.group = None
+                  newleader.save()
 
-            group.leader = newleader
-            group.save()
-            
-            student.group = group
-            student.save()
+                  group.leader = newleader
+                  group.save()
+                  
+                  student.group = group
+                  student.save()
             
             members = group.members.all()
             for member in members:
@@ -271,22 +274,34 @@ class LeaveGroupView(APIView):
       permission_classes = [IsAuthenticated, IsStudent, IsPreferenceFillingLive]
 
       def patch(self, request):
-            student = Student.objects.filter(user=request.user).select_related('leader_of_group', 'group').first()
+            student = Student.objects.filter(user=request.user).select_related('leader_of_group', 'group').prefetch_related('group__members').first()
             try:
                   _ = student.leader_of_group
                   return Response({'detail': 'You must tranfer the group ownership to one of the group members to leave this group!'}, status=status.HTTP_403_FORBIDDEN)
-            except:
+            except ObjectDoesNotExist:
                   group = student.group
                   if group is None:
                         return Response({'detail': 'Only a Group Member is authorized to perform this action!'}, status=status.HTTP_403_FORBIDDEN)
-            student.group = None
-            student.save()
-            indvgroup = Group(leader = student, cg = student.cg)
-            indvgroup.save()
             
+            with transaction.atomic():
+                  members = group.members.all()
+                  updatedcg = group.leader.cg - student.cg
+                  cnt = 0
+                  for member in members:
+                        updatedcg += member.cg
+                        cnt += 1
+                  updatedcg /= cnt
+                  group.cg = round(updatedcg, 2)
+                  group.save()
+                  
+                  student.group = None
+                  student.save()
+
+                  indvgroup = Group(leader = student, cg = student.cg)
+                  indvgroup.save()
+                  
             left_group_mail.delay(group.leader.name, student.name, student.rollno, group.leader.user.email)
             
-            members = group.members.all()
             for member in members:
                   left_group_mail.delay(member.name, student.name, student.rollno, member.user.email)
             return Response(status=status.HTTP_200_OK)
