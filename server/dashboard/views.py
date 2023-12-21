@@ -15,13 +15,13 @@ from .permissions import IsAdmin
 
 from preference.models import Hostel, RoomType, RoomTypeChoice
 from student.models import Batch, Section, Student, Group
-from .models import AllotmentStatus, AcademicSession, Faq, AllotmentLogsGroup, AllotmentLogsStudent
+from .models import AllotmentStatus, AcademicSession, Faq
 
 from .serializers import HostelSerializer, HostelSingleSerializer, RoomTypeSerializer, RoomTypeChoiceSerializer, RoomTypeOptionSerializer, BatchSerializer, BatchUninitializedSerializer, SectionSerializer, ProfileSerializer, AllotmentStatusSerializer, SectionRoomTypeSerializer, AcademicSessionSerializer, FAQSerializer, DefaulterSerializer
 from .serializers import *
 from student.serializers import StudentSerializer, GroupSerializer, StudentProfileSerializer, StudentSerializer
 
-from .tasks import send_reminder_mail, import_students, import_defaulters
+from .tasks import send_reminder_mail, import_students, import_defaulters, allot, studentfileformat
 
 from datetime import datetime
 import csv, os, json
@@ -30,8 +30,6 @@ from openpyxl.styles import Font
 from collections import OrderedDict
 
 from preference.models import Preference
-
-studentfileformat = ('rollno', 'email', 'name', 'phoneno', 'cg', 'batch', 'gender', 'current_hostel', 'current_room_type', 'alloted_hostel', 'alloted_room_type')
 
 # Create your views here.
 
@@ -196,7 +194,13 @@ class UpdateObjectView(APIView):
                   instance = Section.objects.filter(id=id).first()
                   if instance is None:
                         return Response(status=status.HTTP_404_NOT_FOUND)
-                  serializer = SectionSerializer(instance, request.data, partial=True)
+                  fee_submission_deadline = request.data.get('fee_submission_deadline', '')
+                  reporting_information = request.data.get('reporting_information', '')
+                  context = {
+                        'fee_submission_deadline': fee_submission_deadline,
+                        'reporting_information': reporting_information
+                  }
+                  serializer = SectionSerializer(instance, request.data, context=context, partial=True)
             elif model=='batch':
                   instance = Batch.objects.filter(id=id).first()
                   if instance is None:
@@ -1153,200 +1157,9 @@ class AllotmentView(APIView):
       permission_classes = [IsAuthenticated, IsAdmin]
 
       def post(self, request):
-
             section_ids = request.data.get('sections')
-
-            retained_students_cnt = 0
-            retained_groups_cnt = 0
-
-            alloted_students_cnt = 0
-            alloted_groups_cnt = 0
-
-            partial_allot_students_cnt = 0
-            partial_allot_groups_cnt = 0
-
-            logs_instance = AllotmentStatus()
-            logs_instance.save()
-
-            if not isinstance(section_ids, list):
-                  return Response({'detail': 'Invalid data type for sections!'}, status=status.HTTP_400_BAD_REQUEST)
-            
-            for section_id in section_ids:
-
-                  section = Section.objects.filter(id=section_id).first()
-
-                  # storing the rooms capacity in a dictionary
-                  choices_queryset = section.choices.all()
-                  offered_room_types_capacity = {}
-                  for choice in choices_queryset:
-                        offered_room_types_capacity[choice.room_type.id] = choice.capacity
-                  
-                  # Subtract Manually Alloted Students from capacity
-                  alloted_queryset = Student.objects.filter(batch=section.batch, gender=section.gender, alloted_room__isnull=False).select_related('leader_of_group', 'group').prefetch_related('leader_of_group__members', 'group__members').all()
-                  alloted_students_map = {}
-                  for student in alloted_queryset:
-                        try:
-                              gp = student.leader_of_group
-                              if gp.members.count() > 0:
-                                    newleader = gp.members.first()
-                                    gp.leader = newleader
-
-                                    ms = gp.members.all()
-
-                                    updatedcg = gp.leader.cg  - student.cg
-                                    cnt = 0
-                                    for member in ms:
-                                          updatedcg += member.cg
-                                          cnt += 1
-                                    updatedcg /= cnt
-                                    gp.cg = round(updatedcg, 2)
-                                    gp.save()
-
-                                    newleader.group = None
-                                    newleader.save()
-
-                                    for member in ms:
-                                          send_teamleader_change_mail.delay(gp.leader.name, gp.leader.rollno, member.user.email, member.name)
-                                    send_teamleader_change_mail.delay(gp.leader.name, gp.leader.rollno, gp.leader.user.email, gp.leader.name)
-
-                                    Group.objects.create(leader=student, cg=student.cg)
-                        
-                        except ObjectDoesNotExist:
-                              if student.group is not None:
-                                    gp = student.group
-
-                                    left_group_mail.delay(gp.leader.name, student.name, student.rollno, gp.leader.user.email)
-                                    ms = gp.members.all()
-                                    for m in ms:
-                                          if m != student:
-                                                left_group_mail.delay(m.name, student.name, student.rollno, m.user.email)
-                                    
-                                    # due to prefetch, members were fetched before execution of above statement, so adjust cg of removed student
-                                    updatedcg = gp.leader.cg  - student.cg
-                                    cnt = 0
-                                    for member in ms:
-                                          updatedcg += member.cg
-                                          cnt += 1
-                                    updatedcg /= cnt
-                                    gp.cg = round(updatedcg, 2)
-                                    gp.save()
-
-                                    student.group = None
-                                    student.save()
-
-                                    Group.objects.create(leader=student, cg=student.cg)
-
-                        offered_room_types_capacity[student.alloted_room.id] -= 1
-                        alloted_students_map[student.id] = True
-                  
-                  # Handing groups that retained their previous room
-                  retain_groups = Group.objects.filter(is_retained=True, leader__batch=section.batch, leader__gender=section.gender).all()
-                  for group in retain_groups:
-                        if offered_room_types_capacity[group.leader.current_room.id] > 0 and not alloted_students_map.get(group.leader.id, False):
-                              group.leader.preview_room = group.leader.current_room
-                              group.leader.save()
-                              offered_room_types_capacity[group.leader.current_room.id] -= 1
-                              retained_students_cnt += 1
-                        for member in group.members.all():
-                              if offered_room_types_capacity[member.current_room.id] > 0 and not alloted_students_map.get(member.id, False):
-                                    member.preview_room = member.current_room
-                                    member.save()
-                                    offered_room_types_capacity[member.current_room.id] -= 1
-                                    retained_students_cnt += 1
-                        retained_groups_cnt += 1
-
-                  # Handling groups that have filled preferences
-                  unalloted_groups = []
-                  groups = Group.objects.filter(is_retained=False).annotate(
-                        preferences_count = Count('preferences')
-                  ).filter(preferences_count__gt=0).order_by('-cg').all()
-                  for group in groups:
-                        members = group.members.all()
-                        group_size = len(members) + 1
-                        preferences = Preference.objects.filter(group=group).order_by('priority').all()
-                        got_allotment = False
-                        for preference in preferences:
-                              choice = preference.room_type_choice
-                              cnt = 0
-                              if offered_room_types_capacity[choice.room_type.id] < group_size:
-                                    continue
-                              if not alloted_students_map.get(group.leader.id, False):
-                                    room_type = choice.room_type
-                                    group.leader.preview_room = room_type
-                                    group.leader.save()
-                                    cnt += 1
-                              for member in group.members.all():
-                                    if not alloted_students_map.get(group.leader.id, False):
-                                          member.preview_room = room_type
-                                          member.save()
-                                          cnt += 1
-                              offered_room_types_capacity[choice.room_type.id] -= cnt
-                              got_allotment = True
-                              alloted_students_cnt += cnt
-                              alloted_groups_cnt += 1
-                              break
-                        if not got_allotment:
-                              unalloted_groups.append(group)
-                  
-                  # Handle groups that can't get same hostel
-                  for group in unalloted_groups:
-                        leader = group.leader
-                        students = [group.leader]
-                        for member in group.members.all():
-                              students.append(member)
-                        students.sort(key = lambda x: x.cg, reverse = True)
-                        preferences = group.preferences.order_by('priority').all()
-                        ptr = 0
-                        
-                        for preference in preferences:
-                              room_type = preference.room_type_choice.room_type
-                              while ptr < len(students) and offered_room_types_capacity[room_type.id] > 0:
-                                    students[ptr].preview_room = room_type
-                                    students[ptr].save()
-                                    offered_room_types_capacity[room_type.id] -= 1
-                                    ptr += 1
-                        
-                        logs_leader = AllotmentLogsStudent.objects.create(
-                              name = leader.name,
-                              email = leader.user.email,
-                              rollno = leader.rollno,
-                              phoneno = leader.phoneno,
-                              cg = leader.cg,
-                              preview_room = leader.preview_room
-                        )
-
-                        logs_group = AllotmentLogsGroup.objects.create(
-                              leader = logs_leader,
-                              cg = group.cg,
-                              status = logs_instance
-                        )
-
-                        for member in group.members.all():
-                              AllotmentLogsStudent.objects.create(
-                                    name = leader.name,
-                                    email = member.user.email,
-                                    rollno = member.rollno,
-                                    phoneno = member.phoneno,
-                                    cg = member.cg,
-                                    preview_room = member.preview_room,
-                                    group = logs_group
-                              )
-                        
-                        partial_allot_groups_cnt += 1
-                        partial_allot_students_cnt += len(students)
-                  
-                  logs_instance.sections.add(section)
-
-            logs_instance.retained_students_cnt = retained_students_cnt
-            logs_instance.retained_groups_cnt = retained_groups_cnt
-            logs_instance.alloted_students_cnt = alloted_students_cnt
-            logs_instance.alloted_groups_cnt = alloted_groups_cnt
-            logs_instance.partial_allot_students_cnt = partial_allot_students_cnt
-            logs_instance.partial_allot_groups_cnt = partial_allot_groups_cnt
-            logs_instance.save()
-            
-            serializer = AllotmentStatusSerializer(logs_instance)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            allot.delay(section_ids)
+            return Response(status=status.HTTP_202_ACCEPTED)
 
 
 class BatchAnalyticsView(APIView):

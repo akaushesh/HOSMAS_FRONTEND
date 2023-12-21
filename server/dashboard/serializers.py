@@ -8,10 +8,11 @@ from student.serializers import StudentProfileSerializer, StudentProfileRoomType
 from user.models import User
 from .models import AllotmentStatus, AcademicSession, Faq, AllotmentLogsGroup, AllotmentLogsStudent
 import json, string
-from .tasks import send_start_allocation_mail
+from .tasks import start_preference_filling, release_allotment_results
 from random import choice
 from collections import OrderedDict
 from user.models import ResetSlug
+
 
 class HostelSerializer(serializers.ModelSerializer):
       # Serializer for representing data of all hostels
@@ -129,46 +130,14 @@ class SectionSerializer(serializers.ModelSerializer):
             updated_allotment_status = validated_data.get('is_allotment_enabled')
             if updated_allotment_status is not None:
                   if not instance.is_allotment_enabled and updated_allotment_status:
-                        # Send mails to all section's students    
-                        groups = Group.objects.filter(Q(leader__batch = instance.batch)
-                                                      & Q(leader__gender = instance.gender)).all()
-                        for group in groups:
-                              for student in group.members.all():
-                                    user = student.user
-                                    slug_instance = ResetSlug.objects.filter(user=user).first()
-                                    if slug_instance is None:
-                                          while True:
-                                                slug = ''.join(choice(string.ascii_letters + string.digits + '-') for _ in range(135))
-                                                if not ResetSlug.objects.filter(slug=slug).exists():
-                                                      break
-                                          slug_instance = ResetSlug(user=user, slug=slug)
-                                          slug_instance.save()
-                                    user_slug = slug_instance.slug
-                                    send_start_allocation_mail.delay(student.name, user.email, user_slug)
-                              lead = group.leader
-                              user = lead.user
-                              slug_instance = ResetSlug.objects.filter(user=user).first()
-                              if slug_instance is None:
-                                    while True:
-                                          slug = ''.join(choice(string.ascii_letters + string.digits + '-') for _ in range(135))
-                                          if not ResetSlug.objects.filter(slug=slug).exists():
-                                                break
-                                    slug_instance = ResetSlug(user=user, slug=slug)
-                                    slug_instance.save()
-                              user_slug = slug_instance.slug
-                              send_start_allocation_mail.delay(lead.name, user.email, user_slug)
-                        
+                        start_preference_filling.delay(instance.id)
                   instance.is_allotment_enabled = updated_allotment_status
 
             # Check allotment result status and if made public, finalize result
             updated_allotment_result_status = validated_data.get('is_allotment_result_public')
             if updated_allotment_result_status is not None:
                   if not instance.is_allotment_result_public and updated_allotment_result_status:
-                        students = Student.objects.filter(batch=instance.batch, gender=instance.gender, preview_room__isnull=False, alloted_room__isnull=True).all()
-                        for student in students:
-                              student.alloted_room  = student.preview_room
-                              student.preview_room = None
-                              student.save()
+                        release_allotment_results.delay(instance.id, self.context.get('fee_submission_deadline'), self.context.get('reporting_information'))
                   instance.is_allotment_result_public = updated_allotment_result_status
 
             instance.is_retain_allowed = validated_data.get('is_retain_allowed', instance.is_retain_allowed)

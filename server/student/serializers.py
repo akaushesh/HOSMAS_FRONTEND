@@ -97,7 +97,7 @@ class StudentProfileRoomTypeSerializer(serializers.ModelSerializer):
       
       class Meta:
             model = RoomType
-            fields = ['id', 'room_type_id', 'room_type', 'hostel_id', 'hostel']
+            fields = ['id', 'room_type_id', 'room_type', 'hostel_id', 'hostel', 'fee']
             extra_kwargs = {
                   'id': {'read_only': False, 'write_only': True}
             }

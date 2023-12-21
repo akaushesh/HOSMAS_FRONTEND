@@ -12,7 +12,7 @@ class RoomTypeAdmin(admin.ModelAdmin):
     def hostel__name(self, obj):
         return obj.hostel.name
 
-    list_display = ('id', 'name', 'hostel__name', 'room_size', 'rooms_count')
+    list_display = ('id', 'name', 'hostel__name', 'room_size', 'rooms_count', 'fee')
     list_filter = ('hostel', )
     search_fields = ('name', 'hostel__name')
 
@@ -45,7 +45,7 @@ class PreferenceAdmin(admin.ModelAdmin):
     def group__leader__rollno(self, obj):
         return obj.group.leader.rollno
     
-    list_display = ('id', 'room_type_choice', 'room_type', 'group', 'group__leader__name', 'group__leader__rollno', 'priority')
+    list_display = ('id', 'room_type_choice', 'room_type', 'group__leader__name', 'group__leader__rollno', 'priority')
     search_fields = ('group__id', 'group__leader__name', 'group__leader__rollno')
 
 
