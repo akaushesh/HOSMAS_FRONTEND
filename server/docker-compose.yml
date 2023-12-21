@@ -41,6 +41,9 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile
-    command: celery -A config worker -l info --pool=gevent --concurrency=2 -E -Q hms-admin-task -n worker-admin-task@%h
+    volumes:
+      - ./logs/:/app/logs/
+      - ./imported-data/:/app/imported-data/
+    command: celery -A config worker -l info --pool=threads --concurrency=1 -E -Q hms-admin-task -n worker-admin-task@%h
     network_mode: "host"
     restart: always
