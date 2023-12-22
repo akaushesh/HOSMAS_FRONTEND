@@ -222,3 +222,4 @@ ADMIN_EMAIL = config('ADMIN_EMAIL', default='creativecomputingsociety@gmail.com'
 DEVELOPER_EMAIL = config('DEVELOPER_EMAIL', default='creativecomputingsociety@gmail.com')
 
 DRF_API_LOGGER_DATABASE = True  # Default to False
+DRF_API_LOGGER_SIGNAL = True  # Default to False
