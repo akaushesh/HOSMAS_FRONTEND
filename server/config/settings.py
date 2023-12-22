@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'django_celery_results',
+    'drf_api_logger',
 
     #custom apps
     'user',
@@ -63,6 +64,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'drf_api_logger.middleware.api_logger_middleware.APILoggerMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -218,3 +220,5 @@ LOGS_ROOT = os.path.join(BASE_DIR, config('LOGS_ROOT', default='logs'))
 
 ADMIN_EMAIL = config('ADMIN_EMAIL', default='creativecomputingsociety@gmail.com')
 DEVELOPER_EMAIL = config('DEVELOPER_EMAIL', default='creativecomputingsociety@gmail.com')
+
+DRF_API_LOGGER_DATABASE = True  # Default to False
