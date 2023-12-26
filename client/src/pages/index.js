@@ -10,6 +10,7 @@ import { useQueryClient } from "@tanstack/react-query";
 const Page = () => {
   const queryClient = useQueryClient();
   const user = queryClient.getQueryData(["getProfile"]);
+  console.log(user);
 
   return (
     <Fragment>
@@ -35,14 +36,14 @@ const Page = () => {
                 email={user?.user?.email}
                 rollNumber={user?.rollno}
                 CGPA={user?.cg}
-                feeDue={user?.feeDue}
+                feeDue={user?.allotedHostel ? user.allotedHostel?.fee : ""}
                 phoneNumber={user?.phoneno}
               />
             </Grid>
             <Grid item xs={12} lg={4}>
               <Grid>
                 <OverviewBudget
-                  allotedHostel={user?.alloted_room?.hostel ? user.alloted_room?.hostel : ""}
+                  allotedHostel={user?.alloted_room?.hostel ? user?.alloted_room?.hostel : ""}
                   academicSession={user?.academic_session ? user?.academic_session : ""}
                   sx={{ height: "100%" }}
                 />
