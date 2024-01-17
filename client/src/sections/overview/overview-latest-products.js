@@ -20,9 +20,10 @@ import {
 import { useState } from "react";
 import axios from "axios";
 import { URL } from "config";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import CustomModal from "src/components/customModal";
 import { AcceptRequestConfirmation } from "../customer/accept-request-confirmation";
+import { useInvitation } from "src/hooks/use-invitation";
 
 function timeAgo(timestamp) {
   const currentDate = new Date();
@@ -49,7 +50,6 @@ export const OverviewLatestProducts = (props) => {
   const { sx } = props;
 
   const [limit, setLimit] = useState(4);
-  const [requests, setRequests] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [modalProduct, setModalProduct] = useState(null);
 
@@ -89,35 +89,13 @@ export const OverviewLatestProducts = (props) => {
       .catch(function (error) {});
   };
 
-  const {
-    data: reqs,
-    isLoading,
-    isError,
-  } = useQuery({
-    queryFn: async () => {
-      const jwt = sessionStorage.getItem("jwt");
-      const getProfileConfig = {
-        maxBodyLength: Infinity,
-        headers: {
-          Authorization: "Bearer " + jwt,
-        },
-      };
-
-      const newURL = URL + "student/invitation/view/received/";
-
-      const getProfileResponse = await axios.get(newURL, getProfileConfig);
-      setRequests(getProfileResponse?.data);
-      return getProfileResponse?.data;
-    },
-    queryKey: ["getInvitation"],
-  });
+  const { requests, isError, isLoading } = useInvitation();
+  const finalProducts = requests?.slice(0, limit);
 
   const OnClickHandler = () => {
     if (limit === 4) setLimit(100);
     else setLimit(4);
   };
-
-  const finalProducts = requests?.slice(0, limit);
 
   return (
     <Card sx={sx}>

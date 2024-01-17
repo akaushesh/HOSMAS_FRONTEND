@@ -3,10 +3,7 @@ import { Box } from "@mui/system";
 import Masonry from "react-masonry-css";
 import { FAQCard } from "src/components/FAQ-card";
 import styles from "../../styles/masonry.module.css";
-import { useQuery } from "@tanstack/react-query";
-import { URL } from "config";
-import axios from "axios";
-import { useState } from "react";
+import { useFAQs } from "src/hooks/use-FAQs";
 
 const breakpoints = {
   default: 3,
@@ -15,36 +12,11 @@ const breakpoints = {
 };
 
 export const AllFAQs = () => {
-  const [loading, setLoading] = useState(false);
-  const { data: FAQs = [] } = useQuery({
-    queryFn: async () => {
-      setLoading(true);
-      try {
-        const jwt = sessionStorage.getItem("jwt");
-        const url = URL + "dashboard/getFAQ/";
-
-        const getFAQsConfig = {
-          maxBodyLength: Infinity,
-          url: url,
-          headers: {
-            Authorization: "Bearer " + jwt,
-          },
-        };
-
-        const getFAQsResponse = await axios.get(url, getFAQsConfig);
-        setLoading(false);
-        return getFAQsResponse?.data;
-      } catch (err) {
-        setLoading(false);
-        return [];
-      }
-    },
-    queryKey: ["getFAQs"],
-  });
+  const { isLoading, FAQs } = useFAQs();
 
   return (
     <Box>
-      {loading ? (
+      {isLoading ? (
         <Grid container marginTop="1rem" justifyContent="center">
           <CircularProgress />
         </Grid>

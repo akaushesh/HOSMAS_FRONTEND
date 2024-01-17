@@ -25,7 +25,6 @@ export const OverviewBudget = (props) => {
             }}
           >
             <SvgIcon>
-              {/* <CurrencyDollarIcon /> */}
               <DomainIcon />
             </SvgIcon>
           </Avatar>
