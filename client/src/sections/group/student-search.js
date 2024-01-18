@@ -13,7 +13,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import { Stack } from "@mui/system";
 import { Fragment, useState } from "react";
 import CustomModal from "src/components/customModal";
-import { CustomerConfirmation } from "./customer-confirmation";
+import { CustomerConfirmation } from "./send-request-confirmation";
 import axios from "axios";
 import { URL } from "config";
 import { useQueryClient } from "@tanstack/react-query";

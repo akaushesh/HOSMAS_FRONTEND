@@ -22,7 +22,7 @@ import axios from "axios";
 import { URL } from "config";
 import { useQueryClient } from "@tanstack/react-query";
 import CustomModal from "src/components/customModal";
-import { AcceptRequestConfirmation } from "../customer/accept-request-confirmation";
+import { AcceptRequestConfirmation } from "./accept-request-confirmation";
 import { useInvitation } from "src/hooks/use-invitation";
 
 function timeAgo(timestamp) {

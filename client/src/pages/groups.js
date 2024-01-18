@@ -1,12 +1,11 @@
 import { Fragment, useEffect } from "react";
 import Head from "next/head";
-import { Box, Button, Container, Grid, Stack, SvgIcon, Typography } from "@mui/material";
+import { Box, Container, Grid, Stack, Typography } from "@mui/material";
 import { Layout as DashboardLayout } from "src/layouts/dashboard/layout";
-import { CustomersTable } from "src/sections/customer/customers-table";
-import { CustomersSearch } from "src/sections/customer/customers-search";
-import { OverviewLatestProducts } from "src/sections/overview/overview-latest-products";
+import { CustomersTable } from "src/sections/group/group-table";
+import { CustomersSearch } from "src/sections/group/student-search";
+import { OverviewLatestProducts } from "src/sections/group/group-requests";
 import { useRouter } from "next/router";
-import { useAuthContext } from "src/contexts/auth-context";
 import { useQueryClient } from "@tanstack/react-query";
 
 const Page = () => {
