@@ -16,19 +16,15 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import { alpha } from "@mui/material/styles";
-import { usePopover } from "src/hooks/use-popover";
-import { AccountPopover } from "./account-popover";
-import { useAuthContext } from "src/contexts/auth-context";
 import { useQueryClient } from "@tanstack/react-query";
+import { Fragment } from "react";
 
 const SIDE_NAV_WIDTH = 280;
 const TOP_NAV_HEIGHT = 64;
 
 export const TopNav = (props) => {
-  const auth = useAuthContext();
   const { onNavOpen } = props;
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
-  const accountPopover = usePopover();
   const router = useRouter();
 
   const queryClient = useQueryClient();
@@ -43,7 +39,7 @@ export const TopNav = (props) => {
   };
 
   return (
-    <>
+    <Fragment>
       <Box
         component="header"
         sx={{
@@ -78,13 +74,6 @@ export const TopNav = (props) => {
                 </SvgIcon>
               </IconButton>
             )}
-            {/* <Tooltip title="Search">
-              <IconButton>
-                <SvgIcon fontSize="small">
-                  <MagnifyingGlassIcon />
-                </SvgIcon>
-              </IconButton>
-            </Tooltip> */}
           </Stack>
           <Stack alignItems="center" direction="row" spacing={2}>
             {user?.group_size_limit != 1 && (
@@ -96,16 +85,6 @@ export const TopNav = (props) => {
                 </IconButton>
               </Tooltip>
             )}
-
-            {/* <Tooltip title="Notifications">
-              <IconButton>
-                <Badge badgeContent={4} color="success" variant="dot">
-                  <SvgIcon fontSize="small">
-                    <BellIcon />
-                  </SvgIcon>
-                </Badge>
-              </IconButton>
-            </Tooltip> */}
             <Tooltip title="Reset Password">
               <IconButton onClick={redirectToSettings}>
                 <SvgIcon fontSize="medium">
@@ -113,25 +92,10 @@ export const TopNav = (props) => {
                 </SvgIcon>
               </IconButton>
             </Tooltip>
-            {/* <Avatar
-              onClick={accountPopover.handleOpen}
-              ref={accountPopover.anchorRef}
-              sx={{
-                cursor: "pointer",
-                height: 40,
-                width: 40,
-              }}
-              src="/assets/avatars/avatar-anika-visser.png"
-            /> */}
           </Stack>
         </Stack>
       </Box>
-      <AccountPopover
-        anchorEl={accountPopover.anchorRef.current}
-        open={accountPopover.open}
-        onClose={accountPopover.handleClose}
-      />
-    </>
+    </Fragment>
   );
 };
 

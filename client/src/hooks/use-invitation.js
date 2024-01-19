@@ -20,6 +20,7 @@ export const useInvitation = () => {
       const newURL = URL + "student/invitation/view/received/";
 
       const getProfileResponse = await axios.get(newURL, getProfileConfig);
+      console.log(getProfileResponse);
       return getProfileResponse?.data;
     },
     queryKey: ["getInvitation"],

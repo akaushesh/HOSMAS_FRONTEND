@@ -6,6 +6,7 @@ import { OverviewTotalCustomers } from "src/sections/overview/overview-group";
 import { AccountProfileDetails } from "src/sections/account/account-profile-details";
 import { Fragment } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { useProfile } from "src/hooks/use-profile";
 
 const Page = () => {
   const queryClient = useQueryClient();

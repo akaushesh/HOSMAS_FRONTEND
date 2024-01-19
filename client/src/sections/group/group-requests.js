@@ -101,8 +101,8 @@ export const OverviewLatestProducts = (props) => {
     <Card sx={sx}>
       <CardHeader title="Group Requests" />
       <List>
-        {finalProducts.map((product, index) => {
-          const hasDivider = index < finalProducts.length - 1;
+        {finalProducts?.map((product, index) => {
+          const hasDivider = index < finalProducts?.length - 1;
           const ago = timeAgo(product.time);
 
           return (
@@ -144,13 +144,13 @@ export const OverviewLatestProducts = (props) => {
       <Divider />
       <Grid container marginTop="1.5rem" justifyContent="center" alignItems="center">
         <Grid item>
-          {finalProducts.length === 0 && (
+          {finalProducts?.length === 0 && (
             <Typography variant="body2">No pending requests</Typography>
           )}
         </Grid>
       </Grid>
       <CardActions sx={{ justifyContent: "flex-end" }}>
-        {requests.length > 4 && (
+        {requests?.length > 4 && (
           <Button
             color="inherit"
             onClick={OnClickHandler}

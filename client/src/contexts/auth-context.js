@@ -3,6 +3,7 @@ import { URL } from "config";
 import PropTypes from "prop-types";
 import axios from "axios";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useProfile } from "src/hooks/use-profile";
 
 const HANDLERS = {
   INITIALIZE: "INITIALIZE",
@@ -65,31 +66,9 @@ export const AuthProvider = (props) => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const initialized = useRef(false);
 
-  const { data: user } = useQuery({
-    queryFn: async () => {
-      try {
-        const jwt = sessionStorage.getItem("jwt");
-        if (!jwt) return null;
-        const getProfileConfig = {
-          maxBodyLength: Infinity,
-          headers: {
-            Authorization: "Bearer " + jwt,
-          },
-        };
-
-        const newURL = URL + "student/profile/";
-
-        const getProfileResponse = await axios.get(newURL, getProfileConfig);
-        return getProfileResponse?.data;
-      } catch (err) {
-        return null;
-      }
-    },
-    queryKey: ["getProfile"],
-  });
+  const { user } = useProfile();
 
   const initialize = async () => {
-    // Prevent from calling twice in development mode with React.StrictMode enabled
     if (initialized.current) {
       return;
     }
@@ -105,42 +84,8 @@ export const AuthProvider = (props) => {
     }
 
     if (isAuthenticated) {
-      const url = URL + "auth/token/refresh/";
-      const refreshToken = sessionStorage.getItem("refresh");
-      const data = { refresh: refreshToken };
-
-      const refreshConfig = {
-        maxBodyLength: Infinity,
-        headers: {},
-      };
-
-      const refreshTokenResponse = await axios.post(url, data, { refreshConfig });
-      sessionStorage.setItem("jwt", refreshTokenResponse?.data?.access);
-
-      const userProfile = queryClient.getQueriesData(["getProfile"])[0][1];
-
-      const user = {
-        batch: userProfile?.batch,
-        cg: userProfile?.cg,
-        gender: userProfile?.gender,
-        name: userProfile?.name,
-        role: userProfile?.role,
-        rollno: userProfile?.rollno,
-        email: userProfile?.email,
-        group: userProfile?.group,
-        gender: userProfile?.gender,
-        batch: userProfile?.batch,
-        current_hostel: userProfile?.current_hostel,
-        current_room: userProfile?.current_room,
-        alloted_hostel: userProfile?.alloted_hostel,
-        alloted_room: userProfile?.alloted_room,
-        preference_filled: userProfile?.preference_filled,
-        group_size: userProfile?.group_size_limit,
-      };
-
       dispatch({
         type: HANDLERS.INITIALIZE,
-        payload: user,
       });
     } else {
       dispatch({
