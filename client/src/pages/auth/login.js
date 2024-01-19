@@ -47,8 +47,12 @@ const Page = () => {
         queryClient.invalidateQueries(["getProfile"]);
         router.push("/");
       } catch (err) {
+        if (err?.response?.status === 401) {
+          helpers.setErrors({ submit: err?.response?.data?.detail });
+        } else {
+          helpers.setErrors({ submit: "Something went wrong" });
+        }
         helpers.setStatus({ success: false });
-        helpers.setErrors({ submit: err.message });
         helpers.setSubmitting(false);
       }
       setLoading(false);
