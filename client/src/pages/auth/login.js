@@ -5,14 +5,16 @@ import { useRouter } from "next/navigation";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { Box, Button, FormHelperText, Stack, TextField, Typography } from "@mui/material";
-import { useAuth } from "src/hooks/use-auth";
 import { Layout as AuthLayout } from "src/layouts/auth/layout";
 import Link from "next/link";
 import { LoadingButton } from "@mui/lab";
+import axios from "axios";
+import { URL } from "config";
+import { useQueryClient } from "@tanstack/react-query";
 
 const Page = () => {
   const router = useRouter();
-  const auth = useAuth();
+  const queryClient = useQueryClient();
   const [method, setMethod] = useState("email");
   const [loading, setLoading] = useState(false);
   const formik = useFormik({
@@ -28,7 +30,21 @@ const Page = () => {
     onSubmit: async (values, helpers) => {
       setLoading(true);
       try {
-        await auth.signIn(values.email, values.password);
+        const loginURL = URL + "auth/token/";
+        const data = { email: values.email, password: values.password };
+
+        var loginConfig = {
+          method: "post",
+          maxBodyLength: Infinity,
+          headers: {},
+          data: data,
+        };
+
+        const loginResponse = await axios.post(loginURL, data, { loginConfig });
+        window.sessionStorage.setItem("authenticated", "true");
+        window.sessionStorage.setItem("jwt", loginResponse?.data?.access);
+        window.sessionStorage.setItem("refresh", loginResponse?.data?.refresh);
+        queryClient.invalidateQueries(["getProfile"]);
         router.push("/");
       } catch (err) {
         helpers.setStatus({ success: false });
@@ -38,15 +54,6 @@ const Page = () => {
       setLoading(false);
     },
   });
-
-  const handleMethodChange = useCallback((event, value) => {
-    setMethod(value);
-  }, []);
-
-  const handleSkip = useCallback(() => {
-    auth.skip();
-    router.push("/");
-  }, [auth, router]);
 
   return (
     <>

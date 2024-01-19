@@ -10,14 +10,12 @@ import {
   Typography,
   useMediaQuery,
 } from "@mui/material";
-import FavoriteIcon from "@mui/icons-material/Favorite";
 import { Scrollbar } from "src/components/scrollbar";
 import { items } from "./config";
 import { SideNavItem } from "./side-nav-item";
 import NextLink from "next/link";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { useRouter } from "next/router";
-import { useAuth } from "src/hooks/use-auth";
 import { useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import PaidIcon from "@mui/icons-material/Paid";
@@ -28,15 +26,16 @@ export const SideNav = (props) => {
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
 
   const router = useRouter();
-  const auth = useAuth();
 
   const queryClient = useQueryClient();
   const user = queryClient.getQueryData(["getProfile"]);
 
   const handleSignOut = useCallback(() => {
-    auth.signOut();
+    window.sessionStorage.setItem("authenticated", "false");
+    window.sessionStorage.removeItem("jwt");
+    window.sessionStorage.removeItem("refresh");
     router.push("/auth/login");
-  }, [onClose, auth, router]);
+  }, [onClose, router]);
 
   const content = (
     <Scrollbar
