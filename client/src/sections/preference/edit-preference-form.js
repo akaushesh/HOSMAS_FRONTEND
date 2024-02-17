@@ -15,8 +15,9 @@ import {
 import CustomModal from "src/components/customModal";
 import { FormConfirmation } from "./form-confirmation";
 import { useQueryClient } from "@tanstack/react-query";
-import { useAvailableChoices } from "src/hooks/use-available-choices";
-import { useIsPreferenceFillingLive } from "src/hooks/use-is-preference-live";
+import { useAvailableChoices } from "src/hooks/use-preference";
+
+import { useIsPreferenceFillingLive } from "src/hooks/use-preference";
 
 export const EditPreferenceForm = (props) => {
   const { sx } = props;

@@ -3,10 +3,9 @@ import Head from "next/head";
 import { Box, CircularProgress, Container, Grid, Stack, Typography } from "@mui/material";
 import { Layout as DashboardLayout } from "src/layouts/dashboard/layout";
 import { PreferenceForm } from "src/sections/preference/preference-form";
-import { useIsPreferenceFillingLive } from "src/hooks/use-is-preference-live";
-import { useCurrentPreference } from "src/hooks/use-current-preference";
-import { useAvailableChoices } from "src/hooks/use-available-choices";
-
+import { useIsPreferenceFillingLive } from "src/hooks/use-preference";
+import { useCurrentPreference } from "src/hooks/use-preference";
+import { useAvailableChoices } from "src/hooks/use-preference";
 const Page = () => {
   const { isLive, isLoading: isLiveLoading } = useIsPreferenceFillingLive();
   const { currentPreferences } = useCurrentPreference();

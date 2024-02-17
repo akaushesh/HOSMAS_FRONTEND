@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import UsersIcon from "@heroicons/react/24/solid/UsersIcon";
-import { useIsPreferenceFillingLive } from "src/hooks/use-is-preference-live";
+import { useIsPreferenceFillingLive } from "src/hooks/use-preference";
 import { Avatar, Card, CardContent, Stack, SvgIcon, Typography } from "@mui/material";
 
 export const OverviewTotalCustomers = (props) => {

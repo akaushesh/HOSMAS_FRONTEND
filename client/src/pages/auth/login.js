@@ -4,15 +4,34 @@ import NextLink from "next/link";
 import { useRouter } from "next/navigation";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { Box, Button, FormHelperText, Stack, TextField, Typography } from "@mui/material";
+import { Box, FormHelperText, Stack, TextField, Typography } from "@mui/material";
 import { Layout as AuthLayout } from "src/layouts/auth/layout";
 import Link from "next/link";
 import { LoadingButton } from "@mui/lab";
 import axios from "axios";
 import { URL } from "config";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const Page = () => {
+  // const mutation = useMutation(async ({ email, password }) => {
+  //   const loginURL = URL + "auth/token/";
+  //   const data = { email, password };
+
+  //   var loginConfig = {
+  //     method: "post",
+  //     maxBodyLength: Infinity,
+  //     headers: {},
+  //     data: data,
+  //   };
+
+  //   const loginResponse = await axios.post(loginURL, data, { loginConfig });
+
+  //   window.sessionStorage.setItem("authenticated", "true");
+  //   window.sessionStorage.setItem("jwt", loginResponse?.data?.access);
+  //   window.sessionStorage.setItem("refresh", loginResponse?.data?.refresh);
+  //   return loginResponse?.data;
+  // });
+
   const router = useRouter();
   const queryClient = useQueryClient();
   const [method, setMethod] = useState("email");
@@ -46,6 +65,8 @@ const Page = () => {
         window.sessionStorage.setItem("refresh", loginResponse?.data?.refresh);
         queryClient.invalidateQueries(["getProfile"]);
         router.push("/");
+        // mutation.mutate({ email: values.email, password: values.password });
+        console.log("Here");
       } catch (err) {
         if (err?.response?.status === 401) {
           helpers.setErrors({ submit: err?.response?.data?.detail });

@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useReducer } from "react";
 import PropTypes from "prop-types";
-import { useProfile } from "src/hooks/use-profile";
+import { useProfile } from "src/hooks/use-auth";
 
 const HANDLERS = {
   INITIALIZE: "INITIALIZE",

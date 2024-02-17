@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/router";
-import { useIsPreferenceFillingLive } from "src/hooks/use-is-preference-live";
+import { useIsPreferenceFillingLive } from "src/hooks/use-preference";
 
 export const PreferenceForm = ({ sx, availableChoices = [], currentPreferences = [] }) => {
   const queryClient = useQueryClient();
