@@ -60,7 +60,7 @@ export const SideNav = (props) => {
           <Box
             sx={{
               alignItems: "center",
-              backgroundColor: "rgba(255, 255, 255, 0.04)",
+              backgroundColor: "rgba(255, 255, 255, 0.07)",
               borderRadius: 1,
               cursor: "pointer",
               display: "flex",
