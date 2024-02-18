@@ -64,6 +64,8 @@ export const TopNav = (props) => {
           sx={{
             minHeight: TOP_NAV_HEIGHT,
             px: 2,
+            // backgroundColor: "neutral.1000",
+            // boxShadow: "0 2px 20px rgba(0, 0, 0, 0.04)",
           }}
         >
           <Stack alignItems="center" direction="row" spacing={2}>

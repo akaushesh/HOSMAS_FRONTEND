@@ -152,7 +152,10 @@ export const SideNav = (props) => {
           <Divider sx={{ borderColor: "neutral.700" }} />
           <Box padding={2}>
             <Typography textAlign="center">
-              Made by <Link href="https://www.ccstiet.com">Team CCS</Link>
+              Made by{" "}
+              <Link sx={{ color: "neutral.1000" }} href="https://www.ccstiet.com">
+                Team CCS
+              </Link>
             </Typography>
           </Box>
         </Box>

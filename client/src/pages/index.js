@@ -22,6 +22,7 @@ const Page = () => {
         sx={{
           flexGrow: 1,
           py: 8,
+          // backgroundColor: "neutral.1000",
         }}
       >
         <Container maxWidth="xl">

@@ -11,26 +11,31 @@ const withAlphas = (color) => {
   };
 };
 
+// 200 is the color of nav items in side menu
+// 500 is the color of the grey used in top bar elements and some grey text
+
 export const neutral = {
   50: "#F8F9FA",
   100: "#F3F4F6",
-  200: "#E5E7EB",
+  200: "#E3E3E3",
   300: "#D2D6DB",
   // 400: "#9DA4AE",
   400: "#9DA4AE",
   500: "#6C737F",
+  // 500: "#0D1F2D",
   600: "#4D5761",
-  // 700: "#2F3746",
   700: "#9DA4AE",
   // 800: "#1C2536",
   800: "#640000",
   900: "#111927",
+  1000: "#FCF7F8",
 };
 
 export const indigo = withAlphas({
-  lightest: "#F5F7FF",
+  lightest: "#FCF7F8",
   light: "#EBEEFE",
-  main: "#FCF7F8",
+  // main: "#FCF7F8",
+  main: "#CA141C",
   dark: "#4338CA",
   darkest: "#312E81",
   contrastText: "#FFFFFF",
