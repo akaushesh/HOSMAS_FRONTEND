@@ -16,14 +16,15 @@ import { useQueryClient } from "@tanstack/react-query";
 import Hostel_M_Map from "public/assets/hostels/Hostel_M_Map.jpg";
 import Image from "next/image";
 import { hostelRooms } from "public/assets/data/hostel_m_data.js";
+import CustomModal from "src/components/customModal";
+import { MemberAssingn } from "src/sections/room-allocation/member-assign";
 
 const Page = () => {
   const queryClient = useQueryClient();
   const user = queryClient.getQueryData(["getProfile"]);
-  console.log(user);
 
-  console.log(hostelRooms);
   const [floor, setFloor] = useState("ground");
+  const [open, setOpen] = useState(false);
 
   const handleChange = (event) => {
     setFloor(event.target.value);
@@ -69,21 +70,26 @@ const Page = () => {
             </Grid>
           </Grid>
 
-          <Grid container spacing={3}>
-            <Grid item xs={12} alignSelf={"center"}>
+          <Grid container rowGap={3} justifyContent="space-between">
+            <Grid item xs={12} md={7.5}>
               <Image
                 src={Hostel_M_Map}
                 alt="Alloted Hostel Map"
                 style={{ maxWidth: "100%", height: "auto", borderRadius: "8px" }}
               />
             </Grid>
-            <Grid item xs={12}>
-              <Grid container>
+            <Grid item xs={12} md={4}>
+              <Grid container rowGap={1.5}>
                 {hostelRooms.rooms.map((room) => (
-                  <Grid key={room.id} item>
-                    <Button variant="outlined">{room.id}</Button>
+                  <Grid key={room.id} xs={3} justifySelf="center" item>
+                    <Button variant="outlined" sx={{ width: "4rem" }}>
+                      {room.id}
+                    </Button>
                   </Grid>
                 ))}
+                <CustomModal>
+                  <MemberAssingn />
+                </CustomModal>
               </Grid>
             </Grid>
           </Grid>
