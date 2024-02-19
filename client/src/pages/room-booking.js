@@ -55,7 +55,6 @@ const Page = () => {
                 labelId="select-floor-label"
                 id="select-floor"
                 name="floor"
-                label="Choose Floor"
                 value={floor}
                 onChange={handleChange}
                 autoWidth
