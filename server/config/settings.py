@@ -190,7 +190,7 @@ if config('FILE_LOGGING', cast=bool, default=False):
     }
 
 
-CELERY_BROKER_URL = 'amqp://localhost:5672'
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379/1'
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_RESULT_BACKEND = 'django-db'
 CELERY_RESULT_SERIALIZER = 'json'
