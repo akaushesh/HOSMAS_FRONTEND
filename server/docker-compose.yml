@@ -2,14 +2,13 @@ version: '3'
 
 services:
   hosmas-api:
-    image: ccs/hosmas-api
+    image: hosmas-api
+    container_name: hosmas-api
     build:
       context: .
       dockerfile: ./Dockerfile
     depends_on:
-      - hosmas-celery-default
-      - hosmas-celery-priority
-      - hosmas-celery-admin-task
+      - hosmas-celery
     volumes:
       - ./static/:/app/static/
       - ./logs/:/app/logs/
@@ -17,10 +16,11 @@ services:
       - ./imported-data/:/app/imported-data/
     network_mode: "host"
   
-  hosmas-celery-default:
-    image: ccs/hosmas-celery-default
+  hosmas-celery:
+    image: hosmas-celery
+    container_name: hosmas-celery
     build:
       context: .
       dockerfile: ./Dockerfile
-    command: celery -A config worker -l info --pool=gevent --concurrency=3 -n worker@%h --without-mingle --without-gossip --without-heartbeat
+    command: celery -A config worker -l info --pool=gevent --concurrency=1 -n worker@%h --without-mingle --without-gossip --without-heartbeat
     network_mode: "host"
