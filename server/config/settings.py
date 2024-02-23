@@ -28,7 +28,7 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', cast=bool, default=False)
 
-ALLOWED_HOSTS = ['api.allotment.onlinehostel.in', '127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['api.allotment.onlinehostel.in', 'api.hosmas.ccstiet.com', '127.0.0.1', 'localhost']
 
 
 # Application definition
