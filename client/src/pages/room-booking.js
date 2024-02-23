@@ -60,7 +60,6 @@ const Page = () => {
                 onChange={handleChange}
                 autoWidth
                 sx={{ mb: 2 }}
-                inputProps={{ IconComponent: () => null }}
               >
                 <MenuItem value="ground">Ground Floor</MenuItem>
                 <MenuItem value="first">First Floor</MenuItem>

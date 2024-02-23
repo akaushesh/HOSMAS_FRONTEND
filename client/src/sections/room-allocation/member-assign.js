@@ -14,7 +14,7 @@ export const MemberAssingn = ({ onClose }) => {
   return (
     <Box padding="1rem">
       <Typography variant="h4" marginBottom="1rem">
-        Assign this room to
+        Assign room to
       </Typography>
 
       <Typography variant="body1" textAlign="justify">

@@ -6,6 +6,7 @@ import { PreferenceForm } from "src/sections/preference/preference-form";
 import { useIsPreferenceFillingLive } from "src/hooks/use-preference";
 import { useCurrentPreference } from "src/hooks/use-preference";
 import { useAvailableChoices } from "src/hooks/use-preference";
+import { PreferenceCard } from "src/sections/preference/preference-card";
 const Page = () => {
   const { isLive, isLoading: isLiveLoading } = useIsPreferenceFillingLive();
   const { currentPreferences } = useCurrentPreference();
@@ -25,7 +26,7 @@ const Page = () => {
         }}
         position="relative"
       >
-        <Container maxWidth="xl">
+        {/* <Container maxWidth="xl">
           {isLiveLoading ? (
             <Box
               sx={{
@@ -61,6 +62,11 @@ const Page = () => {
               </Typography>
             </Box>
           )}
+        </Container> */}
+        <Container maxWidth="xl">
+          <Stack>
+            <PreferenceCard />
+          </Stack>
         </Container>
       </Box>
     </Fragment>
