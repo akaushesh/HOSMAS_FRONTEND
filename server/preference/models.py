@@ -59,3 +59,35 @@ class Preference(models.Model):
 
     def __str__(self):
         return f"{self.group}-{self.priority}"
+    
+    
+# class Level(models.Model):
+#     level = models.PositiveSmallIntegerField()
+#     hostel = models.ForeignKey('preference.Hostel', on_delete=models.CASCADE, related_name='levels')
+    
+#     class Meta:
+#         unique_together = ('level', 'hostel')
+    
+#     def __str__(self):
+#         return f"{self.hostel.name}: {self.level}"
+
+
+class Room(models.Model):
+    room_type = models.ForeignKey('preference.RoomType', on_delete=models.CASCADE, related_name='rooms')
+    # level = models.ForeignKey('preference.Level', on_delete=models.CASCADE, related_name='rooms')
+    level = models.PositiveSmallIntegerField()
+    room_no = models.CharField(max_length=5)
+    # hostel = models.ForeignKey('preference.Hostel', on_delete=models.CASCADE, related_name='rooms')
+    # total_capacity = models.PositiveSmallIntegerField()
+    current_capacity = models.PositiveSmallIntegerField(default=0)
+    
+    is_allotted = models.BooleanField(default=False)
+    is_registered = models.BooleanField(default=True)
+       
+    class Meta:
+        unique_together = ('room_type', 'room_no', 'level')
+
+    def __str__(self):
+        return f"{self.room_type.hostel.name}: {self.level} - {self.room_no}"
+    
+    

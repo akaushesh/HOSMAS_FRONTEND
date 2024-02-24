@@ -2,7 +2,7 @@ from django.db.models import Q, Count
 from django.db import transaction
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
-from preference.models import Hostel, RoomType, RoomTypeChoice
+from preference.models import Hostel, RoomType, RoomTypeChoice, Room
 from student.models import Batch, Section, Student, Group, Defaulter
 from student.serializers import StudentProfileSerializer, StudentProfileRoomTypeSerializer
 from user.models import User
@@ -32,6 +32,17 @@ class RoomTypeSerializer(serializers.ModelSerializer):
                   'hostel': {'write_only': True}
             }
 
+
+class RoomSerializer(serializers.ModelSerializer):
+      # Serializer to represent data to admin on room side
+
+      class Meta:
+            model = Room
+            fields = ['id', 'room_type', 'level', 'room_no', 'current_capacity']
+            extra_kwargs = {
+                  'room_type': {'write_only': True},
+                  'level': {'write_only': True}
+            }
 
 class HostelSingleSerializer(serializers.ModelSerializer):
       # Serializer for representing data of single hostel

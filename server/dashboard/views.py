@@ -13,7 +13,7 @@ from student.tasks import *
 
 from .permissions import IsAdmin
 
-from preference.models import Hostel, RoomType, RoomTypeChoice
+from preference.models import Hostel, RoomType, RoomTypeChoice, Room
 from student.models import Batch, Section, Student, Group
 from .models import AllotmentStatus, AcademicSession, Faq
 
@@ -42,6 +42,8 @@ class CreateObjectView(APIView):
                   serializer = HostelSingleSerializer(data=request.data)
             elif model=='roomtype':
                   serializer = RoomTypeSerializer(data=request.data)
+            elif model  == 'room':
+                  serializer = RoomSerializer(data=request.data)
             elif model=='choice':
                   serializer = RoomTypeChoiceSerializer(data=request.data)
             elif model=='batch':
@@ -1223,3 +1225,38 @@ class BatchAnalyticsView(APIView):
             }
 
             return Response(res, status=status.HTTP_200_OK)
+      
+      
+
+class UnregisterRoomView(APIView):
+      permission_classes = [IsAuthenticated, IsAdmin]
+
+      def post(self, request):
+            hostel = request.data.get('hostel')
+             
+            start = int(request.data.get('start'))
+            end = int(request.data.get('end'))
+            if start is None or end is None:
+                  return Response(status=status.HTTP_400_BAD_REQUEST)
+            rooms = Room.objects.filter(room_no__gte=start, room_no__lte=end, room_type__hostel = hostel).all()
+            for room in rooms:
+                  room.is_registered = False
+                  room.save()
+            return Response(status=status.HTTP_200_OK)
+      
+class RegisterRoomView(APIView):
+      permission_classes = [IsAuthenticated, IsAdmin]
+
+      def post(self, request):
+            hostel = request.data.get('hostel')
+             
+            start = int(request.data.get('start'))
+            end = int(request.data.get('end'))
+            if start is None or end is None:
+                  return Response(status=status.HTTP_400_BAD_REQUEST)
+            rooms = Room.objects.filter(room_no__gte=start, room_no__lte=end, room_type__hostel = hostel).all()
+            for room in rooms:
+                  room.is_registered = True
+                  room.save()
+            return Response(status=status.HTTP_200_OK)
+      

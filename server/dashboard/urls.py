@@ -38,4 +38,7 @@ urlpatterns = [
       path('<slug:model>/update/<int:id>/', views.UpdateObjectView.as_view(), name='update_object'),
       path('<slug:model>/delete/', views.DeleteObjectView.as_view(), name='delete_object'),
       path('<slug:model>/delete/multiple/', views.DeleteObjectsView.as_view(), name='delete_object'),
+
+      path('registerRoom/', views.RegisterRoomView.as_view(), name='register'),
+      path('unregisterRoom/', views.UnregisterRoomView.as_view(), name='unregister'),
 ]

@@ -46,8 +46,7 @@ venv
 
 #media files root
 /media
-/YOLO
-/pics
+
 
 #ssl certificates
 privkey.pem
@@ -55,11 +54,13 @@ cert.pem
 
 #error logs
 logs
-YOLO
-pics
+
 
 # static folder
 static
 
 # import data folder
 imported-data/
+
+#virtual envs
+env
