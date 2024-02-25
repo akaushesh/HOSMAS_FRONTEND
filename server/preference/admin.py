@@ -56,7 +56,7 @@ class RoomAdmin(admin.ModelAdmin):
     def room_type__name(self, obj):
         return f"{obj.room_type.hostel.name}: {obj.room_type.name}"
     
-    list_display = ('id', 'room_type__name',  'level', 'room_no',  'current_capacity')
+    list_display = ('id', 'room_type__name',  'level', 'room_no',  'current_occupants')
     list_filter = ('level', 'room_type')
     search_fields = ('room_no', 'room_type')
 

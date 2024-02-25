@@ -38,7 +38,7 @@ class RoomSerializer(serializers.ModelSerializer):
 
       class Meta:
             model = Room
-            fields = ['id', 'room_type', 'level', 'room_no', 'current_capacity']
+            fields = ['id', 'room_type', 'level', 'room_no', 'current_occupants']
             extra_kwargs = {
                   'room_type': {'write_only': True},
                   'level': {'write_only': True}

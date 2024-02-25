@@ -79,7 +79,7 @@ class Room(models.Model):
     room_no = models.CharField(max_length=5)
     # hostel = models.ForeignKey('preference.Hostel', on_delete=models.CASCADE, related_name='rooms')
     # total_capacity = models.PositiveSmallIntegerField()
-    current_capacity = models.PositiveSmallIntegerField(default=0)
+    current_occupants = models.PositiveSmallIntegerField(default=0)
     
     is_allotted = models.BooleanField(default=False)
     is_registered = models.BooleanField(default=True)
