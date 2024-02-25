@@ -26,6 +26,13 @@ const Page = () => {
   const [floor, setFloor] = useState("ground");
   const [open, setOpen] = useState(false);
 
+  const onOpen = () => {
+    setOpen(true);
+  };
+  const onClose = () => {
+    setOpen(false);
+  };
+
   const handleChange = (event) => {
     setFloor(event.target.value);
   };
@@ -80,14 +87,16 @@ const Page = () => {
               <Grid container rowGap={1.5}>
                 {hostelRooms.rooms.map((room) => (
                   <Grid key={room.id} xs={3} justifySelf="center" item>
-                    <Button variant="outlined" sx={{ width: "4rem" }}>
+                    <Button onClick={onOpen} variant="outlined" sx={{ width: "4rem" }}>
                       {room.id}
                     </Button>
                   </Grid>
                 ))}
-                <CustomModal>
-                  <MemberAssingn />
-                </CustomModal>
+                {open && (
+                  <CustomModal open={open} onClose={onClose}>
+                    <MemberAssingn onClose={onClose} />
+                  </CustomModal>
+                )}
               </Grid>
             </Grid>
           </Grid>
