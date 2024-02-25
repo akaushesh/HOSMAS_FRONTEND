@@ -1240,6 +1240,8 @@ class UnregisterRoomView(APIView):
                   return Response(status=status.HTTP_400_BAD_REQUEST)
             rooms = Room.objects.filter(room_no__gte=start, room_no__lte=end, room_type__hostel = hostel).all()
             for room in rooms:
+                  if room.is_allotted:
+                        return Response({'Error':f'Students are currently residing in room number {room.room_no}'},status=status.HTTP_400_BAD_REQUEST)
                   room.is_registered = False
                   room.save()
             return Response(status=status.HTTP_200_OK)
@@ -1260,3 +1262,42 @@ class RegisterRoomView(APIView):
                   room.save()
             return Response(status=status.HTTP_200_OK)
       
+class AddRoomRangeView(APIView):
+      permission_classes = [IsAuthenticated, IsAdmin]
+
+      def post(self, request):
+            room_type = request.data.get('room_type')
+            level = request.data.get('level')
+            if room_type is None:
+                  return Response(status=status.HTTP_400_BAD_REQUEST)
+            
+            start = int(request.data.get('start'))
+            end = int(request.data.get('end'))
+            if start is None or end is None or level is None:
+                  return Response(status=status.HTTP_400_BAD_REQUEST)
+            room_type = RoomType.objects.filter(room_type = room_type).first()
+            if Room.objects.filter(room_no__gte=start, room_no__lte=end, room_type = room_type).exists():
+                  return Response({'Error':'Room already exists'},status=status.HTTP_400_BAD_REQUEST)
+            for i in range(start,end+1):
+                  room = Room(room_no = i, room_type = room_type, level = level)
+                  room.save()
+            return Response(status=status.HTTP_200_OK)
+      
+
+class DeleteRoomRangeView(APIView):
+      permission_classes = [IsAuthenticated, IsAdmin]
+
+      def post(self, request):
+            room_type = request.data.get('room_type')
+            if room_type is None:
+                  return Response(status=status.HTTP_400_BAD_REQUEST)
+            
+            start = int(request.data.get('start'))
+            end = int(request.data.get('end'))
+            if start is None or end is None:
+                  return Response(status=status.HTTP_400_BAD_REQUEST)
+            room_type = RoomType.objects.filter(room_type = room_type).first()
+            rooms = Room.objects.filter(room_no__gte=start, room_no__lte=end, room_type = room_type).all()
+            for room in rooms:
+                  room.delete()
+            return Response(status=status.HTTP_200_OK)
