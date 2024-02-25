@@ -25,7 +25,9 @@ class Student (models.Model):
 
     current_room = models.ForeignKey('preference.RoomType', on_delete=models.SET_NULL, null=True, blank=True, related_name='current_students')
     preview_room = models.ForeignKey('preference.RoomType', on_delete=models.SET_NULL, null=True, blank=True, default=None, related_name='preview_students')
-    alloted_room = models.OneToOneField('preference.Room', on_delete=models.SET_NULL, null=True, blank=True, related_name='alloted_students')
+    alloted_room = models.ForeignKey('preference.RoomType', on_delete=models.SET_NULL, null=True, blank=True, related_name='alloted_students')
+
+    alloted_room_number = models.ForeignKey('preference.Room', on_delete=models.SET_NULL, null=True, blank=True, default=None, related_name='alloted_students')
 
     def __str__(self):
       return self.name

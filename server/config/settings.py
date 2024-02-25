@@ -34,6 +34,8 @@ ALLOWED_HOSTS = ['api.allotment.onlinehostel.in', 'api.hosmas.ccstiet.com', '127
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
+    
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -85,7 +87,8 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'config.wsgi.application'
+# WSGI_APPLICATION = 'config.wsgi.application'
+ASGI_APPLICATION = 'config.asgi.application'
 
 
 # Database
@@ -223,3 +226,13 @@ DEVELOPER_EMAIL = config('DEVELOPER_EMAIL', default='creativecomputingsociety@gm
 
 DRF_API_LOGGER_DATABASE = True  # Default to False
 DRF_API_LOGGER_SIGNAL = True  # Default to False
+
+# Django Channels Layer configuration
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}

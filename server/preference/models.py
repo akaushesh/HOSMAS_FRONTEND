@@ -69,7 +69,7 @@ class Level(models.Model):
         unique_together = ('level_no', 'hostel')
     
     def __str__(self):
-        return f"{self.hostel.name}: {self.level}"
+        return f"{self.hostel.name}: {self.level_no}"
 
 
 class Room(models.Model):

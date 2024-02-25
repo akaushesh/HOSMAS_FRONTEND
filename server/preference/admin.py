@@ -49,6 +49,18 @@ class PreferenceAdmin(admin.ModelAdmin):
     search_fields = ('group__id', 'group__leader__name', 'group__leader__rollno')
 
 
+class LevelAdmin(admin.ModelAdmin):
+    def hostel_name(self, obj):
+        return obj.hostel.name
+    
+    def rooms_count(self, obj):
+        return obj.rooms.count()
+    
+    list_display = ('id', 'level_no', 'hostel_name', 'rooms_count')
+    list_filter = ('hostel', )
+    search_fields = ('level_no', 'hostel__name')
+
+
 class RoomAdmin(admin.ModelAdmin):
     def hostel__name(self, obj):
         return obj.hostel.name
@@ -64,4 +76,5 @@ admin.site.register(Hostel, HostelAdmin)
 admin.site.register(RoomType, RoomTypeAdmin)
 admin.site.register(RoomTypeChoice, RoomTypeChoiceAdmin)
 admin.site.register(Preference, PreferenceAdmin)
+admin.site.register(Level, LevelAdmin)
 admin.site.register(Room, RoomAdmin)

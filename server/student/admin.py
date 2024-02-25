@@ -22,8 +22,13 @@ class StudentAdmin(admin.ModelAdmin):
             if obj.alloted_room is None:
                   return None
             return f"{obj.alloted_room.hostel.name}: {obj.alloted_room.name}"
+      
+      # def alloted_room(self, obj):
+      #       if obj.alloted_room_number is None:
+      #             return None
+      #       return f"{obj.alloted_room_number.level.level_no}: {obj.alloted_room_number.name}"
 
-      list_display = ('id', 'user', 'name', 'rollno', 'phoneno', 'gender', 'cg', 'batch__name', 'current_hostel', 'preview_hostel', 'alloted_hostel')
+      list_display = ('id', 'user', 'name', 'rollno', 'phoneno', 'gender', 'cg', 'batch__name', 'current_hostel', 'preview_hostel', 'alloted_hostel', 'alloted_room_number')
       list_filter = ('gender', 'batch')
       search_fields = ('user__email', 'name', 'rollno', 'phoneno')
 
