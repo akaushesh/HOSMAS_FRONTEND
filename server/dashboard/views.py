@@ -1228,7 +1228,7 @@ class BatchAnalyticsView(APIView):
       
       
 
-class UnregisterRoomView(APIView):
+class CannotBeAllocatedRoomView(APIView):
       permission_classes = [IsAuthenticated, IsAdmin]
 
       def post(self, request):
@@ -1246,7 +1246,7 @@ class UnregisterRoomView(APIView):
                   room.save()
             return Response(status=status.HTTP_200_OK)
       
-class RegisterRoomView(APIView):
+class CanBeAllocatedRoomView(APIView):
       permission_classes = [IsAuthenticated, IsAdmin]
 
       def post(self, request):

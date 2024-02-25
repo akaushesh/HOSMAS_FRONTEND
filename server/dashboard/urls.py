@@ -39,6 +39,6 @@ urlpatterns = [
       path('<slug:model>/delete/', views.DeleteObjectView.as_view(), name='delete_object'),
       path('<slug:model>/delete/multiple/', views.DeleteObjectsView.as_view(), name='delete_object'),
 
-      path('registerRoom/', views.RegisterRoomView.as_view(), name='register'),
-      path('unregisterRoom/', views.UnregisterRoomView.as_view(), name='unregister'),
+      path('registerRoom/', views.CannotBeAllocatedRoomView.as_view(), name='cannot_be_allocated_room'),
+      path('unregisterRoom/', views.CanBeAllocatedRoomView.as_view(), name='can_be_allocated_room'),
 ]
