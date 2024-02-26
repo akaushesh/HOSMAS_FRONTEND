@@ -229,3 +229,22 @@ class PreferenceFillingStatusView(APIView):
                   'can_retain': section is not None and section.is_retain_allowed
             }
             return Response(result, status=status.HTTP_200_OK)
+
+
+class AllotedHostelLevelsView(APIView):
+    permission_classes = [IsAuthenticated, IsStudent, IsGroupLeader]
+
+    def get(self, request):
+        alloted_room_type = request.user.student.alloted_room
+
+        if alloted_room_type is None:
+            return Response({
+                'detail': 'User has currently no alloted hostel'
+            }, status = status.HTTP_400_BAD_REQUEST)
+        
+        qs = Level.objects.filter(hostel=alloted_room_type.hostel, rooms__room_type=alloted_room_type).distinct().all()
+        serializer = LevelSerializer(qs, many=True)
+        return Response({
+            'room_capacity': alloted_room_type.room_size,
+            'levels': serializer.data
+        }, status=status.HTTP_200_OK)

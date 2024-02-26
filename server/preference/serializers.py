@@ -37,3 +37,9 @@ class StudentAllotedRoomSerializer(ModelSerializer):
     class Meta:
         model = Student
         fields = ('name', 'rollno', 'level', 'alloted_room_number')
+
+
+class LevelSerializer(ModelSerializer):
+    class Meta:
+        model = Level
+        fields = ('level_no', 'layout_image')

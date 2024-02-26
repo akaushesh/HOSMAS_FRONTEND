@@ -56,7 +56,7 @@ class LevelAdmin(admin.ModelAdmin):
     def rooms_count(self, obj):
         return obj.rooms.count()
     
-    list_display = ('id', 'level_no', 'hostel_name', 'rooms_count')
+    list_display = ('id', 'level_no', 'hostel_name', 'rooms_count', 'layout_image')
     list_filter = ('hostel', )
     search_fields = ('level_no', 'hostel__name')
 

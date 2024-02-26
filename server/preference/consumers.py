@@ -24,7 +24,7 @@ def check_if_user_is_group_leader(user):
     try:
         user.student
         user.student.leader_of_group
-        return True
+        return user.student.alloted_room is not None
     except ObjectDoesNotExist:
         return False
 
@@ -118,7 +118,10 @@ class RoomPreferenceConsumer(AsyncJsonWebsocketConsumer):
         await self.accept()
         
         initial_data = await get_initial_room_objects(user, level)
-        await self.send_json(initial_data)
+        await self.send_json({
+            'type': 'initial',
+            'data': initial_data
+        })
 
     async def receive_json(self, content):
         user = self.scope['user']

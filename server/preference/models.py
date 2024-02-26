@@ -64,6 +64,7 @@ class Preference(models.Model):
 class Level(models.Model):
     level_no = models.PositiveSmallIntegerField()
     hostel = models.ForeignKey('preference.Hostel', on_delete=models.CASCADE, related_name='levels')
+    layout_image = models.URLField(max_length=2000, blank=True, default='')
     
     class Meta:
         unique_together = ('level_no', 'hostel')
@@ -88,6 +89,6 @@ class Room(models.Model):
         unique_together = ('room_type', 'room_no')
 
     def __str__(self):
-        return f"{self.room_type.hostel.name}: {self.level} - {self.room_no}"
+        return f"{self.level} - {self.room_no}"
     
     
