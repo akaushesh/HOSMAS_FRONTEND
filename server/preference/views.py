@@ -38,7 +38,7 @@ class getAvailableChoices(APIView):
         data = []
         for choice in roomtypechoices:
             room_detail = {
-                'choice_id' : choice.id,
+                'id' : choice.id,
                 'room_name' : choice.room_type.name,
                 'room_hostel' : choice.room_type.hostel.name
             }
