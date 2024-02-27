@@ -7,6 +7,7 @@ import { useIsPreferenceFillingLive } from "src/hooks/use-preference";
 import { useCurrentPreference } from "src/hooks/use-preference";
 import { useAvailableChoices } from "src/hooks/use-preference";
 import { PreferenceCard } from "src/sections/preference/preference-card";
+import { TestPreferenceCard } from "src/sections/preference/test-preference-card";
 const Page = () => {
   const { isLive, isLoading: isLiveLoading } = useIsPreferenceFillingLive();
   const { currentPreferences } = useCurrentPreference();
@@ -65,7 +66,8 @@ const Page = () => {
         </Container> */}
         <Container maxWidth="xl">
           <Stack>
-            <PreferenceCard />
+            {/* <PreferenceCard /> */}
+            {availableChoices && <TestPreferenceCard availableChoices={availableChoices} />}
           </Stack>
         </Container>
       </Box>
