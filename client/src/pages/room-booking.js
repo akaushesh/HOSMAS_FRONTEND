@@ -12,6 +12,36 @@ import { Fragment, useState } from "react";
 import { RoomContainer } from "src/sections/room-allocation/room-container";
 import { useLevels } from "src/hooks/use-rooms";
 
+const floorStringToNumber = (floor) => {
+  console.log(floor);
+  switch (floor) {
+    case "ground":
+      return 0;
+    case "first":
+      return 1;
+    case "second":
+      return 2;
+    case "third":
+      return 3;
+    case "fourth":
+      return 4;
+    case "fifth":
+      return 5;
+    case "sixth":
+      return 6;
+    case "seventh":
+      return 7;
+    case "eighth":
+      return 8;
+    case "ninth":
+      return 9;
+    case "tenth":
+      return 10;
+    default:
+      return 0;
+  }
+};
+
 const Page = () => {
   const [floor, setFloor] = useState("ground");
 
@@ -20,7 +50,6 @@ const Page = () => {
   };
 
   const levels = useLevels();
-  console.log(levels);
 
   return (
     <Fragment>
@@ -57,7 +86,11 @@ const Page = () => {
               </Select>
             </Grid>
           </Grid>
-          <RoomContainer />
+          <RoomContainer
+            levels={levels?.levels?.levels}
+            room_capacity={levels?.levels?.room_capacity}
+            floor={floorStringToNumber(floor)}
+          />
         </Container>
       </Box>
     </Fragment>

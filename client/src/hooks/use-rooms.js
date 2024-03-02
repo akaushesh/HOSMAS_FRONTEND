@@ -8,7 +8,7 @@ export const useLevels = () => {
       try {
         const jwt = sessionStorage.getItem("jwt");
         if (!jwt) return null;
-        const getProfileConfig = {
+        const getLevelsConfig = {
           maxBodyLength: Infinity,
           headers: {
             Authorization: "Bearer " + jwt,
@@ -16,15 +16,15 @@ export const useLevels = () => {
         };
 
         const newURL = URL + "preferences/alloted-hostel-levels/";
+        console.log(newURL);
 
-        const getLevels = await axios.get(newURL, getProfileConfig);
-        console.log(getLevels);
+        const getLevels = await axios.get(newURL, getLevelsConfig);
         return getLevels?.data;
       } catch (err) {
-        return null;
+        return err;
       }
     },
-    queryKey: ["getProfile"],
+    queryKey: ["getLevels"],
   });
 
   return { levels };
