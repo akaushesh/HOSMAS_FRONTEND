@@ -12,10 +12,11 @@ export const RoomContainer = ({ levels = [], room_capacity, floor }) => {
   const [webSocket, setWebSocket] = useState(null);
 
   useEffect(() => {
-    const jwtToken = "YOUR_JWT_TOKEN";
+    const jwtToken = sessionStorage.getItem("jwt");
+    console.log(jwtToken);
 
     // Establish WebSocket connection when component mounts
-    const ws = new WebSocket("wss://api.hosmas.ccstiet.com/ws/preference/level/1/room/");
+    const ws = new WebSocket(`wss://api.hosmas.ccstiet.com/ws/preference/level/${floor}/room/`);
     setWebSocket(ws);
 
     // Cleanup function to close WebSocket connection when component unmounts
@@ -24,7 +25,7 @@ export const RoomContainer = ({ levels = [], room_capacity, floor }) => {
         ws.close();
       }
     };
-  }, []);
+  }, [floor]);
 
   useEffect(() => {
     // Send the JWT token as a message when WebSocket connection is open
