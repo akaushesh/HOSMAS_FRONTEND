@@ -21,26 +21,29 @@ class JwtAuthMiddleware(BaseMiddleware):
         # set default user as anonymous user
         scope['user'] = AnonymousUser()
 
-        # Get the token value from headers
+        # get the query parameters bytes-like object, decode and made a list
+        qs = scope['query_string'].decode('utf-8').split('&')
+
+        # Get the token value from query string
         token = ''
-        for h_tuple in scope['headers']:
-            if h_tuple[0]==b'authorization':
-                token = h_tuple[1]
+        for q in qs:
+            q = q.split('=')
+            if q[0]=='t':
+                token = q[1]
 
         # get authentication backend
         backend = JWTAuthentication()
 
-        # get raw token
-        token  =  await sync_to_async(backend.get_raw_token)(token)
-
-        if token is not None:
+        if token != '':
             try:
                 # get validated token
                 token = await sync_to_async(backend.get_validated_token)(token)
+
+                print(token)
 
                 # get user
                 scope['user'] = await sync_to_async(backend.get_user)(token)
             except (InvalidToken, TokenError) as e:
                 pass
-        
+
         return await super().__call__(scope, receive, send)
