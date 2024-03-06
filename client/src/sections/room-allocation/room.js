@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { Button, Grid } from "@mui/material";
 
-export const Room = ({ id, onOpen, room_capacity = 1, current_capacity = 0 }) => {
+export const Room = ({ id, onOpen, room_no, room_capacity = 1, current_capacity = 0 }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const isFull = current_capacity === room_capacity;
 
   return (
     <Grid xs={3} justifySelf="center" item>
@@ -11,6 +12,7 @@ export const Room = ({ id, onOpen, room_capacity = 1, current_capacity = 0 }) =>
         variant="outlined"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
+        disabled={isFull}
         sx={{
           width: "5rem",
           "&:hover": {
@@ -19,7 +21,7 @@ export const Room = ({ id, onOpen, room_capacity = 1, current_capacity = 0 }) =>
           },
         }}
       >
-        {isHovered ? `${current_capacity} / ${room_capacity}` : id}
+        {isHovered ? `${current_capacity} / ${room_capacity}` : room_no}
       </Button>
     </Grid>
   );

@@ -2,17 +2,15 @@ import { LoadingButton } from "@mui/lab";
 import { Button, Grid, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import { Fragment, useState } from "react";
+import { useProfile } from "src/hooks/use-auth";
+import { TeammateCard } from "./teammate-card";
 
-export const MemberAssingn = ({ onClose, roomDetails }) => {
+export const MemberAssingn = ({ onClose, roomDetails, allotRoom }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const onAccept = async () => {
-    onClose();
-  };
-  const onReject = () => {
-    onClose();
-  };
+  const user = useProfile();
+  console.log(user);
 
   return (
     <Box padding="1rem">
@@ -20,34 +18,25 @@ export const MemberAssingn = ({ onClose, roomDetails }) => {
         Assign room to
       </Typography>
 
-      <Typography variant="body1" textAlign="justify">
-        If you leave your group you will only be able to rejoin it if you receive another joining
-        request.
-      </Typography>
-      <br />
-      <Typography variant="body1" textAlign="justify">
-        Are you sure you want to leave?
-      </Typography>
-      {error && (
-        <Fragment>
-          <br />
-          <Typography variant="body1" textAlign="justify" color="error.main">
-            {error}
-          </Typography>
-        </Fragment>
-      )}
-
-      <Grid container marginTop="1rem" justifyContent="space-between" alignItems="center">
-        <Grid item xs={5.5}>
-          <LoadingButton loading={loading} onClick={onAccept} variant="contained" fullWidth>
-            Accept
-          </LoadingButton>
-        </Grid>
-        <Grid item xs={5.5}>
-          <Button onClick={onReject} variant="contained" fullWidth>
-            Reject
-          </Button>
-        </Grid>
+      <Grid container>
+        <TeammateCard
+          allotRoom={allotRoom}
+          onClose={onClose}
+          name="Harsiddak Singh Bedi"
+          room="Q102"
+        />
+        <TeammateCard
+          allotRoom={allotRoom}
+          onClose={onClose}
+          name="Arvinder Singh Kandola"
+          room="Q103"
+        />
+        <TeammateCard
+          allotRoom={allotRoom}
+          onClose={onClose}
+          name="Chandravo Bhattacharya"
+          room="Q104"
+        />
       </Grid>
     </Box>
   );

@@ -4,12 +4,11 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Card, Grid, Typography } from "@mui/material";
 
-export function SortableItem({ id }) {
+export function SortableItem({ id, room_hostel, room_name }) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
     id: id,
   });
 
-  console.log(id);
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
@@ -23,7 +22,7 @@ export function SortableItem({ id }) {
             <Grid container flexDirection="column">
               <Grid item>
                 <Typography component="h4" variant="h6" mb={2}>
-                  Hostel B 2S
+                  {room_hostel} {room_name}
                 </Typography>
               </Grid>
               <Grid item>

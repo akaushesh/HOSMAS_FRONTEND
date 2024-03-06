@@ -19,7 +19,7 @@ import { SortableItem } from "./SortableItem";
 import { Button, Card, Grid } from "@mui/material";
 import { HostelDetails } from "./hostel-details";
 
-export const TestPreferenceCard = ({ availableChoices }) => {
+export const SortPreference = ({ availableChoices }) => {
   const [items, setItems] = useState(availableChoices);
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -28,6 +28,10 @@ export const TestPreferenceCard = ({ availableChoices }) => {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   );
+
+  function printItems() {
+    console.log(items);
+  }
 
   function handleDragEnd(event) {
     const { active, over } = event;
@@ -55,12 +59,18 @@ export const TestPreferenceCard = ({ availableChoices }) => {
             >
               <SortableContext items={items} strategy={verticalListSortingStrategy}>
                 {items.map((item) => (
-                  <SortableItem key={item.id} id={item.id} choice_id={item.choice_id} />
+                  <SortableItem
+                    key={item.id}
+                    id={item.id}
+                    choice_id={item.choice_id}
+                    room_hostel={item.room_hostel}
+                    room_name={item.room_name}
+                  />
                 ))}
               </SortableContext>
             </DndContext>
             <Grid item sx={{ marginTop: "0.5rem" }}>
-              <Button fullWidth variant="contained">
+              <Button onClick={printItems} fullWidth variant="contained">
                 Edit
               </Button>
             </Grid>

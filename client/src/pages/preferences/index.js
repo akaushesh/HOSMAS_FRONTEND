@@ -2,15 +2,15 @@ import { Fragment } from "react";
 import Head from "next/head";
 import { Box, CircularProgress, Container, Grid, Stack, Typography } from "@mui/material";
 import { Layout as DashboardLayout } from "src/layouts/dashboard/layout";
-import { PreferenceForm } from "src/sections/preference/preference-form";
 import { useIsPreferenceFillingLive } from "src/hooks/use-preference";
 import { useCurrentPreference } from "src/hooks/use-preference";
 import { useAvailableChoices } from "src/hooks/use-preference";
-import { PreferenceCard } from "src/sections/preference/preference-card";
-import { TestPreferenceCard } from "src/sections/preference/test-preference-card";
+import { SortPreference } from "src/sections/preference/sort-preference";
+import { CurrentPreference } from "src/sections/preference/current-preference";
 const Page = () => {
   const { isLive, isLoading: isLiveLoading } = useIsPreferenceFillingLive();
   const { currentPreferences } = useCurrentPreference();
+  console.log(currentPreferences);
   const { availableChoices } = useAvailableChoices();
 
   return (
@@ -66,8 +66,8 @@ const Page = () => {
         </Container> */}
         <Container maxWidth="xl">
           <Stack>
-            {/* <PreferenceCard /> */}
-            {availableChoices && <TestPreferenceCard availableChoices={availableChoices} />}
+            {availableChoices && <CurrentPreference availableChoices={availableChoices} />}
+            {/* {availableChoices && <SortPreference availableChoices={availableChoices} />} */}
           </Stack>
         </Container>
       </Box>
