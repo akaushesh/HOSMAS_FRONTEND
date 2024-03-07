@@ -49,9 +49,19 @@ class StudentSerializer(ModelSerializer):
 
 
 class GroupStudentSerializer(ModelSerializer):
+      alloted_room = SerializerMethodField()
+
+      def get_alloted_room(self, obj):
+            if obj.alloted_room_number is None:
+                  return None
+            return {
+                  'level': obj.alloted_room_number.level.level_no,
+                  'number': obj.alloted_room_number.room_no
+            }
+
       class Meta:
             model = Student
-            fields = ['name', 'rollno', 'cg']
+            fields = ['name', 'rollno', 'cg', 'alloted_room']
 
 
 class GroupSerializer(ModelSerializer):
@@ -123,6 +133,7 @@ class StudentProfileSerializer(serializers.ModelSerializer):
       current_hostel = StudentProfileRoomTypeSerializer(read_only=True, source='current_room')
       preview_hostel = serializers.SerializerMethodField()
       alloted_hostel = serializers.SerializerMethodField()
+      alloted_room = SerializerMethodField()
       
       group = SerializerMethodField()
       is_preference_filled = SerializerMethodField()
@@ -132,7 +143,7 @@ class StudentProfileSerializer(serializers.ModelSerializer):
 
       class Meta:
             model = Student
-            fields = ['rollno', 'name', 'phoneno', 'gender', 'cg', 'batch', 'current_room', 'alloted_room', 'user', 'group', 'is_preference_filled', 'academic_session', 'fee_structure_url', 'current_hostel', 'preview_hostel', 'alloted_hostel', 'group_size_limit']
+            fields = ['rollno', 'name', 'phoneno', 'gender', 'cg', 'batch', 'current_room', 'alloted_room', 'user', 'group', 'is_preference_filled', 'academic_session', 'fee_structure_url', 'current_hostel', 'preview_hostel', 'alloted_hostel', 'group_size_limit', 'alloted_room']
             extra_kwargs = {
                   'alloted_room': {'write_only': True},
                   'current_room': {'write_only': True},
@@ -213,6 +224,14 @@ class StudentProfileSerializer(serializers.ModelSerializer):
             if section is None:
                   return 1
             return section.group_size_limit
+      
+      def get_alloted_room(self, obj):
+            if obj.alloted_room_number is None:
+                  return None
+            return {
+                  'level': obj.alloted_room_number.level.level_no,
+                  'number': obj.alloted_room_number.room_no
+            }
       
       @transaction.atomic
       def create(self, validated_data):
