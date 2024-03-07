@@ -62,15 +62,18 @@ class LevelAdmin(admin.ModelAdmin):
 
 
 class RoomAdmin(admin.ModelAdmin):
-    def hostel__name(self, obj):
-        return obj.hostel.name
+    def hostel_name(self, obj):
+        return obj.room_type.hostel.name
     
-    def room_type__name(self, obj):
-        return f"{obj.room_type.hostel.name}: {obj.room_type.name}"
+    def room_type_name(self, obj):
+        return obj.room_type.name
     
-    list_display = ('id', 'room_type__name',  'level', 'room_no',  'current_capacity')
+    def level_no(self, obj):
+        return obj.level.level_no
+    
+    list_display = ('id', 'hostel_name', 'room_type_name',  'level_no', 'room_no',  'current_capacity')
     list_filter = ('level', 'room_type')
-    search_fields = ('room_no', 'room_type')
+    search_fields = ('room_no', 'room_type__hostel__name', 'room_type__name')
 
 admin.site.register(Hostel, HostelAdmin)
 admin.site.register(RoomType, RoomTypeAdmin)
