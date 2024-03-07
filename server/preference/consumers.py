@@ -124,6 +124,21 @@ class RoomPreferenceConsumer(AsyncJsonWebsocketConsumer):
         })
 
     async def receive_json(self, content):
+        if not isinstance(content, list):
+            await self.send_json({
+                'type': 'error',
+                'message': 'Invalid data type!'
+            })
+            return
+        
+        for item in content:
+            if item.get('room') is None or item.get('student') is None:
+                await self.send_json({
+                    'type': 'error',
+                    'message': 'Invalid data type!'
+                })
+                return
+
         user = self.scope['user']
         level = self.scope['url_route']['kwargs']['level']
         
