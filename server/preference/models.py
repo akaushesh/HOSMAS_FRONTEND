@@ -24,6 +24,7 @@ class RoomType(models.Model):
     hostel = models.ForeignKey('preference.Hostel', on_delete=models.CASCADE, related_name='room_types')
     room_size = models.PositiveSmallIntegerField()
     rooms_count = models.PositiveSmallIntegerField()
+    photo = models.URLField(max_length=2000, blank=True, default='')
     fee = models.PositiveIntegerField(default=0)
 
     class Meta:

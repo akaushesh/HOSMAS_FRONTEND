@@ -67,14 +67,64 @@ class CreateObjectView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-class GetMultipleObjectsView(APIView):
-      permission_classes = [IsAuthenticated & IsAdmin]
+def get_object_view(request, model, id):
+      public_models = ['hostel', 'roomtype']
+      if model in public_models:
+            return GetPublicObjectView.as_view()(request, model = model, id=id)
+      else:
+            return GetObjectView.as_view()(request, model = model,id=id)
+      
+      
+def get_multiple_objects_view(request, model):
+      public_models = ['hostel', 'roomtype']
+      if model in public_models:
+            return GetPublicMultipleObjectsView.as_view()(request, model= model)
+      else:
+            return GetMultipleObjectsView.as_view()(request, model=model)
+      
+class GetPublicObjectView(APIView):
+      def get(self, request, model, id):
+            if model=='hostel':
+                  instance = Hostel.objects.filter(id=id).prefetch_related('room_types').first()
+                  if instance is None:
+                        return Response(status=status.HTTP_404_NOT_FOUND)
+                  serializer = HostelSingleSerializer(instance)
+            
+            elif model=='roomtype':
+                  instance = RoomType.objects.filter(id=id).first()
+                  if instance is None:
+                        return Response(status=status.HTTP_404_NOT_FOUND)
+                  serializer = RoomTypeSerializer(instance)
+                  
+            else:
+                  return Response(status.HTTP_404_NOT_FOUND)
+            
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
+class GetPublicMultipleObjectsView(APIView):
       def get(self, request, model):
             if model=='hostel':
                   queryset = Hostel.objects.all()
                   serializer = HostelSerializer(queryset, many=True)
-            elif model=='section':
+            
+            elif model=='roomtype':
+                  queryset = RoomType.objects.select_related('hostel').all()
+                  serializer = RoomTypeOptionSerializer(queryset, many=True)
+            
+            else:
+                  return Response(status.HTTP_404_NOT_FOUND)
+            
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+class GetMultipleObjectsView(APIView):
+      permission_classes = [IsAuthenticated & IsAdmin]
+
+      def get(self, request, model):
+            # if model=='hostel':
+            #       queryset = Hostel.objects.all()
+            #       serializer = HostelSerializer(queryset, many=True)
+            # elif model=='section':
+            if model=='section':
                   queryset = Section.objects.select_related('batch').all()
                   serializer = SectionSerializer(queryset, many=True)
             elif model=='uninitialized-batch':
@@ -85,9 +135,9 @@ class GetMultipleObjectsView(APIView):
             elif model=='batch':
                   queryset = Batch.objects.all()
                   serializer = BatchSerializer(queryset, many=True)
-            elif model=='roomtype':
-                  queryset = RoomType.objects.select_related('hostel').all()
-                  serializer = RoomTypeOptionSerializer(queryset, many=True)
+            # elif model=='roomtype':
+            #       queryset = RoomType.objects.select_related('hostel').all()
+            #       serializer = RoomTypeOptionSerializer(queryset, many=True)
             elif model=='choice':
                   queryset = Section.objects.filter(id=request.GET.get('section')).select_related('batch').prefetch_related('choices').first()
                   if queryset is None:
@@ -107,19 +157,20 @@ class GetObjectView(APIView):
       permission_classes = [IsAuthenticated & IsAdmin]
       
       def get(self, request, model, id):
-            if model=='hostel':
-                  instance = Hostel.objects.filter(id=id).prefetch_related('room_types').first()
-                  if instance is None:
-                        return Response(status=status.HTTP_404_NOT_FOUND)
-                  serializer = HostelSingleSerializer(instance)
+            # if model=='hostel':
+            #       instance = Hostel.objects.filter(id=id).prefetch_related('room_types').first()
+            #       if instance is None:
+            #             return Response(status=status.HTTP_404_NOT_FOUND)
+            #       serializer = HostelSingleSerializer(instance)
             
-            elif model=='roomtype':
-                  instance = RoomType.objects.filter(id=id).first()
-                  if instance is None:
-                        return Response(status=status.HTTP_404_NOT_FOUND)
-                  serializer = RoomTypeSerializer(instance)
+            # elif model=='roomtype':
+            #       instance = RoomType.objects.filter(id=id).first()
+            #       if instance is None:
+            #             return Response(status=status.HTTP_404_NOT_FOUND)
+            #       serializer = RoomTypeSerializer(instance)
             
-            elif model=='allotment-status':
+            # elif model=='allotment-status':
+            if model=='allotment-status':
                   instance = AllotmentStatus.objects.filter(id=id).first()
                   if instance is None:
                         return Response(status=status.HTTP_404_NOT_FOUND)

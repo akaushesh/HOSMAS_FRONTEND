@@ -19,7 +19,7 @@ class HostelSerializer(serializers.ModelSerializer):
 
       class Meta:
             model = Hostel
-            fields = ['id', 'name', 'gender']
+            fields = ['id', 'name', 'gender', 'photos']
 
 
 class RoomTypeSerializer(serializers.ModelSerializer):
@@ -27,7 +27,7 @@ class RoomTypeSerializer(serializers.ModelSerializer):
 
       class Meta:
             model = RoomType
-            fields = ['id', 'name', 'hostel', 'room_size', 'rooms_count']
+            fields = ['id', 'name', 'hostel', 'room_size', 'rooms_count', 'photo']
             extra_kwargs = {
                   'hostel': {'write_only': True}
             }
@@ -52,7 +52,7 @@ class HostelSingleSerializer(serializers.ModelSerializer):
 
       class Meta:
             model = Hostel
-            fields = ['id', 'name', 'gender', 'caretaker_email', 'caretaker_name', 'room_types', 'capacity']
+            fields = ['id', 'name', 'gender', 'caretaker_email', 'caretaker_name', 'room_types', 'capacity', 'description', 'photos']
       
       def get_capacity(self, obj):
             cnt = 0
@@ -90,7 +90,7 @@ class RoomTypeOptionSerializer(serializers.ModelSerializer):
 
       class Meta:
             model = RoomType
-            fields = ['id', 'name', 'hostel']
+            fields = ['id', 'name', 'hostel', 'photo']
 
 
 class BatchUninitializedSerializer(serializers.ModelSerializer):
