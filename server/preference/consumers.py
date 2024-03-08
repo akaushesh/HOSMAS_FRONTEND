@@ -58,7 +58,7 @@ def allot_room(arr, user):
             }
         cp_mp[item['room']] = avl_cap - 1
         student_instance = Student.objects.filter(rollno=item['student']).first()
-        if student_instance is None or (student_instance!=group_leader and student.group!=group_instance):
+        if student_instance is None or (student_instance!=group_leader and student_instance.group!=group_instance):
             return {
                 'type': 'error',
                 'message': f'No student found with roll number {item["student"]}'

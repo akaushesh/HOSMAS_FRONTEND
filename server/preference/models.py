@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.cache import cache
 from student.models import GENDER_CHOICES
+from django.contrib.postgres.fields import ArrayField
 
 # Create your models here.
 
@@ -10,6 +11,9 @@ class Hostel(models.Model):
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
     caretaker_email = models.EmailField(max_length=200)
     caretaker_name = models.CharField(max_length=200)
+    description = models.TextField(blank=True, null=True)
+    photos = ArrayField(models.URLField(max_length=2000), blank=True, default=list)
+    
 
     def __str__(self):
         return self.name
