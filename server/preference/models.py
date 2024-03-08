@@ -82,11 +82,8 @@ class Room(models.Model):
     level = models.ForeignKey('preference.Level', on_delete=models.CASCADE, related_name='rooms')
     # level = models.PositiveSmallIntegerField()
     room_no = models.CharField(max_length=5)
-    # hostel = models.ForeignKey('preference.Hostel', on_delete=models.CASCADE, related_name='rooms')
-    # total_capacity = models.PositiveSmallIntegerField()
     current_capacity = models.PositiveSmallIntegerField(default=0)
     
-    # is_allotted = models.BooleanField(default=False)
     can_allot = models.BooleanField(default=True)
        
     class Meta:
@@ -94,5 +91,15 @@ class Room(models.Model):
 
     def __str__(self):
         return f"{self.level} - {self.room_no}"
+    
+    def save(self, *args, **kwargs):
+        # Check if the instance is being created
+        if not self.pk:
+            # Get the total_capacity from the associated RoomType object
+            total_capacity = self.room_type.room_size
+
+            self.current_capacity = total_capacity
+
+        super().save(*args, **kwargs)
     
     

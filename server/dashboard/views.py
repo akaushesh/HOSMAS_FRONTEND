@@ -1240,9 +1240,9 @@ class CannotBeAllocatedRoomView(APIView):
                   return Response(status=status.HTTP_400_BAD_REQUEST)
             rooms = Room.objects.filter(room_no__gte=start, room_no__lte=end, room_type__hostel = hostel).all()
             for room in rooms:
-                  if room.is_allotted:
+                  if room.current_capacity == 0:
                         return Response({'Error':f'Students are currently residing in room number {room.room_no}'},status=status.HTTP_400_BAD_REQUEST)
-                  room.is_registered = False
+                  room.can_allot = False
                   room.save()
             return Response(status=status.HTTP_200_OK)
       
@@ -1258,7 +1258,7 @@ class CanBeAllocatedRoomView(APIView):
                   return Response(status=status.HTTP_400_BAD_REQUEST)
             rooms = Room.objects.filter(room_no__gte=start, room_no__lte=end, room_type__hostel = hostel).all()
             for room in rooms:
-                  room.is_registered = True
+                  room.can_allot = True
                   room.save()
             return Response(status=status.HTTP_200_OK)
       
