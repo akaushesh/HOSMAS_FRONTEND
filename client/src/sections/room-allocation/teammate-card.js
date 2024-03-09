@@ -6,9 +6,11 @@ export const TeammateCard = ({
   current_room = "free",
   selected_room,
   allotRoom,
+  onClose,
 }) => {
   const onClick = () => {
     allotRoom(rollNumber, selected_room);
+    onClose();
   };
 
   return (
