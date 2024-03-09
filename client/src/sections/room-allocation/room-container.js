@@ -9,14 +9,15 @@ import { Room } from "./room";
 
 export const RoomContainer = ({ levels = [], room_capacity, floor }) => {
   const [open, setOpen] = useState(false);
+  const [selectedRoomID, setSelectedRoomID] = useState(null);
   const [webSocket, setWebSocket] = useState(null);
   const [rooms, setRooms] = useState([]);
 
-  const allotRoom = () => {
+  const allotRoom = (rollNumber, room) => {
     const request = [
       {
-        student: "102103500",
-        room: "1",
+        student: rollNumber,
+        room: room,
       },
     ];
     const requestString = JSON.stringify(request);
@@ -45,15 +46,13 @@ export const RoomContainer = ({ levels = [], room_capacity, floor }) => {
     // Send the JWT token as a message when WebSocket connection is open
     if (webSocket) {
       webSocket.onopen = () => {
-        // const jwtToken = "YOUR_JWT_TOKEN";
-        // webSocket.send(JSON.stringify({ authorization: `Bearer ${jwtToken}` }));
+        console.log("WebSocket connection is open");
       };
 
       webSocket.onmessage = (event) => {
         // console.log("Message received:", event.data);
-        console.log(JSON.parse(event.data));
+        console.log("JSON received:", JSON.parse(event.data));
         const { type, data, updates } = JSON.parse(event.data);
-        console.log(data);
         if (type === "initial") setRooms(data);
         else if (type === "update") setRooms(updates);
         // Handle the response here
@@ -66,7 +65,8 @@ export const RoomContainer = ({ levels = [], room_capacity, floor }) => {
     }
   }, [webSocket]);
 
-  const onOpen = () => {
+  const onOpen = (roomID) => {
+    setSelectedRoomID(roomID);
     setOpen(true);
   };
   const onClose = () => {
@@ -97,7 +97,11 @@ export const RoomContainer = ({ levels = [], room_capacity, floor }) => {
           ))}
           {open && (
             <CustomModal open={open} onClose={onClose}>
-              <MemberAssingn allotRoom={allotRoom} onClose={onClose} />
+              <MemberAssingn
+                selected_room={selectedRoomID}
+                allotRoom={allotRoom}
+                onClose={onClose}
+              />
             </CustomModal>
           )}
         </Grid>

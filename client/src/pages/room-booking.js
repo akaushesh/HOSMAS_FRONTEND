@@ -13,7 +13,6 @@ import { RoomContainer } from "src/sections/room-allocation/room-container";
 import { useLevels } from "src/hooks/use-rooms";
 
 const floorStringToNumber = (floor) => {
-  console.log(floor);
   switch (floor) {
     case "ground":
       return 0;
@@ -50,6 +49,7 @@ const Page = () => {
   };
 
   const levels = useLevels();
+  console.log(levels);
 
   return (
     <Fragment>

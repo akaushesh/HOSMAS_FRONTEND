@@ -1,16 +1,16 @@
-import { LoadingButton } from "@mui/lab";
-import { Button, Grid, Typography } from "@mui/material";
+import { CircularProgress, Grid, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import { Fragment, useState } from "react";
 import { useProfile } from "src/hooks/use-auth";
 import { TeammateCard } from "./teammate-card";
+import { useGroups } from "src/hooks/use-groups";
 
-export const MemberAssingn = ({ onClose, roomDetails, allotRoom }) => {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-
+export const MemberAssingn = ({ onClose, selected_room, allotRoom }) => {
   const user = useProfile();
   console.log(user);
+
+  const { group, isLoading } = useGroups();
+  console.log(group);
 
   return (
     <Box padding="1rem">
@@ -18,25 +18,31 @@ export const MemberAssingn = ({ onClose, roomDetails, allotRoom }) => {
         Assign room to
       </Typography>
 
-      <Grid container>
-        <TeammateCard
-          allotRoom={allotRoom}
-          onClose={onClose}
-          name="Harsiddak Singh Bedi"
-          room="Q102"
-        />
-        <TeammateCard
-          allotRoom={allotRoom}
-          onClose={onClose}
-          name="Arvinder Singh Kandola"
-          room="Q103"
-        />
-        <TeammateCard
-          allotRoom={allotRoom}
-          onClose={onClose}
-          name="Chandravo Bhattacharya"
-          room="Q104"
-        />
+      <Grid container justifyContent="center" alignItems="center">
+        {isLoading && <CircularProgress />}
+        {group && (
+          <Fragment>
+            <TeammateCard
+              allotRoom={allotRoom}
+              onClose={onClose}
+              name={group?.leader?.name}
+              rollNumber={group?.leader?.rollno}
+              current_room={group?.leader?.alloted_room?.number}
+              selected_room={selected_room}
+            />
+            {group?.members.map((member) => (
+              <TeammateCard
+                key={member.rollno}
+                allotRoom={allotRoom}
+                onClose={onClose}
+                name={member.name}
+                rollNumber={member.rollno}
+                current_room={member.alloted_room?.number}
+                selected_room={selected_room}
+              />
+            ))}
+          </Fragment>
+        )}
       </Grid>
     </Box>
   );

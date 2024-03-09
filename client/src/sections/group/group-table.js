@@ -24,6 +24,7 @@ import { useState } from "react";
 import CustomModal from "src/components/customModal";
 import { LeaveConfirmation } from "./leave-confirmation";
 import { TransferOwnershipConfirmation } from "./transfer-ownership-confirmation";
+import { useGroups } from "src/hooks/use-groups";
 
 export const CustomersTable = (props) => {
   const { sx, selected = [] } = props;
@@ -67,28 +68,30 @@ export const CustomersTable = (props) => {
     onOpenOwnerTransferModal();
   };
 
-  const {
-    data: group,
-    isLoading,
-    error,
-  } = useQuery({
-    queryFn: async () => {
-      try {
-        const jwt = sessionStorage.getItem("jwt");
-        const url = URL + "student/group/view/";
-        const getGroupConfig = {
-          maxBodyLength: Infinity,
-          headers: { Authorization: "Bearer " + jwt },
-        };
+  // const {
+  //   data: group,
+  //   isLoading,
+  //   error,
+  // } = useQuery({
+  //   queryFn: async () => {
+  //     try {
+  //       const jwt = sessionStorage.getItem("jwt");
+  //       const url = URL + "student/group/view/";
+  //       const getGroupConfig = {
+  //         maxBodyLength: Infinity,
+  //         headers: { Authorization: "Bearer " + jwt },
+  //       };
 
-        const getGroupResponse = await axios.get(url, getGroupConfig);
-        return getGroupResponse?.data;
-      } catch (err) {
-        return null;
-      }
-    },
-    queryKey: ["getGroup"],
-  });
+  //       const getGroupResponse = await axios.get(url, getGroupConfig);
+  //       return getGroupResponse?.data;
+  //     } catch (err) {
+  //       return null;
+  //     }
+  //   },
+  //   queryKey: ["getGroup"],
+  // });
+
+  const { group, isLoading, error } = useGroups();
 
   const open = Boolean(anchorEl);
   const id = open ? "simple-popover" : undefined;
