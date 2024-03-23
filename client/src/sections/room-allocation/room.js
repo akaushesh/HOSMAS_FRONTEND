@@ -4,7 +4,6 @@ import { Button, Grid } from "@mui/material";
 export const Room = ({ id, onOpen, room_no, room_capacity = 1, current_capacity = 0 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const isFull = current_capacity === 0;
-  console.log(id, room_no);
 
   const onClick = () => {
     onOpen(id);
