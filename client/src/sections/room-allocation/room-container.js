@@ -63,9 +63,11 @@ export const RoomContainer = ({ levels = [], room_capacity, floor }) => {
       webSocket.onmessage = (event) => {
         console.log("JSON received:", JSON.parse(event.data));
         const { type, data, updates } = JSON.parse(event.data);
-        if (type === "initial") setRooms(data);
-        else if (type === "result") onOpenSnackBar();
-        else if (type === "update") {
+        if (type === "initial") {
+          setRooms(data);
+        } else if (type === "result") {
+          onOpenSnackBar();
+        } else if (type === "update") {
           setRooms((prevRooms) => {
             const updatedRooms = prevRooms.map((room) => {
               const updateInfo = updates.find((update) => update.id === room.id);

@@ -44,7 +44,7 @@ const Page = () => {
             <Grid item xs={12} lg={4}>
               <Grid>
                 <OverviewBudget
-                  allotedHostel={user?.alloted_hostel?.hostel ? user?.alloted_room?.hostel : ""}
+                  allotedHostel={user?.alloted_hostel?.hostel ? user?.alloted_hostel?.hostel : ""}
                   academicSession={user?.academic_session ? user?.academic_session : ""}
                   sx={{ height: "100%" }}
                 />

@@ -1,8 +1,10 @@
 import PropTypes from "prop-types";
 import DomainIcon from "@mui/icons-material/Domain";
 import { Avatar, Card, CardContent, Stack, SvgIcon, Typography } from "@mui/material";
+import { useProfile } from "src/hooks/use-auth";
 
 export const OverviewBudget = (props) => {
+  const user = useProfile();
   const { sx, allotedHostel = "", academicSession = "" } = props;
 
   return (
@@ -14,7 +16,11 @@ export const OverviewBudget = (props) => {
               Allotted Hostel
             </Typography>
             <Typography variant="h4">
-              {allotedHostel === "" ? "None" : `${allotedHostel}`}
+              {allotedHostel === ""
+                ? "None"
+                : `${allotedHostel} ${
+                    user?.user?.alloted_room?.number ? user?.user?.alloted_room?.number : ""
+                  }`}
             </Typography>
           </Stack>
           <Avatar

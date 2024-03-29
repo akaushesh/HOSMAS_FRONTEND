@@ -67,7 +67,7 @@ const Page = () => {
           <Grid container justifyContent={"space-between"}>
             <Grid item>
               <Typography variant="h3" sx={{ mb: 3 }} paddingLeft={2}>
-                Hostel M
+                Hostel E
               </Typography>
             </Grid>
             <Grid item paddingRight={2}>
