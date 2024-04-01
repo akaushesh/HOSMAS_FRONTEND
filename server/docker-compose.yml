@@ -22,5 +22,9 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile
+    volumes:
+      - ./logs/:/app/logs/
+      - ./media/:/app/media/
+      - ./imported-data/:/app/imported-data/
     command: celery -A config worker -l info --pool=gevent --concurrency=1 -n worker@%h --without-mingle --without-gossip --without-heartbeat
     network_mode: "host"
