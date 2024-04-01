@@ -13,6 +13,7 @@ const Page = () => {
   const { currentPreferences } = useCurrentPreference();
   console.log(currentPreferences);
   const { availableChoices } = useAvailableChoices();
+  console.log(availableChoices);
 
   return (
     <Fragment>
