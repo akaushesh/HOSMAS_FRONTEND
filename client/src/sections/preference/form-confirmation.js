@@ -49,7 +49,7 @@ export const FormConfirmation = ({ onClose, preferences, retain }) => {
 
       const order = {};
       preferences.forEach((item, index) => {
-        order[index + 1] = item.choice_id;
+        order[index + 1] = item.id;
       });
 
       const data = {
