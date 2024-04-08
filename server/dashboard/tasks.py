@@ -11,7 +11,7 @@ from django.db import transaction
 from config.celery import app
 
 from student.models import Student, Group, Defaulter, Batch, Section
-from user.models import User
+from user.models import User, ResetSlug
 from preference.models import Hostel, RoomType, Preference
 from dashboard.models import AllotmentLogsStudent, AllotmentLogsGroup, AllotmentStatus, AcademicSession
 from student.tasks import left_group_mail, send_teamleader_change_mail
