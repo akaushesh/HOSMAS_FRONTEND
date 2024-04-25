@@ -41,7 +41,7 @@ export default function Home() {
         </Box>
       </Box>
 
-      <Footer />
+      {/* <Footer /> */}
     </Box>
   );
 }
