@@ -46,7 +46,7 @@ export const getSentInvitationStatus = async (): Promise<AxiosResponse<Invitatio
   return res;
 };
 
-export const getInvitations = async (): Promise<AxiosResponse<Invitation[]>> => {
+export const getReceivedInvitations = async (): Promise<AxiosResponse<Invitation[]>> => {
   const token = (await authClient.getToken()).data;
 
   if (token === null || token === undefined) {

@@ -1,7 +1,11 @@
+'use client';
+
 import * as React from 'react';
 import type { Viewport } from 'next';
 
 import '@/styles/global.css';
+
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import { UserProvider } from '@/contexts/user-context';
 import { LocalizationProvider } from '@/components/core/localization-provider';
@@ -13,15 +17,19 @@ interface LayoutProps {
   children: React.ReactNode;
 }
 
+const queryClient = new QueryClient();
+
 export default function Layout({ children }: LayoutProps): React.JSX.Element {
   return (
     <html lang="en">
       <body>
-        <LocalizationProvider>
-          <UserProvider>
-            <ThemeProvider>{children}</ThemeProvider>
-          </UserProvider>
-        </LocalizationProvider>
+        <QueryClientProvider client={queryClient}>
+          <LocalizationProvider>
+            <UserProvider>
+              <ThemeProvider>{children}</ThemeProvider>
+            </UserProvider>
+          </LocalizationProvider>
+        </QueryClientProvider>
       </body>
     </html>
   );

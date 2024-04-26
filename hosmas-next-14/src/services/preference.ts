@@ -60,7 +60,7 @@ export const getChoices = async (): Promise<AxiosResponse<Choice[]>> => {
   return res;
 };
 
-export const getPreferences = async (): Promise<AxiosResponse<PreferenceResponse>> => {
+export const getPreference = async (): Promise<AxiosResponse<PreferenceResponse>> => {
   const token = (await authClient.getToken()).data;
 
   if (token === null || token === undefined) {
@@ -94,7 +94,7 @@ export const getPreferenceStatus = async (): Promise<AxiosResponse<PreferenceSta
   return res;
 };
 
-export const getAllLevels = async (): Promise<AxiosResponse<LevelsResponse>> => {
+export const getAllLevel = async (): Promise<AxiosResponse<LevelsResponse>> => {
   const token = (await authClient.getToken()).data;
 
   if (token === null || token === undefined) {

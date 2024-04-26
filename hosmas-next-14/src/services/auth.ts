@@ -18,7 +18,7 @@ interface ErrorResponse {
   details: string;
 }
 
-type LoginResponse = TokenResponse | ErrorResponse;
+export type LoginResponse = TokenResponse | ErrorResponse;
 
 export const login = async (values: LoginData): Promise<AxiosResponse<LoginResponse>> => {
   const data = {
