@@ -5,6 +5,7 @@ import KeyIcon from "@mui/icons-material/Key";
 import LiveHelpIcon from "@mui/icons-material/LiveHelp";
 import ApartmentIcon from "@mui/icons-material/Apartment";
 import { SvgIcon } from "@mui/material";
+import ListAltIcon from '@mui/icons-material/ListAlt';
 
 export const items = [
   {
@@ -30,7 +31,7 @@ export const items = [
     path: "/preferences",
     icon: (
       <SvgIcon fontSize="small">
-        <ApartmentIcon />
+        <ListAltIcon/>
       </SvgIcon>
     ),
   },
@@ -40,6 +41,15 @@ export const items = [
     icon: (
       <SvgIcon fontSize="small">
         <RoomPreferencesIcon />
+      </SvgIcon>
+    ),
+  },
+  {
+    title: "View Hostels",
+    path: "/view-hostel",
+    icon: (
+      <SvgIcon fontSize="small">
+        <ApartmentIcon />
       </SvgIcon>
     ),
   },

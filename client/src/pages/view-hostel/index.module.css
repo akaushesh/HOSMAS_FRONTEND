@@ -1,0 +1,44 @@
+.CardCont{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    align-items: center;
+    margin-block: 20px 8vh;
+}
+
+.Card {
+    position: relative;
+    background-repeat: no-repeat;
+    width: 25%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 2% 1%;
+    padding: 3%;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: ease-in-out 200ms;
+    z-index: 2;
+}
+
+.CardBackground {   
+    position: absolute;
+    top: 0;
+    z-index: -1;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.425);
+    border-radius: 8px;
+}
+.Card:hover .CardBackground {
+    background-color: rgba(255, 255, 255, 0.123); /* Fully transparent on hover */
+}
+
+.Card:hover{
+    background-color: rgba(255, 255, 255, 0.123);
+    filter: brightness(88%) grayscale(10%);
+    scale: 1.05;
+    box-shadow: 0 0 10px 5px #b4b4b456;
+}

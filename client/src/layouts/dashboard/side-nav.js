@@ -112,8 +112,13 @@ export const SideNav = (props) => {
             {items.map((item) => {
               if (user?.group_size_limit == 1 && item.title == "Group") return;
 
-              const active = item.path ? pathname === item.path : false;
-
+              let active = false;
+              if (item.path) {
+                if (pathname === item.path || pathname.startsWith(`${item.path}/`)) {
+                  active = true;
+                }
+              }
+              
               return (
                 <SideNavItem
                   active={active}
