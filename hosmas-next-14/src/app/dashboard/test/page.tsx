@@ -5,6 +5,7 @@ import { Button } from '@mui/material';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 
+import { logger } from '@/lib/default-logger';
 import { useLogin } from '@/hooks/mutation/use-auth';
 
 // import { logger } from '@/lib/default-logger';
@@ -23,7 +24,11 @@ export default function Page(): React.JSX.Element {
   // const { data } = useReceivedInvitationStatus();
   // logger.debug('useReceivedInvitationStatus', data);
 
-  const { mutate: login } = useLogin();
+  const onSuccess = (): void => {
+    logger.debug('Working');
+  };
+
+  const { mutate: login } = useLogin({ onSuccess });
 
   return (
     <Stack spacing={3}>

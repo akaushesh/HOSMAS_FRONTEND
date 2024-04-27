@@ -1,37 +1,21 @@
 import { leaveGroup, searchStudent, transferOwnersip } from '@/services/group';
-import { useMutation } from '@tanstack/react-query';
 import type { UseMutationResult } from '@tanstack/react-query';
-import type { AxiosError, AxiosResponse } from 'axios';
 
-export const useSearchStudent = (
-  onSuccess?: (response: AxiosResponse) => void,
-  onError?: (error: AxiosError) => void
-): UseMutationResult => {
-  return useMutation({
-    mutationFn: searchStudent,
-    onSuccess,
-    onError,
-  });
+import { useCustomMutation } from './use-custom-mutation';
+import type { ResolutionFunctions } from './use-custom-mutation';
+
+export const useLogin = ({ onSuccess, onError }: ResolutionFunctions): UseMutationResult => {
+  return useCustomMutation(searchStudent, onSuccess, onError);
 };
 
-export const useTransferOwnership = (
-  onSuccess?: (response: AxiosResponse) => void,
-  onError?: (error: AxiosError) => void
-): UseMutationResult => {
-  return useMutation({
-    mutationFn: transferOwnersip,
-    onSuccess,
-    onError,
-  });
+export const useTransferOwnership = ({ onSuccess, onError }: ResolutionFunctions): UseMutationResult => {
+  return useCustomMutation(transferOwnersip, onSuccess, onError);
 };
 
-export const useLeaveGroup = (
-  onSuccess?: (response: AxiosResponse) => void,
-  onError?: (error: AxiosError) => void
-): UseMutationResult => {
-  return useMutation({
-    mutationFn: leaveGroup,
-    onSuccess,
-    onError,
-  });
+export const useSearchStudent = ({ onSuccess, onError }: ResolutionFunctions): UseMutationResult => {
+  return useCustomMutation(searchStudent, onSuccess, onError);
+};
+
+export const useLeaveGroup = ({ onSuccess, onError }: ResolutionFunctions): UseMutationResult => {
+  return useCustomMutation(leaveGroup, onSuccess, onError);
 };
