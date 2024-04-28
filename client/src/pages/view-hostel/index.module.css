@@ -1,15 +1,19 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+
+
 .CardCont{
     display: flex;
     flex-wrap: wrap;
     justify-content: space-evenly;
     align-items: center;
-    margin-block: 20px 8vh;
+    margin-block: 3vh 8vh;
 }
 
 .Card {
     position: relative;
     background-repeat: no-repeat;
-    width: 25%;
+    width: 28%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -41,4 +45,128 @@
     filter: brightness(88%) grayscale(10%);
     scale: 1.05;
     box-shadow: 0 0 10px 5px #b4b4b456;
+}
+
+
+
+.heading{
+    display: flex;
+    align-items: baseline;
+    gap: 0.8%;
+    padding: 0% 1%;
+    margin-top: 2%;
+}
+
+.Grid{
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1.8fr 1fr;
+    gap: 15px;
+    padding: 1% 15px;
+    height: 50vh;
+    position: relative;
+}
+
+.LGridItem{
+    position: relative;
+    width: 100%;
+    height:inherit;
+    object-position: center;
+} 
+.SGridCont {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Two columns */
+    grid-template-rows: 1fr 1fr;
+    height: inherit; 
+    gap: 15px;
+    align-items: center;
+    justify-content: center;
+}
+
+.SGridItem{
+    position: relative;
+    width: 100%;
+    height: 100%;
+    object-position: center;
+}
+
+.LImage,.SImage{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+    transition: ease-in-out 300ms;
+}
+.LImage:hover{
+    scale: 1.01;
+}
+.SImage:hover{
+    scale: 1.02;
+}
+
+
+.overlay{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5 );
+    color: white;
+    display: flex;
+    align-items: center;
+    border-radius: 8px;
+    justify-content: center;
+    z-index: 2;
+    cursor: pointer;
+    flex-direction:column ;
+}
+
+.content{
+    font-family: "Poppins", sans-serif;
+    padding: 2% 3%;
+}
+
+.heading>h1,.heading>h4,.HostelInfo>p,.content>p,.Contact>p{
+    padding: 0%;
+    margin: 0%;
+}
+.content>p{
+    text-align: justify;
+    font-size: 18px;
+    margin-top: 1%;
+    font-weight: 500;
+}
+.lowerCont{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 1.5%;
+}
+.HostelInfo{
+    display: flex;
+    gap:8px;
+    flex-direction: column;
+}
+.HostelInfo>p{
+    font-size: 20px;
+}
+.HostelInfo>p>b{
+    font-size: 22px;
+    font-weight: 600;
+}
+
+
+.Contact{
+    width: 20%;
+}
+.Contact>div{
+    font-size: 19px;
+}
+.Contact>div>b{
+    font-size: 22px;
+    font-weight: 600;
+}
+.Contact>p{
+    font-size: 16px;
 }
