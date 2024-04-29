@@ -20,12 +20,7 @@ interface ErrorResponse {
 
 export type LoginResponse = TokenResponse | ErrorResponse;
 
-export const login = async (values: LoginData): Promise<AxiosResponse<LoginResponse>> => {
-  const data = {
-    email: values.email,
-    password: values.password,
-  };
-
+export const login = async (data: LoginData): Promise<AxiosResponse<LoginResponse>> => {
   const res = await authApi.post('auth/token/', data);
   logger.debug('login', res.data);
   return res;

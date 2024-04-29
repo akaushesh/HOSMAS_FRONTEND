@@ -6,7 +6,9 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 
 import { logger } from '@/lib/default-logger';
-import { useLogin } from '@/hooks/mutation/use-auth';
+import { useRetain } from '@/hooks/mutation/use-preference';
+
+// import { useLogin } from '@/hooks/mutation/use-auth';
 
 // import { logger } from '@/lib/default-logger';
 // import { useFaq } from '@/hooks/query/use-faq';
@@ -28,7 +30,8 @@ export default function Page(): React.JSX.Element {
     logger.debug('Working');
   };
 
-  const { mutate: login } = useLogin({ onSuccess });
+  // const { mutate: login } = useLogin({ onSuccess });
+  const { mutate: retain } = useRetain({ onSuccess });
 
   return (
     <Stack spacing={3}>
@@ -36,7 +39,7 @@ export default function Page(): React.JSX.Element {
         <Typography variant="h4">API Test</Typography>
         <Button
           onClick={() => {
-            login({ email: 'smahajan1_be21@thapar.edu', password: 'password' });
+            retain({});
           }}
         >
           Click me

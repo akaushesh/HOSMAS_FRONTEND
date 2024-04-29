@@ -4,6 +4,7 @@ import { authClient } from '@/lib/auth/client';
 import { logger } from '@/lib/default-logger';
 
 import { preferenceApi } from './api';
+import type { SuccessResponse } from './invitation';
 
 interface Choice {
   id: number;
@@ -41,6 +42,12 @@ interface Levels {
 interface LevelsResponse {
   room_capacity: number;
   levels: Levels[];
+}
+
+type Order = Record<number, number>;
+
+interface PreferenceOrder {
+  order: Order;
 }
 
 export const getChoices = async (): Promise<AxiosResponse<Choice[]>> => {
@@ -90,6 +97,44 @@ export const getPreferenceStatus = async (): Promise<AxiosResponse<PreferenceSta
     },
   });
   logger.debug('getPreferenceStatus', res.data);
+
+  return res;
+};
+
+export const setRetain = async (): Promise<AxiosResponse<SuccessResponse>> => {
+  const token = (await authClient.getToken()).data;
+
+  if (token === null || token === undefined) {
+    throw new Error('You must be logged in to perform this action');
+  }
+
+  const res = await preferenceApi.post(
+    'retain/',
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  logger.debug('setRetain', res.data);
+
+  return res;
+};
+
+export const createPreference = async (data: PreferenceOrder): Promise<AxiosResponse<SuccessResponse>> => {
+  const token = (await authClient.getToken()).data;
+
+  if (token === null || token === undefined) {
+    throw new Error('You must be logged in to perform this action');
+  }
+
+  const res = await preferenceApi.post('createPreference', data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  logger.debug('createPreference', res.data);
 
   return res;
 };
