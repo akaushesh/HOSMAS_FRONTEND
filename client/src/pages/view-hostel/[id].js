@@ -26,14 +26,13 @@ const hostel = () => {
 
 
   return (
-    <>
+    <div className={styles.indHostel}>
         <Head>
             <title>{data.name} | Thapar Hostel Allocation System</title>
         </Head>
         
         <div className={styles.heading}>
                 <h1>{data.name}</h1>
-                <h4>{data.gender}  Hostel</h4>
         </div>
         <div className={styles.Grid}>
             
@@ -68,21 +67,25 @@ const hostel = () => {
             <div className={styles.lowerCont}>
 
                 <div className={styles.HostelInfo}>
-                    <p><b>Floors</b> : {data.floors}</p>
-                    <p><b>Rooms</b> : {data.rooms}</p>
-                    <p><b>Student Capacity</b> : {data.students}</p>
+                    <p style={{width:"25%"}}><b>Floors</b> <p> {data.floors}</p></p>
+                    <p style={{width:"25%"}}><b>Rooms</b> <p> {data.rooms}</p></p>
+                    <p style={{width:"40%"}}><b>Student Capacity</b> <p> {data.students}</p></p>
                 </div>
                 <div className={styles.Contact}>
-                    <div><b>Caretaker : </b>{data.caretaker}</div>
-                    <div><b>Warden : </b>{data.warden}</div>
-                    <p>{data.email}</p>
-                    <p>{data.contact}</p>
+                    <div>
+                        <div><b>Caretaker : </b>{data.caretaker}</div>
+                        <div><b>Warden : </b>{data.warden}</div>
+                    </div>
+                    <div>
+                        <p>{data.email}</p>
+                        <p>{data.contact}</p>
+                    </div>
                 </div>
              
             </div>
         </div>
 
-    </>
+    </div>
   )
 }
 
