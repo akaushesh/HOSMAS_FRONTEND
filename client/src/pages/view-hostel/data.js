@@ -14,7 +14,7 @@ const hostels=[
         email:"xyz@thapar.edu",
         gender:"Boys",
         image:['https://4kwallpapers.com/images/walls/thumbs_3t/8728.jpg','https://4kwallpapers.com/images/walls/thumbs_3t/8728.jpg','https://4kwallpapers.com/images/walls/thumbs_3t/8728.jpg','https://4kwallpapers.com/images/walls/thumbs_3t/8728.jpg','https://4kwallpapers.com/images/walls/thumbs_3t/8728.jpg','https://4kwallpapers.com/images/walls/thumbs_3t/8728.jpg','https://4kwallpapers.com/images/walls/thumbs_3t/8728.jpg','https://4kwallpapers.com/images/walls/thumbs_3t/8728.jpg'],
-        description:"Hostel A is the first hostel of Thapar University, Patiala. It is the oldest hostel of the university and is located near the main gate of the university", 
+        description:"Hostel A is the first hostel of Thapar University, Patiala. It is the oldest hostel of the university and is located near the main gate of the university Hostel A is the first hostel of Thapar University, Patiala. It is the oldest hostel of the university and is located near the main gate of the university Hostel A is the first hostel of Thapar University, Patiala. It is the oldest hostel of the university and is located near the main gate of the university Hostel A is the first hostel of Thapar University, Patiala. It is the oldest hostel of the university and is located near the main gate of the university Hostel A is the first hostel of Thapar University, Patiala. It is the oldest hostel of the university and is located near the main gate of the university", 
     },
     {
         name:"Hostel B",
@@ -28,7 +28,7 @@ const hostels=[
         email:"xyz@thapar.edu",
         gender:"Boys",
         image:['https://4kwallpapers.com/images/walls/thumbs_3t/8728.jpg','https://4kwallpapers.com/images/walls/thumbs_3t/8728.jpg','https://4kwallpapers.com/images/walls/thumbs_3t/8728.jpg','https://4kwallpapers.com/images/walls/thumbs_3t/8728.jpg','https://4kwallpapers.com/images/walls/thumbs_3t/8728.jpg','https://4kwallpapers.com/images/walls/thumbs_3t/8728.jpg','https://4kwallpapers.com/images/walls/thumbs_3t/8728.jpg','https://4kwallpapers.com/images/walls/thumbs_3t/8728.jpg'],
-        description:"Hostel A is the first hostel of Thapar University, Patiala. It is the oldest hostel of the university and is located near the main gate of the university", 
+        description:"Hostel A is the first hostel of Thapar University, Patiala. It is the oldest hostel of the university and is located near the main gate of the university Hostel A is the first hostel of Thapar University, Patiala. It is the oldest hostel of the university and is located near the main gate of the university Hostel A is the first hostel of Thapar University, Patiala. It is the oldest hostel of the university and is located near the main gate of the university Hostel A is the first hostel of Thapar University, Patiala. It is the oldest hostel of the university and is located near the main gate of the university Hostel A is the first hostel of Thapar University, Patiala. It is the oldest hostel of the university and is located near the main gate of the university", 
     },
     {
         name:"Hostel C",
@@ -42,7 +42,7 @@ const hostels=[
         email:"xyz@thapar.edu",
         gender:"Boys",
         image:['https://4kwallpapers.com/images/walls/thumbs_3t/8728.jpg','https://4kwallpapers.com/images/walls/thumbs_3t/8728.jpg','https://4kwallpapers.com/images/walls/thumbs_3t/8728.jpg','https://4kwallpapers.com/images/walls/thumbs_3t/8728.jpg','https://4kwallpapers.com/images/walls/thumbs_3t/8728.jpg','https://4kwallpapers.com/images/walls/thumbs_3t/8728.jpg','https://4kwallpapers.com/images/walls/thumbs_3t/8728.jpg','https://4kwallpapers.com/images/walls/thumbs_3t/8728.jpg'],
-        description:"Hostel A is the first hostel of Thapar University, Patiala. It is the oldest hostel of the university and is located near the main gate of the university", 
+        description:"Hostel A is the first hostel of Thapar University, Patiala. It is the oldest hostel of the university and is located near the main gate of the university Hostel A is the first hostel of Thapar University, Patiala. It is the oldest hostel of the university and is located near the main gate of the university Hostel A is the first hostel of Thapar University, Patiala. It is the oldest hostel of the university and is located near the main gate of the university Hostel A is the first hostel of Thapar University, Patiala. It is the oldest hostel of the university and is located near the main gate of the university Hostel A is the first hostel of Thapar University, Patiala. It is the oldest hostel of the university and is located near the main gate of the university", 
     },
     {
         name:"Hostel D",
@@ -56,7 +56,7 @@ const hostels=[
         email:"xyz@thapar.edu",
         gender:"Boys",
         image:['https://4kwallpapers.com/images/walls/thumbs_3t/8728.jpg','https://4kwallpapers.com/images/walls/thumbs_3t/8728.jpg','https://4kwallpapers.com/images/walls/thumbs_3t/8728.jpg','https://4kwallpapers.com/images/walls/thumbs_3t/8728.jpg','https://4kwallpapers.com/images/walls/thumbs_3t/8728.jpg','https://4kwallpapers.com/images/walls/thumbs_3t/8728.jpg','https://4kwallpapers.com/images/walls/thumbs_3t/8728.jpg','https://4kwallpapers.com/images/walls/thumbs_3t/8728.jpg'],
-        description:"Hostel A is the first hostel of Thapar University, Patiala. It is the oldest hostel of the university and is located near the main gate of the university", 
+        description:"Hostel A is the first hostel of Thapar University, Patiala. It is the oldest hostel of the university and is located near the main gate of the university Hostel A is the first hostel of Thapar University, Patiala. It is the oldest hostel of the university and is located near the main gate of the university Hostel A is the first hostel of Thapar University, Patiala. It is the oldest hostel of the university and is located near the main gate of the university Hostel A is the first hostel of Thapar University, Patiala. It is the oldest hostel of the university and is located near the main gate of the university Hostel A is the first hostel of Thapar University, Patiala. It is the oldest hostel of the university and is located near the main gate of the university", 
     },
 
 ]
