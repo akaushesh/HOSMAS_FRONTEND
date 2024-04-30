@@ -50,6 +50,18 @@ interface PreferenceOrder {
   order: Order;
 }
 
+interface RoomData {
+  id: number;
+  room_type_name: string;
+  hostel_name: string;
+  priority: number;
+}
+
+interface CreatePreferenceResponse {
+  status: string;
+  data: RoomData[];
+}
+
 export const getChoices = async (): Promise<AxiosResponse<Choice[]>> => {
   const token = (await authClient.getToken()).data;
 
@@ -122,7 +134,7 @@ export const setRetain = async (): Promise<AxiosResponse<SuccessResponse>> => {
   return res;
 };
 
-export const createPreference = async (data: PreferenceOrder): Promise<AxiosResponse<SuccessResponse>> => {
+export const createPreference = async (data: PreferenceOrder): Promise<AxiosResponse<CreatePreferenceResponse>> => {
   const token = (await authClient.getToken()).data;
 
   if (token === null || token === undefined) {

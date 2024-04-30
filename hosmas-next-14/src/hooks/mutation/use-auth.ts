@@ -1,4 +1,4 @@
-import { login } from '@/services/auth';
+import { initiatePasswordReset, login, resetPassword } from '@/services/auth';
 import { changePassword } from '@/services/profile';
 import type { UseMutationResult } from '@tanstack/react-query';
 
@@ -9,6 +9,13 @@ export const useLogin = ({ onSuccess, onError }: ResolutionFunctions): UseMutati
   return useCustomMutation(login, onSuccess, onError);
 };
 
+export const useInitiatePasswordReset = ({ onSuccess, onError }: ResolutionFunctions): UseMutationResult => {
+  return useCustomMutation(initiatePasswordReset, onSuccess, onError);
+};
+
+export const useResetPassword = ({ onSuccess, onError }: ResolutionFunctions): UseMutationResult => {
+  return useCustomMutation(resetPassword, onSuccess, onError);
+};
 export const useChangePassword = ({ onSuccess, onError }: ResolutionFunctions): UseMutationResult => {
   return useCustomMutation(changePassword, onSuccess, onError);
 };
