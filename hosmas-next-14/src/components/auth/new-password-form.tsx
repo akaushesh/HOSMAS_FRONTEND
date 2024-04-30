@@ -15,15 +15,18 @@ import { z as zod } from 'zod';
 
 import { authClient } from '@/lib/auth/client';
 
-const schema = zod.object({ email: zod.string().min(1, { message: 'Email is required' }).email() });
+interface NewPasswordProps {
+  slug: string;
+}
+
+const schema = zod.object({ password: zod.string().min(8, { message: 'Password should be atleast 8 characters' }) });
 
 type Values = zod.infer<typeof schema>;
 
-const defaultValues = { email: '' } satisfies Values;
+const defaultValues = { password: '' } satisfies Values;
 
-export function ResetPasswordForm(): React.JSX.Element {
+export function NewPasswordForm({ slug }: NewPasswordProps): React.JSX.Element {
   const [isPending, setIsPending] = React.useState<boolean>(false);
-  const [isSent, setIsSent] = React.useState<boolean>(false);
 
   const {
     control,
@@ -36,19 +39,22 @@ export function ResetPasswordForm(): React.JSX.Element {
     async (values: Values): Promise<void> => {
       setIsPending(true);
 
-      const { error } = await authClient.initiateResetPassword(values);
+      const data = {
+        slug,
+        password: values.password,
+      };
+      const { error } = await authClient.resetPassword(data);
 
       if (error) {
         setError('root', { type: 'server', message: error });
         setIsPending(false);
         return;
       }
-      setIsSent(true);
       setIsPending(false);
 
       // Redirect to confirm password reset
     },
-    [setError]
+    [setError, slug]
   );
 
   return (
@@ -58,18 +64,18 @@ export function ResetPasswordForm(): React.JSX.Element {
         <Stack spacing={2}>
           <Controller
             control={control}
-            name="email"
+            name="password"
             render={({ field }) => (
-              <FormControl error={Boolean(errors.email)}>
+              <FormControl error={Boolean(errors.password)}>
                 <InputLabel>Email address</InputLabel>
-                <OutlinedInput {...field} label="Email address" type="email" />
-                {errors.email ? <FormHelperText>{errors.email.message}</FormHelperText> : null}
+                <OutlinedInput {...field} label="New Password" type="password" />
+                {errors.password ? <FormHelperText>{errors.password.message}</FormHelperText> : null}
               </FormControl>
             )}
           />
           {errors.root ? <Alert color="error">{errors.root.message}</Alert> : null}
-          <Button disabled={isPending || isSent} type="submit" variant="contained">
-            {isSent ? 'Check your email!' : 'Send recovery link'}
+          <Button disabled={isPending} type="submit" variant="contained">
+            Reset Password
           </Button>
         </Stack>
       </form>

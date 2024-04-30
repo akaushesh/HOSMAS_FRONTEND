@@ -4,9 +4,10 @@ import * as React from 'react';
 import { Button } from '@mui/material';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
+import type { AxiosError } from 'axios';
 
 import { logger } from '@/lib/default-logger';
-import { useResetPassword } from '@/hooks/mutation/use-auth';
+import { useCreatePreference } from '@/hooks/mutation/use-preference';
 
 // import { config } from '@/config';
 
@@ -22,14 +23,14 @@ export default function Page(): React.JSX.Element {
   const onSuccess = (): void => {
     logger.debug('Working');
   };
-  const onError = (): void => {
+  const onError = (error: AxiosError): void => {
     logger.error(error);
   };
 
   // const { mutate: login } = useLogin({ onSuccess });
   // const { mutate: retain } = useRetain({ onSuccess });
-  // const { mutate: createPreferece } = useCreatePreference({ onSuccess });
-  const { mutate: resetPassword, error } = useResetPassword({ onSuccess, onError });
+  const { mutate: createPreferece } = useCreatePreference({ onSuccess, onError });
+  // const { mutate: resetPassword } = useResetPassword({ onSuccess, onError });
   // const { mutate: initateResetPassword } = useInitiatePasswordReset({ onSuccess, onError });
 
   return (
@@ -39,10 +40,7 @@ export default function Page(): React.JSX.Element {
         <Button
           onClick={() => {
             // createPreferece({ order: { 1: 3, 2: 4 } });
-            resetPassword({
-              slug: 'moqtGWo3iiqQqDAsI7RefvVcCVEJOAdUPqOdq3fZh3qAo0yfZvTj9SG4zaKmevfpYvHFa6asrHWewH4EjSxnok6lmn32EqqMVimKKrNXEHeAPe1ikQta8MyL2UDEw7lUpiYeBWc',
-              password: 'password',
-            });
+            createPreferece({ order: { 1: 3, 2: 4 } });
             // initateResetPassword({ email: 'aparmar_be21@thapar.edu' });
           }}
         >

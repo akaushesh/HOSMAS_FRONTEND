@@ -1,6 +1,6 @@
 'use client';
 
-import { login } from '@/services/auth';
+import { initiatePasswordReset, login, resetPassword } from '@/services/auth';
 import type { TokenResponse } from '@/services/auth';
 import type { AxiosError, AxiosResponse } from 'axios';
 
@@ -42,8 +42,13 @@ export interface SignInWithPasswordParams {
   password: string;
 }
 
-export interface ResetPasswordParams {
+export interface InitiateResetPasswordParams {
   email: string;
+}
+
+export interface ResetPasswordParams {
+  slug: string;
+  password: string;
 }
 
 class AuthClient {
@@ -83,8 +88,35 @@ class AuthClient {
     return {};
   }
 
-  async resetPassword(_: ResetPasswordParams): Promise<{ error?: string }> {
-    return { error: 'Password reset not implemented' };
+  async initiateResetPassword(params: InitiateResetPasswordParams): Promise<{ error?: string }> {
+    try {
+      await initiatePasswordReset(params);
+    } catch (err) {
+      const axiosError = err as AxiosError<CustomErrorResponse>;
+      logger.error('initiate password reset', axiosError);
+
+      if (axiosError?.response?.data?.detail) {
+        return { error: axiosError.response.data.detail };
+      }
+      return { error: 'An error occurred' };
+    }
+    return {};
+  }
+
+  async resetPassword(params: ResetPasswordParams): Promise<{ error?: string }> {
+    try {
+      logger.debug('reset password', params);
+      await resetPassword(params);
+    } catch (err) {
+      const axiosError = err as AxiosError<CustomErrorResponse>;
+      logger.error('reset password', axiosError);
+
+      if (axiosError?.response?.data?.detail) {
+        return { error: axiosError.response.data.detail };
+      }
+      return { error: 'An error occurred' };
+    }
+    return {};
   }
 
   async updatePassword(_: ResetPasswordParams): Promise<{ error?: string }> {
