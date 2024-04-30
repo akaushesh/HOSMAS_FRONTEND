@@ -8,6 +8,7 @@ import type { AxiosError } from 'axios';
 
 import { logger } from '@/lib/default-logger';
 import { useCreatePreference } from '@/hooks/mutation/use-preference';
+import { useGroup } from '@/hooks/query/use-group';
 
 // import { config } from '@/config';
 
@@ -15,10 +16,12 @@ import { useCreatePreference } from '@/hooks/mutation/use-preference';
 
 export default function Page(): React.JSX.Element {
   // const { data } = useFaq();
-  // const { data } = useGroup();
+  const { data } = useGroup();
   // const { data } = useSentInvitationStatus();
   // const { data } = useReceivedInvitationStatus();
   // logger.debug('useReceivedInvitationStatus', data);
+
+  logger.debug('useGroup', data);
 
   const onSuccess = (): void => {
     logger.debug('Working');
