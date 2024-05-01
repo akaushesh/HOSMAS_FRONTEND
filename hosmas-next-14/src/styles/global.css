@@ -31,3 +31,25 @@ html {
 body {
   height: 100%;
 }
+
+
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--mui-palette-secondary-main);
+  border-radius: 80px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--mui-palette-secondary-light);
+}
+
+
+
+
