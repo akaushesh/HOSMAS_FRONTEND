@@ -3,6 +3,7 @@ import { paths } from '@/paths';
 
 export const navItems = [
   { key: 'overview', title: 'Overview', href: paths.dashboard.overview, icon: 'chart-pie' },
+  { key: 'group', title: 'Group', href: paths.dashboard.group, icon: 'users' },
   { key: 'customers', title: 'Customers', href: paths.dashboard.customers, icon: 'users' },
   { key: 'integrations', title: 'Integrations', href: paths.dashboard.integrations, icon: 'plugs-connected' },
   { key: 'preferences', title: 'Preferences', href: paths.dashboard.preference, icon: 'list-dashes' },
