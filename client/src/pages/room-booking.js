@@ -14,8 +14,6 @@ import { useLevels } from "src/hooks/use-rooms";
 
 const floorStringToNumber = (floor) => {
   switch (floor) {
-    case "ground":
-      return 0;
     case "first":
       return 1;
     case "second":
@@ -37,12 +35,12 @@ const floorStringToNumber = (floor) => {
     case "tenth":
       return 10;
     default:
-      return 0;
+      return 1;
   }
 };
 
 const Page = () => {
-  const [floor, setFloor] = useState("ground");
+  const [floor, setFloor] = useState("first");
 
   const handleChange = (event) => {
     setFloor(event.target.value);
@@ -80,7 +78,6 @@ const Page = () => {
                 autoWidth
                 sx={{ mb: 2 }}
               >
-                <MenuItem value="ground">Ground Floor</MenuItem>
                 <MenuItem value="first">First Floor</MenuItem>
                 <MenuItem value="second">Second Floor</MenuItem>
               </Select>

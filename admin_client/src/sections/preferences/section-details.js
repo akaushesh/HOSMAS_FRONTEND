@@ -117,6 +117,16 @@ function SectionPreference({ sectionId }) {
     } catch (err) {}
   };
 
+  const handleAllotmentResultsReleased = async (e) => {
+    try {
+      setIsAllotmentPublic(e.target.checked);
+      const updateData = { is_allotment_result_public: e.target.checked };
+
+      const res = await updateSection(sectionId, updateData, accessToken);
+      console.log(res);
+    } catch (err) {}
+  };
+
   const handleDownloadAllotmentData = async (e) => {
     try {
       const fetchDownloadLink = async () => {
@@ -244,6 +254,21 @@ function SectionPreference({ sectionId }) {
                       sx={{ transform: "translateY(5%)" }}
                       checked={isRetainEnabled}
                       onChange={handleRetainEnableChange}
+                    />
+                  </Stack>
+                </CardContent>
+              </Card>
+            </Grid>
+
+            <Grid xs={12} sm={6} md={12}>
+              <Card sx={{ display: "flex", alignItems: "center" }}>
+                <CardContent>
+                  <Stack direction="row" spacing={1} alignItems="center">
+                    <Typography variant="h5">Allotment Results Released</Typography>
+                    <Switch
+                      sx={{ transform: "translateY(5%)" }}
+                      checked={isAllotmentPublic}
+                      onChange={handleAllotmentResultsReleased}
                     />
                   </Stack>
                 </CardContent>

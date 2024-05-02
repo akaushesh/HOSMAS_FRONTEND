@@ -70,3 +70,12 @@ export const sendReminderMail = async (ids, accessToken) => {
   });
   return res;
 };
+
+export const runAllotmentScript = async (data, accessToken) => {
+  const res = await otherApi.post(`dashboard/allocate/`, data, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+  return res;
+};

@@ -27,7 +27,7 @@ import { useAuthContext } from "src/contexts/auth-context";
 import CustomModal from "src/components/CustomModal";
 import { getAllSections, updateSectionsAllotmentStatus } from "src/services/section";
 import EmailIcon from "@mui/icons-material/Email";
-import { getAcademicSession, sendReminderMail, updateAcademicSession } from "src/services/others";
+import { getAcademicSession, sendReminderMail, updateAcademicSession, runAllotmentScript } from "src/services/others";
 import ConfirmationModal from "src/components/ConfirmationModal";
 // import { OverviewBudget } from "../overview/overview-budget";
 // import { OverviewTotalCustomers } from "../overview/overview-total-customers";
@@ -77,11 +77,14 @@ export const AdminAccountProfilePage = () => {
   const [email, setEmail] = useState();
   const [sections, setSections] = useState([]);
   const [openUpdatePreferenceModal, setOpenUpdatePreferenceModal] = useState(false);
+  const [openRunScriptSelectionModal, setOpenRunScriptSelectionModal] = useState(false);
   const [openAcademicSessionModal, setOpenAcademicSessionModal] = useState(false);
   const [openFeeStructureLinkModal, setOpenFeeStructureLinkModal] = useState(false);
   const [academicSession, setAcademicSession] = useState("");
   const [feeStructureLink, setFeeStructureLink] = useState("");
   const [enableAllotmentConfirmationModalOpen, setEnableAllotmentConfirmationModalOpen] =
+    useState(false);
+  const [runScriptConfirmationModalOpen, setRunScriptConfirmationModalOpen] =
     useState(false);
   const [openReminderMailModal, setOpenReminderMailModal] = useState(false);
   const [reminderMailConfirmationModalOpen, setReminderMailConfirmationModalOpen] = useState(false);
@@ -157,7 +160,45 @@ export const AdminAccountProfilePage = () => {
       const res = await updateSectionsAllotmentStatus(allotmentStatusData, accessToken);
       if (res.status == 200) {
         setOpenUpdatePreferenceModal(false);
-        setEnableAllotmentConfirmationModalOpen(false);
+      }
+      console.log(res);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+
+  const handleRunScriptSelectionClick = async () => {
+    try {
+      const fetchSectionsData = async () => {
+        const res = await getAllSections(accessToken);
+        console.log(res);
+        setSections(res?.data);
+      };
+
+      fetchSectionsData();
+      setOpenRunScriptSelectionModal(true);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleRunScriptSelection = async () => {
+    try {
+      const sectionsList = sections.filter((section) => {
+        return section.release_results;
+      }).map((section) => {
+        return section.id;
+      })
+
+      const requestData = {
+        'sections': sectionsList
+      }
+
+      const res = await runAllotmentScript(requestData, accessToken);
+      if (res.status == 202) {
+        setOpenRunScriptSelectionModal(false);
+        setRunScriptConfirmationModalOpen(false);
       }
       console.log(res);
     } catch (err) {
@@ -169,6 +210,15 @@ export const AdminAccountProfilePage = () => {
     setSections((prev) => {
       return prev.map((section) => {
         if (section.id == id) return { ...section, is_allotment_enabled: checked };
+        return section;
+      });
+    });
+  };
+
+  const updateRunScriptSectionStatus = async (id, checked) => {
+    setSections((prev) => {
+      return prev.map((section) => {
+        if (section.id == id) return { ...section, release_results: checked };
         return section;
       });
     });
@@ -385,26 +435,26 @@ export const AdminAccountProfilePage = () => {
             </Card>
           </Grid> */}
           <Grid xs={12} md={6} lg={4}>
-            <Card>
-              <Link href="/manage-groups" style={{ color: "black", textDecoration: "none" }}>
-                <CardContent>
-                  <Stack direction="row" alignItems="center" justifyContent="space-evenly">
-                    <Avatar
-                      sx={{
-                        backgroundColor: "brown",
-                        height: 56,
-                        width: 56,
-                      }}
-                    >
-                      <SvgIcon>
-                        <UsersIcon />
-                      </SvgIcon>
-                    </Avatar>
-                    <Typography>Run Script</Typography>
-                    <EastIcon fontSize="large" />
-                  </Stack>
-                </CardContent>
-              </Link>
+            <Card onClick={handleRunScriptSelectionClick}>
+              <CardContent sx={{ cursor: "pointer" }}>
+                <Stack direction="row" alignItems="center" justifyContent="space-evenly">
+                  <Avatar
+                    sx={{
+                      backgroundColor: "blue",
+                      height: 56,
+                      width: 56,
+                    }}
+                  >
+                    <SvgIcon>
+                      <PlayCircleFilledWhiteIcon />
+                    </SvgIcon>
+                  </Avatar>
+                  <Typography textAlign="center">
+                    Run Script
+                  </Typography>
+                  <EastIcon fontSize="large" />
+                </Stack>
+              </CardContent>
             </Card>
           </Grid>
           <Grid xs={12} md={6} lg={4}>
@@ -598,6 +648,45 @@ export const AdminAccountProfilePage = () => {
           </Button>
         </CustomModal>
 
+
+        <CustomModal
+          open={openRunScriptSelectionModal}
+          onClose={() => setOpenRunScriptSelectionModal(false)}
+          maxWidth={700}
+        >
+          <Grid container spacing={2} mb={2}>
+            {sections.map((section) => {
+              console.log(section);
+              return (
+                <Grid item xs={12} sm={6} md={4}>
+                  <Card>
+                    <CardContent>
+                      <Stack direction="row" alignItems="center" justifyContent="center">
+                        <Typography>
+                          {section.batch_name} {section.gender === "M" ? "BOYS" : "GIRLS"}
+                        </Typography>
+                        <Checkbox
+                          checked={section?.release_results}
+                          onChange={(e) => {
+                            updateRunScriptSectionStatus(section.id, e.target.checked);
+                          }}
+                        />
+                      </Stack>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              );
+            })}
+          </Grid>
+          <Button
+            variant="contained"
+            onClick={() => setRunScriptConfirmationModalOpen(true)}
+            sx={{ display: "block", margin: "0 auto" }}
+          >
+            Run Allotment Script
+          </Button>
+        </CustomModal>
+
         <ConfirmationModal
           open={enableAllotmentConfirmationModalOpen}
           onClose={() => {
@@ -607,6 +696,17 @@ export const AdminAccountProfilePage = () => {
           noMessage="No, leave it"
           yesMessage="Yes, update"
           execFunction={handleUpdatePrefernceSelection}
+        />
+
+        <ConfirmationModal
+          open={runScriptConfirmationModalOpen}
+          onClose={() => {
+            setRunScriptConfirmationModalOpen(false);
+          }}
+          message="Are you sure you want to run hostel allotment script? This action will allocate hostels to all students. Althogh the results will not get publically declared now. You can still re-run this script and adjust allotment results."
+          noMessage="No, leave it"
+          yesMessage="Yes, run script"
+          execFunction={handleRunScriptSelection}
         />
 
         <ConfirmationModal
