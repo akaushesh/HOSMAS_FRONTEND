@@ -5,11 +5,11 @@ import { Box, Paper, SvgIcon, Typography } from '@mui/material';
 import oneS from '../Assets/1S.svg'
 import { navIcons } from './icons';
 
-interface PropsN {
+interface logo {
   logo: string;
 }
 
-const NavIcon: React.FC<PropsN> = ({ logo }) => {
+const NavIcon: React.FC<logo> = ({ logo }) => {
   const Icon = navIcons[logo];
   return (
     <img src={Icon} alt='logo' style={{scale:"0.8"}}/>
@@ -20,11 +20,12 @@ const NavIcon: React.FC<PropsN> = ({ logo }) => {
 interface Props {
   logo: string;
   id: string;
-  content: string;
+  room: string;
+  hostel: string;
 }
 
 
-const Card: React.FC<Props> = ({ logo,id, content }) => {
+const Card: React.FC<Props> = ({ logo,id, room,hostel }) => {
   const { setNodeRef, attributes, listeners, transition, transform } = useSortable({ id });
   const style = {
     transition,
@@ -40,6 +41,7 @@ const Card: React.FC<Props> = ({ logo,id, content }) => {
         alignItems: 'center',
         justifyContent: 'space-between',
         px: 2,
+        py:"3px",
         border: '1px dashed',
         my: 1,
         touchAction: 'none',
@@ -50,7 +52,11 @@ const Card: React.FC<Props> = ({ logo,id, content }) => {
     >
       <Box sx={{display:"flex", alignItems:"center"}} gap={2}>
         <NavIcon logo={logo} />
-        <p>{content}</p>
+        <Box sx={{display:"flex",alignItems:"baseline",justifyContent:"flex-start"}} gap={1.2}>
+          <Typography variant='h6' >{logo}</Typography>
+          <Typography variant='h5'  fontSize={"19px"}>{room}</Typography>
+          <Typography variant='subtitle2'>{hostel}</Typography>
+        </Box>
       </Box>
 
       <Typography

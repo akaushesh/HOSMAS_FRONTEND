@@ -9,7 +9,8 @@ import Placeholder from './Placeholder';
 interface CardData {
   logo: string;
   id: string;
-  content: string;
+  room: string;
+  hostel: string;
 }
 
 interface Props {
@@ -34,7 +35,7 @@ const Collumn: React.FC<Props> = (props) => {
         {props.main.map((el) => {
           if(!el)return null;
           return (
-            <Card key={el.id} logo={el.logo} id={el.id} content={el.content} />
+            <Card key={el.id} logo={el.logo} id={el.id} room={el.room} hostel={el.hostel} />
           );
         })}
 

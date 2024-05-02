@@ -16,7 +16,7 @@ const Placeholder: React.FC<Props> = ({ id }) => {
     };
 
   return (
-    <Box sx={{border:"1px dashed", width:1,height:1,fontSize:"40px",fontWeight:"400",display:"flex",alignItems:"center",justifyContent:"center" }} ref={setNodeRef}  key={id} style={style}>
+    <Box sx={{border:"1px dashed", width:1,height:1,fontSize:"50px",fontWeight:"400",display:"flex",alignItems:"center",justifyContent:"center" }} borderRadius={1} ref={setNodeRef}  key={id} style={style}>
         +
     </Box>
   );

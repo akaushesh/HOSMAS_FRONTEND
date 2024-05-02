@@ -1,48 +1,92 @@
 'use client';
 
-import React, { useState } from 'react';
-import { closestCorners, DndContext, DragOverlay, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import React, { useEffect, useState } from 'react';
+import Head from 'next/head';
 import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  useSortable,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
-import { Box, Button, Paper, Stack, Typography } from '@mui/material';
+  closestCorners,
+  DndContext,
+  DragOverlay,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import { restrictToWindowEdges } from '@dnd-kit/modifiers';
+import { arrayMove, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { Box, Button, Checkbox, CircularProgress, Paper, Stack, Typography } from '@mui/material';
+
+import { useChoices, usePreference, usePreferenceStatus } from '@/hooks/query/use-preference';
 
 import Collumn from './Components/Collumn';
-import styles from './page.module.css';
-import { restrictToWindowEdges } from '@dnd-kit/modifiers';
+
+
 
 interface Card {
   logo: string;
   id: string;
-  content: string;
+  room: string;
+  hostel: string;
 }
 
-const cards1: Card[] = [
-  { logo:'1S',id: 'card1', content: 'Card 1' },
-  { logo:'2S',id: 'card2', content: 'Card 2' },
-  { logo:'3S',id: 'card3', content: 'Card 3' },
-  { logo:'1S',id: 'card4', content: 'Card 4' },
-  { logo:'2S',id: 'card5', content: 'Card 5' },
-  { logo:'3S',id: 'card6', content: 'Card 6' },
-  { logo:'4S',id: 'card7', content: 'Card 7' },
-];
-
-const cards2: Card[] = [
-  { logo:'2S',id: 'card8', content: 'Card 8' },
-  { logo:'1S',id: 'card9', content: 'Card 9' },
-  { logo:'3S',id: 'card10', content: 'Card 10' },
-  { logo:'4S',id: 'card11', content: 'Card 11' },
-  { logo:'4S',id: 'card12', content: 'Card 12' },
-  { logo:'4S',id: 'card13', content: 'Card 13' },
-];
+interface Response {
+  data: any;
+  isLoading: boolean;
+}
 
 const page = () => {
-  const [data1, setData1] = useState<Card[]>(cards1);
-  const [data2, setData2] = useState<Card[]>(cards2);
+  const { data: choices, isLoading: isLoadingChoices } = useChoices() as Response;
+  const { data: prefernces, isLoading: isLoadingPreferences } = usePreference() as Response;
+  const { data: PrefStatus, isLoading: isLoadPrefStatus } = usePreferenceStatus() as Response;
+
+  const [allowPref, setAllowPref] = useState<boolean>(true);
+
+  const [data1, setData1] = useState<Card[]>([]);
+  const [data2, setData2] = useState<Card[]>([]);
+  const [allowRetain, setAllowRetain] = useState<boolean>(true);
+  const [isRetain, setRetain] = useState<boolean>(false);
+
+
+
+  useEffect(() => {
+    if (!isLoadingChoices && !isLoadingPreferences && !isLoadPrefStatus) {
+      setData1(
+        choices.data.map((el: any) => {
+          const preferenceExists = prefernces.data.data.preferences.find(
+            (pref: any) => pref.room_type_name === el.room_name && pref.hostel_name === el.room_hostel
+          );
+          if (preferenceExists) return null;
+
+          return {
+            logo: el.room_name.substr(0, 2),
+            id: el.id,
+            room: el.room_name.substr(3),
+            hostel: el.room_hostel,
+          };
+        })
+      );
+
+
+      let d2=prefernces.data.data.preferences.map((el: any) => {
+        return {
+          logo: el.room_type_name.substr(0, 2),
+          id: el.id,
+          room: el.room_type_name.substr(3),
+          hostel: el.hostel_name,
+        };
+      }) as Card[];
+      setData2(d2);
+
+      
+      let retain;
+      if (PrefStatus.data.can_retain) {
+        retain=(prefernces.data.data.retain);
+      }
+      setRetain(retain);
+
+      setAllowRetain(PrefStatus.data.can_retain);
+      setAllowPref(PrefStatus.data.is_live);
+    }
+  }, [isLoadingChoices, isLoadingPreferences, isLoadPrefStatus]);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -88,25 +132,85 @@ const page = () => {
     }
   };
 
-  const [disabled, setDisabled] = useState(false);
+  const [disabled, setDisabled] = useState(true);
+  useEffect(() => {
+    if (data1.length === 0 || isRetain ){
+      setDisabled(false);
+    }
+    else {
+      if(disabled !== true) {
+        setDisabled(true);
+      }
+    }
+
+  }, [data1, isRetain,data2]);
+
+
+  const handleReset = () => {
+    setData1(
+      choices.data.map((el: any) => {
+        return {
+          logo: el.room_name.substr(0, 2),
+          id: el.id,
+          room: el.room_name.substr(3),
+          hostel: el.room_hostel,
+        };
+      })
+    );
+    setData2([]);
+    if (allowRetain) setRetain(false);
+  };
+
+
+  const[saving,setSaving]=useState(false);
+  const[saveCont,setSaveCont]=useState("SAVE");
+  const handleSubmit=()=>{
+
+  }
 
   return (
     <Stack>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 8 }}>
         <Box>
-          <Typography variant="h2" sx={{ color: 'inherit' }}>
+          <Typography variant="h3" sx={{ color: 'inherit' }}>
             Hostel Preference Order
           </Typography>
-          <Typography>Drag and Drop your hostel preferences in order</Typography>
+          
+          <Typography>
+            {allowPref?" Drag and Drop your hostel preferences in order":"Preference Selection is now locked."}
+          </Typography>
+        
         </Box>
 
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end', mb: 1 }} gap={2}>
-          <Button sx={{ px: 7, fontSize: 16 }} color="inherit" variant="contained">
-            RESET
-          </Button>
-          <Button sx={{ px: 7, fontSize: 16 }} disabled={disabled} color="inherit" variant="contained">
-            SAVE
-          </Button>
+        <Box 
+          width={'35%'} 
+          sx={{ 
+            opacity: !allowPref ? 0.45 : 1, 
+            pointerEvents: !allowPref ? 'none' : 'initial' 
+          }}
+        >
+
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end', mb: 1 }} gap={2}>
+            <Button sx={{ px: 7, fontSize: 16 }} color="inherit" variant="contained" onClick={() => handleReset()}>
+              RESET
+            </Button>
+            <Button sx={{ px: 7, fontSize: 16 }} disabled={disabled} color="inherit" variant="contained">
+              SAVE
+            </Button>
+          </Box>
+
+          <Typography
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'flex-end',
+              opacity: !allowRetain ? 0.45 : 1,
+              pointerEvents: !allowRetain ? 'none' : 'initial',
+            }}
+            variant="h6"
+          >
+            Retain Current Allotment :: <Checkbox onChange={() => setRetain(!isRetain)} checked={isRetain} />
+          </Typography>
         </Box>
       </Box>
 
@@ -117,46 +221,61 @@ const page = () => {
         collisionDetection={closestCorners}
         modifiers={[restrictToWindowEdges]}
       >
-        <Box sx={{ display: 'flex', justifyContent: 'space-evenly'}}>
-
-
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-evenly',
+            opacity: (isRetain||!allowPref) ? 0.45 : 1,
+            pointerEvents: (isRetain||!allowPref) ? 'none' : 'initial',
+          }}
+        >
           <Paper
             elevation={4}
             sx={{
               width: '30%',
-              height: '65vh',
+              minHeight: '45vh',
               p: 2,
               display: 'flex',
               alignItems: 'center',
               flexDirection: 'column',
-              justifyContent: 'space-between',
+              justifyContent: isLoadingChoices ? 'center' : 'space-between',
             }}
           >
-            <Typography variant="overline" sx={{ textAlign:"left" , mb:2 }} width={1} >
-              You have selected {data2.length} out of {data1.length + data2.length} items.
-            </Typography>
-            <Collumn id={'collumn1'} main={data1} second={data2} />
+            {isLoadingChoices && <CircularProgress color="inherit" />}
+
+            {!isLoadingChoices && (
+              <>
+                <Typography variant="overline" sx={{ textAlign: 'left', mb: 2 }} width={1}>
+                  You have selected {data2.length} out of {data1.length + data2.length} items.
+                </Typography>
+                <Collumn id={'collumn1'} main={data1} second={data2} />
+              </>
+            )}
           </Paper>
 
           <Paper
             elevation={4}
             sx={{
               width: '30%',
-              height: '65vh',
+              minHeight: '45vh',
               p: 2,
               display: 'flex',
               alignItems: 'center',
               flexDirection: 'column',
-              justifyContent: 'space-between',
+              justifyContent: isLoadingPreferences ? 'center' : 'space-between',
             }}
           >
-            <Typography variant="overline" sx={{ textAlign:"left" , mb:2 }} width={1} >
-              Arrange your preferences here.
-            </Typography>
-            <Collumn id={'collumn2'} main={data2} second={data1} />
+            {isLoadingPreferences && <CircularProgress color="inherit" />}
+
+            {!isLoadingPreferences && (
+              <>
+                <Typography variant="overline" sx={{ textAlign: 'left', mb: 2 }} width={1}>
+                  Arrange your preferences here.
+                </Typography>
+                <Collumn id={'collumn2'} main={data2} second={data1} />
+              </>
+            )}
           </Paper>
-
-
         </Box>
       </DndContext>
     </Stack>
