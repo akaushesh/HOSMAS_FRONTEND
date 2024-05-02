@@ -24,12 +24,12 @@ interface PreferenceData {
   preferences: Preference[];
 }
 
-interface PreferenceResponse {
+export interface PreferenceResponse {
   status: string;
   data: PreferenceData;
 }
 
-interface PreferenceStatusResponse {
+export interface PreferenceStatusResponse {
   is_live: string;
   can_retain: string;
 }

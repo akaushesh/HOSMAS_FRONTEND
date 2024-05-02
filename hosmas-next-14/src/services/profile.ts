@@ -33,7 +33,7 @@ interface Hostel {
   fee: number;
 }
 
-interface ProfileResponse {
+export interface ProfileResponse {
   rollno: string;
   name: string;
   phoneno: string;
