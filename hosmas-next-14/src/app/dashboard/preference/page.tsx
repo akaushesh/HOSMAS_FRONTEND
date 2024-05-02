@@ -65,6 +65,7 @@ const page = () => {
         })
       );
 
+      console.log(prefernces.data.data.preferences);
 
       let d2=prefernces.data.data.preferences.map((el: any) => {
         return {
@@ -164,8 +165,35 @@ const page = () => {
 
   const[saving,setSaving]=useState(false);
   const[saveCont,setSaveCont]=useState("SAVE");
-  const handleSubmit=()=>{
 
+  const handleSubmit=(event:any)=>{
+    event.preventDefault();
+    setSaving(true);
+    
+    let pref:any=[];
+
+    if(!isRetain){
+      pref=data2.map((el,index)=>{
+        return({
+          id: el.id,
+          room_type_name: el.logo+' '+el.room,
+          hostel_name: el.hostel,
+          preference:index
+        })
+      })
+    }
+
+
+
+    console.log(pref);
+
+    // POST
+
+    setSaving(false);
+    setSaveCont('SAVED!');
+    setTimeout(()=>{
+      setSaveCont('SAVE');
+    },2000)
   }
 
   return (
@@ -194,8 +222,8 @@ const page = () => {
             <Button sx={{ px: 7, fontSize: 16 }} color="inherit" variant="contained" onClick={() => handleReset()}>
               RESET
             </Button>
-            <Button sx={{ px: 7, fontSize: 16 }} disabled={disabled} color="inherit" variant="contained">
-              SAVE
+            <Button sx={{ px: 7, fontSize: 16 }} disabled={disabled} color="inherit" variant="contained" onClick={(e)=>handleSubmit(e)}>
+              {saving?<CircularProgress/>:saveCont}
             </Button>
           </Box>
 
