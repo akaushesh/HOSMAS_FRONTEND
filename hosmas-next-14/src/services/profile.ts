@@ -86,6 +86,7 @@ export const changePassword = async (values: ResetPasswordData): Promise<AxiosRe
   const data = {
     password: values.password,
   };
+  logger.debug('changePassword', data);
 
   const res = await authApi.post('auth/change-password/', data, {
     headers: {

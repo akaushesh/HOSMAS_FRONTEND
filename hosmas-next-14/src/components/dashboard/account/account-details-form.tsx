@@ -14,6 +14,8 @@ import OutlinedInput from '@mui/material/OutlinedInput';
 import Select from '@mui/material/Select';
 import Grid from '@mui/material/Unstable_Grid2';
 
+import { AccountInput } from './account-input';
+
 const states = [
   { value: 'alabama', label: 'Alabama' },
   { value: 'new-york', label: 'New York' },
@@ -29,14 +31,13 @@ export function AccountDetailsForm(): React.JSX.Element {
       }}
     >
       <Card>
-        <CardHeader subheader="The information can be edited" title="Profile" />
-        <Divider />
+        <CardHeader subheader="Contact queries_studentaffairs@thapar.edu for any discrepancy" title="Profile" />
+        {/* <Divider /> */}
         <CardContent>
           <Grid container spacing={3}>
             <Grid md={6} xs={12}>
               <FormControl fullWidth required>
-                <InputLabel>First name</InputLabel>
-                <OutlinedInput defaultValue="Sofia" label="First name" name="firstName" />
+                <AccountInput detail="Sanya" />
               </FormControl>
             </Grid>
             <Grid md={6} xs={12}>

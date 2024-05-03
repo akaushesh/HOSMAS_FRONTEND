@@ -15,7 +15,7 @@ export interface TokenResponse {
   access: string;
 }
 
-interface ErrorResponse {
+export interface ErrorResponse {
   details: string;
 }
 
