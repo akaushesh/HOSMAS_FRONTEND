@@ -18,6 +18,8 @@ import { Box, Button, Checkbox, CircularProgress, Paper, Stack, Typography } fro
 import { useChoices, usePreference, usePreferenceStatus } from '@/hooks/query/use-preference';
 
 import Collumn from './Components/Collumn';
+import { useQueryClient } from '@tanstack/react-query';
+import { useProfile } from '@/hooks/query/use-profile';
 
 
 
@@ -33,39 +35,55 @@ interface Response {
   isLoading: boolean;
 }
 
+
+
+
+
+
+
+
+
 const page = () => {
+
+  // QUERIES
   const { data: choices, isLoading: isLoadingChoices } = useChoices() as Response;
   const { data: prefernces, isLoading: isLoadingPreferences } = usePreference() as Response;
   const { data: PrefStatus, isLoading: isLoadPrefStatus } = usePreferenceStatus() as Response;
+  const { data: user, isLoading: isLoadProfile } = useProfile() as Response;
 
+  // ADMIN RESTRICTIONS
   const [allowPref, setAllowPref] = useState<boolean>(true);
+  const [allowRetain, setAllowRetain] = useState<boolean>(true);
 
+  // CLIENT SIDE
   const [data1, setData1] = useState<Card[]>([]);
   const [data2, setData2] = useState<Card[]>([]);
-  const [allowRetain, setAllowRetain] = useState<boolean>(true);
   const [isRetain, setRetain] = useState<boolean>(false);
 
+  const isLeader = !user?.group || user?.user?.email === user?.group?.leader_email;
+
+  // TEMP DATA TO CHECK IF CHANGES ARE DONE
+  const[initialData,setInitialData]=useState({
+    data2:[] as any,
+    isRetain:false,
+  })
 
 
+
+// INITIALISATION
   useEffect(() => {
     if (!isLoadingChoices && !isLoadingPreferences && !isLoadPrefStatus) {
-      setData1(
-        choices.data.map((el: any) => {
-          const preferenceExists = prefernces.data.data.preferences.find(
-            (pref: any) => pref.room_type_name === el.room_name && pref.hostel_name === el.room_hostel
-          );
-          if (preferenceExists) return null;
 
-          return {
+      setData1(
+        choices.data
+          .filter((el: any) => !prefernces.data.data.preferences.some((pref: any) => pref.room_type_name === el.room_name && pref.hostel_name === el.room_hostel))
+          .map((el: any) => ({
             logo: el.room_name.substr(0, 2),
             id: el.id,
             room: el.room_name.substr(3),
             hostel: el.room_hostel,
-          };
-        })
+          }))
       );
-
-      console.log(prefernces.data.data.preferences);
 
       let d2=prefernces.data.data.preferences.map((el: any) => {
         return {
@@ -74,32 +92,37 @@ const page = () => {
           room: el.room_type_name.substr(3),
           hostel: el.hostel_name,
         };
-      }) as Card[];
+      })
       setData2(d2);
 
-      
-      let retain;
+      setInitialData({
+        data2:d2,
+        isRetain:PrefStatus.data.can_retain?prefernces.data.data.retain:false
+      }) 
+
       if (PrefStatus.data.can_retain) {
-        retain=(prefernces.data.data.retain);
+        setRetain(prefernces.data.data.retain);
       }
-      setRetain(retain);
 
       setAllowRetain(PrefStatus.data.can_retain);
       setAllowPref(PrefStatus.data.is_live);
     }
   }, [isLoadingChoices, isLoadingPreferences, isLoadPrefStatus]);
 
+
+
+
+
+// DND KIT
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   );
-
   const getPos = (id: string, data: Card[]): number => {
     return data.findIndex((item) => item.id === id);
   };
-
   const handleDragEndNOver = (event: any) => {
     const { active, over } = event;
     if (!over) return;
@@ -133,20 +156,53 @@ const page = () => {
     }
   };
 
+
+
+
+  // SAVE--DISABLED--CONDITION
+
+  const arraysAreEqualExcludingId = (arr1:any[], arr2:any[]) => {
+    if (arr1.length !== arr2.length) {
+      return false;
+    }
+  
+    for (let i = 0; i < arr1.length; i++) {
+      const obj1 = { ...arr1[i] };
+      const obj2 = { ...arr2[i] };
+  
+      delete obj1.id;
+      delete obj2.id;
+  
+      if (JSON.stringify(obj1) !== JSON.stringify(obj2)) {
+        return false;
+      }
+    }
+  
+    return true;
+  };
   const [disabled, setDisabled] = useState(true);
   useEffect(() => {
-    if (data1.length === 0 || isRetain ){
-      setDisabled(false);
-    }
-    else {
+    const arraysAreEqual = arraysAreEqualExcludingId(initialData.data2, data2);
+
+    console.log(initialData.data2,"---",data2);  
+    if((initialData.isRetain===true && isRetain===true)||(arraysAreEqual && initialData.isRetain===isRetain)){
       if(disabled !== true) {
         setDisabled(true);
       }
     }
+    else if (data1.length === 0 || isRetain ){
+      setDisabled(false);
+    }
+    else{
+      if(disabled !== true) {
+        setDisabled(true);
+      }
+    }
+  
+  }, [data1, isRetain ,data2]);
 
-  }, [data1, isRetain,data2]);
 
-
+// RESET BUTTON
   const handleReset = () => {
     setData1(
       choices.data.map((el: any) => {
@@ -163,9 +219,10 @@ const page = () => {
   };
 
 
+
+// SAVE BUTTON
   const[saving,setSaving]=useState(false);
   const[saveCont,setSaveCont]=useState("SAVE");
-
   const handleSubmit=(event:any)=>{
     event.preventDefault();
     setSaving(true);
@@ -178,14 +235,14 @@ const page = () => {
           id: el.id,
           room_type_name: el.logo+' '+el.room,
           hostel_name: el.hostel,
-          preference:index
+          priority:index+1
         })
       })
     }
 
+    let d={preferences:pref,retain:isRetain}
 
-
-    console.log(pref);
+    console.log(d);
 
     // POST
 
@@ -195,6 +252,8 @@ const page = () => {
       setSaveCont('SAVE');
     },2000)
   }
+
+
 
   return (
     <Stack>
@@ -213,8 +272,8 @@ const page = () => {
         <Box 
           width={'35%'} 
           sx={{ 
-            opacity: !allowPref ? 0.45 : 1, 
-            pointerEvents: !allowPref ? 'none' : 'initial' 
+            opacity: (!allowPref || !isLeader) ? 0.45 : 1, 
+            pointerEvents: (!allowPref || !isLeader) ? 'none' : 'initial' 
           }}
         >
 
@@ -253,8 +312,8 @@ const page = () => {
           sx={{
             display: 'flex',
             justifyContent: 'space-evenly',
-            opacity: (isRetain||!allowPref) ? 0.45 : 1,
-            pointerEvents: (isRetain||!allowPref) ? 'none' : 'initial',
+            opacity: (isRetain||!allowPref||!isLeader) ? 0.45 : 1,
+            pointerEvents: (isRetain||!allowPref||!isLeader) ? 'none' : 'initial',
           }}
         >
           <Paper
