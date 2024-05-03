@@ -63,6 +63,7 @@ class Section(models.Model):
     is_allotment_enabled = models.BooleanField(default=False)
     is_retain_allowed = models.BooleanField(default=False)
     is_allotment_result_public = models.BooleanField(default=False)
+    is_room_allotment_enabled = models.BooleanField(default=False)
     group_size_limit = models.PositiveIntegerField(default=1)
 
     class Meta:

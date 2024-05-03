@@ -128,7 +128,7 @@ class SectionSerializer(serializers.ModelSerializer):
       batch_name = serializers.SerializerMethodField()
       class Meta:
             model = Section
-            fields = ['id', 'batch_name', 'batch', 'gender', 'is_allotment_result_public', 'is_allotment_enabled', 'is_retain_allowed', 'group_size_limit']
+            fields = ['id', 'batch_name', 'batch', 'gender', 'is_allotment_result_public', 'is_allotment_enabled', 'is_retain_allowed', 'is_room_allotment_enabled', 'group_size_limit']
             extra_kwargs = {
                   'batch': {'write_only': True}
             }
@@ -151,6 +151,7 @@ class SectionSerializer(serializers.ModelSerializer):
                         release_allotment_results.delay(instance.id, self.context.get('fee_submission_deadline'), self.context.get('reporting_information'))
                   instance.is_allotment_result_public = updated_allotment_result_status
 
+            instance.is_room_allotment_enabled = validated_data.get('is_room_allotment_enabled', instance.is_room_allotment_enabled)
             instance.is_retain_allowed = validated_data.get('is_retain_allowed', instance.is_retain_allowed)
             instance.group_size_limit = validated_data.get('group_size_limit', instance.group_size_limit)
             
