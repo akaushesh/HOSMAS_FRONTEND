@@ -30,9 +30,12 @@ function SectionPreference({ sectionId }) {
   const [sectionData, setSectionData] = useState();
   const [preferences, setPreferences] = useState([]);
   const [isAllotmentEnabled, setIsAllotmentEnabled] = useState(false);
+  const [isRoomAllotmentEnabled, setIsRoomAllotmentEnabled] = useState(false);
   const [isRetainEnabled, setIsRetainEnabled] = useState(false);
   const [confirmationModalOpen, setConfirmationModalOpen] = useState();
   const [enableAllotmentConfirmationModalOpen, setEnableAllotmentConfirmationModalOpen] =
+    useState();
+  const [enableRoomAllotmentConfirmationModalOpen, setEnableRoomAllotmentConfirmationModalOpen] =
     useState();
   const [groupSize, setGroupSize] = useState();
   const [openGroupSizeModal, setOpenGroupSizeModal] = useState(false);
@@ -51,6 +54,7 @@ function SectionPreference({ sectionId }) {
           gender: res?.data?.gender,
         });
         setIsAllotmentEnabled(res?.data?.is_allotment_enabled);
+        setIsRoomAllotmentEnabled(res?.data?.is_room_allotment_enabled);
         setIsRetainEnabled(res?.data?.is_retain_allowed);
         setIsAllotmentPublic(res?.data?.is_allotment_result_public);
         setGroupSize(res?.data?.group_size_limit);
@@ -101,6 +105,29 @@ function SectionPreference({ sectionId }) {
     try {
       setIsAllotmentEnabled(false);
       const updateData = { is_allotment_enabled: false };
+
+      const res = await updateSection(sectionId, updateData, accessToken);
+      console.log(res);
+    } catch (err) {}
+  };
+
+  const handleRoomAllotmentEnable = async () => {
+    try {
+      setIsRoomAllotmentEnabled(true);
+      const updateData = { is_room_allotment_enabled: true };
+
+      const res = await updateSection(sectionId, updateData, accessToken);
+      if (res.status == 200) {
+        setEnableRoomAllotmentConfirmationModalOpen(false);
+      }
+      console.log(res);
+    } catch (err) {}
+  };
+
+  const handleRoomAllotmentDisable = async () => {
+    try {
+      setIsRoomAllotmentEnabled(false);
+      const updateData = { is_room_allotment_enabled: false };
 
       const res = await updateSection(sectionId, updateData, accessToken);
       console.log(res);
@@ -275,6 +302,27 @@ function SectionPreference({ sectionId }) {
               </Card>
             </Grid>
 
+            <Grid xs={12} sm={6} md={12}>
+              <Card sx={{ display: "flex", alignItems: "center" }}>
+                <CardContent>
+                  <Stack direction="row" spacing={1} alignItems="center">
+                    <Typography variant="h5">Enable Room Allotment</Typography>
+                    <Switch
+                      sx={{ transform: "translateY(5%)" }}
+                      checked={isRoomAllotmentEnabled}
+                      onChange={(e) => {
+                        if (e.target.checked == true) {
+                          setEnableRoomAllotmentConfirmationModalOpen(true);
+                        } else {
+                          handleRoomAllotmentDisable();
+                        }
+                      }}
+                    />
+                  </Stack>
+                </CardContent>
+              </Card>
+            </Grid>
+
             <Grid xs={4} md={12}>
               <Card
                 sx={{ display: "flex", alignItems: "center", cursor: "pointer" }}
@@ -330,6 +378,17 @@ function SectionPreference({ sectionId }) {
           noMessage="No, leave it"
           yesMessage="Yes, enable it"
           execFunction={handleAllotmentEnable}
+        />
+
+        <ConfirmationModal
+          open={enableRoomAllotmentConfirmationModalOpen}
+          onClose={() => {
+            setEnableRoomAllotmentConfirmationModalOpen(false);
+          }}
+          message="Are you sure you want to enable room allotment? This action will allow all the students of this section to select their room of choice in alloted hostel and room type."
+          noMessage="No, leave it"
+          yesMessage="Yes, enable it"
+          execFunction={handleRoomAllotmentEnable}
         />
       </Container>
     </Box>
