@@ -4,17 +4,17 @@ import type { UseMutationResult } from '@tanstack/react-query';
 import { useCustomMutation, type ResolutionFunctions } from './use-custom-mutation';
 
 export const useSendInvitation = ({ onSuccess, onError }: ResolutionFunctions): UseMutationResult => {
-  return useCustomMutation(sendInvitation, onSuccess, onError);
+  return useCustomMutation({ mutationFn: sendInvitation, onSuccess, onError });
 };
 
 export const useWithdrawInvitation = ({ onSuccess, onError }: ResolutionFunctions): UseMutationResult => {
-  return useCustomMutation(withdrawInvitation, onSuccess, onError);
+  return useCustomMutation({ mutationFn: withdrawInvitation, onSuccess, onError });
 };
 
 export const useAcceptInvitation = ({ onSuccess, onError }: ResolutionFunctions): UseMutationResult => {
-  return useCustomMutation(acceptInvitation, onSuccess, onError);
+  return useCustomMutation({ mutationFn: acceptInvitation, onSuccess, onError });
 };
 
 export const useDeleteInvitation = ({ onSuccess, onError }: ResolutionFunctions): UseMutationResult => {
-  return useCustomMutation(deleteInvitation, onSuccess, onError);
+  return useCustomMutation({ mutationFn: deleteInvitation, onSuccess, onError });
 };

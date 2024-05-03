@@ -6,16 +6,16 @@ import { useCustomMutation } from './use-custom-mutation';
 import type { ResolutionFunctions } from './use-custom-mutation';
 
 export const useLogin = ({ onSuccess, onError }: ResolutionFunctions): UseMutationResult => {
-  return useCustomMutation(login, onSuccess, onError);
+  return useCustomMutation({ mutationFn: login, onSuccess, onError });
 };
 
 export const useInitiatePasswordReset = ({ onSuccess, onError }: ResolutionFunctions): UseMutationResult => {
-  return useCustomMutation(initiatePasswordReset, onSuccess, onError);
+  return useCustomMutation({ mutationFn: initiatePasswordReset, onSuccess, onError });
 };
 
 export const useResetPassword = ({ onSuccess, onError }: ResolutionFunctions): UseMutationResult => {
-  return useCustomMutation(resetPassword, onSuccess, onError);
+  return useCustomMutation({ mutationFn: resetPassword, onSuccess, onError });
 };
 export const useChangePassword = ({ onSuccess, onError }: ResolutionFunctions): UseMutationResult => {
-  return useCustomMutation(changePassword, onSuccess, onError);
+  return useCustomMutation({ mutationFn: changePassword, onSuccess, onError });
 };
