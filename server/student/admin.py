@@ -59,7 +59,7 @@ class SectionAdmin(admin.ModelAdmin):
       def batch__name(self, obj):
             return obj.batch.name
 
-      list_display = ('id', 'batch__name', 'gender', 'is_allotment_enabled', 'is_retain_allowed', 'group_size_limit', 'is_allotment_result_public')
+      list_display = ('id', 'batch__name', 'gender', 'is_allotment_enabled', 'is_retain_allowed', 'group_size_limit', 'is_allotment_result_public', 'is_room_allotment_enabled')
       list_filter = ('gender', )
       search_fields = ('batch__name', )
 
