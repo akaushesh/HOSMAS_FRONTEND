@@ -5,13 +5,15 @@ import { logger } from '@/lib/default-logger';
 
 import { dashboardApi } from './api';
 
-export interface FAQResponse {
+interface FAQ {
   id: number;
   question: string;
   answer: string;
 }
 
-export const getFAQ = async (): Promise<AxiosResponse<FAQResponse[]>> => {
+export type FAQResponse = FAQ[];
+
+export const getFAQ = async (): Promise<AxiosResponse<FAQResponse>> => {
   const token = (await authClient.getToken()).data;
 
   if (token === null || token === undefined) {

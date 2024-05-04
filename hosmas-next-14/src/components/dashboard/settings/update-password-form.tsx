@@ -3,7 +3,7 @@
 import * as React from 'react';
 import type { ErrorResponse } from '@/services/auth';
 import type { OkResponse } from '@/services/profile';
-import Button from '@mui/material/Button';
+import { LoadingButton } from '@mui/lab';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
@@ -62,7 +62,7 @@ export function UpdatePasswordForm(): React.JSX.Element {
     logger.error('Error', err);
   };
 
-  const { mutate: changePassword } = useChangePassword({ onSuccess, onError });
+  const { mutate: changePassword, isPending } = useChangePassword({ onSuccess, onError });
 
   return (
     <form onSubmit={onSubmit}>
@@ -102,9 +102,9 @@ export function UpdatePasswordForm(): React.JSX.Element {
         </CardContent>
         <Divider />
         <CardActions sx={{ justifyContent: 'flex-end' }}>
-          <Button type="submit" variant="contained">
+          <LoadingButton loading={isPending} type="submit" variant="contained">
             Update
-          </Button>
+          </LoadingButton>
         </CardActions>
       </Card>
     </form>
