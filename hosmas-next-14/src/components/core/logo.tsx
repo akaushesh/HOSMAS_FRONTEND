@@ -19,15 +19,9 @@ export interface LogoProps {
 }
 
 export function Logo({ color = 'dark', emblem, height = HEIGHT, width = WIDTH }: LogoProps): React.JSX.Element {
-  let url: string;
+  let url: string='/assets/hosmas-logo.svg'
 
-  if (emblem) {
-    url = color === 'light' ? '/assets/logo-emblem.svg' : '/assets/logo-emblem--dark.svg';
-  } else {
-    url = color === 'light' ? '/assets/logo.svg' : '/assets/logo--dark.svg';
-  }
-
-  return <Box alt="logo" component="img" height={height} src={url} width={width} />;
+  return <Box alt="logo" component="img" height={height} src={url} width={width} mt={1} />;
 }
 
 export interface DynamicLogoProps {

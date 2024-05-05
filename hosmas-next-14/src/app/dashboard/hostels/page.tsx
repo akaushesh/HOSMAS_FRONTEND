@@ -72,7 +72,7 @@ export default function Page(): React.JSX.Element {
 
         <Box width={"65%"} sx={{display:"flex",alignItems:"center",justifyContent:"center"}} height={1} zIndex={2}>
           {name !== '' && (
-              <Typography variant='h1' sx={{textShadow:"0 0 10px #000"}} color={"white"}>{name}</Typography >
+              <Typography variant='h1' >{name}</Typography >
           )}
         </Box>
 

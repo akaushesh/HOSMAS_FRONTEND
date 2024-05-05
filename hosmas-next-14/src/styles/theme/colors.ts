@@ -111,9 +111,9 @@ export const stormGrey = {
 
 export const primaryRed = {
   300: '', 
-  400: '#cc3333', //  Only use
-  500: '#b30000', //  Only use
-  600: '',
+  400: '#ff0000',
+  500: '#cc3333', //  Only use
+  600: '#b30000', //  Only use
 } satisfies Color;
 
 export const secondaryGrey = {
@@ -124,8 +124,8 @@ export const secondaryGrey = {
 } satisfies Color;
 
 export const text = {
-  300: '',
-  400: '#cccccc', 
-  500: '#878787', 
+  300: '#cccccc', 
+  400: '#878787', 
+  500: '#5a5a5a',
   600: '#3A3A3A', 
 } satisfies Color;

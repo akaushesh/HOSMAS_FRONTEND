@@ -122,10 +122,10 @@ export const colorSchemes = {
       },
       text: {
         primary: text[600],
-        primaryChannel: text[400],
-        secondary: text[300],
-        secondaryChannel: text[500],
-        disabled: 'var(--mui-palette-neutral-400)',
+        primaryChannel: text[500],
+        secondary: text[400],
+        secondaryChannel: primaryRed[500],
+        disabled: text[300],
       },
       warning: {
         ...california,
