@@ -42,12 +42,12 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--mui-palette-secondary-main);
+  background: var(--mui-palette-secondary-dark);
   border-radius: 80px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--mui-palette-secondary-light);
+  background: var(--mui-palette-secondary-dark);
 }
 
 
