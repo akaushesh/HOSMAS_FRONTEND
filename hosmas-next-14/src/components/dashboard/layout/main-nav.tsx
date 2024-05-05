@@ -27,8 +27,7 @@ export function MainNav(): React.JSX.Element {
       <Box
         component="header"
         sx={{
-          borderBottom: '1px solid var(--mui-palette-divider)',
-          backgroundColor: 'var(--mui-palette-background-paper)',
+          backgroundColor: 'transparent',
           position: 'sticky',
           top: 0,
           zIndex: 'var(--mui-zIndex-appBar)',
@@ -37,29 +36,9 @@ export function MainNav(): React.JSX.Element {
         <Stack
           direction="row"
           spacing={2}
-          sx={{ alignItems: 'center', justifyContent: 'space-between', minHeight: '64px', px: 2 }}
+          sx={{ alignItems: 'center', justifyContent: 'flex-end', minHeight: '64px', px: 2 }}
         >
-          <Stack sx={{ alignItems: 'center' }} direction="row" spacing={2}>
-            <IconButton
-              onClick={(): void => {
-                setOpenNav(true);
-              }}
-              sx={{ display: { lg: 'none' } }}
-            >
-              <ListIcon />
-            </IconButton>
-            <Tooltip title="Search">
-              <IconButton>
-                <MagnifyingGlassIcon />
-              </IconButton>
-            </Tooltip>
-          </Stack>
-          <Stack sx={{ alignItems: 'center' }} direction="row" spacing={2}>
-            <Tooltip title="Contacts">
-              <IconButton>
-                <UsersIcon />
-              </IconButton>
-            </Tooltip>
+          <Stack sx={{ alignItems: 'center' }} direction="row" spacing={3} m={2}>
             <Tooltip title="Notifications">
               <Badge badgeContent={4} color="success" variant="dot">
                 <IconButton>

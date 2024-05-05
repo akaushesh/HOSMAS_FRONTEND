@@ -8,7 +8,7 @@ export const colorSchemes = {
     palette: {
       action: { disabledBackground: 'rgba(0, 0, 0, 0.12)' },
       background: {
-        default: 'var(--mui-palette-neutral-950)',
+        default: secondaryGrey[300],
         defaultChannel: '9 10 11',
         paper: 'var(--mui-palette-neutral-900)',
         level1: 'var(--mui-palette-neutral-800)',
@@ -74,7 +74,7 @@ export const colorSchemes = {
     palette: {
       action: { disabledBackground: 'rgba(0, 0, 0, 0.06)' },
       background: {
-        default: 'var(--mui-palette-common-white)',
+        default: secondaryGrey[300],
         defaultChannel: '255 255 255',
         paper: 'var(--mui-palette-common-white)',
         level1: 'var(--mui-palette-neutral-50)',

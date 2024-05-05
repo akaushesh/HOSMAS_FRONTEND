@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Box, Grid, Paper, Typography } from '@mui/material';
+import { Box, Divider, Grid, Link, List, ListItem, ListItemText, Paper, Typography } from '@mui/material';
 
 import hostels from '../data';
+import PopupGallery from '@/components/core/popupGallery';
 
 interface hostel {
   name: string;
@@ -24,6 +25,14 @@ export default function Page({ params }: { params: { slug: string } }): React.JS
   const id = params.slug;
   const [images, setImages] = useState<string[]>([]);
   const [data, setData] = useState<hostel | null>(null);
+  
+  
+  const [popup, setPopup] = useState<boolean>(false);
+
+  const handlePopup = (value: boolean) => {
+    setPopup(value);
+  }
+
 
   useEffect(() => {
     const hostel = hostels.find(({ path }) => id === path) as hostel;
@@ -43,14 +52,31 @@ export default function Page({ params }: { params: { slug: string } }): React.JS
 
   return (
     <>
-      <Paper sx={{ p: 1.5, borderRadius: 1, mb: 2 }} elevation={3}>
-        <Typography variant="h1">{data?.name}</Typography>
+      {popup && <PopupGallery images={images} handlePopup={handlePopup} />  }
+
+
+      <Paper sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between',width:1, gap:4 ,px: 3, py: 1, borderRadius: 1, mb: 2 }} elevation={3}>
+        <Box mb={0.5}>
+          <Typography variant="h2">{data?.name}</Typography>
+          <Typography variant="subtitle2" >{data?.description}</Typography>
+        </Box>
+        <Divider orientation="vertical" variant="middle" flexItem />
+        <Box>
+            <Typography textAlign={'center'} my={2}  variant="h6" fontSize={'17px'}>
+              <Link color={'inherit'} href={`mailto:${data?.email}`} target={'_blank'}>
+                {data?.email}
+              </Link>
+            </Typography>
+            <Typography textAlign={'center'} my={2} variant="h6" fontSize={'17px'}>
+              {data?.contact}
+            </Typography>
+          </Box>
       </Paper>
 
       <Box
         sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}
         gap={2}
-        height={'50vh'}
+        height={'42vh'}
         width={1}
       >
         <Box
@@ -66,7 +92,7 @@ export default function Page({ params }: { params: { slug: string } }): React.JS
           <img alt={data?.name} src={images[0]} style={imageStyle} />
         </Box>
 
-        <Grid width={'39%'} height={1} container gap={2}>
+        <Grid width={'39%'} height={1} container gap={2} >
           {images.slice(1, 4).map((image, index) => (
             <Grid
               item
@@ -105,6 +131,7 @@ export default function Page({ params }: { params: { slug: string } }): React.JS
                 backgroundColor: 'rgba(0, 0, 0, 0.5 )',
                 cursor: 'pointer',
               }}
+              onClick={() => handlePopup(true)}
               borderRadius={1}
               color={'white'}
               width={1}
@@ -116,39 +143,54 @@ export default function Page({ params }: { params: { slug: string } }): React.JS
           </Grid>
         </Grid>
       </Box>
+      
+      <Box sx={{display:'flex',alignItems:'center',justifyContent:'space-between',width:1, gap:5,mt:3}}>
 
-      <div className={styles.content}>
-        <p>{data?.description}</p>
-        <div className={styles.lowerCont}>
-          <div className={styles.HostelInfo}>
-            <p style={{ width: '25%' }}>
-              <b>Floors</b> <p> {data?.floors}</p>
-            </p>
-            <p style={{ width: '25%' }}>
-              <b>Rooms</b> <p> {data?.rooms}</p>
-            </p>
-            <p style={{ width: '40%' }}>
-              <b>Student Capacity</b> <p> {data?.students}</p>
-            </p>
-          </div>
-          <div className={styles.Contact}>
-            <div>
-              <div>
-                <b>Caretaker : </b>
-                {data?.caretaker}
-              </div>
-              <div>
-                <b>Warden : </b>
-                {data?.warden}
-              </div>
-            </div>
-            <div>
-              <p>{data?.email}</p>
-              <p>{data?.contact}</p>
-            </div>
-          </div>
-        </div>
-      </div>
+          <Paper elevation={3}  sx={{px:2, py:1,width:1}}>
+
+            <Box sx={{display:'flex',alignItems:'baseline',justifyContent:'start'}} gap={1} my={1} ml={2}>
+                <Typography variant='h6' fontSize={'20px'}>•  Floors :</Typography>
+                  <Typography variant='subtitle1' fontSize={'18px'}>{data?.floors}</Typography> 
+            </Box>
+              
+            <Divider variant="middle" flexItem />
+              
+            <Box sx={{display:'flex',alignItems:'baseline',justifyContent:'start'}} gap={1} my={1} ml={2}>
+                <Typography variant='h6' fontSize={'20px'}>•  Rooms :</Typography>
+                  <Typography variant='subtitle1' fontSize={'18px'}>{data?.rooms}</Typography> 
+            </Box>
+              
+            <Divider variant="middle" flexItem />
+              
+            <Box sx={{display:'flex',alignItems:'baseline',justifyContent:'start'}} gap={1} my={1} ml={2}>
+                <Typography variant='h6' fontSize={'20px'}>•  Students :</Typography>
+                  <Typography variant='subtitle1' fontSize={'18px'}>{data?.students}</Typography> 
+            </Box>
+         
+          </Paper>
+
+          <Divider orientation='vertical' variant="middle" flexItem />
+
+
+          <Paper elevation={3}  sx={{px:2, py:1,width:1}}>
+            <Box sx={{display:'flex',alignItems:'baseline',justifyContent:'start'}} gap={1} my={1} ml={2}>
+                  <Typography variant='h6' fontSize={'20px'}>•  Warden :</Typography>
+                    <Typography variant='subtitle1' fontSize={'18px'}>{data?.warden}</Typography> 
+              </Box>
+
+              <Divider variant="middle" flexItem />
+
+              <Box sx={{display:'flex',alignItems:'baseline',justifyContent:'start'}} gap={1} my={1} ml={2}>
+                  <Typography variant='h6' fontSize={'20px'}>•  Caretaker :</Typography>
+                    <Typography variant='subtitle1' fontSize={'18px'}>{data?.caretaker}</Typography> 
+              </Box>
+         
+          </Paper>
+
+      </Box>
+        
+
+
     </>
   );
 }

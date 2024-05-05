@@ -10,7 +10,6 @@ export function isNavItemActive({
   if (disabled || !href || external) {
     return false;
   }
-
   if (matcher) {
     if (matcher.type === 'startsWith') {
       return pathname.startsWith(matcher.href);

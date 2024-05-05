@@ -69,7 +69,7 @@ export function SideNav(): React.JSX.Element {
      
       <Divider sx={{ borderColor: 'var(--mui-palette-text-secondary)' }} />
       <Box>
-        <Typography variant='h5' color={'var(--mui-palette-text-primary)'} my={5} textAlign={'center'} >
+        <Typography variant='h6' color={'var(--mui-palette-text-primaryChannel)'} my={3} mb={4} textAlign={'center'} fontSize={22} >
           Made by 
           <Link href='https://www.ccstiet.com/' ml={1} color='inherit' target='_blank' >Team CCS</Link> </Typography>
       </Box>
