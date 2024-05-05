@@ -18,7 +18,7 @@ interface Member {
   alloted_room: Room;
 }
 
-interface Group {
+export interface GroupResponse {
   id: number;
   leader: Member;
   members: Member[];
@@ -35,7 +35,7 @@ export interface StudentData {
   rollno: string;
 }
 
-export const getGroup = async (): Promise<AxiosResponse<Group[]>> => {
+export const getGroup = async (): Promise<AxiosResponse<GroupResponse>> => {
   const token = (await authClient.getToken()).data;
 
   if (token === null || token === undefined) {
