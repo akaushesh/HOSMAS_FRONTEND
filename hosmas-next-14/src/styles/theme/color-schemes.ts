@@ -1,6 +1,6 @@
 import type { ColorSystemOptions } from '@mui/material/styles';
 
-import { california, kepple, neonBlue, nevada, redOrange, shakespeare, stormGrey } from './colors';
+import { california, kepple, neonBlue, nevada, redOrange, shakespeare, stormGrey,primaryRed,secondaryGrey,text } from './colors';
 import type { ColorScheme } from './types';
 
 export const colorSchemes = {
@@ -100,18 +100,18 @@ export const colorSchemes = {
       },
       neutral: { ...stormGrey },
       primary: {
-        ...neonBlue,
-        light: neonBlue[400],
-        main: neonBlue[500],
-        dark: neonBlue[600],
+        ...primaryRed,
+        light: primaryRed[400],
+        main: primaryRed[500],
+        dark: primaryRed[600],
         contrastText: 'var(--mui-palette-common-white)',
       },
       secondary: {
-        ...nevada,
-        light: nevada[600],
-        main: nevada[700],
-        dark: nevada[800],
-        contrastText: 'var(--mui-palette-common-white)',
+        ...secondaryGrey,
+        light: secondaryGrey[300],
+        main: secondaryGrey[400],
+        dark: secondaryGrey[500],
+        contrastText:secondaryGrey[600]
       },
       success: {
         ...kepple,
@@ -121,10 +121,10 @@ export const colorSchemes = {
         contrastText: 'var(--mui-palette-common-white)',
       },
       text: {
-        primary: 'var(--mui-palette-neutral-900)',
-        primaryChannel: '33 38 54',
-        secondary: 'var(--mui-palette-neutral-500)',
-        secondaryChannel: '102 112 133',
+        primary: text[600],
+        primaryChannel: text[400],
+        secondary: text[300],
+        secondaryChannel: text[500],
         disabled: 'var(--mui-palette-neutral-400)',
       },
       warning: {

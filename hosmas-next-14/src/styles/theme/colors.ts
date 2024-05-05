@@ -1,5 +1,12 @@
 import type { PaletteRange } from '@mui/material/styles/createPalette';
 
+interface Color {
+  300: string;
+  400: string;
+  500: string;
+  600: string;
+}
+
 export const california = {
   50: '#fffaea',
   100: '#fff3c6',
@@ -97,3 +104,28 @@ export const stormGrey = {
   900: '#212636',
   950: '#121621',
 } satisfies PaletteRange;
+
+
+
+
+
+export const primaryRed = {
+  300: '', 
+  400: '#cc3333', //  Only use
+  500: '#b30000', //  Only use
+  600: '',
+} satisfies Color;
+
+export const secondaryGrey = {
+  300: '#f7f7f7',
+  400: '#efefef', 
+  500: '#7A7E86', 
+  600: '#121212', 
+} satisfies Color;
+
+export const text = {
+  300: '',
+  400: '#cccccc', 
+  500: '#878787', 
+  600: '#3A3A3A', 
+} satisfies Color;

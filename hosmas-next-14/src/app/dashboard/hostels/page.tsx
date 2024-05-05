@@ -6,23 +6,6 @@ import hostels from './data';
 import { Box, Fade, Paper, Typography } from '@mui/material';
 
 
-interface hostel{
-  name:string;
-  path:string;
-  floors:number;
-  rooms:number;
-  students:number;
-  warden:string;
-  caretaker:string;
-  contact:string;
-  email:string;
-  gender:string;
-  image:string[];
-  description:string; 
-}
-
-
-
 
 export default function Page(): React.JSX.Element {
 
@@ -56,6 +39,7 @@ export default function Page(): React.JSX.Element {
             <Box sx={{position:"absolute",zIndex:1,top:0,left:0,backgroundImage: `url(${wallpaper})`,
             backgroundSize: 'cover',
             transition:"background-image ease 350ms",
+            boxShadow: 'inset 0 0 7px #fff ',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',}} width={1} height={1} borderRadius={2} ></Box>
 
@@ -64,7 +48,7 @@ export default function Page(): React.JSX.Element {
         <Typography variant='h2'>Hostels</Typography>
           
           <Box width={1}height={1}  px={3}  py={1} sx={{display:"flex",alignItems:"center",flexDirection:'column',overflowY:"auto",overflowX:"hidden"}} gap={2}>
-            {hostels.map((hostel:hostel, index:number) => {
+            {hostels.map((hostel, index) => {
               return (
                 <Paper
                   key={index}
