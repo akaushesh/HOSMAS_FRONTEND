@@ -13,9 +13,10 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import Stack from '@mui/material/Stack';
-import type { AxiosError, AxiosResponse } from 'axios';
 
+import type { AxiosError, AxiosResponse } from 'axios';
 import { logger } from '@/lib/default-logger';
+
 import { useChangePassword } from '@/hooks/mutation/use-auth';
 
 export function UpdatePasswordForm(): React.JSX.Element {

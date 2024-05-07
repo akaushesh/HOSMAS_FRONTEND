@@ -28,6 +28,7 @@ export function MainNav(): React.JSX.Element {
         component="header"
         sx={{
           backgroundColor: 'transparent',
+          backdropFilter: 'blur(5px)',
           position: 'sticky',
           top: 0,
           zIndex: 'var(--mui-zIndex-appBar)',

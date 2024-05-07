@@ -46,7 +46,7 @@ interface LevelsResponse {
 
 type Order = Record<number, number>;
 
-interface PreferenceOrder {
+export interface PreferenceOrder {
   order: Order;
 }
 
@@ -137,11 +137,13 @@ export const setRetain = async (): Promise<AxiosResponse<SuccessResponse>> => {
 export const createPreference = async (data: PreferenceOrder): Promise<AxiosResponse<CreatePreferenceResponse>> => {
   const token = (await authClient.getToken()).data;
 
+  console.log(data);
+
   if (token === null || token === undefined) {
     throw new Error('You must be logged in to perform this action');
   }
 
-  const res = await preferenceApi.post('createPreference', data, {
+  const res = await preferenceApi.post('createPreference/', data, {
     headers: {
       Authorization: `Bearer ${token}`,
     },

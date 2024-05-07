@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import Head from 'next/head';
 import {
   closestCorners,
   DndContext,
@@ -21,11 +20,21 @@ import { useProfile } from '@/hooks/query/use-profile';
 
 import Collumn from './Components/Collumn';
 
+import { useCreatePreference, useRetain } from '@/hooks/mutation/use-preference';
+
+import { logger } from '@/lib/default-logger';
+import { PreferenceOrder } from '@/services/preference';
+import { useRouter } from 'next/navigation';
+import { set } from 'react-hook-form';
+
+
+
 interface Card {
   logo: string;
   id: string;
   room: string;
   hostel: string;
+  priority: number;
 }
 
 interface Response {
@@ -39,6 +48,7 @@ const page = () => {
   const { data: prefernces, isLoading: isLoadingPreferences } = usePreference() as Response;
   const { data: PrefStatus, isLoading: isLoadPrefStatus } = usePreferenceStatus() as Response;
   const { data: user, isLoading: isLoadProfile } = useProfile() as Response;
+
 
   // ADMIN RESTRICTIONS
   const [allowPref, setAllowPref] = useState<boolean>(true);
@@ -60,31 +70,39 @@ const page = () => {
   // INITIALISATION
   useEffect(() => {
     if (!isLoadingChoices && !isLoadingPreferences && !isLoadPrefStatus) {
-      setData1(
-        choices.data
-          .filter(
-            (el: any) =>
-              !prefernces.data.data.preferences.some(
-                (pref: any) => pref.room_type_name === el.room_name && pref.hostel_name === el.room_hostel
-              )
-          )
-          .map((el: any) => ({
+
+      let d1:Card[] = [] ;
+      let d2:Card[] = [];
+
+      choices.data.forEach((el: any) => {
+        if (prefernces.data.data.preferences.some((pref: any) => pref.room_type_name === el.room_name && pref.hostel_name === el.room_hostel)) {
+
+          d2.push({
             logo: el.room_name.substr(0, 2),
             id: el.id,
             room: el.room_name.substr(3),
             hostel: el.room_hostel,
-          }))
-      );
+            priority: prefernces.data.data.preferences.find(
+              (pref: any) => pref.room_type_name === el.room_name && pref.hostel_name === el.room_hostel
+            ).priority,
+          });
 
-      let d2 = prefernces.data.data.preferences.map((el: any) => {
-        return {
-          logo: el.room_type_name.substr(0, 2),
-          id: el.id,
-          room: el.room_type_name.substr(3),
-          hostel: el.hostel_name,
-        };
+        } 
+        else {
+          d1.push({
+            logo: el.room_name.substr(0, 2),
+            id: el.id,
+            room: el.room_name.substr(3),
+            hostel: el.room_hostel,
+            priority: 0,
+          });
+        }
       });
+
+      d2.sort((a:Card, b:Card) => (a.priority || 0) - (b.priority || 0));
+      setData1(d1);
       setData2(d2);
+
 
       setInitialData({
         data2: d2,
@@ -164,11 +182,12 @@ const page = () => {
 
     return true;
   };
+
+
   const [disabled, setDisabled] = useState(true);
   useEffect(() => {
     const arraysAreEqual = arraysAreEqualExcludingId(initialData.data2, data2);
 
-    console.log(initialData.data2, '---', data2);
     if ((initialData.isRetain === true && isRetain === true) || (arraysAreEqual && initialData.isRetain === isRetain)) {
       if (disabled !== true) {
         setDisabled(true);
@@ -180,7 +199,9 @@ const page = () => {
         setDisabled(true);
       }
     }
-  }, [data1, isRetain, data2]);
+  }, [data1, isRetain, data2,initialData]);
+
+
 
   // RESET BUTTON
   const handleReset = () => {
@@ -198,38 +219,63 @@ const page = () => {
     if (allowRetain) setRetain(false);
   };
 
+
+
   // SAVE BUTTON
-  const [saving, setSaving] = useState(false);
-  const [saveCont, setSaveCont] = useState('SAVE');
-  const handleSubmit = (event: any) => {
-    event.preventDefault();
-    setSaving(true);
+  const [msg, setMsg] = useState<string>('');
+  const [success, setSuccess] = useState<boolean>(false);
+  
+ 
+  const onSuccess = (res: any): void => {
+    console.log(res);
+    setMsg('Preferences Saved Successfully!');
+    setSuccess(true);
 
-    let pref: any = [];
-
-    if (!isRetain) {
-      pref = data2.map((el, index) => {
-        return {
-          id: el.id,
-          room_type_name: el.logo + ' ' + el.room,
-          hostel_name: el.hostel,
-          priority: index + 1,
-        };
-      });
-    }
-
-    let d = { preferences: pref, retain: isRetain };
-
-    console.log(d);
-
-    // POST
-
-    setSaving(false);
-    setSaveCont('SAVED!');
+    setInitialData({
+      data2: data2,
+      isRetain: isRetain,
+    })
+    
     setTimeout(() => {
-      setSaveCont('SAVE');
-    }, 2000);
+      setMsg('');
+    }, 1500);
   };
+
+  const onError = (err: any): void => {
+    console.log(err);
+    setMsg('Something went wrong! Please try again.');
+    setSuccess(false);
+    setTimeout(() => {
+      setMsg('');
+    }, 1500);
+  };
+ 
+  const {mutate:PrefMutation,isPending:pendingPref} = useCreatePreference({onSuccess, onError});
+  const {mutate:RetainMutation,isPending:pendingRetain} = useRetain({onSuccess, onError});
+ 
+  const handleSubmit = async(event: any) => {
+    event.preventDefault();
+
+    
+    if(isRetain){
+      RetainMutation({});
+    }
+    else{
+      let pref: any = {};
+      data2.forEach((el, index) => {
+        pref[index+1] = el.id;
+      });
+      
+      console.log(pref);
+      PrefMutation({order: pref} as PreferenceOrder);
+    
+    }
+    
+
+  };
+
+
+
 
   return (
     <Stack
@@ -275,9 +321,11 @@ const page = () => {
               variant="contained"
               onClick={(e) => handleSubmit(e)}
             >
-              {saving ? <CircularProgress /> : saveCont}
+              {(pendingPref||pendingRetain) ? <CircularProgress color='inherit' size={32}/> : 'SAVE'}
             </Button>
           </Box>
+
+          <Typography sx={{color:success?'var(--mui-palette-success-dark)':'var(--mui-palette-error-main)', textAlign:'end'}} variant='body2'>{msg}</Typography>
 
           <Typography
             sx={{
