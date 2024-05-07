@@ -3,23 +3,27 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Divider, Grid, Link, List, ListItem, ListItemText, Paper, Typography } from '@mui/material';
 
-import hostels from '../data';
+import hostels from '../assets/hostelData';
 import PopupGallery from '@/components/core/popupGallery';
 
-interface hostel {
-  name: string;
-  path: string;
-  floors: number;
-  rooms: number;
-  students: number;
-  warden: string;
-  caretaker: string;
-  contact: string;
-  email: string;
-  gender: string;
-  image: string[];
-  description: string;
+interface hostel{
+  name:string;
+  path:string;
+  floors:number;
+  rooms:number;
+  students:number;
+  warden:string;
+  assistantWarden:string;
+  dayCaretaker:string;
+  nightCaretaker:string;
+  contact:string;
+  emailW:string;
+  emailC:string;
+  gender:string;
+  image:string[];
+  description:string; 
 }
+
 
 export default function Page({ params }: { params: { slug: string } }): React.JSX.Element {
   const id = params.slug;
@@ -58,18 +62,36 @@ export default function Page({ params }: { params: { slug: string } }): React.JS
       <Paper sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between',width:1, gap:4 ,px: 3, py: 1, borderRadius: 1, mb: 2 }} elevation={3}>
         <Box mb={0.5}>
           <Typography variant="h2">{data?.name}</Typography>
-          <Typography variant="subtitle2" >{data?.description}</Typography>
+
+          {data?.description.split('<br/>').map((desc, index) => {
+            return(
+              <Typography key={index} variant="subtitle2">{desc}</Typography>
+            )
+          })}
+
         </Box>
         <Divider orientation="vertical" variant="middle" flexItem />
         <Box>
-            <Typography textAlign={'center'} my={2}  variant="h6" fontSize={'17px'}>
-              <Link color={'inherit'} href={`mailto:${data?.email}`} target={'_blank'}>
-                {data?.email}
+
+            <Typography textAlign={'center'} mb={2}  variant="h6" fontSize={'17px'}>
+              <Link color={'inherit'} href={`mailto:${data?.emailW}`} target={'_blank'}>
+                {data?.emailW}
               </Link>
             </Typography>
-            <Typography textAlign={'center'} my={2} variant="h6" fontSize={'17px'}>
-              {data?.contact}
+
+            <Typography textAlign={'center'} mb={2}  variant="h6" fontSize={'17px'}>
+              <Link color={'inherit'} href={`mailto:${data?.emailC}`} target={'_blank'}>
+                {data?.emailC}
+              </Link>
             </Typography>
+
+              {data?.contact.split(',').map((contact, index) => {
+                return(
+                  <Typography key={index} textAlign={'center'} mb={2} variant="h6" fontSize={'17px'}>
+                    {`+91 ${contact.trim()}`}
+                  </Typography>
+                )
+              })}
           </Box>
       </Paper>
 
@@ -146,7 +168,11 @@ export default function Page({ params }: { params: { slug: string } }): React.JS
       
       <Box sx={{display:'flex',alignItems:'center',justifyContent:'space-between',width:1, gap:5,mt:3}}>
 
-          <Paper elevation={3}  sx={{px:2, py:1,width:1}}>
+         
+         
+         
+         
+          <Paper elevation={3}  sx={{px:2, py:1,width:0.35}}>
 
             <Box sx={{display:'flex',alignItems:'baseline',justifyContent:'start'}} gap={1} my={1} ml={2}>
                 <Typography variant='h6' fontSize={'20px'}>•  Floors :</Typography>
@@ -169,22 +195,63 @@ export default function Page({ params }: { params: { slug: string } }): React.JS
          
           </Paper>
 
+
+
+
+
+
           <Divider orientation='vertical' variant="middle" flexItem />
 
 
-          <Paper elevation={3}  sx={{px:2, py:1,width:1}}>
-            <Box sx={{display:'flex',alignItems:'baseline',justifyContent:'start'}} gap={1} my={1} ml={2}>
+          
+        
+          <Paper elevation={3}  sx={{px:2, py:1,width:0.55}}>
+           
+             {data?.warden && (
+              <>
+
+              <Box sx={{display:'flex',alignItems:'baseline',justifyContent:'start'}} gap={1} my={1} ml={2}>
                   <Typography variant='h6' fontSize={'20px'}>•  Warden :</Typography>
                     <Typography variant='subtitle1' fontSize={'18px'}>{data?.warden}</Typography> 
               </Box>
 
               <Divider variant="middle" flexItem />
+             
+              </>
+             
+             )} 
+
+              {data?.assistantWarden && (
+              <>
+            
+            <Box sx={{display:'flex',alignItems:'baseline',justifyContent:'start'}} gap={1} my={1} ml={2}>
+                  <Typography variant='h6' fontSize={'20px'}>• Assistant Warden :</Typography>
+                    <Typography variant='subtitle1' fontSize={'18px'}>{data?.assistantWarden}</Typography> 
+              </Box>
+
+              <Divider variant="middle" flexItem />
+                </>
+              )}
+
+            {data?.dayCaretaker && (
+              <>
 
               <Box sx={{display:'flex',alignItems:'baseline',justifyContent:'start'}} gap={1} my={1} ml={2}>
-                  <Typography variant='h6' fontSize={'20px'}>•  Caretaker :</Typography>
-                    <Typography variant='subtitle1' fontSize={'18px'}>{data?.caretaker}</Typography> 
+                  <Typography variant='h6' fontSize={'20px'}>•  Day Caretaker :</Typography>
+                    <Typography variant='subtitle1' fontSize={'18px'}>{data?.dayCaretaker}</Typography> 
               </Box>
-         
+             
+              <Divider variant="middle" flexItem />
+              </>
+            )}
+            {data?.nightCaretaker && (
+              <>
+              <Box sx={{display:'flex',alignItems:'baseline',justifyContent:'start'}} gap={1} my={1} ml={2}>
+                  <Typography variant='h6' fontSize={'20px'}>•  Night Caretaker :</Typography>
+                    <Typography variant='subtitle1' fontSize={'18px'}>{data?.nightCaretaker}</Typography> 
+              </Box>
+              </>
+            )}
           </Paper>
 
       </Box>

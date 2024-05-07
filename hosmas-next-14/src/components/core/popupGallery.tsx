@@ -21,10 +21,10 @@ const PopupGallery: React.FC<PopupGalleryProps> = ({ images, handlePopup }): Rea
   } as any;
 
   return (
-    <div>
+    <Box >
       <Box
         sx={{
-          position: 'absolute',
+          position: 'fixed',
           zIndex: 10,
           top: '10vh',
           left: '25%',
@@ -80,7 +80,7 @@ const PopupGallery: React.FC<PopupGalleryProps> = ({ images, handlePopup }): Rea
           </ImageList>
         </Box>
       </Box>
-    </div>
+    </Box>
   );
 };
 

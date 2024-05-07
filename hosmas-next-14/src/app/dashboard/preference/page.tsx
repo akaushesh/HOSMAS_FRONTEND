@@ -13,15 +13,13 @@ import {
 } from '@dnd-kit/core';
 import { restrictToWindowEdges } from '@dnd-kit/modifiers';
 import { arrayMove, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
-import { Box, Button, Checkbox, CircularProgress, Paper, Stack, Typography } from '@mui/material';
+import { Box, Button, Checkbox, CircularProgress, Paper, Stack, SvgIcon, Typography } from '@mui/material';
+import { ArrowRight } from '@phosphor-icons/react';
 
 import { useChoices, usePreference, usePreferenceStatus } from '@/hooks/query/use-preference';
-
-import Collumn from './Components/Collumn';
-import { useQueryClient } from '@tanstack/react-query';
 import { useProfile } from '@/hooks/query/use-profile';
 
-
+import Collumn from './Components/Collumn';
 
 interface Card {
   logo: string;
@@ -35,16 +33,7 @@ interface Response {
   isLoading: boolean;
 }
 
-
-
-
-
-
-
-
-
 const page = () => {
-
   // QUERIES
   const { data: choices, isLoading: isLoadingChoices } = useChoices() as Response;
   const { data: prefernces, isLoading: isLoadingPreferences } = usePreference() as Response;
@@ -63,20 +52,22 @@ const page = () => {
   const isLeader = !user?.group || user?.user?.email === user?.group?.leader_email;
 
   // TEMP DATA TO CHECK IF CHANGES ARE DONE
-  const[initialData,setInitialData]=useState({
-    data2:[] as any,
-    isRetain:false,
-  })
+  const [initialData, setInitialData] = useState({
+    data2: [] as any,
+    isRetain: false,
+  });
 
-
-
-// INITIALISATION
+  // INITIALISATION
   useEffect(() => {
     if (!isLoadingChoices && !isLoadingPreferences && !isLoadPrefStatus) {
-
       setData1(
         choices.data
-          .filter((el: any) => !prefernces.data.data.preferences.some((pref: any) => pref.room_type_name === el.room_name && pref.hostel_name === el.room_hostel))
+          .filter(
+            (el: any) =>
+              !prefernces.data.data.preferences.some(
+                (pref: any) => pref.room_type_name === el.room_name && pref.hostel_name === el.room_hostel
+              )
+          )
           .map((el: any) => ({
             logo: el.room_name.substr(0, 2),
             id: el.id,
@@ -85,20 +76,20 @@ const page = () => {
           }))
       );
 
-      let d2=prefernces.data.data.preferences.map((el: any) => {
+      let d2 = prefernces.data.data.preferences.map((el: any) => {
         return {
           logo: el.room_type_name.substr(0, 2),
           id: el.id,
           room: el.room_type_name.substr(3),
           hostel: el.hostel_name,
         };
-      })
+      });
       setData2(d2);
 
       setInitialData({
-        data2:d2,
-        isRetain:PrefStatus.data.can_retain?prefernces.data.data.retain:false
-      }) 
+        data2: d2,
+        isRetain: PrefStatus.data.can_retain ? prefernces.data.data.retain : false,
+      });
 
       if (PrefStatus.data.can_retain) {
         setRetain(prefernces.data.data.retain);
@@ -109,11 +100,7 @@ const page = () => {
     }
   }, [isLoadingChoices, isLoadingPreferences, isLoadPrefStatus]);
 
-
-
-
-
-// DND KIT
+  // DND KIT
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -156,53 +143,46 @@ const page = () => {
     }
   };
 
-
-
-
   // SAVE--DISABLED--CONDITION
 
-  const arraysAreEqualExcludingId = (arr1:any[], arr2:any[]) => {
+  const arraysAreEqualExcludingId = (arr1: any[], arr2: any[]) => {
     if (arr1.length !== arr2.length) {
       return false;
     }
-  
+
     for (let i = 0; i < arr1.length; i++) {
       const obj1 = { ...arr1[i] };
       const obj2 = { ...arr2[i] };
-  
+
       delete obj1.id;
       delete obj2.id;
-  
+
       if (JSON.stringify(obj1) !== JSON.stringify(obj2)) {
         return false;
       }
     }
-  
+
     return true;
   };
   const [disabled, setDisabled] = useState(true);
   useEffect(() => {
     const arraysAreEqual = arraysAreEqualExcludingId(initialData.data2, data2);
 
-    console.log(initialData.data2,"---",data2);  
-    if((initialData.isRetain===true && isRetain===true)||(arraysAreEqual && initialData.isRetain===isRetain)){
-      if(disabled !== true) {
+    console.log(initialData.data2, '---', data2);
+    if ((initialData.isRetain === true && isRetain === true) || (arraysAreEqual && initialData.isRetain === isRetain)) {
+      if (disabled !== true) {
         setDisabled(true);
       }
-    }
-    else if (data1.length === 0 || isRetain ){
+    } else if (data1.length === 0 || isRetain) {
       setDisabled(false);
-    }
-    else{
-      if(disabled !== true) {
+    } else {
+      if (disabled !== true) {
         setDisabled(true);
       }
     }
-  
-  }, [data1, isRetain ,data2]);
+  }, [data1, isRetain, data2]);
 
-
-// RESET BUTTON
+  // RESET BUTTON
   const handleReset = () => {
     setData1(
       choices.data.map((el: any) => {
@@ -218,29 +198,27 @@ const page = () => {
     if (allowRetain) setRetain(false);
   };
 
-
-
-// SAVE BUTTON
-  const[saving,setSaving]=useState(false);
-  const[saveCont,setSaveCont]=useState("SAVE");
-  const handleSubmit=(event:any)=>{
+  // SAVE BUTTON
+  const [saving, setSaving] = useState(false);
+  const [saveCont, setSaveCont] = useState('SAVE');
+  const handleSubmit = (event: any) => {
     event.preventDefault();
     setSaving(true);
-    
-    let pref:any=[];
 
-    if(!isRetain){
-      pref=data2.map((el,index)=>{
-        return({
+    let pref: any = [];
+
+    if (!isRetain) {
+      pref = data2.map((el, index) => {
+        return {
           id: el.id,
-          room_type_name: el.logo+' '+el.room,
+          room_type_name: el.logo + ' ' + el.room,
           hostel_name: el.hostel,
-          priority:index+1
-        })
-      })
+          priority: index + 1,
+        };
+      });
     }
 
-    let d={preferences:pref,retain:isRetain}
+    let d = { preferences: pref, retain: isRetain };
 
     console.log(d);
 
@@ -248,41 +226,56 @@ const page = () => {
 
     setSaving(false);
     setSaveCont('SAVED!');
-    setTimeout(()=>{
+    setTimeout(() => {
       setSaveCont('SAVE');
-    },2000)
-  }
-
-
+    }, 2000);
+  };
 
   return (
-    <Stack>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 8 }}>
+    <Stack
+      sx={{
+        '--Card-HeadColor': 'var(--mui-palette-text-secondaryChannel)',
+        '--Card-FontColor': 'var(--mui-palette-text-primaryChannel)',
+        '--PButton-Color': 'var(--mui-palette-primary-main)',
+        '--PButton-HoverColor': 'var(--mui-palette-primary-dark)',
+        '--SButton-Color': 'var(--mui-palette-secondary-dark)',
+        '--SButton-HoverColor': 'var(--mui-palette-secondary-main)',
+        '--Button-FontColor': 'var(--mui-palette-common-white)',
+      }}
+    >
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 5 }}>
         <Box>
-          <Typography variant="h3" sx={{ color: 'inherit' }}>
+          <Typography variant="h3" sx={{ color: 'var(--Card-HeadColor)', mb: 1 }}>
             Hostel Preference Order
           </Typography>
-          
+
           <Typography>
-            {allowPref?" Drag and Drop your hostel preferences in order":"Preference Selection is now locked."}
+            {allowPref ? ' Drag and Drop your hostel preferences in order' : 'Preference Selection is now locked.'}
           </Typography>
-        
         </Box>
 
-        <Box 
-          width={'35%'} 
-          sx={{ 
-            opacity: (!allowPref || !isLeader) ? 0.45 : 1, 
-            pointerEvents: (!allowPref || !isLeader) ? 'none' : 'initial' 
+        <Box
+          width={'35%'}
+          sx={{
+            opacity: !allowPref || !isLeader ? 0.45 : 1,
+            pointerEvents: !allowPref || !isLeader ? 'none' : 'initial',
           }}
         >
-
           <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end', mb: 1 }} gap={2}>
-            <Button sx={{ px: 7, fontSize: 16 }} color="inherit" variant="contained" onClick={() => handleReset()}>
+            <Button
+              sx={{ px: 7, fontSize: 16, background: 'var(--SButton-Color)', color: 'var(--Button-FontColor)', '&:hover': { background: 'var(--SButton-HoverColor)'}}}
+              variant="contained"
+              onClick={() => handleReset()}
+            >
               RESET
             </Button>
-            <Button sx={{ px: 7, fontSize: 16 }} disabled={disabled} color="inherit" variant="contained" onClick={(e)=>handleSubmit(e)}>
-              {saving?<CircularProgress/>:saveCont}
+            <Button
+              sx={{ px: 7, fontSize: 16, background: 'var(--PButton-Color)', color: 'var(--Button-FontColor)','&:hover': { background: 'var(--PButton-HoverColor)'} }}
+              disabled={disabled}
+              variant="contained"
+              onClick={(e) => handleSubmit(e)}
+            >
+              {saving ? <CircularProgress /> : saveCont}
             </Button>
           </Box>
 
@@ -311,21 +304,23 @@ const page = () => {
         <Box
           sx={{
             display: 'flex',
-            justifyContent: 'space-evenly',
-            opacity: (isRetain||!allowPref||!isLeader) ? 0.45 : 1,
-            pointerEvents: (isRetain||!allowPref||!isLeader) ? 'none' : 'initial',
+            justifyContent: 'space-between',
+            opacity: isRetain || !allowPref || !isLeader ? 0.45 : 1,
+            pointerEvents: isRetain || !allowPref || !isLeader ? 'none' : 'initial',
+            color: 'var(--Card-FontColor)',
           }}
         >
           <Paper
             elevation={4}
             sx={{
-              width: '30%',
-              minHeight: '45vh',
+              width: '37%',
+              minHeight: '60vh',
               p: 2,
               display: 'flex',
               alignItems: 'center',
               flexDirection: 'column',
               justifyContent: isLoadingChoices ? 'center' : 'space-between',
+              color: 'var(--Card-FontColor)',
             }}
           >
             {isLoadingChoices && <CircularProgress color="inherit" />}
@@ -340,16 +335,26 @@ const page = () => {
             )}
           </Paper>
 
+          <Box
+            height={'60vh'}
+            width={0.1}
+            fontSize={'40px'}
+            sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          >
+            <ArrowRight />
+          </Box>
+
           <Paper
             elevation={4}
             sx={{
-              width: '30%',
-              minHeight: '45vh',
+              width: '37%',
+              minHeight: '60vh',
               p: 2,
               display: 'flex',
               alignItems: 'center',
               flexDirection: 'column',
               justifyContent: isLoadingPreferences ? 'center' : 'space-between',
+              color: 'var(--Card-FontColor)',
             }}
           >
             {isLoadingPreferences && <CircularProgress color="inherit" />}

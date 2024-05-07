@@ -36,15 +36,20 @@ const Card: React.FC<Props> = ({ logo,id, room,hostel }) => {
     <Paper
       elevation={4}
       sx={{
+        '--Card-BgColor':'var(--mui-palette-secondary-light)',
+        '--Card-TextColor':'var(--mui-palette-text-primaryChannel)',
+        '--Card-BorderColor':'var(--mui-palette-secondary-dark)',
         width: 0.97,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         px: 2,
         py:"3px",
-        border: '1px dashed',
+        border: '1px dashed var(--Card-BorderColor)',
         my: 1,
         touchAction: 'none',
+        background: 'var(--Card-BgColor)',
+        color: 'var(--Card-TextColor)',
       }}
       ref={setNodeRef}
       key={id}

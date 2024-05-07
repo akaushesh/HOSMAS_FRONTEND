@@ -1,4 +1,5 @@
 import type { NavItemConfig } from '@/types/nav';
+import path from 'path';
 
 export function isNavItemActive({
   disabled,
@@ -10,17 +11,10 @@ export function isNavItemActive({
   if (disabled || !href || external) {
     return false;
   }
-  if (matcher) {
-    if (matcher.type === 'startsWith') {
-      return pathname.startsWith(matcher.href);
-    }
+  
 
-    if (matcher.type === 'equals') {
-      return pathname === matcher.href;
-    }
-
-    return false;
+  if (pathname.startsWith(`${href}/`)&&href!=='/dashboard') {
+    return true;
   }
-
-  return pathname === href;
+  return pathname==href;
 }

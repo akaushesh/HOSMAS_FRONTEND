@@ -3,13 +3,12 @@
 import React, { Fragment, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Box, Fade, Paper, Typography } from '@mui/material';
+import hostels from './assets/hostelData';
 
-import hostels from './data';
 
 export default function Page(): React.JSX.Element {
   const router = useRouter();
-  const defaultwp =
-    'https://img.freepik.com/free-photo/sunset-silhouettes-trees-mountains-generative-ai_169016-29371.jpg';
+  const defaultwp ='/assets/thapar.jpg';
 
   const [wallpaper, setWallpaper] = useState<string>(defaultwp);
   const [name, setName] = useState<string>('');
