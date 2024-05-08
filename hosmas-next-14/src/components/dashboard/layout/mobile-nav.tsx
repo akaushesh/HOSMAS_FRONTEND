@@ -3,6 +3,7 @@
 import * as React from 'react';
 import RouterLink from 'next/link';
 import { usePathname } from 'next/navigation';
+import { Link, Paper } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
@@ -33,14 +34,15 @@ export function MobileNav({ open, onClose }: MobileNavProps): React.JSX.Element 
     <Drawer
       PaperProps={{
         sx: {
-          '--MobileNav-background': 'var(--mui-palette-neutral-950)',
+          '--MobileNav-background': 'var(--mui-palette-common-white)',
           '--MobileNav-color': 'var(--mui-palette-common-white)',
-          '--NavItem-color': 'var(--mui-palette-neutral-300)',
-          '--NavItem-hover-background': 'rgba(255, 255, 255, 0.04)',
+          '--MobileNav-logo-background': 'var(--mui-palette-primary-main)',
+          '--NavItem-color': 'var(--mui-palette-text-secondary)',
+          '--NavItem-hover-background': 'var(--mui-palette-primary-main)',
           '--NavItem-active-background': 'var(--mui-palette-primary-main)',
           '--NavItem-active-color': 'var(--mui-palette-primary-contrastText)',
           '--NavItem-disabled-color': 'var(--mui-palette-neutral-500)',
-          '--NavItem-icon-color': 'var(--mui-palette-neutral-400)',
+          '--NavItem-icon-color': 'var(--mui-palette-text-primaryChannel)',
           '--NavItem-icon-active-color': 'var(--mui-palette-primary-contrastText)',
           '--NavItem-icon-disabled-color': 'var(--mui-palette-neutral-600)',
           bgcolor: 'var(--MobileNav-background)',
@@ -52,71 +54,48 @@ export function MobileNav({ open, onClose }: MobileNavProps): React.JSX.Element 
           width: 'var(--MobileNav-width)',
           zIndex: 'var(--MobileNav-zIndex)',
           '&::-webkit-scrollbar': { display: 'none' },
+          px: 2,
         },
       }}
       onClose={onClose}
       open={open}
     >
-      <Stack spacing={2} sx={{ p: 3 }}>
-        <Box component={RouterLink} href={paths.home} sx={{ display: 'inline-flex' }}>
-          <Logo color="light" height={32} width={122} />
-        </Box>
-        <Box
+      <Stack spacing={2} sx={{ p: 3, py: 4 }}>
+        <Paper
+          elevation={6}
+          component={RouterLink}
+          href={paths.home}
           sx={{
-            alignItems: 'center',
-            backgroundColor: 'var(--mui-palette-neutral-950)',
-            border: '1px solid var(--mui-palette-neutral-700)',
-            borderRadius: '12px',
-            cursor: 'pointer',
             display: 'flex',
-            p: '4px 12px',
+            justifyContent: 'center',
+            alignContent: 'center',
           }}
         >
-          <Box sx={{ flex: '1 1 auto' }}>
-            <Typography color="var(--mui-palette-neutral-400)" variant="body2">
-              Workspace
-            </Typography>
-            <Typography color="inherit" variant="subtitle1">
-              Devias
-            </Typography>
-          </Box>
-          <CaretUpDownIcon />
-        </Box>
+          <Logo color="light" height={0.8} width={0.8} />
+        </Paper>
       </Stack>
-      <Divider sx={{ borderColor: 'var(--mui-palette-neutral-700)' }} />
-      <Box component="nav" sx={{ flex: '1 1 auto', p: '12px' }}>
+
+      <Divider sx={{ borderColor: 'var(--mui-palette-text-secondary)' }} />
+      <Box component="nav" sx={{ flex: '1 1 auto', px: 3, mt: 6 }}>
         {renderNavItems({ pathname, items: navItems })}
       </Box>
-      <Divider sx={{ borderColor: 'var(--mui-palette-neutral-700)' }} />
-      <Stack spacing={2} sx={{ p: '12px' }}>
-        <div>
-          <Typography color="var(--mui-palette-neutral-100)" variant="subtitle2">
-            Need more features?
-          </Typography>
-          <Typography color="var(--mui-palette-neutral-400)" variant="body2">
-            Check out our Pro solution template.
-          </Typography>
-        </div>
-        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-          <Box
-            component="img"
-            alt="Pro version"
-            src="/assets/devias-kit-pro.png"
-            sx={{ height: 'auto', width: '160px' }}
-          />
-        </Box>
-        <Button
-          component="a"
-          endIcon={<ArrowSquareUpRightIcon fontSize="var(--icon-fontSize-md)" />}
-          fullWidth
-          href="https://material-kit-pro-react.devias.io/"
-          sx={{ mt: 2 }}
-          target="_blank"
-          variant="contained"
+
+      <Divider sx={{ borderColor: 'var(--mui-palette-text-secondary)' }} />
+      <Box>
+        <Typography
+          variant="h6"
+          color={'var(--mui-palette-text-primaryChannel)'}
+          my={3}
+          mb={4}
+          textAlign={'center'}
+          fontSize={22}
         >
-          Pro version
-        </Button>
-      </Stack>
+          Made by
+          <Link href="https://www.ccstiet.com/" ml={1} color="inherit" target="_blank">
+            Team CCS
+          </Link>{' '}
+        </Typography>
+      </Box>
     </Drawer>
   );
 }

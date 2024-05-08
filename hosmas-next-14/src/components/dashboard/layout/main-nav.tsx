@@ -37,9 +37,22 @@ export function MainNav(): React.JSX.Element {
         <Stack
           direction="row"
           spacing={2}
-          sx={{ alignItems: 'center', justifyContent: 'flex-end', minHeight: '64px', px: 2 }}
+          sx={{ alignItems: 'center', justifyContent: 'space-between', minHeight: '64px', px: 2 }}
         >
           <Stack sx={{ alignItems: 'center' }} direction="row" spacing={3} m={2}>
+            <IconButton
+              onClick={(): void => {
+                setOpenNav(true);
+              }}
+              sx={{ display: { lg: 'none' } }}
+            >
+              <ListIcon />
+            </IconButton>
+          </Stack>
+
+          <Stack direction="row"
+          spacing={2}
+          sx={{ alignItems: 'center', justifyContent: 'flex-end' }} m={2}>
             <Tooltip title="Notifications">
               <Badge badgeContent={4} color="success" variant="dot">
                 <IconButton>

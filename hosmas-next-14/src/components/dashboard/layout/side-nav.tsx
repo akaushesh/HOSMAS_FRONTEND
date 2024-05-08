@@ -3,6 +3,7 @@
 import * as React from 'react';
 import RouterLink from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import { Link, Paper, SvgIcon } from '@mui/material';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Stack from '@mui/material/Stack';
@@ -17,18 +18,16 @@ import { Logo } from '@/components/core/logo';
 
 import { navItems } from './config';
 import { navIcons } from './nav-icons';
-import { Link, SvgIcon } from '@mui/material';
 
 export function SideNav(): React.JSX.Element {
   const pathname = usePathname();
-
-  
 
   return (
     <Box
       sx={{
         '--SideNav-background': 'var(--mui-palette-common-white)',
         '--SideNav-color': 'var(--mui-palette-common-white)',
+        '--SideNav-logo-background': 'var(--mui-palette-primary-main)',
         '--NavItem-color': 'var(--mui-palette-text-secondary)',
         '--NavItem-hover-background': 'var(--mui-palette-primary-main)',
         '--NavItem-active-background': 'var(--mui-palette-primary-main)',
@@ -54,24 +53,41 @@ export function SideNav(): React.JSX.Element {
       }}
     >
       <Stack spacing={2} sx={{ p: 3 }}>
-        <Box component={RouterLink} href={paths.home} sx={{ display: 'inline-flex' }}>
+        <Paper
+          elevation={4}
+          component={RouterLink}
+          href={paths.home}
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            px:2,
+          }}
+        >
           <Logo color="light" width={1} height={1} />
-        </Box>
+        </Paper>
       </Stack>
-      <Divider sx={{ borderColor: 'var(--mui-palette-text-secondary)' }}/>
+      <Divider sx={{ borderColor: 'var(--mui-palette-text-secondary)' }} />
 
-
-      <Box component="nav" sx={{ flex: '1 1 auto', mt:6,px:3 }}>
+      <Box component="nav" sx={{ flex: '1 1 auto', mt: 6, px: 3 }}>
         {renderNavItems({ pathname, items: navItems })}
       </Box>
-     
-     
-     
+
       <Divider sx={{ borderColor: 'var(--mui-palette-text-secondary)' }} />
       <Box>
-        <Typography variant='h6' color={'var(--mui-palette-text-primaryChannel)'} my={3} mb={4} textAlign={'center'} fontSize={22} >
-          Made by 
-          <Link href='https://www.ccstiet.com/' ml={1} color='inherit' target='_blank' >Team CCS</Link> </Typography>
+        <Typography
+          variant="h6"
+          color={'var(--mui-palette-text-primaryChannel)'}
+          my={3}
+          mb={4}
+          textAlign={'center'}
+          fontSize={22}
+        >
+          Made by
+          <Link href="https://www.ccstiet.com/" ml={1} color="inherit" target="_blank">
+            Team CCS
+          </Link>{' '}
+        </Typography>
       </Box>
     </Box>
   );
@@ -93,8 +109,6 @@ function renderNavItems({ items = [], pathname }: { items?: NavItemConfig[]; pat
   );
 }
 
-
-
 interface NavItemProps extends Omit<NavItemConfig, 'items'> {
   pathname: string;
 }
@@ -104,17 +118,16 @@ function NavItem({ disabled, external, href, icon, matcher, pathname, title }: N
   const Icon = icon ? navIcons[icon] : null;
   const router = useRouter();
 
-
-  const handleRoute= (link:string)=>{
-    if(link){
+  const handleRoute = (link: string) => {
+    if (link) {
       router.push(link);
     }
-  }
+  };
 
   return (
     <li>
       <Box
-        onClick={()=>handleRoute(href as string)}
+        onClick={() => handleRoute(href as string)}
         sx={{
           alignItems: 'center',
           borderRadius: 1,
@@ -130,7 +143,7 @@ function NavItem({ disabled, external, href, icon, matcher, pathname, title }: N
           transition: 'ease-in-out 200ms',
           '&:hover': {
             transform: 'scale(1.005)',
-            color:!active?'var(--NavItem-hover-background)': '',
+            color: !active ? 'var(--NavItem-hover-background)' : '',
           },
           ...(disabled && {
             bgcolor: 'var(--NavItem-disabled-background )',
@@ -138,27 +151,24 @@ function NavItem({ disabled, external, href, icon, matcher, pathname, title }: N
             cursor: 'not-allowed',
           }),
           ...(active && { bgcolor: 'var(--NavItem-active-background)', color: 'var(--NavItem-active-color)' }),
-          pl:2
+          pl: 2,
         }}
       >
         <Box sx={{ alignItems: 'center', display: 'flex', justifyContent: 'center', flex: '0 0 auto' }}>
           {Icon ? (
-            
             <SvgIcon
               sx={{
-                fontSize:'var(--icon-fontSize-md)',
+                fontSize: 'var(--icon-fontSize-md)',
               }}
             >
-
-            <Icon/>
-            
+              <Icon />
             </SvgIcon>
           ) : null}
         </Box>
         <Box sx={{ flex: '1 1 auto' }}>
           <Typography
             component="span"
-            sx={{ color: 'inherit', fontSize: '0.875rem', fontWeight: 500, lineHeight: '28px', }}
+            sx={{ color: 'inherit', fontSize: '0.875rem', fontWeight: 500, lineHeight: '28px' }}
           >
             {title}
           </Typography>
