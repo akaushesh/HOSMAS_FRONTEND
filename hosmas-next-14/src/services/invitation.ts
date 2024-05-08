@@ -14,12 +14,16 @@ interface InvitationStatus {
   time: string;
 }
 
+export type InvitationStatusResponse = AxiosResponse<InvitationStatus[]>;
+
 interface Invitation {
   id: number;
   group_leader_name: string;
   group_leader_rollno: string;
   time: string;
 }
+
+export type ReceivedInvitationResponse = AxiosResponse<Invitation[]>;
 
 interface InvitationData {
   id: number;
@@ -29,7 +33,7 @@ export interface SuccessResponse {
   status: string;
 }
 
-export const getSentInvitationStatus = async (): Promise<AxiosResponse<InvitationStatus[]>> => {
+export const getSentInvitationStatus = async (): Promise<InvitationStatusResponse> => {
   const token = (await authClient.getToken()).data;
 
   if (token === null || token === undefined) {
@@ -46,7 +50,7 @@ export const getSentInvitationStatus = async (): Promise<AxiosResponse<Invitatio
   return res;
 };
 
-export const getReceivedInvitations = async (): Promise<AxiosResponse<Invitation[]>> => {
+export const getReceivedInvitations = async (): Promise<ReceivedInvitationResponse> => {
   const token = (await authClient.getToken()).data;
 
   if (token === null || token === undefined) {

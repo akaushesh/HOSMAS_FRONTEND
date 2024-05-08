@@ -7,9 +7,6 @@ import { config } from '@/config';
 import GroupDetails from '@/components/dashboard/group/group-details';
 import InvitationDetails from '@/components/dashboard/group/invitation-details';
 
-// import { ReceivedInvitations } from '@/components/dashboard/invitations/received-invitations';
-// import { SentInvitations } from '@/components/dashboard/invitations/sent-invitations';
-
 export const metadata = { title: `Customers | Dashboard | ${config.site.name}` } satisfies Metadata;
 
 export default function Page(): React.JSX.Element {
@@ -28,8 +25,6 @@ export default function Page(): React.JSX.Element {
           <InvitationDetails />
         </Grid>
       </Grid>
-      {/* <SentInvitations />
-        <ReceivedInvitations /> */}
     </Stack>
   );
 }
