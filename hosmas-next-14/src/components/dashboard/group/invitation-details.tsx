@@ -45,9 +45,6 @@ export default function InvitationDetails(): React.JSX.Element {
           }}
           onClick={handleOpenInvitationModal}
         >
-          <CustomModal open={openInvitationModal} onClose={handleCloseInvitationModal}>
-            <InviteMember onClose={handleCloseInvitationModal} />
-          </CustomModal>
           <AddIcon />
         </Button>
       </Stack>
@@ -67,6 +64,10 @@ export default function InvitationDetails(): React.JSX.Element {
           <SentInvitations />
         </TabPanel>
       </TabContext>
+
+      <CustomModal open={openInvitationModal} onClose={handleCloseInvitationModal}>
+        <InviteMember onClose={handleCloseInvitationModal} />
+      </CustomModal>
     </Paper>
   );
 }
