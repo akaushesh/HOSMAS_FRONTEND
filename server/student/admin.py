@@ -28,9 +28,9 @@ class StudentAdmin(admin.ModelAdmin):
       #             return None
       #       return f"{obj.alloted_room_number.level.level_no}: {obj.alloted_room_number.name}"
 
-      list_display = ('id', 'user', 'name', 'rollno', 'phoneno', 'gender', 'cg', 'batch__name', 'current_hostel', 'preview_hostel', 'alloted_hostel', 'alloted_room_number')
+      list_display = ('id', 'user', 'name', 'rollno', 'token', 'phoneno', 'gender', 'cg', 'batch__name', 'current_hostel', 'preview_hostel', 'alloted_hostel', 'alloted_room_number')
       list_filter = ('gender', 'batch')
-      search_fields = ('user__email', 'name', 'rollno', 'phoneno')
+      search_fields = ('user__email', 'name', 'rollno', 'phoneno', 'token')
 
 
 class GroupAdmin(admin.ModelAdmin):
@@ -82,8 +82,9 @@ class InvitationAdmin(admin.ModelAdmin):
             return obj.for_group.leader.rollno
       
       
-      list_display = ('id', 'to__name', 'to__rollno', 'for_group__id', 'for_group__leader__name', 'for_group__leader__rollno', 'time')
+      list_display = ('id', 'to__name', 'to__rollno', 'for_group__id', 'for_group__leader__name', 'for_group__leader__rollno', 'status', 'time')
       search_fields = ('to__name', 'to__rollno', 'for_group__leader__name', 'for_group__leader__rollno')
+      list_filter = ('status', )
 
 
 class DefaulterAdmin(admin.ModelAdmin):

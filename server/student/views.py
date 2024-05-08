@@ -32,7 +32,7 @@ class SearchStudentView(APIView):
 
       def post(self, request):
             student = Student.objects.filter(user=request.user).select_related('batch', 'leader_of_group').first()
-            resultant = Student.objects.filter(rollno=request.data.get('rollno')).select_related('batch', 'group', 'defaulter').first()
+            resultant = Student.objects.filter(token=request.data.get('token')).select_related('batch', 'group', 'defaulter').first()
 
             if resultant is None:
                   return Response({'detail': 'No student found!'}, status=status.HTTP_403_FORBIDDEN)
@@ -87,7 +87,7 @@ class SendInvitationView(APIView):
                   group = Group(leader=student, cg=student.cg)
                   group.save()
             
-            invitee = Student.objects.filter(rollno=request.data.get("rollno")).select_related('group', 'batch', 'defaulter').first()
+            invitee = Student.objects.filter(token=request.data.get("token")).select_related('group', 'batch', 'defaulter').first()
             if invitee is None:
                   return Response({"detail": "Invalid Roll Number!"}, status=status.HTTP_403_FORBIDDEN)
 
@@ -100,7 +100,7 @@ class SendInvitationView(APIView):
             if invitee==student or (invitee.group is not None and invitee.group.id==group.id):
                   return Response({"detail": "This student is already part of your group!"}, status=status.HTTP_403_FORBIDDEN)
 
-            if Invitation.objects.filter(to=invitee, for_group=group).exists():
+            if Invitation.objects.filter(to=invitee, for_group=group, status='W').exists():
                   return Response({"detail": "You've already sent an invitation to this student!"}, status=status.HTTP_403_FORBIDDEN)
 
             if invitee.batch!=student.batch or invitee.gender!=student.gender:
@@ -136,15 +136,20 @@ class InvitationsReceivedView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class DeleteInvitationView(APIView):
+class RejectInvitationView(APIView):
       permission_classes = [IsAuthenticated, IsStudent, IsPreferenceFillingLive]
 
-      def delete(self, request):
+      def post(self, request):
+            student = request.user.student
             invitation = Invitation.objects.filter(id=request.data.get('id')).first()
-            if invitation is None:
+            if invitation is None or invitation.to != student:
                   return Response({"detail": "Invitation not found"}, status=status.HTTP_403_FORBIDDEN)
 
-            invitation.delete()
+            if invitation.status=='A':
+                  return Response({"detail": "Invitation is already accepted!"}, status=status.HTTP_403_FORBIDDEN)
+
+            invitation.status = 'R'
+            invitation.save()
 
             return Response(status=status.HTTP_200_OK)
 
@@ -161,6 +166,12 @@ class AcceptInvitationView(APIView):
 
             if invitation.to != student:
                   return Response({'detail': 'You\'re not authorized to accept someone\'s invitation!'}, status=status.HTTP_403_FORBIDDEN)
+
+            if invitation.status=='R':
+                  return Response({'detail': 'Invitation was previously rejected! Please ask group leader to re-send an invitation'}, status=status.HTTP_403_FORBIDDEN)
+            
+            if invitation.status=='A':
+                  return Response({'detail': 'Invitation is already accepted'}, status=status.HTTP_403_FORBIDDEN)
 
             group = invitation.for_group
             section = Section.objects.filter(batch=student.batch, gender=student.gender).first()
@@ -200,7 +211,8 @@ class AcceptInvitationView(APIView):
                   student.group = group
                   student.save()
 
-                  invitation.delete()
+                  invitation.status = 'A'
+                  invitation.save()
 
                   updatedcg = group.leader.cg + student.cg
                   cnt = 2

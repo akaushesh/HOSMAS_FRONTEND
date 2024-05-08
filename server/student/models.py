@@ -1,11 +1,19 @@
 from django.db import models
 # from preference.models import Room
 
+import uuid
+
 # Create your models here.
 
 GENDER_CHOICES = (
     ('M', 'Male'),
     ('F', 'Female')
+)
+
+INVITATION_STATUS_CHOICES = (
+    ('W', 'Waiting'),
+    ('A', 'Accepted'),
+    ('R', 'Rejected')
 )
 
 
@@ -15,6 +23,8 @@ class Student (models.Model):
     name = models.CharField(max_length=100, null=False, blank=False)
     rollno = models.CharField(max_length=12, unique=True, null=False, blank=False)
     phoneno = models.CharField(max_length=12, unique=True, null=True)
+
+    token = models.UUIDField(unique=True, blank=True, default=uuid.uuid4)
 
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
     cg = models.FloatField(null=False, blank=False)
@@ -78,8 +88,7 @@ class Invitation(models.Model):
     for_group = models.ForeignKey('student.Group', on_delete=models.CASCADE, related_name='invitations')
     time = models.DateTimeField(auto_now_add=True, blank=True)
 
-    class Meta:
-        unique_together = ('to', 'for_group')
+    status = models.CharField(max_length=1, choices=INVITATION_STATUS_CHOICES, default='W')
 
     def __str__(self):
         return f"{self.for_group.id}-{self.to.name}"

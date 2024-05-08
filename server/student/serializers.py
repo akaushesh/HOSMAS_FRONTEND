@@ -18,7 +18,7 @@ class InvitationsReceivedSerializer(ModelSerializer):
 
       class Meta:
             model = Invitation
-            fields = ('id', 'group_leader_name', 'group_leader_rollno', 'time')
+            fields = ('id', 'group_leader_name', 'group_leader_rollno', 'status', 'time')
 
       def get_group_leader_name(self, obj):
             return obj.for_group.leader.name
@@ -33,7 +33,7 @@ class InvitationsSentSerializer(ModelSerializer):
 
       class Meta:
             model = Invitation
-            fields = ('id', 'invitee_name', 'invitee_rollno', 'time')
+            fields = ('id', 'invitee_name', 'invitee_rollno', 'status', 'time')
 
       def get_invitee_name(self, obj):
             return obj.to.name
@@ -45,7 +45,7 @@ class InvitationsSentSerializer(ModelSerializer):
 class StudentSerializer(ModelSerializer):
       class Meta:
             model = Student
-            fields = ['name', 'rollno']
+            fields = ['name', 'rollno', 'token']
 
 
 class GroupStudentSerializer(ModelSerializer):
@@ -61,7 +61,7 @@ class GroupStudentSerializer(ModelSerializer):
 
       class Meta:
             model = Student
-            fields = ['name', 'rollno', 'cg', 'alloted_room']
+            fields = ['name', 'rollno', 'token', 'cg', 'alloted_room']
 
 
 class GroupSerializer(ModelSerializer):
@@ -143,10 +143,11 @@ class StudentProfileSerializer(serializers.ModelSerializer):
 
       class Meta:
             model = Student
-            fields = ['rollno', 'name', 'phoneno', 'gender', 'cg', 'batch', 'current_room', 'alloted_room', 'user', 'group', 'is_preference_filled', 'academic_session', 'fee_structure_url', 'current_hostel', 'preview_hostel', 'alloted_hostel', 'group_size_limit', 'alloted_room']
+            fields = ['token', 'rollno', 'name', 'phoneno', 'gender', 'cg', 'batch', 'current_room', 'alloted_room', 'user', 'group', 'is_preference_filled', 'academic_session', 'fee_structure_url', 'current_hostel', 'preview_hostel', 'alloted_hostel', 'group_size_limit', 'alloted_room']
             extra_kwargs = {
                   'alloted_room': {'write_only': True},
                   'current_room': {'write_only': True},
+                  'token': {'read_only': True},
             }
 
       def get_group(self, obj):
