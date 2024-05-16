@@ -22,8 +22,9 @@ export default function LeaveConfirmation({ onClose }: LeaveConfirmationProps): 
   const onError = (err: AxiosError<ErrorResponse>): void => {
     if (err?.response?.data?.detail) {
       setError(err?.response?.data?.detail);
+    } else {
+      setError('Something went wrong');
     }
-    setError('Something went wrong');
   };
 
   const { mutate: leaveGroup, isPending } = useLeaveGroup({ onError });

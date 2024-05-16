@@ -102,15 +102,11 @@ export const leaveGroup = async (): Promise<AxiosResponse<OkResponse>> => {
     throw new Error('You must be logged in to perform this action');
   }
 
-  const res = await groupApi.patch(
-    'leave/',
-    {},
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
+  const res = await groupApi.patch('leave/', null, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
   logger.debug('leaveGroup', res.data);
 
   return res;
