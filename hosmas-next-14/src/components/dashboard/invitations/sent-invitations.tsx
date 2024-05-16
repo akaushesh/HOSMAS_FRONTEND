@@ -1,9 +1,11 @@
 'use client';
 
 import * as React from 'react';
+import type { ErrorResponse } from '@/services/auth';
 import type { InvitationStatusResponse } from '@/services/invitation';
-import { Chip, CircularProgress, Table, TableBody, TableCell, TableRow } from '@mui/material';
+import { Chip, CircularProgress, Table, TableBody, TableCell, TableRow, Typography } from '@mui/material';
 import { Box } from '@mui/system';
+import type { AxiosError } from 'axios';
 
 import { logger } from '@/lib/default-logger';
 import { useSentInvitationStatus } from '@/hooks/query/use-invitation';
@@ -29,8 +31,9 @@ function timeAgo(timestamp: Date): string {
 }
 
 export function SentInvitations(): React.JSX.Element {
-  const { data: invitations, isLoading } = useSentInvitationStatus();
+  const { data: invitations, isLoading, isError, error } = useSentInvitationStatus();
   const sentInvitations = invitations as InvitationStatusResponse;
+  const sentInvitationError = error as AxiosError<ErrorResponse>;
   logger.debug('sent invitations', sentInvitations);
 
   return (
@@ -40,8 +43,22 @@ export function SentInvitations(): React.JSX.Element {
           <TableBody>
             <TableRow key="loading">
               <TableCell>&nbsp;</TableCell>
+              <TableCell align="center">{isLoading !== undefined && <CircularProgress />}</TableCell>
+              <TableCell align="right">&nbsp;</TableCell>
+            </TableRow>
+          </TableBody>
+        ) : isError ? (
+          <TableBody>
+            <TableRow key="loading">
+              <TableCell>&nbsp;</TableCell>
               <TableCell align="center">
-                <CircularProgress />
+                {isError !== undefined && (
+                  <Typography variant="body2">
+                    {sentInvitationError?.response?.data?.detail
+                      ? sentInvitationError?.response?.data?.detail
+                      : 'Something went wrong'}
+                  </Typography>
+                )}
               </TableCell>
               <TableCell align="right">&nbsp;</TableCell>
             </TableRow>
