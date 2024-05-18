@@ -1,128 +1,138 @@
 'use client';
 
-import React, { Fragment, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Box, Fade, Paper, Typography } from '@mui/material';
-import hostels from './assets/hostelData';
+import { relative } from 'path';
 
+import React, { Fragment, useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Box, Button, Fade, Paper, Typography } from '@mui/material';
+import Carousel from 'react-material-ui-carousel';
+
+import hostels from './assets/hostelData';
 
 export default function Page(): React.JSX.Element {
   const router = useRouter();
-  const defaultwp ='/assets/thapar.jpg';
-
-  const [wallpaper, setWallpaper] = useState<string>(defaultwp);
-  const [name, setName] = useState<string>('');
-
-  const handleMouseEnter = (image: string, name: string) => {
-    setWallpaper(image);
-    setName(name);
-  };
-  const handleMouseLeave = () => {
-    setWallpaper(defaultwp);
-    setName('');
-  };
 
   const handleHostelClick = (path: string) => {
     router.push('/dashboard/hostels/' + path);
   };
 
+  const [pause, setPause] = useState(false);
+  const [current, setCurrent] = useState(-1);
+  const [index, setIndex] = useState(1);
+  
+
+  const handleMouseEnter = (index: number) => {
+    setPause(true);
+    setCurrent(index);
+  }
+  const handleMouseLeave = () => {
+    setPause(false);
+    setCurrent(-1);
+  }
+
+
   return (
-    <>
-      <Box
-        sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative' }}
-        gap={5}
-        px={4}
-        py={4}
-      >
-        <Box
-          sx={{
-            position: 'absolute',
-            zIndex: 1,
-            top: 0,
-            left: 0,
-            backgroundImage: `url(${wallpaper})`,
-            backgroundSize: 'cover',
-            transition: 'background-image ease 350ms',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
-          }}
-          width={1}
-          height={1}
-          borderRadius={1}
-        ></Box>
+    <Box
+      sx={{
+        '--Card-Subheading-FontColor': 'var(--mui-palette-text-primaryChannel)',
+        '--Card-Hostel-FontColor': 'var(--mui-palette-text-primary)',
+        '--Button-Color': '#f8f8f8db',
+        '--Button-HoverColor': 'var(--mui-palette-secondary-light)',
+        '--Button-FontColor': 'var(--mui-palette-text-primary)',
+        position: 'relative',
+      }}
+    >
+      <Carousel indicators={false} strictIndexing={true} stopAutoPlayOnHover={false} autoPlay={!pause}>
+        {hostels.map((hostel, index) => {
+          hostel=pause?hostels[current]:hostel;
+          return (
+            <Box
+              key={index}
+              sx={{
+                width: 1,
+                height: '70vh',
+                position: 'relative',
+                cursor: 'pointer',
+              }}
+              onClick={() => handleHostelClick(hostel.path)}
+            >
+              <img
+                src={hostel.image[0]}
+                alt={hostel.name}
+                style={{
+                  width: '100%',
+                  borderRadius: '14px',
+                  position: 'absolute',
+                  height: '100%',
+                  objectFit: 'cover',
+                }}
+              />
 
-        <Paper
-          sx={{
-            width: '25%',
-            borderRadius: 1,
-            height: '69vh',
-            display: 'flex',
-            alignItems: 'center',
-            flexDirection: 'column',
-            py: 4,
-            gap: 4,
-            px: 2,
-            zIndex: 2,
-          }}
-          elevation={5}
-        >
-          <Typography variant="h3">Hostels</Typography>
-
-          <Box
-            width={1}
-            height={1}
-            px={3}
-            py={1}
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              flexDirection: 'column',
-              overflowY: 'auto',
-              overflowX: 'hidden',
-            }}
-            gap={2}
-          >
-            {hostels.map((hostel, index) => {
-              return (
-                <Paper
-                  key={index}
-                  onClick={() => handleHostelClick(hostel.path)}
-                  onMouseEnter={() => handleMouseEnter(hostel.image[0], hostel.name)}
-                  onMouseLeave={() => handleMouseLeave()}
+              <Box
+                zIndex={1}
+                sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', width: 1 }}
+                p={3}
+              >
+                <Box
                   sx={{
-                    display: 'flex',
-                    width: 1,
-                    alignItems: 'baseline',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    borderRadius: 1,
-                    px: 1,
-                    gap: 2,
-                    py: 2,
+                    background: '#FDFDFD',
+                    position: 'relative',
+                    zIndex: 1,
+                    transition: 'ease 250ms',
+                    textAlign: 'center',
                   }}
-                  elevation={5}
+                  width={'fit-content'}
+                  borderRadius={1}
+                  p={2}
                 >
-                  <Typography variant="h6">{hostel.name}</Typography>
-                  <Typography variant="body2">{`${hostel.gender} Hostel`}</Typography>
-                </Paper>
-              );
-            })}
-          </Box>
-        </Paper>
-
-        <Box
-          width={'65%'}
-          sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-          height={1}
-          zIndex={2}
-        >
-          {name !== '' && (
-            <Box sx={{ background: '#ffffff75',transition: 'ease 250ms', }} borderRadius={1} px={3} py={1}>
-              <Typography sx={{transition: 'ease 250ms',}} variant="h2">{name}</Typography>
+                  <Typography variant="h6" color={'var(--Card-Subheading-FontColor)'}>
+                    {'HOSTEL'}
+                  </Typography>
+                  <Typography variant="h2" color={'var(--Card-Heading-FontColor)'}>
+                    {hostel.name.split(' ')[1]}
+                  </Typography>
+                </Box>
+              </Box>
             </Box>
-          )}
-        </Box>
+          );
+        })}
+      </Carousel>
+
+
+
+      <Box
+        zIndex={20}
+        width={1}
+        sx={{ position: 'absolute', display: 'flex', alignItems: 'center', justifyContent: 'center',bottom:30,flexWrap:'wrap' }}
+        gap={0.7}
+      >
+        {hostels.map((hostel, index) => {
+          return (
+
+              <Button
+                sx={{
+                  px: current==index?4:2,
+                  fontSize:current==index?16:13,
+                  mx:current==index?1:'',
+                  scale:current==index?"1.4":"",
+                  zIndex:current==index?20:1,
+                  boxShadow:"0 0 10px #00000060",
+                  background: 'var(--Button-Color)',
+                  color: 'var(--Button-FontColor)',
+                  '&:hover': { background: 'var(--Button-HoverColor)' },
+                  transition: 'ease 250ms',
+                }}
+                onMouseEnter={()=>handleMouseEnter(index)}
+                onMouseLeave={()=>handleMouseLeave()}
+                key={index}
+                onClick={() => handleHostelClick(hostel.path)}
+              >
+                {hostel.name}
+              </Button>
+              
+          );
+        })}
       </Box>
-    </>
+    </Box>
   );
 }

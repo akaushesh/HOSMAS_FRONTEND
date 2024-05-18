@@ -10,7 +10,7 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
-import { restrictToWindowEdges } from '@dnd-kit/modifiers';
+import { restrictToFirstScrollableAncestor, restrictToParentElement, restrictToVerticalAxis, restrictToWindowEdges } from '@dnd-kit/modifiers';
 import { arrayMove, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { Box, Button, Checkbox, CircularProgress, Paper, Stack, SvgIcon, Typography } from '@mui/material';
 import { ArrowRight } from '@phosphor-icons/react';
@@ -26,6 +26,8 @@ import { logger } from '@/lib/default-logger';
 import { PreferenceOrder } from '@/services/preference';
 import { useRouter } from 'next/navigation';
 import { set } from 'react-hook-form';
+import { AxiosResponse } from 'axios';
+import { ProfileResponse } from '@/services/profile';
 
 
 
@@ -47,7 +49,8 @@ const page = () => {
   const { data: choices, isLoading: isLoadingChoices } = useChoices() as Response;
   const { data: prefernces, isLoading: isLoadingPreferences } = usePreference() as Response;
   const { data: PrefStatus, isLoading: isLoadPrefStatus } = usePreferenceStatus() as Response;
-  const { data: user, isLoading: isLoadProfile } = useProfile() as Response;
+  const { data: profile, isLoading: isLoadProfile } = useProfile() as Response;
+  const user = profile as AxiosResponse<ProfileResponse>
 
 
   // ADMIN RESTRICTIONS
@@ -59,8 +62,10 @@ const page = () => {
   const [data2, setData2] = useState<Card[]>([]);
   const [isRetain, setRetain] = useState<boolean>(false);
 
-  const isLeader = !user?.group || user?.user?.email === user?.group?.leader_email;
+  const isLeader = !user?.data?.group || user?.data?.user?.email === user?.data?.group?.leader_email;
 
+
+  
   // TEMP DATA TO CHECK IF CHANGES ARE DONE
   const [initialData, setInitialData] = useState({
     data2: [] as any,
@@ -74,8 +79,8 @@ const page = () => {
       let d1:Card[] = [] ;
       let d2:Card[] = [];
 
-      choices.data.forEach((el: any) => {
-        if (prefernces.data.data.preferences.some((pref: any) => pref.room_type_name === el.room_name && pref.hostel_name === el.room_hostel)) {
+      choices?.data.forEach((el: any) => {
+        if (prefernces?.data.data.preferences.some((pref: any) => pref.room_type_name === el.room_name && pref.hostel_name === el.room_hostel)) {
 
           d2.push({
             logo: el.room_name.substr(0, 2),
@@ -106,15 +111,15 @@ const page = () => {
 
       setInitialData({
         data2: d2,
-        isRetain: PrefStatus.data.can_retain ? prefernces.data.data.retain : false,
+        isRetain: PrefStatus?.data.can_retain ? prefernces?.data.data.retain : false,
       });
 
-      if (PrefStatus.data.can_retain) {
-        setRetain(prefernces.data.data.retain);
+      if (PrefStatus?.data.can_retain) {
+        setRetain(prefernces?.data.data.retain);
       }
 
-      setAllowRetain(PrefStatus.data.can_retain);
-      setAllowPref(PrefStatus.data.is_live);
+      setAllowRetain(PrefStatus?.data.can_retain);
+      setAllowPref(PrefStatus?.data.is_live);
     }
   }, [isLoadingChoices, isLoadingPreferences, isLoadPrefStatus]);
 
@@ -337,7 +342,7 @@ const page = () => {
             }}
             variant="h6"
           >
-            Retain Current Allotment :: <Checkbox onChange={() => setRetain(!isRetain)} checked={isRetain} />
+            Retain Current Allotment :: <Checkbox onChange={() => setRetain(!isRetain)} checked={isRetain}disabled={!allowPref||!isLeader} />
           </Typography>
         </Box>
       </Box>
@@ -347,7 +352,7 @@ const page = () => {
         onDragOver={handleDragEndNOver}
         sensors={sensors}
         collisionDetection={closestCorners}
-        modifiers={[restrictToWindowEdges]}
+        modifiers={[restrictToFirstScrollableAncestor, restrictToWindowEdges]}
       >
         <Box
           sx={{
