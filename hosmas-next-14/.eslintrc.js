@@ -22,6 +22,12 @@ module.exports = {
     },
   },
   rules: {
+    "react/no-unknown-property": [
+      "error",
+      {
+        "ignore": ["castShadow"]
+      }
+    ],
     '@typescript-eslint/no-unused-vars': [
       'error',
       {
