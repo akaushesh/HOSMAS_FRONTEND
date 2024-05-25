@@ -1,5 +1,3 @@
-'use client';
-
 import React, { useState } from 'react';
 import { Box, Button, Collapse, Divider, Grid, Link, Paper, Typography } from '@mui/material';
 

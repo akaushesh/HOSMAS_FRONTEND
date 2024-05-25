@@ -1,5 +1,5 @@
 import { hostel } from "@/types/hostels";
-import { hostelB, hostelN, hostelO } from "./hostelImages";
+import { hostelB, hostelM, hostelN, hostelO } from "./hostelImages";
 
 const hostels=[
     {
@@ -65,6 +65,35 @@ const hostels=[
         • Hostel-N includes an open stage, an excellent platform for hosting cultural functions within the hostel premises. Guest rooms are available for visitors, ensuring their comfort during their stay. The hostel maintains strict security measures, with guards stationed at entrances and patrolling the premises day and night. Fire alarms are also installed throughout the premises, ensuring safety in emergencies.<br/>
         • The hostel's mess facility takes pride in providing hygienic and nutritious food to its residents. Meals are lovingly prepared under the supervision of a dedicated and vigilant committee. The mess menu is carefully curated by the committee members, considering the resident's preferences and nutritional requirements. Special supplements such as healthy sprouts, cornflakes, soups, and boiled eggs are included in the menu. For efficient management, Hostel-N has developed an in-house complaint management system. This online system allows residents to register complaints regarding equipment malfunction and automatically processes the complaints by extracting the relevant room details. Caretakers are available day and night to assist residents with their needs.<br/>
         • Furthermore, the hostel offers an online room allocation system, allowing residents to select their desired rooms through an interactive interface at the beginning of the academic session. The allocation is done on a first-come, first-served basis.`,
+    },
+    
+    {
+        name: "Hostel M",
+        path: "hostel-m",
+        floors: 8,
+        rooms: 144,
+        students: 1148,
+        warden: "Dr. Rahul Upadhaya",
+        emailW: "wardenm1@thapar.edu, wardenm2@thapar.edu",
+        contact: "",
+        dayCaretaker: "Mr. Jaspal Singh, Mr. Satguru Singh, Mr. Brijesh Kumar",
+        nightCaretaker: "Mr. Amrinder Singh",
+        emailC: "caretaker.m@thapar.edu",
+        gender: "Boys",
+        image: hostelM,
+        description: `Iconic Hostel M is a modern multi-story boys" hostel that boasts state-of-the-art facilities spanning four towers and eight floors with a total capacity of 1148 students.<br/>
+        The accommodation options include single and double-seater air-conditioned rooms with attached and shared washrooms.<br/>
+        • Each room is furnished with essential amenities such as a study table, chair, almirah, book rack, mattress, geyser, curtains, and dustbins.<br/>
+        • Additionally, every floor is equipped with a water cooler, RO system, and sofa sets.<br/>
+        • The architectural design of Iconic Hostel M prioritizes seamless accessibility for its students, and this is exemplified by the provision of two elevators in each block. These elevators serve as essential conduits for easy vertical movement, spanning from the ground floor up to the eighth floor.<br/>
+        • Upholding superior cleanliness, the hostel engages housekeeping personnel to ensure a pristine environment.<br/>
+        • Students can avail themselves of a laundry unit system for their convenience.<br/>
+        • The entire hostel premises are enveloped by a continuous 24/7 Wi-Fi network, granting students access to high-speed internet at all times.<br/>
+        • The gymnasium within the hostel is furnished with contemporary fitness equipment, catering to the exercise requirements of the students.<br/>
+        • Hostel M places utmost importance on safety and security, ensuring the presence of guards at entrances and within each block.<br/>
+        • Fire alarms are installed throughout the premises to guarantee a response in emergencies.<br/>
+        • Additionally, the hostel provides guest rooms and sick rooms, prioritizing the comfort and well-being of its residents.<br/>
+        Hostel M strives to create a harmonious blend of opulence and safety, recognizing that an ideal student living space goes beyond mere accommodation. It is a space where students can thrive academically, socially, and personally within an environment that prioritizes their comfort, security, and holistic development.`,
     }
     
 

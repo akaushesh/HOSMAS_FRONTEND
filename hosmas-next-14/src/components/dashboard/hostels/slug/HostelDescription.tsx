@@ -1,4 +1,3 @@
-'use client';
 
 import React, { useState } from 'react';
 import { Box, Button, Collapse, Divider, Link, Paper, Typography } from '@mui/material';
@@ -75,11 +74,11 @@ export default function HostelDescription({ hostel }: PropsType): React.JSX.Elem
         </Typography>
 
         {hostel?.contact.split(',').map((contact, index) => {
-          return (
+          return contact.trim()!=''?(
               <Typography key={index} textAlign={'center'} mb={2} variant="h6" fontSize={'17px'}>
               {`+91 ${contact.trim()}`}
             </Typography>
-          );
+          ):('');
         })}
         
         </>

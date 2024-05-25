@@ -19,6 +19,7 @@ interface Props {
   second: CardData[];
 }
 
+
 const Collumn: React.FC<Props> = (props) => {
   return (
     <Box

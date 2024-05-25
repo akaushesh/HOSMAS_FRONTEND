@@ -18,7 +18,7 @@ import { ArrowRight } from '@phosphor-icons/react';
 import { useChoices, usePreference, usePreferenceStatus } from '@/hooks/query/use-preference';
 import { useProfile } from '@/hooks/query/use-profile';
 
-import Collumn from './Components/Collumn';
+// import Collumn from './Components/Collumn';
 
 import { useCreatePreference, useRetain } from '@/hooks/mutation/use-preference';
 
@@ -28,6 +28,7 @@ import { useRouter } from 'next/navigation';
 import { set } from 'react-hook-form';
 import { AxiosResponse } from 'axios';
 import { ProfileResponse } from '@/services/profile';
+import Collumn from '@/components/dashboard/preference/Collumn';
 
 
 

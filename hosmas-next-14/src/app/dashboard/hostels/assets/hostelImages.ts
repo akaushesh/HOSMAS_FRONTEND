@@ -56,3 +56,16 @@ export const hostelO = [
   'https://res.cloudinary.com/dmwydl8zn/image/upload/v1714996241/hosmas/hostel_o/kugm2zncmxqcnczr45wj.jpg',
   'https://res.cloudinary.com/dmwydl8zn/image/upload/v1714996244/hosmas/hostel_o/xzojqmij7oyhktq6blsj.jpg',
 ] as string[];
+
+export const hostelM=[
+  "https://res.cloudinary.com/dmwydl8zn/image/upload/v1715098045/hosmas/hostel_m/bezl4tqeguzu2foomzyz.jpg",
+  "https://res.cloudinary.com/dmwydl8zn/image/upload/v1715098049/hosmas/hostel_m/fm2s19hhq5mrg6xqz2fl.jpg",
+  "https://res.cloudinary.com/dmwydl8zn/image/upload/v1715098029/hosmas/hostel_m/lj58f9dg0qkdyzimontr.jpg",
+  "https://res.cloudinary.com/dmwydl8zn/image/upload/v1715098033/hosmas/hostel_m/bn6kb3s0oqhe4s1d1aea.jpg",
+  "https://res.cloudinary.com/dmwydl8zn/image/upload/v1715098038/hosmas/hostel_m/qcjky5idp24nkpmloqge.jpg",
+  "https://res.cloudinary.com/dmwydl8zn/image/upload/v1715098041/hosmas/hostel_m/ipgxntfhrfsyt20i8kvv.jpg",
+  "https://res.cloudinary.com/dmwydl8zn/image/upload/v1715098052/hosmas/hostel_m/jtut3h3ovonghvdhnind.jpg",
+  "https://res.cloudinary.com/dmwydl8zn/image/upload/v1715098056/hosmas/hostel_m/sz186pqux3us2ozqkvtz.jpg",
+  "https://res.cloudinary.com/dmwydl8zn/image/upload/v1715098061/hosmas/hostel_m/kdqgpks5qccvrmos1kkp.jpg",
+  "https://res.cloudinary.com/dmwydl8zn/image/upload/v1715098065/hosmas/hostel_m/vhosaqgipl4hpl4gxynt.jpg"
+] as string[];
