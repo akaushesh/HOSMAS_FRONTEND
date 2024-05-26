@@ -9,11 +9,16 @@ from django.contrib.postgres.fields import ArrayField
 class Hostel(models.Model):
     name = models.CharField(max_length=100, unique=True)
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
-    caretaker_email = models.EmailField(max_length=200)
-    caretaker_name = models.CharField(max_length=200)
     description = models.TextField(blank=True, null=True)
     photos = ArrayField(models.URLField(max_length=2000), blank=True, default=list)
     
+    caretaker_name = models.CharField(max_length=200)
+    caretaker_email = models.EmailField(max_length=200)
+    caretaker_phone_number = models.CharField(max_length=20)
+    
+    warden_name = models.CharField(max_length=200)
+    warden_email = models.EmailField(max_length=200)
+    warden_phone_number = models.CharField(max_length=20)
 
     def __str__(self):
         return self.name

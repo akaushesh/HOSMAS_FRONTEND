@@ -3,9 +3,9 @@ from .models import *
 
 
 class HostelAdmin(admin.ModelAdmin):
-    list_display = ('id','name', 'gender', 'caretaker_email', 'caretaker_name')
+    list_display = ('id','name', 'gender', 'warden_name', 'caretaker_name')
     list_filter = ('gender', )
-    search_fields = ('name', )
+    search_fields = ('name', 'caretaker_name', 'caretaker_email', 'warden_name', 'warden_email')
 
 
 class RoomTypeAdmin(admin.ModelAdmin):
