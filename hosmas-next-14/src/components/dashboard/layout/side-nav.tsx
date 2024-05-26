@@ -8,8 +8,6 @@ import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import { ArrowSquareUpRight as ArrowSquareUpRightIcon } from '@phosphor-icons/react/dist/ssr/ArrowSquareUpRight';
-import { CaretUpDown as CaretUpDownIcon } from '@phosphor-icons/react/dist/ssr/CaretUpDown';
 
 import type { NavItemConfig } from '@/types/nav';
 import { paths } from '@/paths';
@@ -61,7 +59,7 @@ export function SideNav(): React.JSX.Element {
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            px:2,
+            px: 2,
           }}
         >
           <Logo color="light" width={1} height={1} />
@@ -77,15 +75,15 @@ export function SideNav(): React.JSX.Element {
       <Box>
         <Typography
           variant="h6"
-          color={'var(--mui-palette-text-primaryChannel)'}
+          color="var(--mui-palette-text-primaryChannel)"
           my={3}
           mb={4}
-          textAlign={'center'}
+          textAlign="center"
           fontSize={22}
         >
           Made by
           <Link href="https://www.ccstiet.com/" ml={1} color="inherit" target="_blank">
-            Team CCS
+            Team HMS
           </Link>{' '}
         </Typography>
       </Box>
@@ -118,7 +116,7 @@ function NavItem({ disabled, external, href, icon, matcher, pathname, title }: N
   const Icon = icon ? navIcons[icon] : null;
   const router = useRouter();
 
-  const handleRoute = (link: string) => {
+  const handleRoute = (link: string): void => {
     if (link) {
       router.push(link);
     }
@@ -127,7 +125,10 @@ function NavItem({ disabled, external, href, icon, matcher, pathname, title }: N
   return (
     <li>
       <Box
-        onClick={() => handleRoute(href as string)}
+        onClick={() => {
+          const link = href!;
+          handleRoute(link);
+        }}
         sx={{
           alignItems: 'center',
           borderRadius: 1,

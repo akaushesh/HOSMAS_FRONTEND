@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import type { GroupResponse } from '@/services/group';
-import { Button, CircularProgress, TableFooter } from '@mui/material';
+import { Button, CircularProgress, Divider, TableFooter } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -91,8 +91,10 @@ export default function GroupDetails(): React.JSX.Element {
                 <TableCell align="right">&nbsp;</TableCell>
               </TableRow>
             ))}
+            <Divider />
           </TableBody>
         )}
+
         <TableFooter>
           <TableRow>
             <TableCell>&nbsp;</TableCell>

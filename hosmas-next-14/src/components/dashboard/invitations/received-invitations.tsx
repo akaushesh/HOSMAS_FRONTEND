@@ -132,6 +132,7 @@ export function ReceivedInvitations(): React.JSX.Element {
                       aria-haspopup="true"
                       aria-expanded={open ? 'true' : undefined}
                       onClick={handleClick}
+                      sx={{ minHeight: 0, minWidth: 0, padding: 0 }}
                     >
                       <MoreVertIcon />
                     </IconButton>
