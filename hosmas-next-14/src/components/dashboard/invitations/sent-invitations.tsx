@@ -65,6 +65,11 @@ export function SentInvitations(): React.JSX.Element {
           </TableBody>
         ) : (
           <TableBody>
+            {sentInvitations?.data.length === 0 && (
+              <TableRow>
+                <TableCell>No invitations sent yet!</TableCell>
+              </TableRow>
+            )}
             {sentInvitations?.data.map((invitation) => {
               return (
                 <TableRow hover key={invitation.invitee_rollno}>

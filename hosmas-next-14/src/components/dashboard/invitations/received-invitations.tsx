@@ -115,7 +115,12 @@ export function ReceivedInvitations(): React.JSX.Element {
           </TableBody>
         ) : (
           <TableBody>
-            {receivedInvitations.data.map((invitation) => {
+            {receivedInvitations?.data.length === 0 && (
+              <TableRow>
+                <TableCell align="center">No invitations received yet!</TableCell>
+              </TableRow>
+            )}
+            {receivedInvitations?.data.map((invitation) => {
               return (
                 <TableRow hover key={invitation.group_leader_rollno}>
                   <TableCell>{invitation.group_leader_name}</TableCell>
