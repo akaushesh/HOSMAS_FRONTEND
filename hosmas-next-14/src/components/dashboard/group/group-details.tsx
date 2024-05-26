@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import type { GroupResponse } from '@/services/group';
-import { Button, CircularProgress } from '@mui/material';
+import { Button, CircularProgress, TableFooter } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -93,6 +93,13 @@ export default function GroupDetails(): React.JSX.Element {
             ))}
           </TableBody>
         )}
+        <TableFooter>
+          <TableRow>
+            <TableCell>&nbsp;</TableCell>
+            <TableCell align="center">Group can contain upto 8 members</TableCell>
+            <TableCell>&nbsp;</TableCell>
+          </TableRow>
+        </TableFooter>
       </Table>
     </TableContainer>
   );
