@@ -4,9 +4,9 @@ import Container from '@mui/material/Container';
 import GlobalStyles from '@mui/material/GlobalStyles';
 
 import { AuthGuard } from '@/components/auth/auth-guard';
+import { Ellipse2 } from '@/components/core/ellipse';
 import { MainNav } from '@/components/dashboard/layout/main-nav';
 import { SideNav } from '@/components/dashboard/layout/side-nav';
-import { Ellipse1, Ellipse2 } from '@/components/core/ellipse';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -36,18 +36,23 @@ export default function Layout({ children }: LayoutProps): React.JSX.Element {
           minHeight: '100%',
         }}
       >
-        <Box  sx={{position:"absolute",top:0,left:"35%",zIndex:0}}>
-          <Ellipse2/>
+        <Box sx={{ position: 'absolute', top: 0, left: '35%', zIndex: 0 }}>
+          <Ellipse2 />
         </Box>
 
-        <Box  sx={{position:"absolute",bottom:0,left:"60%",zIndex:0}}>
+        {/* <Box  sx={{position:"absolute",bottom:0,left:"60%",zIndex:0}}>
           <Ellipse1/>
-        </Box>
-
-
+        </Box> */}
 
         <SideNav />
-        <Box sx={{ display: 'flex', flex: '1 1 auto', flexDirection: 'column', pl: { lg: 'var(--SideNav-width)',zIndex:3 } }}>
+        <Box
+          sx={{
+            display: 'flex',
+            flex: '1 1 auto',
+            flexDirection: 'column',
+            pl: { lg: 'var(--SideNav-width)', zIndex: 3 },
+          }}
+        >
           <MainNav />
 
           <main>
@@ -57,7 +62,6 @@ export default function Layout({ children }: LayoutProps): React.JSX.Element {
           </main>
         </Box>
       </Box>
-      
     </AuthGuard>
   );
 }

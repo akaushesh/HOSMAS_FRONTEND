@@ -1,7 +1,8 @@
-import  React from 'react';
+import React from 'react';
 import { useRouter } from 'next/navigation';
 import { Box, Typography } from '@mui/material';
 import Carousel from 'react-material-ui-carousel';
+
 import type { hostel } from '@/types/hostels';
 
 interface PropsType {
@@ -12,28 +13,30 @@ interface PropsType {
 
 export default function HostelCarousel({ hostels, pause, current }: PropsType): React.JSX.Element {
   const router = useRouter();
-  const handleHostelClick = (path: string) => {
+  const handleHostelClick = (path: string): void => {
     router.push(`/dashboard/hostels/${path}`);
   };
 
   return (
     <Carousel indicators={false} strictIndexing stopAutoPlayOnHover={false} autoPlay={!pause}>
-      {hostels.map((hostel, index) => {
-        hostel = pause ? hostels[current] : hostel;
+      {hostels.map((hostel, _) => {
+        const currentHostel = pause ? hostels[current] : hostel;
         return (
           <Box
-            key={index}
+            key={hostel.emailW}
             sx={{
               width: 1,
               height: '70vh',
               position: 'relative',
               cursor: 'pointer',
             }}
-            onClick={() => handleHostelClick(hostel.path)}
-            >
+            onClick={() => {
+              handleHostelClick(currentHostel.path);
+            }}
+          >
             <img
-              src={hostel.image[0]}
-              alt={hostel.name}
+              src={currentHostel.image[0]}
+              alt={currentHostel.name}
               style={{
                 width: '100%',
                 borderRadius: '14px',
@@ -52,15 +55,15 @@ export default function HostelCarousel({ hostels, pause, current }: PropsType): 
                   transition: 'ease 250ms',
                   textAlign: 'center',
                 }}
-                width={'fit-content'}
+                width="fit-content"
                 borderRadius={1}
                 p={2}
-                >
-                <Typography variant="h6" color={'var(--Card-Subheading-FontColor)'}>
-                  {'HOSTEL'}
+              >
+                <Typography variant="h6" color="var(--Card-Subheading-FontColor)">
+                  HOSTEL
                 </Typography>
-                <Typography variant="h2" color={'var(--Card-Heading-FontColor)'}>
-                  {hostel.name.split(' ')[1]}
+                <Typography variant="h2" color="var(--Card-Heading-FontColor)">
+                  {currentHostel.name.split(' ')[1]}
                 </Typography>
               </Box>
             </Box>

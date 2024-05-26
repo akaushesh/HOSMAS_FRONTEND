@@ -1,22 +1,22 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Box, Button } from '@mui/material';
+import { Box } from '@mui/material';
 
 import HostelCarousel from '@/components/dashboard/hostels/HostelCarousel';
 import HostelSelectors from '@/components/dashboard/hostels/HostelSelectors';
 
-import hostels from './assets/hostelData';
+import hostels from './assets/HostelData';
 
 export default function Page(): React.JSX.Element {
   const [pause, setPause] = useState(false);
   const [current, setCurrent] = useState(-1);
 
-  const handleMouseEnter = (index: number) => {
+  const handleMouseEnter = (index: number): void => {
     setPause(true);
     setCurrent(index);
   };
-  const handleMouseLeave = () => {
+  const handleMouseLeave = (): void => {
     setPause(false);
     setCurrent(-1);
   };

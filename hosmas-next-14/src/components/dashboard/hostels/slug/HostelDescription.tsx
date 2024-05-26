@@ -1,8 +1,7 @@
-
 import React, { useState } from 'react';
-import { Box, Button, Collapse, Divider, Link, Paper, Typography } from '@mui/material';
+import { Box, Collapse, Divider, Link, Paper, Typography } from '@mui/material';
 
-import { hostel } from '@/types/hostels';
+import type { hostel } from '@/types/hostels';
 
 interface PropsType {
   hostel?: hostel | null;
@@ -26,69 +25,67 @@ export default function HostelDescription({ hostel }: PropsType): React.JSX.Elem
       }}
       elevation={3}
     >
-
       <Box mb={0.5}>
         <Typography variant="h2">{hostel?.name}</Typography>
 
         <Collapse in={open} collapsedSize={60}>
-          {hostel?.description.split('<br/>').map((desc, index) => {
+          {hostel?.description.split('<br/>').map((desc, _) => {
             return (
-              <Typography key={index} variant="subtitle2">
+              <Typography key={hostel?.emailW} variant="subtitle2">
                 {desc}
               </Typography>
             );
           })}
         </Collapse>
 
-        <Typography sx={{ cursor: 'pointer' }} variant="body2" mt={1} color={'var(--mui-palette-text-secondaryChannel)'} onClick={() => setOpen(!open)}>
+        <Typography
+          sx={{ cursor: 'pointer' }}
+          variant="body2"
+          mt={1}
+          color="var(--mui-palette-text-secondaryChannel)"
+          onClick={() => {
+            setOpen(!open);
+          }}
+        >
           ...view {open ? 'less' : 'more'}
         </Typography>
       </Box>
-      
-      
-      <Divider orientation="vertical" variant="middle" flexItem />
-      
-      
-      
-      <Box>
-        
-        <Box >
-            <img></img>
-            <Typography variant="h5" fontSize={'17px'}>{hostel?.warden}</Typography>
-            <Typography variant="body2">Warden</Typography>
 
-            <Typography textAlign={'center'} mb={2} variant="h6" fontSize={'17px'}>
-              <Link color={'inherit'} href={`mailto:${hostel?.emailW}`} target={'_blank'}>
-                {hostel?.emailW}
+      <Divider orientation="vertical" variant="middle" flexItem />
+
+      <Box>
+        <Box>
+          <Typography variant="h5" fontSize="17px">
+            {hostel?.warden}
+          </Typography>
+          <Typography variant="body2">Warden</Typography>
+
+          <Typography textAlign="center" mb={2} variant="h6" fontSize="17px">
+            <Link color="inherit" href={`mailto:${hostel?.emailW ?? ''}`} target="_blank">
+              {hostel?.emailW ?? ''}
+            </Link>
+          </Typography>
+        </Box>
+        {open ? (
+          <>
+            <Typography textAlign="center" mb={2} variant="h6" fontSize="17px">
+              <Link color="inherit" href={`mailto:${hostel?.emailC ?? ''}`} target="_blank">
+                {hostel?.emailC ?? ''}
               </Link>
             </Typography>
-            </Box>
-        {open&&(
-         <>
-        
 
-        <Typography textAlign={'center'} mb={2} variant="h6" fontSize={'17px'}>
-          <Link color={'inherit'} href={`mailto:${hostel?.emailC}`} target={'_blank'}>
-            {hostel?.emailC}
-          </Link>
-        </Typography>
-
-        {hostel?.contact.split(',').map((contact, index) => {
-          return contact.trim()!=''?(
-              <Typography key={index} textAlign={'center'} mb={2} variant="h6" fontSize={'17px'}>
-              {`+91 ${contact.trim()}`}
-            </Typography>
-          ):('');
-        })}
-        
-        </>
-       )}
-
-
+            {hostel?.contact.split(',').map((contact, _) => {
+              return contact.trim() !== '' ? (
+                <Typography key={hostel.emailW} textAlign="center" mb={2} variant="h6" fontSize="17px">
+                  {`+91 ${contact.trim()}`}
+                </Typography>
+              ) : (
+                ''
+              );
+            })}
+          </>
+        ) : null}
       </Box>
-
-
-
     </Paper>
   );
 }
