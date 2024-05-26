@@ -1,33 +1,22 @@
 'use client';
 
-import * as React from 'react'; 
+import * as React from 'react';
 import { useEffect, useState } from 'react';
-import {
-  closestCorners,
-  DndContext,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-} from '@dnd-kit/core';
+import type { PreferenceOrder } from '@/services/preference';
+import type { ProfileResponse } from '@/services/profile';
+import { closestCorners, DndContext, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { restrictToFirstScrollableAncestor, restrictToWindowEdges } from '@dnd-kit/modifiers';
-import { arrayMove, sortableKeyboardCoordinates} from '@dnd-kit/sortable';
-import { Box, Button, Checkbox, CircularProgress, Paper, Stack,Typography } from '@mui/material';
+import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
+import { Box, Button, Checkbox, CircularProgress, Paper, Stack, Typography } from '@mui/material';
 import { ArrowRight } from '@phosphor-icons/react';
-
-import { useChoices, usePreference, usePreferenceStatus } from '@/hooks/query/use-preference';
-import { useProfile } from '@/hooks/query/use-profile';
+import type { AxiosResponse } from 'axios';
 
 // import Collumn from './Components/Collumn';
 
 import { useCreatePreference, useRetain } from '@/hooks/mutation/use-preference';
-
-import type { PreferenceOrder } from '@/services/preference';
-import type { AxiosResponse } from 'axios';
-import type { ProfileResponse } from '@/services/profile';
+import { useChoices, usePreference, usePreferenceStatus } from '@/hooks/query/use-preference';
+import { useProfile } from '@/hooks/query/use-profile';
 import Collumn from '@/components/dashboard/preference/Collumn';
-
-
 
 interface Card {
   logo: string;
@@ -37,32 +26,30 @@ interface Card {
   priority: number;
 }
 
-
 interface ChoicesResponse {
-  id:number;
-  room_hostel:string;
-  room_name:string;
+  id: number;
+  room_hostel: string;
+  room_name: string;
 }
 
 interface PrefStatusResponse {
-  can_retain:boolean;
-  is_live:boolean;
-  is_room_allotment_live:boolean;
+  can_retain: boolean;
+  is_live: boolean;
+  is_room_allotment_live: boolean;
 }
 
 interface PrefInternalData {
-  id:number;
-  priority:number;
-  hostel_name:string;
-  room_type_name:string;
+  id: number;
+  priority: number;
+  hostel_name: string;
+  room_type_name: string;
 }
 interface PreferenceResponse {
-  status:boolean;
-  data:{retain:boolean; preferences:PrefInternalData[]};
+  status: boolean;
+  data: { retain: boolean; preferences: PrefInternalData[] };
 }
 
-
-export default function Page():React.JSX.Element {
+export default function Page(): React.JSX.Element {
   // QUERIES
   const { data: choicesRes, isLoading: isLoadingChoices } = useChoices();
   const choices = choicesRes as AxiosResponse<ChoicesResponse[]>;
@@ -70,13 +57,11 @@ export default function Page():React.JSX.Element {
   const { data: preferncesRes, isLoading: isLoadingPreferences } = usePreference();
   const prefernces = preferncesRes as AxiosResponse<PreferenceResponse>;
 
-  const { data: PrefStatusRes, isLoading: isLoadPrefStatus } = usePreferenceStatus() ;
+  const { data: PrefStatusRes, isLoading: isLoadPrefStatus } = usePreferenceStatus();
   const PrefStatus = PrefStatusRes as AxiosResponse<PrefStatusResponse>;
 
   const { data: profile } = useProfile();
-  const user = profile as AxiosResponse<ProfileResponse>
-
-
+  const user = profile as AxiosResponse<ProfileResponse>;
 
   // ADMIN RESTRICTIONS
   const [allowPref, setAllowPref] = useState<boolean>(true);
@@ -89,8 +74,6 @@ export default function Page():React.JSX.Element {
 
   const isLeader = !user?.data?.group || user?.data?.user?.email === user?.data?.group?.leader_email;
 
-
-  
   // TEMP DATA TO CHECK IF CHANGES ARE DONE
   const [initialData, setInitialData] = useState({
     data2: [] as Card[],
@@ -100,25 +83,25 @@ export default function Page():React.JSX.Element {
   // INITIALISATION
   useEffect(() => {
     if (!isLoadingChoices && !isLoadingPreferences && !isLoadPrefStatus) {
-
-      const d1:Card[] = [] ;
-      const d2:Card[] = [];
+      const d1: Card[] = [];
+      const d2: Card[] = [];
 
       choices?.data.forEach((el) => {
-        if (prefernces?.data.data.preferences.some((pref) => pref.room_type_name === el.room_name && pref.hostel_name === el.room_hostel)) {
-
+        if (
+          prefernces?.data.data.preferences.some(
+            (pref) => pref.room_type_name === el.room_name && pref.hostel_name === el.room_hostel
+          )
+        ) {
           d2.push({
             logo: el.room_name.substr(0, 2),
             id: el.id,
             room: el.room_name.substr(3),
             hostel: el.room_hostel,
             priority: prefernces.data.data.preferences.find(
-              (pref:PrefInternalData) => pref.room_type_name === el.room_name && pref.hostel_name === el.room_hostel
+              (pref: PrefInternalData) => pref.room_type_name === el.room_name && pref.hostel_name === el.room_hostel
             ).priority,
           });
-
-        } 
-        else {
+        } else {
           d1.push({
             logo: el.room_name.substr(0, 2),
             id: el.id,
@@ -129,10 +112,9 @@ export default function Page():React.JSX.Element {
         }
       });
 
-      d2.sort((a:Card, b:Card) => (a.priority || 0) - (b.priority || 0));
+      d2.sort((a: Card, b: Card) => (a.priority || 0) - (b.priority || 0));
       setData1(d1);
       setData2(d2);
-
 
       setInitialData({
         data2: d2,
@@ -155,7 +137,6 @@ export default function Page():React.JSX.Element {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   );
-
 
   const getPos = (id: string, data: Card[]): number => {
     return data.findIndex((item) => item.id === id);
@@ -215,49 +196,43 @@ export default function Page():React.JSX.Element {
     return true;
   };
 
-
   const [disabled, setDisabled] = useState(true);
   useEffect(() => {
     const arraysAreEqual = arraysAreEqualExcludingId(initialData.data2, data2);
 
     if ((initialData.isRetain && isRetain) || (arraysAreEqual && initialData.isRetain === isRetain)) {
-      if (!disabled ) {
+      if (!disabled) {
         setDisabled(true);
       }
     } else if (data1.length === 0 || isRetain) {
       setDisabled(false);
     } else if (!disabled) {
-        setDisabled(true);
-      }
+      setDisabled(true);
+    }
   }, [data1, isRetain, data2, initialData, disabled]);
 
-
-
   // RESET BUTTON
-  const handleReset = ():void => {
+  const handleReset = (): void => {
     setData1(
-      choices.data.map((el:ChoicesResponse) => {
+      choices.data.map((el: ChoicesResponse) => {
         return {
           logo: el.room_name.substr(0, 2),
           id: el.id,
           room: el.room_name.substr(3),
           hostel: el.room_hostel,
-          priority:0,
+          priority: 0,
         };
       })
     );
-    
+
     setData2([]);
     if (allowRetain) setIsRetain(false);
   };
 
-
-
   // SAVE BUTTON
   const [msg, setMsg] = useState<string>('');
   const [success, setSuccess] = useState<boolean>(false);
-  
- 
+
   const onSuccess = (): void => {
     setMsg('Preferences Saved Successfully!');
     setSuccess(true);
@@ -265,8 +240,8 @@ export default function Page():React.JSX.Element {
     setInitialData({
       data2,
       isRetain,
-    })
-    
+    });
+
     setTimeout(() => {
       setMsg('');
     }, 1500);
@@ -279,32 +254,24 @@ export default function Page():React.JSX.Element {
       setMsg('');
     }, 1500);
   };
- 
-  const {mutate:PrefMutation,isPending:pendingPref} = useCreatePreference({onSuccess, onError});
-  const {mutate:RetainMutation,isPending:pendingRetain} = useRetain({onSuccess, onError});
- 
-  const handleSubmit = async(event: React.FormEvent<HTMLFormElement>): Promise<void> => {
+
+  const { mutate: PrefMutation, isPending: pendingPref } = useCreatePreference({ onSuccess, onError });
+  const { mutate: RetainMutation, isPending: pendingRetain } = useRetain({ onSuccess, onError });
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
 
-    
-    if(isRetain){
+    if (isRetain) {
       RetainMutation({});
-    }
-    else{
+    } else {
       const pref: Record<number, number> = {};
       data2.forEach((el, index) => {
-        pref[index+1] = el.id;
+        pref[index + 1] = el.id;
       });
-      
-      PrefMutation({order: pref} as PreferenceOrder);
-    
+
+      PrefMutation({ order: pref } as PreferenceOrder);
     }
-    
-
   };
-
-
-
 
   return (
     <Stack
@@ -330,7 +297,7 @@ export default function Page():React.JSX.Element {
         </Box>
 
         <Box
-          width='35%'
+          width="35%"
           sx={{
             opacity: !allowPref || !isLeader ? 0.45 : 1,
             pointerEvents: !allowPref || !isLeader ? 'none' : 'initial',
@@ -338,23 +305,45 @@ export default function Page():React.JSX.Element {
         >
           <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end', mb: 1 }} gap={2}>
             <Button
-              sx={{ px: 7, fontSize: 16, background: 'var(--SButton-Color)', color: 'var(--Button-FontColor)', '&:hover': { background: 'var(--SButton-HoverColor)'}}}
+              sx={{
+                px: 7,
+                fontSize: 16,
+                background: 'var(--SButton-Color)',
+                color: 'var(--Button-FontColor)',
+                '&:hover': { background: 'var(--SButton-HoverColor)' },
+              }}
               variant="contained"
-              onClick={() => { handleReset(); }}
+              onClick={() => {
+                handleReset();
+              }}
             >
               RESET
             </Button>
             <Button
-              sx={{ px: 7, fontSize: 16, background: 'var(--PButton-Color)', color: 'var(--Button-FontColor)','&:hover': { background: 'var(--PButton-HoverColor)'} }}
+              sx={{
+                px: 7,
+                fontSize: 16,
+                background: 'var(--PButton-Color)',
+                color: 'var(--Button-FontColor)',
+                '&:hover': { background: 'var(--PButton-HoverColor)' },
+              }}
               disabled={disabled}
               variant="contained"
               onClick={(e) => handleSubmit(e)}
             >
-              {(pendingPref||pendingRetain) ? <CircularProgress color='inherit' size={32}/> : 'SAVE'}
+              {pendingPref || pendingRetain ? <CircularProgress color="inherit" size={32} /> : 'SAVE'}
             </Button>
           </Box>
 
-          <Typography sx={{color:success?'var(--mui-palette-success-dark)':'var(--mui-palette-error-main)', textAlign:'end'}} variant='body2'>{msg}</Typography>
+          <Typography
+            sx={{
+              color: success ? 'var(--mui-palette-success-dark)' : 'var(--mui-palette-error-main)',
+              textAlign: 'end',
+            }}
+            variant="body2"
+          >
+            {msg}
+          </Typography>
 
           <Typography
             sx={{
@@ -366,7 +355,14 @@ export default function Page():React.JSX.Element {
             }}
             variant="h6"
           >
-            Retain Current Allotment :: <Checkbox onChange={() => { setIsRetain(!isRetain); }} checked={isRetain}disabled={!allowPref||!isLeader} />
+            Retain Current Allotment ::{' '}
+            <Checkbox
+              onChange={() => {
+                setIsRetain(!isRetain);
+              }}
+              checked={isRetain}
+              disabled={!allowPref || !isLeader}
+            />
           </Typography>
         </Box>
       </Box>
@@ -400,22 +396,22 @@ export default function Page():React.JSX.Element {
               color: 'var(--Card-FontColor)',
             }}
           >
-            {isLoadingChoices ? <CircularProgress color="inherit" /> :null}
+            {isLoadingChoices ? <CircularProgress color="inherit" /> : null}
 
             {!isLoadingChoices && (
               <>
                 <Typography variant="overline" sx={{ textAlign: 'left', mb: 2 }} width={1}>
                   You have selected {data2.length} out of {data1.length + data2.length} items.
                 </Typography>
-                <Collumn id='collumn1' main={data1} second={data2} />
+                <Collumn id="collumn1" main={data1} second={data2} />
               </>
             )}
           </Paper>
 
           <Box
-            height='60vh'
+            height="60vh"
             width={0.1}
-            fontSize='40px'
+            fontSize="40px"
             sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
           >
             <ArrowRight />
@@ -441,7 +437,7 @@ export default function Page():React.JSX.Element {
                 <Typography variant="overline" sx={{ textAlign: 'left', mb: 2 }} width={1}>
                   Arrange your preferences here.
                 </Typography>
-                <Collumn id='collumn2' main={data2} second={data1} />
+                <Collumn id="collumn2" main={data2} second={data1} />
               </>
             )}
           </Paper>
@@ -449,5 +445,4 @@ export default function Page():React.JSX.Element {
       </DndContext>
     </Stack>
   );
-};
-
+}

@@ -175,7 +175,7 @@ export default function GroupDetails(): React.JSX.Element {
         <TableFooter>
           <TableRow>
             <TableCell>&nbsp;</TableCell>
-            <TableCell align="center">Group can contain upto 8 members</TableCell>
+            <TableCell align="center">Group can contain upto {user?.data?.group_size_limit} members</TableCell>
             <TableCell>&nbsp;</TableCell>
           </TableRow>
         </TableFooter>
