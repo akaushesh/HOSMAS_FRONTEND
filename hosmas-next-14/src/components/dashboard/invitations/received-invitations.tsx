@@ -64,6 +64,7 @@ export function ReceivedInvitations(): React.JSX.Element {
 
   const onSuccess = async (): Promise<void> => {
     await queryClient.invalidateQueries({ queryKey: ['getReceivedInvitations'] });
+    await queryClient.invalidateQueries({ queryKey: ['getGroup'] });
     handleClose();
   };
 

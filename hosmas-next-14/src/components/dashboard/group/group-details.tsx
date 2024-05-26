@@ -1,8 +1,12 @@
 'use client';
 
 import * as React from 'react';
+import type { ErrorResponse } from '@/services/auth';
 import type { GroupResponse } from '@/services/group';
-import { Button, CircularProgress, Divider, TableFooter } from '@mui/material';
+import type { SuccessResponse } from '@/services/invitation';
+import type { ProfileResponse } from '@/services/profile';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import { Button, CircularProgress, Divider, IconButton, Menu, MenuItem, TableFooter } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -10,10 +14,13 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import type { AxiosResponse } from 'axios';
+import { useQueryClient } from '@tanstack/react-query';
+import type { AxiosError, AxiosResponse } from 'axios';
 
 import { logger } from '@/lib/default-logger';
+import { useTransferOwnership } from '@/hooks/mutation/use-group';
 import { useGroup } from '@/hooks/query/use-group';
+import { useProfile } from '@/hooks/query/use-profile';
 import CustomModal from '@/components/core/custom-modal';
 
 import LeaveConfirmation from './leave-confirmation';
@@ -27,13 +34,49 @@ export interface CreatedData {
 }
 
 export default function GroupDetails(): React.JSX.Element {
-  const { data, isLoading } = useGroup();
-  const group = data as AxiosResponse<GroupResponse>;
+  const { data: groupDetails, isLoading } = useGroup();
+  const group = groupDetails as AxiosResponse<GroupResponse>;
   const leader = group?.data?.leader;
   const members = group?.data?.members;
-  logger.debug('useGroup', data);
+  logger.debug('useGroup', groupDetails);
+
+  const { data: profile } = useProfile();
+  const user = profile as AxiosResponse<ProfileResponse>;
+  const isLeader = user?.data?.rollno === leader?.rollno;
 
   const [openLeaveModal, setOpenLeaveModal] = React.useState(false);
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [newLeaderRollno, setNewLeaderRollno] = React.useState<null | number>(null);
+
+  const queryClient = useQueryClient();
+
+  const onSuccess = async (res: AxiosResponse<SuccessResponse>): Promise<void> => {
+    logger.debug(res);
+    await queryClient.invalidateQueries({ queryKey: ['getGroup'] });
+  };
+
+  const onError = (error: AxiosError<ErrorResponse>): void => {
+    logger.error(error);
+  };
+
+  const { mutate: transferOwnership, isPending: isTransferOwnershipPending } = useTransferOwnership({
+    onSuccess,
+    onError,
+  });
+
+  const open = Boolean(anchorEl);
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>): void => {
+    setAnchorEl(event.currentTarget);
+    setNewLeaderRollno(Number(event.currentTarget.id));
+  };
+  const handleClose = (): void => {
+    setAnchorEl(null);
+  };
+
+  const onTransferOwnership = (): void => {
+    transferOwnership({ rollno: newLeaderRollno });
+    logger.debug(newLeaderRollno);
+  };
 
   return (
     <TableContainer component={Paper}>
@@ -88,7 +131,41 @@ export default function GroupDetails(): React.JSX.Element {
               <TableRow key={member?.rollno}>
                 <TableCell>{member?.name}</TableCell>
                 <TableCell align="center">{member?.rollno}</TableCell>
-                <TableCell align="right">&nbsp;</TableCell>
+                {isLeader ? (
+                  <TableCell align="right">
+                    <IconButton
+                      id={member.rollno.toString()}
+                      aria-controls={open ? 'basic-menu' : undefined}
+                      aria-haspopup="true"
+                      aria-expanded={open ? 'true' : undefined}
+                      onClick={handleClick}
+                      sx={{ minHeight: 0, minWidth: 0, padding: 0 }}
+                    >
+                      <MoreVertIcon />
+                    </IconButton>
+                    <Menu
+                      id="basic-menu"
+                      anchorEl={anchorEl}
+                      open={open}
+                      onClose={handleClose}
+                      MenuListProps={{
+                        'aria-labelledby': 'basic-button',
+                      }}
+                    >
+                      {isTransferOwnershipPending ? (
+                        <div style={{ padding: '1rem 1.2rem' }}>
+                          <CircularProgress />
+                        </div>
+                      ) : (
+                        <div>
+                          <MenuItem onClick={onTransferOwnership}>Transfer Ownership</MenuItem>
+                        </div>
+                      )}
+                    </Menu>
+                  </TableCell>
+                ) : (
+                  <TableCell align="right">&nbsp;</TableCell>
+                )}
               </TableRow>
             ))}
             <Divider />
