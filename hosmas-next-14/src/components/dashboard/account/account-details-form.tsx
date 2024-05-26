@@ -64,8 +64,8 @@ export function AccountDetailsForm(): React.JSX.Element {
             </Grid>
             <Grid md={6} xs={12}>
               <FormControl disabled fullWidth>
-                <InputLabel>0</InputLabel>
-                <OutlinedInput label="feeDue" />
+                <InputLabel>{student?.token}</InputLabel>
+                <OutlinedInput label="private-token" />
               </FormControl>
             </Grid>
           </Grid>

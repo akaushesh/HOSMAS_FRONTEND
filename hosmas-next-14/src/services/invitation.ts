@@ -4,7 +4,6 @@ import { authClient } from '@/lib/auth/client';
 import { logger } from '@/lib/default-logger';
 
 import { invitationApi } from './api';
-import type { StudentData } from './group';
 import type { OkResponse } from './profile';
 
 interface InvitationStatus {
@@ -27,6 +26,10 @@ export type ReceivedInvitationResponse = AxiosResponse<Invitation[]>;
 
 interface InvitationData {
   id: number;
+}
+
+interface TokenData {
+  token: string;
 }
 
 export interface SuccessResponse {
@@ -67,7 +70,7 @@ export const getReceivedInvitations = async (): Promise<ReceivedInvitationRespon
   return res;
 };
 
-export const sendInvitation = async (values: StudentData): Promise<AxiosResponse<SuccessResponse>> => {
+export const sendInvitation = async (values: TokenData): Promise<AxiosResponse<SuccessResponse>> => {
   const token = (await authClient.getToken()).data;
 
   if (token === null || token === undefined) {
@@ -75,7 +78,7 @@ export const sendInvitation = async (values: StudentData): Promise<AxiosResponse
   }
 
   const data = {
-    rollno: values.rollno,
+    token: values.token,
   };
 
   const res = await invitationApi.post('send/', data, {

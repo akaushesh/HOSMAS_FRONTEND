@@ -37,6 +37,7 @@ export interface ProfileResponse {
   rollno: string;
   name: string;
   phoneno: string;
+  token: string;
   gender: string;
   cg: number;
   batch: null | Batch;
