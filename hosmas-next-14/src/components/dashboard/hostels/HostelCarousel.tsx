@@ -1,8 +1,8 @@
-import React from 'react';
+import  React from 'react';
 import { useRouter } from 'next/navigation';
 import { Box, Typography } from '@mui/material';
 import Carousel from 'react-material-ui-carousel';
-import { hostel } from '@/types/hostels';
+import type { hostel } from '@/types/hostels';
 
 interface PropsType {
   hostels: hostel[];
@@ -13,11 +13,11 @@ interface PropsType {
 export default function HostelCarousel({ hostels, pause, current }: PropsType): React.JSX.Element {
   const router = useRouter();
   const handleHostelClick = (path: string) => {
-    router.push('/dashboard/hostels/' + path);
+    router.push(`/dashboard/hostels/${path}`);
   };
 
   return (
-    <Carousel indicators={false} strictIndexing={true} stopAutoPlayOnHover={false} autoPlay={!pause}>
+    <Carousel indicators={false} strictIndexing stopAutoPlayOnHover={false} autoPlay={!pause}>
       {hostels.map((hostel, index) => {
         hostel = pause ? hostels[current] : hostel;
         return (
@@ -30,7 +30,7 @@ export default function HostelCarousel({ hostels, pause, current }: PropsType): 
               cursor: 'pointer',
             }}
             onClick={() => handleHostelClick(hostel.path)}
-          >
+            >
             <img
               src={hostel.image[0]}
               alt={hostel.name}
@@ -55,7 +55,7 @@ export default function HostelCarousel({ hostels, pause, current }: PropsType): 
                 width={'fit-content'}
                 borderRadius={1}
                 p={2}
-              >
+                >
                 <Typography variant="h6" color={'var(--Card-Subheading-FontColor)'}>
                   {'HOSTEL'}
                 </Typography>

@@ -79,15 +79,15 @@ export default function GroupDetails(): React.JSX.Element {
           </TableBody>
         ) : (
           <TableBody>
-            <TableRow key={leader.rollno}>
-              <TableCell>{leader.name}</TableCell>
-              <TableCell align="center">{leader.rollno}</TableCell>
+            <TableRow key={leader?.rollno}>
+              <TableCell>{leader?.name}</TableCell>
+              <TableCell align="center">{leader?.rollno}</TableCell>
               <TableCell align="right">LEADER</TableCell>
             </TableRow>
-            {members.map((member) => (
-              <TableRow key={member.rollno}>
-                <TableCell>{member.name}</TableCell>
-                <TableCell align="center">{member.rollno}</TableCell>
+            {members?.map((member) => (
+              <TableRow key={member?.rollno}>
+                <TableCell>{member?.name}</TableCell>
+                <TableCell align="center">{member?.rollno}</TableCell>
                 <TableCell align="right">&nbsp;</TableCell>
               </TableRow>
             ))}
