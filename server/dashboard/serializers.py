@@ -19,7 +19,7 @@ class HostelSerializer(serializers.ModelSerializer):
 
       class Meta:
             model = Hostel
-            fields = ['id', 'name', 'gender', 'photos']
+            fields = ['id', 'name', 'gender', 'photos', 'warden_name', 'warden_email', 'warden_phone_number', 'caretaker_name', 'caretaker_email', 'caretaker_phone_number']
 
 
 class RoomTypeSerializer(serializers.ModelSerializer):
@@ -52,7 +52,7 @@ class HostelSingleSerializer(serializers.ModelSerializer):
 
       class Meta:
             model = Hostel
-            fields = ['id', 'name', 'gender', 'caretaker_email', 'caretaker_name', 'room_types', 'capacity', 'description', 'photos']
+            fields = ['id', 'name', 'gender', 'room_types', 'capacity', 'description', 'photos', 'warden_name', 'warden_email', 'warden_phone_number', 'caretaker_name', 'caretaker_email', 'caretaker_phone_number']
       
       def get_capacity(self, obj):
             cnt = 0
