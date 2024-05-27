@@ -17,9 +17,28 @@ from user.models import ResetSlug
 class HostelSerializer(serializers.ModelSerializer):
       # Serializer for representing data of all hostels
 
+      capacity = serializers.SerializerMethodField()
+      rooms_count = serializers.SerializerMethodField()
+      levels_count = serializers.SerializerMethodField()
+
       class Meta:
             model = Hostel
-            fields = ['id', 'name', 'gender', 'photos', 'warden_name', 'warden_email', 'warden_phone_number', 'caretaker_name', 'caretaker_email', 'caretaker_phone_number']
+            fields = ['id', 'name', 'gender', 'photos', 'capacity', 'levels_count', 'rooms_count', 'warden_name', 'warden_email', 'warden_phone_number', 'warden_photo', 'day_caretaker_name', 'day_caretaker_email', 'day_caretaker_phone_number', 'night_caretaker_name', 'night_caretaker_email', 'night_caretaker_phone_number']
+      
+      def get_capacity(self, obj):
+            cnt = 0
+            for roomtype in obj.room_types.all():
+                  cnt += roomtype.room_size * roomtype.rooms_count
+            return cnt
+      
+      def get_rooms_count(self, obj):
+            cnt = 0
+            for roomtype in obj.room_types.all():
+                  cnt += roomtype.rooms_count
+            return cnt
+      
+      def get_levels_count(self, obj):
+            return obj.levels.count()
 
 
 class RoomTypeSerializer(serializers.ModelSerializer):
@@ -54,7 +73,7 @@ class HostelSingleSerializer(serializers.ModelSerializer):
 
       class Meta:
             model = Hostel
-            fields = ['id', 'name', 'gender', 'room_types', 'capacity', 'levels_count', 'rooms_count', 'description', 'photos', 'warden_name', 'warden_email', 'warden_phone_number', 'caretaker_name', 'caretaker_email', 'caretaker_phone_number']
+            fields = ['id', 'name', 'gender', 'room_types', 'capacity', 'levels_count', 'rooms_count', 'description', 'photos', 'warden_name', 'warden_email', 'warden_phone_number', 'warden_photo', 'day_caretaker_name', 'day_caretaker_email', 'day_caretaker_phone_number', 'night_caretaker_name', 'night_caretaker_email', 'night_caretaker_phone_number']
       
       def get_capacity(self, obj):
             cnt = 0
