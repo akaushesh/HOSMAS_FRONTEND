@@ -122,44 +122,48 @@ export function ReceivedInvitations(): React.JSX.Element {
               </TableRow>
             )}
             {receivedInvitations?.data.map((invitation) => {
-              return (
-                <TableRow hover key={invitation.group_leader_rollno}>
-                  <TableCell>{invitation.group_leader_name}</TableCell>
-                  <TableCell align="center">{timeAgo(new Date(invitation.time))}</TableCell>
-                  <TableCell align="right">
-                    <IconButton
-                      id={invitation.id.toString()}
-                      aria-controls={open ? 'basic-menu' : undefined}
-                      aria-haspopup="true"
-                      aria-expanded={open ? 'true' : undefined}
-                      onClick={handleClick}
-                      sx={{ minHeight: 0, minWidth: 0, padding: 0 }}
-                    >
-                      <MoreVertIcon />
-                    </IconButton>
-                    <Menu
-                      id="basic-menu"
-                      anchorEl={anchorEl}
-                      open={open}
-                      onClose={handleClose}
-                      MenuListProps={{
-                        'aria-labelledby': 'basic-button',
-                      }}
-                    >
-                      {isAcceptInvitePending || isDeleteInvitePending ? (
-                        <div style={{ padding: '1rem 1.2rem' }}>
-                          <CircularProgress />
-                        </div>
-                      ) : (
-                        <div>
-                          <MenuItem onClick={onAcceptInvite}>Accept</MenuItem>
-                          <MenuItem onClick={onRejectInvite}>Reject</MenuItem>
-                        </div>
-                      )}
-                    </Menu>
-                  </TableCell>
-                </TableRow>
-              );
+              if (invitation?.status === 'W') {
+                return (
+                  <TableRow hover key={invitation.group_leader_rollno}>
+                    <TableCell>{invitation.group_leader_name}</TableCell>
+                    <TableCell align="center">{timeAgo(new Date(invitation.time))}</TableCell>
+                    <TableCell align="right">
+                      <IconButton
+                        id={invitation.id.toString()}
+                        aria-controls={open ? 'basic-menu' : undefined}
+                        aria-haspopup="true"
+                        aria-expanded={open ? 'true' : undefined}
+                        onClick={handleClick}
+                        sx={{ minHeight: 0, minWidth: 0, padding: 0 }}
+                      >
+                        <MoreVertIcon />
+                      </IconButton>
+                      <Menu
+                        id="basic-menu"
+                        anchorEl={anchorEl}
+                        open={open}
+                        onClose={handleClose}
+                        MenuListProps={{
+                          'aria-labelledby': 'basic-button',
+                        }}
+                      >
+                        {isAcceptInvitePending || isDeleteInvitePending ? (
+                          <div style={{ padding: '1rem 1.2rem' }}>
+                            <CircularProgress />
+                          </div>
+                        ) : (
+                          <div>
+                            <MenuItem onClick={onAcceptInvite}>Accept</MenuItem>
+                            <MenuItem onClick={onRejectInvite}>Reject</MenuItem>
+                          </div>
+                        )}
+                      </Menu>
+                    </TableCell>
+                  </TableRow>
+                );
+              } else {
+                return null;
+              }
             })}
           </TableBody>
         )}

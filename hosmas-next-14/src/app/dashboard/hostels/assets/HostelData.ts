@@ -23,9 +23,7 @@ const hostels = [
         <br/>• Hygiene and convenience are also prioritized in Hostel B. The hostel has adequate shared bathrooms with geyser facilities, ensuring hot water is available for bathing. RO-treated drinking water is also available, providing clean and safe water to the students.
         <br/>• Hostel-B provides various facilities to cater to the student’s recreational and daily needs. There is a TV room where students can relax and enjoy their favorite shows or movies. A gymnasium is also available for those who want to stay fit and active. A standard air-conditioned study room is provided for students who prefer to study together or in a quiet environment. Night canteen services are available for late-night snacks or meals.
         <br/>• For convenience, Hostel-B offers laundry services, relieving students from the burden of washing their clothes. The hostel mess, which features an air-conditioned dining area, takes care of all the students" food and nutritional requirements. The mess menu is decided by the committee of residential students, ensuring that their preferences and dietary needs are considered.
-        <br/>• Hostel-B is equipped with CCTV cameras throughout the premises to address security concerns, ensuring a safe and secure environment. Additionally, a security guard is present 24 hours a day to ensure the safety of the students and the hostel premises.
-        <br/>• Apart from the warden and caretaker, an executive committee of residential students is responsible for handling various day-to-day matters of the hostel. This committee acts as a liaison between the students and the hostel management, addressing any concerns or issues that may arise.
-        <br/>Overall, Hostel-B aims to provide a comfortable and conducive living environment for students, with a range of amenities and services that meet their needs and enhance their overall experience during their stay.`,
+        <br/>• Hostel-B is equipped with CCTV cameras throughout the premises to address security concerns, ensuring a safe and secure environment. Additionally, a security guard is present 24 hours a day to ensure the safety of the students and the hostel premises.`,
   },
   {
     name: 'Hostel O',
@@ -89,12 +87,7 @@ const hostels = [
         • The architectural design of Iconic Hostel M prioritizes seamless accessibility for its students, and this is exemplified by the provision of two elevators in each block. These elevators serve as essential conduits for easy vertical movement, spanning from the ground floor up to the eighth floor.<br/>
         • Upholding superior cleanliness, the hostel engages housekeeping personnel to ensure a pristine environment.<br/>
         • Students can avail themselves of a laundry unit system for their convenience.<br/>
-        • The entire hostel premises are enveloped by a continuous 24/7 Wi-Fi network, granting students access to high-speed internet at all times.<br/>
-        • The gymnasium within the hostel is furnished with contemporary fitness equipment, catering to the exercise requirements of the students.<br/>
-        • Hostel M places utmost importance on safety and security, ensuring the presence of guards at entrances and within each block.<br/>
-        • Fire alarms are installed throughout the premises to guarantee a response in emergencies.<br/>
-        • Additionally, the hostel provides guest rooms and sick rooms, prioritizing the comfort and well-being of its residents.<br/>
-        Hostel M strives to create a harmonious blend of opulence and safety, recognizing that an ideal student living space goes beyond mere accommodation. It is a space where students can thrive academically, socially, and personally within an environment that prioritizes their comfort, security, and holistic development.`,
+        • The entire hostel premises are enveloped by a continuous 24/7 Wi-Fi network, granting students access to high-speed internet at all times.<br/>`,
   },
 ];
 

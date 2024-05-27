@@ -55,9 +55,12 @@ export default function HostelDescription({ hostel }: PropsType): React.JSX.Elem
 
       <Box>
         <Box>
+          <img src="/assets/nidhi_kalra.jpeg" height="100px" style={{ margin: '10px auto', display: 'block' }} />
+
           <Typography variant="h5" fontSize="17px">
             {hostel?.warden}
           </Typography>
+
           <Typography variant="body2">Warden</Typography>
 
           <Typography textAlign="center" mb={2} variant="h6" fontSize="17px">
