@@ -6,7 +6,7 @@ import type { GroupResponse } from '@/services/group';
 import type { SuccessResponse } from '@/services/invitation';
 import type { ProfileResponse } from '@/services/profile';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { Button, CircularProgress, Divider, IconButton, Menu, MenuItem, TableFooter } from '@mui/material';
+import { Button, CircularProgress, IconButton, Menu, MenuItem, TableFooter } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -168,7 +168,6 @@ export default function GroupDetails(): React.JSX.Element {
                 )}
               </TableRow>
             ))}
-            <Divider />
           </TableBody>
         )}
 

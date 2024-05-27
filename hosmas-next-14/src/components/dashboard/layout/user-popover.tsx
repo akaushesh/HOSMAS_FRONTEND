@@ -1,6 +1,7 @@
 import * as React from 'react';
 import RouterLink from 'next/link';
 import { useRouter } from 'next/navigation';
+import type { ProfileResponse } from '@/services/profile';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import ListItemIcon from '@mui/material/ListItemIcon';
@@ -11,10 +12,12 @@ import Typography from '@mui/material/Typography';
 import { GearSix as GearSixIcon } from '@phosphor-icons/react/dist/ssr/GearSix';
 import { SignOut as SignOutIcon } from '@phosphor-icons/react/dist/ssr/SignOut';
 import { User as UserIcon } from '@phosphor-icons/react/dist/ssr/User';
+import type { AxiosResponse } from 'axios';
 
 import { paths } from '@/paths';
 import { authClient } from '@/lib/auth/client';
 import { logger } from '@/lib/default-logger';
+import { useProfile } from '@/hooks/query/use-profile';
 import { useUser } from '@/hooks/use-user';
 
 export interface UserPopoverProps {
@@ -27,6 +30,9 @@ export function UserPopover({ anchorEl, onClose, open }: UserPopoverProps): Reac
   const { checkSession } = useUser();
 
   const router = useRouter();
+
+  const { data: profile, isLoading } = useProfile();
+  const userProfile = profile as AxiosResponse<ProfileResponse>;
 
   const handleSignOut = React.useCallback(async (): Promise<void> => {
     try {
@@ -57,9 +63,9 @@ export function UserPopover({ anchorEl, onClose, open }: UserPopoverProps): Reac
       slotProps={{ paper: { sx: { width: '240px' } } }}
     >
       <Box sx={{ p: '16px 20px ' }}>
-        <Typography variant="subtitle1">Sofia Rivers</Typography>
+        <Typography variant="subtitle1">{userProfile?.data?.name}</Typography>
         <Typography color="text.secondary" variant="body2">
-          sofia.rivers@devias.io
+          {userProfile?.data?.user?.email}
         </Typography>
       </Box>
       <Divider />

@@ -44,15 +44,13 @@ export function MainNav(): React.JSX.Element {
               onClick={(): void => {
                 setOpenNav(true);
               }}
-              sx={{ display: { lg: 'none', xs:'flex' } }}
+              sx={{ display: { lg: 'none', xs: 'flex' } }}
             >
               <ListIcon />
             </IconButton>
           </Stack>
 
-          <Stack direction="row"
-          spacing={2}
-          sx={{ alignItems: 'center', justifyContent: 'flex-end' }} m={2}>
+          <Stack direction="row" spacing={2} sx={{ alignItems: 'center', justifyContent: 'flex-end' }} m={2}>
             <Tooltip title="Notifications">
               <Badge badgeContent={4} color="success" variant="dot">
                 <IconButton>
@@ -63,7 +61,7 @@ export function MainNav(): React.JSX.Element {
             <Avatar
               onClick={userPopover.handleOpen}
               ref={userPopover.anchorRef}
-              src="/assets/avatar.png"
+              // src="/assets/avatar.png"
               sx={{ cursor: 'pointer' }}
             />
           </Stack>

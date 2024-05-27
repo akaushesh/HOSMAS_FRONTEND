@@ -110,14 +110,14 @@ export default function Page({ params }: { params: { slug: string } }): React.JS
             <>
               <Box sx={{ display: 'flex', alignItems: 'baseline', justifyContent: 'start' }} gap={1} my={1} ml={2}>
                 <Typography variant="h6" fontSize="20px">
-                  • Warden :
+                  Warden :
                 </Typography>
-                <Typography variant="subtitle1" fontSize="18px">
+                <Typography variant="body2" fontSize="18px">
                   {data?.warden}
                 </Typography>
               </Box>
 
-              <Divider variant="middle" flexItem />
+              {/* <Divider variant="middle" flexItem /> */}
             </>
           ) : null}
 
@@ -125,14 +125,14 @@ export default function Page({ params }: { params: { slug: string } }): React.JS
             <>
               <Box sx={{ display: 'flex', alignItems: 'baseline', justifyContent: 'start' }} gap={1} my={1} ml={2}>
                 <Typography variant="h6" fontSize="20px">
-                  • Assistant Warden :
+                  Assistant Warden :
                 </Typography>
-                <Typography variant="subtitle1" fontSize="18px">
+                <Typography variant="body2" fontSize="18px">
                   {data?.assistantWarden}
                 </Typography>
               </Box>
 
-              <Divider variant="middle" flexItem />
+              {/* <Divider variant="middle" flexItem /> */}
             </>
           ) : null}
 
@@ -140,22 +140,22 @@ export default function Page({ params }: { params: { slug: string } }): React.JS
             <>
               <Box sx={{ display: 'flex', alignItems: 'baseline', justifyContent: 'start' }} gap={1} my={1} ml={2}>
                 <Typography variant="h6" fontSize="20px">
-                  • Day Caretaker :
+                  Day Caretaker :
                 </Typography>
-                <Typography variant="subtitle1" fontSize="18px">
+                <Typography variant="body2" fontSize="18px">
                   {data?.dayCaretaker}
                 </Typography>
               </Box>
 
-              <Divider variant="middle" flexItem />
+              {/* <Divider variant="middle" flexItem /> */}
             </>
           ) : null}
           {data?.nightCaretaker ? (
             <Box sx={{ display: 'flex', alignItems: 'baseline', justifyContent: 'start' }} gap={1} my={1} ml={2}>
               <Typography variant="h6" fontSize="20px">
-                • Night Caretaker :
+                Night Caretaker :
               </Typography>
-              <Typography variant="subtitle1" fontSize="18px">
+              <Typography variant="body2" fontSize="18px">
                 {data?.nightCaretaker}
               </Typography>
             </Box>

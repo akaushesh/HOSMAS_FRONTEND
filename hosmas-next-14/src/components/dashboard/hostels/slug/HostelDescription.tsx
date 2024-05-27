@@ -55,19 +55,23 @@ export default function HostelDescription({ hostel }: PropsType): React.JSX.Elem
 
       <Box>
         <Box>
-          <img src={hostel?.warden_image} height="100px" style={{ margin: '10px auto', display: 'block' }} />
+          <img
+            src={hostel?.warden_image}
+            height="150px"
+            style={{ margin: '10px auto', display: 'block', borderRadius: '8px' }}
+          />
 
-          <Typography variant="h5" fontSize="17px">
+          <Typography variant="body2" textAlign="center" fontSize="14px" lineHeight="1.1rem">
             {hostel?.warden}
           </Typography>
 
-          <Typography variant="body2">Warden</Typography>
+          {/* <Typography variant="body2">Warden</Typography> */}
 
-          <Typography textAlign="center" mb={2} variant="h6" fontSize="17px">
+          {/* <Typography textAlign="center" mb={2} variant="h6" fontSize="17px">
             <Link color="inherit" href={`mailto:${hostel?.emailW ?? ''}`} target="_blank">
               {hostel?.emailW ?? ''}
             </Link>
-          </Typography>
+          </Typography> */}
         </Box>
         {open ? (
           <>
