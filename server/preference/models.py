@@ -12,13 +12,15 @@ class Hostel(models.Model):
     description = models.TextField(blank=True, null=True)
     photos = ArrayField(models.URLField(max_length=2000), blank=True, default=list)
     
-    caretaker_name = models.CharField(max_length=200)
-    caretaker_email = models.EmailField(max_length=200)
-    caretaker_phone_number = models.CharField(max_length=20)
+    day_caretaker_name = models.CharField(max_length=200, blank=True, default='')
+    night_caretaker_name = models.CharField(max_length=200, blank=True, default='')
+
+    caretaker_email = models.CharField(max_length=1000, blank=True, default='')
+    phone_number = models.CharField(max_length=200, blank=True, default='')
     
-    warden_name = models.CharField(max_length=200)
-    warden_email = models.EmailField(max_length=200)
-    warden_phone_number = models.CharField(max_length=20)
+    warden_name = models.CharField(max_length=200, blank=True, default='')
+    warden_email = models.CharField(max_length=200, blank=True, default='')
+    warden_photo = models.URLField(max_length=2000, blank=True, default='')
 
     def __str__(self):
         return self.name
