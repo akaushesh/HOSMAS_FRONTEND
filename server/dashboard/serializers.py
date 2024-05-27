@@ -23,7 +23,7 @@ class HostelSerializer(serializers.ModelSerializer):
 
       class Meta:
             model = Hostel
-            fields = ['id', 'name', 'gender', 'photos', 'capacity', 'levels_count', 'rooms_count', 'warden_name', 'warden_email', 'warden_phone_number', 'warden_photo', 'day_caretaker_name', 'day_caretaker_email', 'day_caretaker_phone_number', 'night_caretaker_name', 'night_caretaker_email', 'night_caretaker_phone_number']
+            fields = ['id', 'name', 'gender', 'photos', 'capacity', 'levels_count', 'rooms_count', 'warden_name', 'warden_email', 'warden_photo', 'day_caretaker_name', 'night_caretaker_name', 'caretaker_email', 'phone_number']
       
       def get_capacity(self, obj):
             cnt = 0
@@ -73,7 +73,7 @@ class HostelSingleSerializer(serializers.ModelSerializer):
 
       class Meta:
             model = Hostel
-            fields = ['id', 'name', 'gender', 'room_types', 'capacity', 'levels_count', 'rooms_count', 'description', 'photos', 'warden_name', 'warden_email', 'warden_phone_number', 'warden_photo', 'day_caretaker_name', 'day_caretaker_email', 'day_caretaker_phone_number', 'night_caretaker_name', 'night_caretaker_email', 'night_caretaker_phone_number']
+            fields = ['id', 'name', 'gender', 'room_types', 'capacity', 'levels_count', 'rooms_count', 'description', 'photos', 'warden_name', 'warden_email', 'warden_photo', 'day_caretaker_name', 'night_caretaker_name', 'caretaker_email', 'phone_number']
       
       def get_capacity(self, obj):
             cnt = 0
