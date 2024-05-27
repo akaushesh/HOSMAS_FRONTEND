@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import MeetingRoomOutlinedIcon from '@mui/icons-material/MeetingRoomOutlined';
+import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
 import { Box, Divider, Paper, Typography } from '@mui/material';
 
 import type { hostel } from '@/types/hostels';
@@ -35,23 +37,52 @@ export default function Page({ params }: { params: { slug: string } }): React.JS
         <HostelDescription hostel={data} />
       </Box>
 
-      <Box pt={23}>
+      <Box pt={30} pb={1}>
         <HostelCollage hostel={data} images={images} handlePopup={handlePopup} height="52vh" />
       </Box>
 
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: 1, gap: 5, mt: 3 }}>
-        <Paper elevation={3} sx={{ px: 2, py: 1, width: 0.35 }}>
-          <Box sx={{ display: 'flex', alignItems: 'baseline', justifyContent: 'start' }} gap={1} my={1} ml={2}>
-            <Typography variant="h6" fontSize="20px">
-              • Floors :
-            </Typography>
+        <Paper elevation={3} sx={{ px: 2, py: 1, width: 0.35, display: 'flex', gap: '20px' }}>
+          <Box
+            sx={{ display: 'flex', alignItems: 'center', borderRight: '1px solid #000', paddingRight: '10px' }}
+            gap={1}
+            my={1}
+            ml={2}
+          >
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <MeetingRoomOutlinedIcon sx={{ fontSize: '40px' }} />
+              <Typography fontSize="12px">FLOORS</Typography>
+            </Box>
             <Typography variant="subtitle1" fontSize="18px">
               {data?.floors}
             </Typography>
           </Box>
 
-          <Divider variant="middle" flexItem />
+          <Box
+            sx={{ display: 'flex', alignItems: 'center', borderRight: '1px solid #000', paddingRight: '10px' }}
+            gap={1}
+            my={1}
+            ml={2}
+          >
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <MeetingRoomOutlinedIcon sx={{ fontSize: '40px' }} />
+              <Typography fontSize="12px">ROOMS</Typography>
+            </Box>
+            <Typography variant="subtitle1" fontSize="18px">
+              {data?.rooms}
+            </Typography>
+          </Box>
 
+          <Box sx={{ display: 'flex', alignItems: 'center' }} gap={1} my={1} ml={2}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <PeopleAltOutlinedIcon sx={{ fontSize: '40px' }} />
+              <Typography fontSize="12px">STUDENTS</Typography>
+            </Box>
+            <Typography variant="subtitle1" fontSize="18px">
+              {data?.students}
+            </Typography>
+          </Box>
+          {/* 
           <Box sx={{ display: 'flex', alignItems: 'baseline', justifyContent: 'start' }} gap={1} my={1} ml={2}>
             <Typography variant="h6" fontSize="20px">
               • Rooms :
@@ -61,7 +92,6 @@ export default function Page({ params }: { params: { slug: string } }): React.JS
             </Typography>
           </Box>
 
-          <Divider variant="middle" flexItem />
 
           <Box sx={{ display: 'flex', alignItems: 'baseline', justifyContent: 'start' }} gap={1} my={1} ml={2}>
             <Typography variant="h6" fontSize="20px">
@@ -70,7 +100,7 @@ export default function Page({ params }: { params: { slug: string } }): React.JS
             <Typography variant="subtitle1" fontSize="18px">
               {data?.students}
             </Typography>
-          </Box>
+          </Box> */}
         </Paper>
 
         <Divider orientation="vertical" variant="middle" flexItem />

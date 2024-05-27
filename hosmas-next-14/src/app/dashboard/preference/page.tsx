@@ -386,7 +386,7 @@ export default function Page(): React.JSX.Element {
           <Paper
             elevation={4}
             sx={{
-              width: '37%',
+              width: '45%',
               minHeight: '60vh',
               p: 2,
               display: 'flex',
@@ -420,7 +420,7 @@ export default function Page(): React.JSX.Element {
           <Paper
             elevation={4}
             sx={{
-              width: '37%',
+              width: '45%',
               minHeight: '60vh',
               p: 2,
               display: 'flex',
