@@ -1,13 +1,13 @@
-import React from 'react';
+import * as React from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Box } from '@mui/material';
 
-interface Props {
+interface PlaceHolderProps {
   id: string;
 }
 
-const Placeholder: React.FC<Props> = ({ id }) => {
+export default function Placeholder ({ id }:PlaceHolderProps):React.JSX.Element {
   const { setNodeRef, transition, transform } = useSortable({ id });
   const style = {
     transition,
@@ -39,4 +39,3 @@ const Placeholder: React.FC<Props> = ({ id }) => {
   );
 };
 
-export default Placeholder;

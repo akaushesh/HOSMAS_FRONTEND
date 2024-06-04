@@ -1,15 +1,14 @@
-import React from 'react';
+import * as React from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Box, Paper, SvgIcon, Typography } from '@mui/material';
-import oneS from '../Assets/1S.svg'
-import { navIcons } from './icons';
+import { Box, Paper, Typography } from '@mui/material';
+import navIcons from './icons';
 
-interface logo {
+interface Logo {
   logo: string;
 }
 
-const NavIcon: React.FC<logo> = ({ logo }) => {
+function NavIcon({ logo }:Logo): React.JSX.Element {
   const Icon = navIcons[logo];
   return (
     <img src={Icon} alt='logo' style={{scale:"0.8"}}/>
@@ -17,7 +16,7 @@ const NavIcon: React.FC<logo> = ({ logo }) => {
 };
 
 
-interface Props {
+interface CardProps {
   logo: string;
   id: string;
   room: string;
@@ -25,7 +24,7 @@ interface Props {
 }
 
 
-const Card: React.FC<Props> = ({ logo,id, room,hostel }) => {
+export default function Card({ logo,id, room,hostel }:CardProps): React.JSX.Element{
   const { setNodeRef, attributes, listeners, transition, transform } = useSortable({ id });
   const style = {
     transition,
@@ -44,7 +43,7 @@ const Card: React.FC<Props> = ({ logo,id, room,hostel }) => {
         alignItems: 'center',
         justifyContent: 'space-between',
         px: 2,
-        py:"3px",
+        py:1,
         border: '1px dashed var(--Card-BorderColor)',
         my: 1,
         touchAction: 'none',
@@ -59,7 +58,7 @@ const Card: React.FC<Props> = ({ logo,id, room,hostel }) => {
         <NavIcon logo={logo} />
         <Box sx={{display:"flex",alignItems:"baseline",justifyContent:"flex-start"}} gap={1.2}>
           <Typography variant='h6' >{logo}</Typography>
-          <Typography variant='h5'  fontSize={"19px"}>{room}</Typography>
+          <Typography variant='h5'  fontSize="19px">{room}</Typography>
           <Typography variant='subtitle2'>{hostel}</Typography>
         </Box>
       </Box>
@@ -78,4 +77,3 @@ const Card: React.FC<Props> = ({ logo,id, room,hostel }) => {
   );
 };
 
-export default Card;

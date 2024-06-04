@@ -44,6 +44,8 @@ export default function GroupDetails(): React.JSX.Element {
   const user = profile as AxiosResponse<ProfileResponse>;
   const isLeader = user?.data?.rollno === leader?.rollno;
 
+  const isIndividual = user?.data?.group?.size === 1;
+
   const [openLeaveModal, setOpenLeaveModal] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [newLeaderRollno, setNewLeaderRollno] = React.useState<null | number>(null);
@@ -91,7 +93,7 @@ export default function GroupDetails(): React.JSX.Element {
                 onClick={() => {
                   setOpenLeaveModal(true);
                 }}
-                disabled={isLoading}
+                disabled={isLoading||isIndividual}
               >
                 Leave
               </Button>

@@ -1,16 +1,18 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import * as React from 'react';
+import { useEffect, useState } from 'react';
 import MeetingRoomOutlinedIcon from '@mui/icons-material/MeetingRoomOutlined';
 import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
 import { Box, Divider, Paper, Typography } from '@mui/material';
 
 import type { hostel } from '@/types/hostels';
-import PopupGallery from '@/components/core/popupGallery';
 import HostelCollage from '@/components/dashboard/hostels/slug/HostelCollage';
 import HostelDescription from '@/components/dashboard/hostels/slug/HostelDescription';
 
 import hostels from '../assets/HostelData';
+import CustomModal from '@/components/core/custom-modal';
+import PopupGallery from '@/components/core/PopupGallery';
 
 export default function Page({ params }: { params: { slug: string } }): React.JSX.Element {
   const id = params.slug;
@@ -31,7 +33,12 @@ export default function Page({ params }: { params: { slug: string } }): React.JS
 
   return (
     <Box sx={{ position: 'relative' }}>
-      {popup ? <PopupGallery images={images} handlePopup={handlePopup} /> : null}
+
+      <CustomModal open={popup} onClose={():void => { handlePopup(false); }}>
+        <PopupGallery images={images} handlePopup={handlePopup} />
+      </CustomModal>
+
+      {/* {popup ? <PopupGallery images={images} handlePopup={handlePopup} /> : null} */}
 
       <Box sx={{ position: 'absolute', top: 0, zIndex: 7 }}>
         <HostelDescription hostel={data} />

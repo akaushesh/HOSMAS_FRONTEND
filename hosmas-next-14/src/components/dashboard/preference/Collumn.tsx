@@ -1,8 +1,7 @@
-import React from 'react';
-import { SortableContext, rectSortingStrategy, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import * as React from 'react';
+import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { Box } from '@mui/material';
 
-import styles from '../page.module.css';
 import Card from './Card';
 import Placeholder from './Placeholder';
 
@@ -13,19 +12,17 @@ interface CardData {
   hostel: string;
 }
 
-interface Props {
+interface CollumnProps {
   id: string;
   main: CardData[];
   second: CardData[];
 }
 
 
-const Collumn: React.FC<Props> = (props) => {
+export default function Collumn(props:CollumnProps):React.JSX.Element{
   return (
     <Box
       sx={{
-        // overflowX:'hidden',
-        // overflowY: 'auto',
         height: '100%',
         width: 1,
       }}
@@ -46,4 +43,3 @@ const Collumn: React.FC<Props> = (props) => {
   );
 };
 
-export default Collumn;

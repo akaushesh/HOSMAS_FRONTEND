@@ -1,7 +1,5 @@
-import { relative } from 'path';
-
-import React, { useEffect, useRef } from 'react';
-import { ImageList, ImageListItem, SvgIcon } from '@mui/material';
+import * as React from 'react';
+import { ImageList, ImageListItem } from '@mui/material';
 import { Box } from '@mui/system';
 import { XCircle } from '@phosphor-icons/react';
 
@@ -10,36 +8,31 @@ interface PopupGalleryProps {
   handlePopup: (value: boolean) => void;
 }
 
-const PopupGallery: React.FC<PopupGalleryProps> = ({ images, handlePopup }): React.ReactElement => {
+export default function PopupGallery({ images, handlePopup }:PopupGalleryProps): React.JSX.Element{
 
-  const imageStyle = {
+  const imageStyle: React.CSSProperties = {
     width: '100%',
     height: '100%',
     objectFit: 'cover',
     borderRadius: '8px',
     transition: 'ease-in-out 300ms',
-  } as any;
+  } ;
 
   return (
     <Box >
       <Box
         sx={{
-          position: 'fixed',
           zIndex: 10,
-          top: '10vh',
-          left: '25%',
           height: '80vh',
           p: 4,
           px: 1,
           borderRadius: 1,
-          background: 'rgba( 0, 0, 0, 0.55 )',
-          boxShadow: '0 8px 32px 0 rgba( 31, 38, 135, 0.37 )',
           backdropFilter: 'blur( 8.5px )'
         }}
-        width={'50%'}
+        width='50%'
      >
         <Box
-          onClick={() => handlePopup(false)}
+          onClick={() => { handlePopup(false); }}
           sx={{
             position: 'absolute',
             top: 3,
@@ -71,7 +64,7 @@ const PopupGallery: React.FC<PopupGalleryProps> = ({ images, handlePopup }): Rea
                 <img
                   srcSet={`${img}?w=248&fit=crop&auto=format&dpr=2 2x`}
                   src={`${img}?w=248&fit=crop&auto=format`}
-                  alt={`img-${index}`}
+                  alt={`img-${index.toString()}`}
                   loading="lazy"
                   style={imageStyle}
                 />
@@ -84,4 +77,3 @@ const PopupGallery: React.FC<PopupGalleryProps> = ({ images, handlePopup }): Rea
   );
 };
 
-export default PopupGallery;
