@@ -11,9 +11,14 @@ export const metadata = { title: `Customers | Dashboard | ${config.site.name}` }
 
 export default function Page(): React.JSX.Element {
   return (
-    <Stack spacing={3}>
+    <Stack spacing={3}
+    sx={{
+      '--Card-HeadColor': 'var(--mui-palette-text-secondaryChannel)',
+    }}
+    >
       <div>
-        <Typography variant="h4">Your Group</Typography>
+        <Typography variant="h3" sx={{ color: 'var(--Card-HeadColor)' }}>
+            Your Group</Typography>
       </div>
 
       <Grid container spacing={3}>

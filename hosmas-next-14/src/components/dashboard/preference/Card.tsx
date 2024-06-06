@@ -18,7 +18,7 @@ function NavIcon({ logo }:Logo): React.JSX.Element {
 
 interface CardProps {
   logo: string;
-  id: string;
+  id: string | number;
   room: string;
   hostel: string;
 }
@@ -49,6 +49,7 @@ export default function Card({ logo,id, room,hostel }:CardProps): React.JSX.Elem
         touchAction: 'none',
         background: 'var(--Card-BgColor)',
         color: 'var(--Card-TextColor)',
+        gap: 1,
       }}
       ref={setNodeRef}
       key={id}
@@ -58,7 +59,7 @@ export default function Card({ logo,id, room,hostel }:CardProps): React.JSX.Elem
         <NavIcon logo={logo} />
         <Box sx={{display:"flex",alignItems:"baseline",justifyContent:"flex-start"}} gap={1.2}>
           <Typography variant='h6' >{logo}</Typography>
-          <Typography variant='h5'  fontSize="19px">{room}</Typography>
+          <Typography variant='h5'  fontSize="18px">{room}</Typography>
           <Typography variant='subtitle2'>{hostel}</Typography>
         </Box>
       </Box>

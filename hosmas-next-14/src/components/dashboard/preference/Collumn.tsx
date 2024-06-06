@@ -7,7 +7,7 @@ import Placeholder from './Placeholder';
 
 interface CardData {
   logo: string;
-  id: string;
+  id: string | number;
   room: string;
   hostel: string;
 }

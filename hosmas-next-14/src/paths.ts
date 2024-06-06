@@ -9,6 +9,7 @@ export const paths = {
     integrations: '/dashboard/integrations',
     hostels: '/dashboard/hostels',
     preference: '/dashboard/preference',
+    rooms: '/dashboard/rooms',
     faqs: '/dashboard/faqs',
     settings: '/dashboard/settings',
   },

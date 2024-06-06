@@ -4,7 +4,7 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import type { PreferenceOrder } from '@/services/preference';
 import type { ProfileResponse } from '@/services/profile';
-import { Box, Button, Checkbox, CircularProgress, Stack, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, Stack, Typography } from '@mui/material';
 import type { AxiosResponse } from 'axios';
 
 
@@ -13,6 +13,8 @@ import { useChoices, usePreference, usePreferenceStatus } from '@/hooks/query/us
 import { useProfile } from '@/hooks/query/use-profile';
 import DnDLarge from '@/components/dashboard/preference/DnDLarge';
 import DnDMobile from '@/components/dashboard/preference/DnDMobile';
+import CheckboxSelect from '@/components/dashboard/preference/checkbox-select';
+
 
 interface Card {
   logo: string;
@@ -253,7 +255,9 @@ export default function Page(): React.JSX.Element {
         
       }}
     >
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 5 }}>
+      <Box sx={{ display: 'flex', justifyContent: {md:'space-between',xs:'center'}, mb: 5,
+        flexDirection:{md:'row',xs:'column'},alignItems:"center", gap: 2
+       }}>
         <Box>
           <Typography variant="h3" sx={{ color: 'var(--Card-HeadColor)', mb: 1 }}>
             Hostel Preference Order
@@ -265,17 +269,19 @@ export default function Page(): React.JSX.Element {
         </Box>
 
         <Box
-          width="35%"
           sx={{
             opacity: !allowPref || !isLeader ? 0.45 : 1,
             pointerEvents: !allowPref || !isLeader ? 'none' : 'initial',
+            width:{md:"25%",xs:"80%"},
           }}
         >
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end', mb: 1 }} gap={2}>
+          <Box sx={{ display: 'flex', justifyContent: {md:'flex-end',xs:'center'}, alignItems: 'flex-end', mb: 2, }} gap={2}>
             <Button
               sx={{
-                px: 7,
-                fontSize: 16,
+                px: {md:7,xs:5},
+                fontSize: {md:16,xs:14},
+                height:43,
+                width:1,
                 background: 'var(--SButton-Color)',
                 color: 'var(--Button-FontColor)',
                 '&:hover': { background: 'var(--SButton-HoverColor)' },
@@ -289,17 +295,19 @@ export default function Page(): React.JSX.Element {
             </Button>
             <Button
               sx={{
-                px: 7,
-                fontSize: 16,
+                px: {md:7,xs:5},
+                fontSize: {md:16,xs:14},
                 background: 'var(--PButton-Color)',
                 color: 'var(--Button-FontColor)',
+                height:43,
+                width:1,
                 '&:hover': { background: 'var(--PButton-HoverColor)' },
               }}
               disabled={disabled}
               variant="contained"
               onClick={(e) => handleSubmit(e)}
             >
-              {pendingPref || pendingRetain ? <CircularProgress color="inherit" size={32} /> : 'SAVE'}
+              {(pendingPref || pendingRetain)? <CircularProgress color="inherit" size={31}/> : 'SAVE'}
             </Button>
           </Box>
 
@@ -313,25 +321,10 @@ export default function Page(): React.JSX.Element {
             {msg}
           </Typography>
 
-          <Typography
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'flex-end',
-              opacity: !allowRetain ? 0.45 : 1,
-              pointerEvents: !allowRetain ? 'none' : 'initial',
-            }}
-            variant="h6"
-          >
-            Retain Current Allotment ::{' '}
-            <Checkbox
-              onChange={() => {
-                setIsRetain(!isRetain);
-              }}
-              checked={isRetain}
-              disabled={!allowPref || !isLeader}
-            />
-          </Typography>
+            <Box sx={{width:1,display:'flex',alignItems:'center', justifyContent:'center'}}>
+              <CheckboxSelect title={allowRetain?"Retain Current Allotment":"Retainment Not Allowed"} IsSelect={isRetain} disabled={!allowRetain || !isLeader} setSelect={setIsRetain} />
+            </Box>
+        
         </Box>
       </Box>
 

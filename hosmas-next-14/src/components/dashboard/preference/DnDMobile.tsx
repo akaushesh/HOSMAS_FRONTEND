@@ -68,7 +68,7 @@ export default function DnDMobile({
   return (
     <Box sx={{ position: 'relative' }} >
       <DndContext
-        onDragEnd={(event: DndEvent) => {
+        onDragEnd={(event) => {
           handleDragEnd(event);
         }}
         sensors={sensors}
@@ -89,7 +89,7 @@ export default function DnDMobile({
             elevation={4}
             sx={{
               width: '90%',
-              minHeight: '60vh',
+              minHeight: '48vh',
               p: 2,
               display: 'flex',
               alignItems: 'center',

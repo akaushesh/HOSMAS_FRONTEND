@@ -1,4 +1,4 @@
-import { Buildings, ListDashes } from '@phosphor-icons/react';
+import { Buildings,DoorOpen, ListDashes } from '@phosphor-icons/react';
 import type { Icon } from '@phosphor-icons/react/dist/lib/types';
 import { ChartPie as ChartPieIcon } from '@phosphor-icons/react/dist/ssr/ChartPie';
 import { GearSix as GearSixIcon } from '@phosphor-icons/react/dist/ssr/GearSix';
@@ -13,6 +13,7 @@ export const navIcons = {
   'plugs-connected': PlugsConnectedIcon,
   City: Buildings,
   'list-dashes': ListDashes,
+  'room-door': DoorOpen,
   'x-square': XSquare,
   user: UserIcon,
   users: UsersIcon,
