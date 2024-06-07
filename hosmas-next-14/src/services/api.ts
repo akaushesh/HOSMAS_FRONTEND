@@ -25,3 +25,7 @@ export const groupApi = axios.create({
 export const preferenceApi = axios.create({
   baseURL: `${url}preferences/`,
 });
+
+export const roomApi = axios.create({
+  baseURL: `${url}preferences/alloted-hostel-levels/`,
+});

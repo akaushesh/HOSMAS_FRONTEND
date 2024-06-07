@@ -245,8 +245,7 @@ export default function Page(): React.JSX.Element {
   return (
     <Stack
       sx={{
-        '--Card-HeadColor': 'var(--mui-palette-text-secondaryChannel)',
-        '--Card-FontColor': 'var(--mui-palette-text-primaryChannel)',
+        '--Page-HeadColor': 'var(--mui-palette-text-secondaryChannel)',
         '--PButton-Color': 'var(--mui-palette-primary-main)',
         '--PButton-HoverColor': 'var(--mui-palette-primary-dark)',
         '--SButton-Color': 'var(--mui-palette-secondary-dark)',
@@ -259,7 +258,7 @@ export default function Page(): React.JSX.Element {
         flexDirection:{md:'row',xs:'column'},alignItems:"center", gap: 2
        }}>
         <Box>
-          <Typography variant="h3" sx={{ color: 'var(--Card-HeadColor)', mb: 1 }}>
+          <Typography variant="h3" sx={{ color: 'var(--Page-HeadColor)', mb: 1 }}>
             Hostel Preference Order
           </Typography>
 
