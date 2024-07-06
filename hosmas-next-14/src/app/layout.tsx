@@ -20,6 +20,14 @@ interface LayoutProps {
 const queryClient = new QueryClient();
 
 export default function Layout({ children }: LayoutProps): React.JSX.Element {
+
+  React.useEffect(()=>{
+    if(localStorage.getItem('mui-mode') === 'dark'  || localStorage.getItem('mui-color-scheme-light') === 'dark'){
+      localStorage.setItem('mui-mode', 'light');
+      localStorage.setItem('mui-color-scheme-light', 'light');
+    }
+  })
+
   return (
     <html lang="en">
       <body>

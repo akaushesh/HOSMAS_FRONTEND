@@ -1,8 +1,7 @@
 import * as React from 'react';
 import RouterLink from 'next/link';
-import { Box, Grid, Stack, Typography } from '@mui/material';
+import { Box, Grid, Typography } from '@mui/material';
 
-import { paths } from '@/paths';
 import { DynamicLogo } from '@/components/core/logo';
 
 export interface LayoutProps {
@@ -102,7 +101,7 @@ export function Layout({ children }: LayoutProps): React.JSX.Element {
                 Thapar Hostel Allocation System
               </Box>
             </Typography>
-            <Typography align="center" sx={{ mb: 3 }} variant="subtitle1"></Typography>
+            {/* <Typography align="center" sx={{ mb: 3 }} variant="subtitle1"></Typography> */}
             {/* <img alt="" src="/assets/auth-illustration.svg" />
             <img alt="hostel picture" src="/assets/hostels/hostelM.webp" /> */}
           </Box>

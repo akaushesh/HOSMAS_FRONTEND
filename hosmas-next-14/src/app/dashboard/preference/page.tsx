@@ -227,7 +227,7 @@ export default function Page(): React.JSX.Element {
   const { mutate: PrefMutation, isPending: pendingPref } = useCreatePreference({ onSuccess, onError });
   const { mutate: RetainMutation, isPending: pendingRetain } = useRetain({ onSuccess, onError });
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
+  const handleSubmit = async (event: React.MouseEvent<HTMLButtonElement>): Promise<void> => {
     event.preventDefault();
 
     if (isRetain) {
@@ -251,6 +251,9 @@ export default function Page(): React.JSX.Element {
         '--SButton-Color': 'var(--mui-palette-secondary-dark)',
         '--SButton-HoverColor': 'var(--mui-palette-secondary-main)',
         '--Button-FontColor': 'var(--mui-palette-common-white)',
+        '--Room-Available': 'transparent',
+        '--Room-Allotted': '#32a83c',
+        '--Room-Color': 'var(--mui-palette-secondary-main)',
         
       }}
     >
@@ -304,7 +307,7 @@ export default function Page(): React.JSX.Element {
               }}
               disabled={disabled}
               variant="contained"
-              onClick={(e) => handleSubmit(e)}
+              onClick={handleSubmit}
             >
               {(pendingPref || pendingRetain)? <CircularProgress color="inherit" size={31}/> : 'SAVE'}
             </Button>

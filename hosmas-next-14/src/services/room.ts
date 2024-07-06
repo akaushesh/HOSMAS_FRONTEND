@@ -1,9 +1,6 @@
-import type { AxiosResponse } from 'axios';
 
 import { authClient } from '@/lib/auth/client';
-import { logger } from '@/lib/default-logger';
 
-import { roomApi } from './api';
 // import type { OkResponse } from './profile';
 
 // interface Room {
@@ -28,19 +25,27 @@ import { roomApi } from './api';
 
 
 
-export const getRooms = async (): Promise<AxiosResponse<any>> => {
+export const getRoomsWSS = async (level: number): Promise<WebSocket> => {
   const token = (await authClient.getToken()).data;
 
   if (token === null || token === undefined) {
     throw new Error('You must be logged in to perform this action');
   }
 
-  const res = await roomApi.get('/', {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  logger.debug('getRooms', res.data);
+  const url = `wss://api.hosmas.ccstiet.com/ws/preference/level/${String(level)}/room/?t=${token}`;
 
-  return res;
+  const socket = new WebSocket(url);
+
+    socket.onopen = () => {
+      console.log("WSS connection is open");
+    };
+
+    // socket.onmessage = (event) => {
+    //   console.log(JSON.parse(event.data));
+    // };
+
+
+  return socket;
+
+
 };
