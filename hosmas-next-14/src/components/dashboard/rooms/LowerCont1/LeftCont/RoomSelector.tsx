@@ -1,37 +1,45 @@
 import * as React from 'react';
 import { Box, Paper, Typography } from '@mui/material';
 
-import { rooms1 } from './roomstemp';
 import type { SelectedRoomProps } from '@/hooks/mutation/use-room';
 
-interface RoomSelectorProps{
-    selectedRooms: SelectedRoomProps[];
-    floor: string;
-    setSelectedRooms: (val: SelectedRoomProps[]) => void;
+import { rooms1 } from './roomstemp';
+import type { AxiosResponse } from 'axios';
+import type { ProfileResponse } from '@/services/profile';
+
+interface RoomSelectorProps {
+  selectedRooms: SelectedRoomProps[];
+  user: AxiosResponse<ProfileResponse>;
+  floor: string;
+  setSelectedRooms: (val: SelectedRoomProps[]) => void;
 }
 
-interface ClickProps{
+interface ClickProps {
   attached: string;
   room: string;
   capacity: number;
   str: string;
 }
 
-export default function RoomSelector({selectedRooms,floor,setSelectedRooms}:RoomSelectorProps): React.JSX.Element {
+export default function RoomSelector({ selectedRooms, floor,user, setSelectedRooms }: RoomSelectorProps): React.JSX.Element {
+  const handleSelect = ({ attached, room, capacity, str }: ClickProps): void => {
 
-  const handleSelect = ({attached,room,capacity,str}: ClickProps): void => {
-    if(str==='gr'){
-      setSelectedRooms((prevSelectedRooms:SelectedRoomProps[  ]) => {
+    if(selectedRooms.length >= user.data.group.size&& str !== 'gr'){
+      return;
+    }
+
+    if (str === 'gr') {
+      setSelectedRooms((prevSelectedRooms: SelectedRoomProps[]) => {
         const index = prevSelectedRooms.findIndex((ele) => ele.room === room);
         return index !== -1
           ? [...prevSelectedRooms.slice(0, index), ...prevSelectedRooms.slice(index + 1)]
           : prevSelectedRooms;
       });
-      
+
       return;
     }
-    setSelectedRooms([...selectedRooms, {floor,attached,room,capacity}]);
-  }
+    setSelectedRooms([...selectedRooms, { floor, attached, room, capacity }]);
+  };
 
   return (
     <Box
@@ -43,7 +51,7 @@ export default function RoomSelector({selectedRooms,floor,setSelectedRooms}:Room
         justifyContent: 'space-evenly',
         width: '100%',
         px: 1,
-        height: '42vh',
+        height: '40vh',
         overflowY: 'auto',
       }}
     >
@@ -54,6 +62,8 @@ export default function RoomSelector({selectedRooms,floor,setSelectedRooms}:Room
             sx={{
               display: 'flex',
               gap: 0,
+              // border: '1px dashed var(--Cluster-BorderColor) ',
+              borderRadius: '8px',
               width: { xs: '100%', xl: '48%' },
               alignItems: 'center',
               p: 1,
@@ -61,14 +71,13 @@ export default function RoomSelector({selectedRooms,floor,setSelectedRooms}:Room
             }}
           >
             {cluster.room.map((el, i) => {
-              const count = selectedRooms.filter(ele => ele.room === el).length;
+              const count = selectedRooms.filter((ele) => ele.room === el).length;
               const roomCapacity = Array.from({ length: cluster.capacity[i] }, (_, j) =>
-                j < cluster.availability[i]
-                  ? 'av'
-                  : j < cluster.availability[i] + count
-                    ? 'gr'
-                    : 'dis'
+                j < cluster.availability[i] ? 'av' : j < cluster.availability[i] + count ? 'gr' : 'dis'
               );
+              
+              const allDisabled = roomCapacity.every(value => value === 'dis');
+
 
               const initCond = cluster.attached > 1 && i !== 0;
               const endCond = cluster.attached > 1 && i !== cluster.room.length - 1;
@@ -79,6 +88,8 @@ export default function RoomSelector({selectedRooms,floor,setSelectedRooms}:Room
                   sx={{
                     display: 'flex',
                     alignItems: 'stretch',
+                    opacity: allDisabled? 0.65 : 1,
+                    pointerEvents: allDisabled? 'none' : 'initial',
                     height: 1,
                     width: '50%',
                   }}
@@ -97,6 +108,8 @@ export default function RoomSelector({selectedRooms,floor,setSelectedRooms}:Room
                       flexDirection: 'column',
                       alignItems: 'center',
                       justifyContent: 'center',
+                      border: '1px dashed var(--Room-BorderColor) ',
+                        
                       gap: '5px',
                       width: '92%',
                       height: 1,
@@ -118,17 +131,36 @@ export default function RoomSelector({selectedRooms,floor,setSelectedRooms}:Room
                       }}
                     >
                       {roomCapacity.map((str, x) => {
+
+                        const disableCondition= str === 'dis' || (selectedRooms.length >= user.data.group.size && str !== 'gr');
+
                         return (
                           // eslint-disable-next-line react/button-has-type -- button type is not necessary.
                           <button
                             key={x}
-                            onClick={()=>{handleSelect({attached: cluster.room[i+1]||cluster.room[i-1], room: el, capacity: cluster.capacity[i],str});}}
-                            style={{ width: '45%', aspectRatio: '1', borderRadius: '8px', border: '1px black solid',
-                            background: str === 'av' ? 'transparent' : str === 'gr' ? '#32a83c' : 'var(--mui-palette-secondary-main)',
-                              opacity: str==='dis' ? 0.18 : 1,
-                              cursor: str==='dis' ? 'auto' : 'pointer',
-                              pointerEvents: str==='dis' ? 'none' : 'initial',
-                             }}
+                            onClick={() => {
+                              handleSelect({
+                                attached: cluster.room[i + 1] || cluster.room[i - 1],
+                                room: el,
+                                capacity: cluster.capacity[i],
+                                str,
+                              });
+                            }}
+                            style={{
+                              width: '35%',
+                              aspectRatio: '1',
+                              borderRadius: '8px',
+                              border: '1px black solid',
+                              background:
+                                str === 'av'
+                                  ? 'transparent'
+                                  : str === 'gr'
+                                    ? '#32a83c'
+                                    : 'var(--mui-palette-secondary-main)',
+                              opacity: disableCondition ? 0.18 : 1,
+                              cursor: disableCondition ? 'auto' : 'pointer',
+                              pointerEvents: disableCondition ? 'none' : 'initial',
+                            }}
                           />
                         );
                       })}

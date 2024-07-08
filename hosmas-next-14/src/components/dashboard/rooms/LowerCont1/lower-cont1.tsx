@@ -22,11 +22,11 @@ export default function LowerCont1({selectedRooms,floor,setSelectedRooms,user,se
 
     return(
             
-            <Box sx={{display:"flex",alignItems:"stretch",justifyContent:"center", minHeight:"60vh", mt:7}} gap={5} width={1}>
-                <Box width="50%">
+            <Box sx={{display:"flex",alignItems:"stretch",justifyContent:"center", minHeight:"60vh", mt:7}} gap="4%" width={1}>
+                <Box width="48%">
                     <RoomAllocator selectedRooms={selectedRooms} floor={floor} setSelectedRooms={setSelectedRooms} user={user}/>
                 </Box>
-                <Box width="50%">
+                <Box width="48%">
                     <FloorPlanViewer floor={floor} floors={floors} setFloor={setFloor}/>
                 </Box>
             </Box>

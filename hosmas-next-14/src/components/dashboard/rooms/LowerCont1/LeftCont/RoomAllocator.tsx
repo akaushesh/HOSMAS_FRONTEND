@@ -67,15 +67,16 @@ export default function RoomAllocator({ selectedRooms, setSelectedRooms,floor, u
       <Typography variant="h5">{`Select your rooms (Max ${user?.data?.group?.size.toString()})`}</Typography>
       <Typography variant="body2">Shared washrooms between rooms is depicted via a line between them.</Typography>
 
-      
-      <SelectionTray selectedRooms={selectedRooms} setSelectedRooms={setSelectedRooms} />
+      <Box width={1}>
+        <SelectionTray selectedRooms={selectedRooms} setSelectedRooms={setSelectedRooms} />
+      </Box>
 
       <Box
         sx={{
           mt: 4,
         }}
       >
-        <RoomSelector selectedRooms={selectedRooms} setSelectedRooms={setSelectedRooms} floor={floor} />
+        <RoomSelector selectedRooms={selectedRooms} setSelectedRooms={setSelectedRooms} user={user} floor={floor} />
       </Box>
     </Paper>
   );

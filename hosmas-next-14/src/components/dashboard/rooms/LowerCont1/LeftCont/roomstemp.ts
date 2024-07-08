@@ -4,7 +4,7 @@ export const rooms1 = [
   {
       attached: 2,
       room: ['D-203', 'D-204'],
-      availability: [3, 2],
+      availability: [0, 2],
       capacity: [4, 4],
       clusterId: 'cluster-1',
       ac:[true,false],
@@ -168,7 +168,7 @@ export const rooms1 = [
   export const selectedRooms1=[
     {
       attached: 'D-204',
-      room: 'D-203',
+      room: 'D-122',
       capacity: 4,
       floor: '2',
     },

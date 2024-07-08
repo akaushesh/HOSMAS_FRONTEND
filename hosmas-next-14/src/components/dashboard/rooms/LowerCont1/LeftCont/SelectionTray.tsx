@@ -26,16 +26,16 @@ export default function SelectionTray({selectedRooms,setSelectedRooms}:Selection
           gap: 2,
           background: 'var(--Tray-Color)',
           border: '1px dashed var(--Tray-BorderColor) ',
-          overflowX:"auto",
-          overflowY:"hidden",
-          width: 1,
+          overflowX:"scroll",
+          transition: 'ease-in-out 250ms',
+          width: "100%",
           whiteSpace:"nowrap"
         }}
       >
 
         {selectedRooms.length > 0 ? (
           selectedRooms.map((el, index) => (
-            <Zoom key={el.room} in  style={{ transitionDelay: selectedRooms[index] ? '500ms' : '0ms' }}>
+            <Zoom key={el.room} in  style={{ transitionDelay: selectedRooms[index] ? '250ms' : '0ms' }}>
               
               <Paper
                 sx={{
@@ -47,6 +47,7 @@ export default function SelectionTray({selectedRooms,setSelectedRooms}:Selection
                   position: 'relative',
                   background: 'var(--Tray-RoomColor)',
                   color: 'white',
+                  // minWidth:"10%"
                 }}
               >
                 

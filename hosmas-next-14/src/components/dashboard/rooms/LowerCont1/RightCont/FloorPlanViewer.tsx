@@ -34,7 +34,7 @@ export default function FloorPlanViewer({ floor, floors, setFloor }: FloorPlanPr
         </Select>
       </FormControl>
     
-       <Box sx={{display:"flex", alignItems:"center",justifyContent:"center", height:"37vh",my:2.5}}>
+       <Box sx={{display:"flex", alignItems:"center",justifyContent:"center", height:"35vh",my:2.5}}>
         
 
       {floorPlan === "" ? (

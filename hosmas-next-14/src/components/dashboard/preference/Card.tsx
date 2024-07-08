@@ -2,18 +2,9 @@ import * as React from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Box, Paper, Typography } from '@mui/material';
-import navIcons from './icons';
+import NavIcon from '../../core/icons';
 
-interface Logo {
-  logo: string;
-}
 
-function NavIcon({ logo }:Logo): React.JSX.Element {
-  const Icon = navIcons[logo];
-  return (
-    <img src={Icon} alt='logo' style={{scale:"0.8"}}/>
-  );
-};
 
 
 interface CardProps {
