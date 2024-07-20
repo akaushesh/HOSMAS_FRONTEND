@@ -14,7 +14,7 @@ import { paths } from '@/paths';
 import { isNavItemActive } from '@/lib/is-nav-item-active';
 import { Logo } from '@/components/core/logo';
 
-import { navItems } from './config';
+import { navSubItems } from './config';
 import { navIcons } from './nav-icons';
 
 export function SideNav(): React.JSX.Element {
@@ -68,7 +68,7 @@ export function SideNav(): React.JSX.Element {
       <Divider sx={{ borderColor: 'var(--mui-palette-text-secondary)' }} />
 
       <Box component="nav" sx={{ flex: '1 1 auto', mt: 6, px: 3 }}>
-        {renderNavItems({ pathname, items: navItems })}
+        {renderNavSubItems({ pathname, items: navSubItems })}
       </Box>
 
       <Divider sx={{ borderColor: 'var(--mui-palette-text-secondary)' }} />
@@ -91,7 +91,16 @@ export function SideNav(): React.JSX.Element {
   );
 }
 
-function renderNavItems({ items = [], pathname }: { items?: NavItemConfig[]; pathname: string }): React.JSX.Element {
+
+// function renderNavItems({ items = [], pathname }: { items?: NavItemConfig[]; pathname: string }): React.JSX.Element {
+//   return(
+//     <>
+//     </>
+//   )
+// }
+
+function renderNavSubItems({ items = [], pathname }: { items?: NavItemConfig[]; pathname: string }): React.JSX.Element {
+  
   const children = items.reduce((acc: React.ReactNode[], curr: NavItemConfig): React.ReactNode[] => {
     const { key, ...item } = curr;
 
@@ -106,6 +115,10 @@ function renderNavItems({ items = [], pathname }: { items?: NavItemConfig[]; pat
     </Stack>
   );
 }
+
+
+
+
 
 interface NavItemProps extends Omit<NavItemConfig, 'items'> {
   pathname: string;

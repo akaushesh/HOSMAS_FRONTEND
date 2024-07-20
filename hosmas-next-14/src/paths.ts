@@ -13,5 +13,8 @@ export const paths = {
     faqs: '/dashboard/faqs',
     settings: '/dashboard/settings',
   },
+  laundry:{
+    overview:'/laundry',
+  },
   errors: { notFound: '/errors/not-found' },
 } as const;

@@ -5,20 +5,17 @@ import RouterLink from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Link, Paper } from '@mui/material';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 import Drawer from '@mui/material/Drawer';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import { ArrowSquareUpRight as ArrowSquareUpRightIcon } from '@phosphor-icons/react/dist/ssr/ArrowSquareUpRight';
-import { CaretUpDown as CaretUpDownIcon } from '@phosphor-icons/react/dist/ssr/CaretUpDown';
 
 import type { NavItemConfig } from '@/types/nav';
 import { paths } from '@/paths';
 import { isNavItemActive } from '@/lib/is-nav-item-active';
 import { Logo } from '@/components/core/logo';
 
-import { navItems } from './config';
+import { navSubItems } from './config';
 import { navIcons } from './nav-icons';
 
 export interface MobileNavProps {
@@ -77,7 +74,7 @@ export function MobileNav({ open, onClose }: MobileNavProps): React.JSX.Element 
 
       <Divider sx={{ borderColor: 'var(--mui-palette-text-secondary)' }} />
       <Box component="nav" sx={{ flex: '1 1 auto', px: 3, mt: 6 }}>
-        {renderNavItems({ pathname, items: navItems })}
+        {renderNavItems({ pathname, items: navSubItems })}
       </Box>
 
       <Divider sx={{ borderColor: 'var(--mui-palette-text-secondary)' }} />
