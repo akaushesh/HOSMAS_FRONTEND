@@ -11,10 +11,9 @@ export const paths = {
     preference: '/dashboard/preference',
     rooms: '/dashboard/rooms',
     faqs: '/dashboard/faqs',
-    settings: '/dashboard/settings',
   },
-  laundry:{
-    overview:'/laundry',
-  },
+  settings:'/settings',
+  laundry:'/laundry',
+  cleaning:'/cleaning',
   errors: { notFound: '/errors/not-found' },
 } as const;

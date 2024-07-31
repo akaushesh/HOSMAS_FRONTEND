@@ -32,7 +32,7 @@ export default function Page({ params }: { params: { slug: string } }): React.JS
   }, [id]);
 
   return (
-    <Box sx={{ position: 'relative' }}>
+    <Box sx={{ position: 'relative',height:"fit-content" }} >
 
       <CustomModal open={popup} onClose={():void => { handlePopup(false); }}>
         <PopupGallery images={images} handlePopup={handlePopup} />

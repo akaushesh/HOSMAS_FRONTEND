@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { closestCorners, DndContext, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
-import { restrictToWindowEdges } from '@dnd-kit/modifiers';
+import { restrictToFirstScrollableAncestor, restrictToVerticalAxis, restrictToWindowEdges } from '@dnd-kit/modifiers';
 import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { Box, CircularProgress, Paper, Typography } from '@mui/material';
 import { ArrowRight } from '@phosphor-icons/react';
@@ -96,8 +96,8 @@ export default function DnDLarge({
         }}
         sensors={sensors}
         collisionDetection={closestCorners}
-        modifiers={[restrictToWindowEdges]}
-        width="100%"
+        modifiers={[restrictToFirstScrollableAncestor]}
+        width="50%"
       >
         <Box
           sx={{

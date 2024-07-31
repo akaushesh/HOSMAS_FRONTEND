@@ -29,8 +29,8 @@ export default function Layout({ children }: LayoutProps): React.JSX.Element {
   })
 
   return (
-    <html lang="en">
-      <body>
+    <html  lang="en">
+      <body >
         <QueryClientProvider client={queryClient}>
           <LocalizationProvider>
             <UserProvider>

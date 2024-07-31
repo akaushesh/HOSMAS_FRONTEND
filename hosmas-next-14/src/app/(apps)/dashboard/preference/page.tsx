@@ -254,7 +254,6 @@ export default function Page(): React.JSX.Element {
         '--Room-Available': 'transparent',
         '--Room-Allotted': '#32a83c',
         '--Room-Color': 'var(--mui-palette-secondary-main)',
-        
       }}
     >
       <Box sx={{ display: 'flex', justifyContent: {md:'space-between',xs:'center'}, mb: 5,

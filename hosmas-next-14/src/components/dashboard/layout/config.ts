@@ -7,12 +7,14 @@ export const navSubItems = [
   { key: 'group', title: 'Group', href: paths.dashboard.group, icon: 'users' },
   { key: 'hostels', title: 'View Hostels', href: paths.dashboard.hostels, icon: 'City' },
   { key: 'preferences', title: 'Preferences', href: paths.dashboard.preference, icon: 'list-dashes' },
-  { key: 'rooms', title: 'Room Allocation', href: paths.dashboard.rooms, icon: 'room-door' },
-  { key: 'settings', title: 'Settings', href: paths.dashboard.settings, icon: 'gear-six' },
+  { key: 'rooms', title: 'Room Allocation', href: paths.dashboard.rooms, icon: 'room-door',disabled:true },
   { key: 'faqs', title: 'FAQs', href: paths.dashboard.faqs, icon: 'user' },
 ] satisfies NavItemConfig[];
   
 export const navItems = [
-    { key: 'Allocation', title: 'Allocation', href: paths.dashboard.overview, icon: 'chart-pie', items: navSubItems },
+    { key: 'allocation', title: 'Allocation', href: paths.dashboard.overview, icon: 'chart-pie', items: navSubItems,isNested:true },
+    { key: 'cleaning', title: 'Cleaning', href: paths.cleaning, icon: 'broom',isNested:false},
+    { key: 'laundry', title: 'Laundry', href: paths.laundry, icon: 'shirt',isNested:false},
+    { key: 'settings', title: 'Settings', href: paths.settings, icon: 'gear-six' },
 ] satisfies NavItemConfig[];
   

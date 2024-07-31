@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import { Box, Typography } from '@mui/material';
 import Carousel from 'react-material-ui-carousel';

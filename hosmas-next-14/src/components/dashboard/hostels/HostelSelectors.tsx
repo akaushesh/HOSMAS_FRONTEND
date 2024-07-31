@@ -33,8 +33,8 @@ export default function HostelSelectors({
             sx={{
               px: current === index ? 4 : 2,
               fontSize: current === index ? 16 : 13,
-              mx: current === index ? 1 : '',
-              scale: current === index ? '1.4' : '',
+              mx: current === index ? 0.5 : '',
+              scale: current === index ? 1.02 : '',
               zIndex: current === index ? 20 : 1,
               boxShadow: '0 0 10px #00000060',
               background: 'var(--Button-Color)',
