@@ -7,7 +7,7 @@ import { config } from '@/config';
 import LeftCont from '@/components/cleaning/LeftCont/LeftCont';
 import RightCont from '@/components/cleaning/RightCont/RightCont';
 
-export const metadata = { title: `Overview | Dashboard | ${config.site.name}` } satisfies Metadata;
+export const metadata = { title: `Cleaning | ${config.site.name}` } satisfies Metadata;
 
 export default function Page(): React.JSX.Element {
   return (

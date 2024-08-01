@@ -8,8 +8,8 @@ import {
   Typography,
 } from '@mui/material';
 
-import SearchCleaning from './SearchCleaning';
 import CleaningTable from './CleaningTable';
+import SearchCleaning from './SearchCleaning';
 
 interface Task {
   id:string;

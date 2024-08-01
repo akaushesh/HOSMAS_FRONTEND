@@ -40,7 +40,7 @@ export default function SearchCleaning({searchFilters,setSearchFilters}:EleProps
       />
 
       <OutlinedInput
-        fullWidth
+        
         size="small"
         value={searchFilters.name}
         onChange={handleChangeName}

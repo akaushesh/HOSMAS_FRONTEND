@@ -118,7 +118,7 @@ function RowCleaning({ task }: { task: Task }): React.JSX.Element {
       <Dialog disableEscapeKeyDown open={open} onClose={handleClose}>
         <DialogTitle>{`Review Form - ${dayjs(task.date).format("DD MMM YYYY")}`}</DialogTitle>
         <DialogContent>
-          <Box sx={{display:"flex",alignItems:"center",justifyContent:"space-between",px:8,py:3}} gap={6}>
+          <Box sx={{display:"flex",alignItems:"center",justifyContent:"space-between",px:8,py:1}} gap={6}>
 
           <Box>
             <InputLabel sx={{mb:1}} id="demo-dialog-select-label">Ratings</InputLabel>

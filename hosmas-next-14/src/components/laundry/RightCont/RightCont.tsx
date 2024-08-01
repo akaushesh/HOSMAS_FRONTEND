@@ -13,9 +13,6 @@ export interface SlotProps {
 
 export default function RightCont(): React.JSX.Element {
 
-  const [slots, setSlots] = React.useState<SlotProps[]>([{ from: '2022-04-17T15:30', to: '2022-04-17T15:40' },
-    // { from: '2022-04-17T6:30', to: '2022-04-17T15:40' },{ from: '2022-04-17T15:30', to: '2022-04-17T15:40' }
-  ]);
 
   return (
     <Box
@@ -23,11 +20,11 @@ export default function RightCont(): React.JSX.Element {
       gap="4%"
       width={1}
     >
-      <Box sx={{width:1,height:0.34}}>
+      <Box sx={{width:1,height:"fit-content"}}>
         <UpperRightCont/>
       </Box>
-      <Box sx={{width:1,height:0.65}}>
-        <LowerRightCont slots={slots} setSlots={setSlots} />
+      <Box sx={{width:1,height:0.75}}>
+        <LowerRightCont/>
       </Box>
     </Box>
   );
