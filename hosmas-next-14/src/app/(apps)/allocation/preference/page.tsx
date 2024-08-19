@@ -11,9 +11,9 @@ import type { AxiosResponse } from 'axios';
 import { useCreatePreference, useRetain } from '@/hooks/mutation/use-preference';
 import { useChoices, usePreference, usePreferenceStatus } from '@/hooks/query/use-preference';
 import { useProfile } from '@/hooks/query/use-profile';
-import DnDLarge from '@/components/dashboard/preference/DnDLarge';
-import DnDMobile from '@/components/dashboard/preference/DnDMobile';
-import CheckboxSelect from '@/components/dashboard/preference/checkbox-select';
+import DnDLarge from '@/components/allocation/preference/DnDLarge';
+import DnDMobile from '@/components/allocation/preference/DnDMobile';
+import CheckboxSelect from '@/components/allocation/preference/checkbox-select';
 
 
 interface Card {

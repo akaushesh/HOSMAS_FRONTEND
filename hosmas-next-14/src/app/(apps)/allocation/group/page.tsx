@@ -4,8 +4,8 @@ import { Grid, Typography } from '@mui/material';
 import Stack from '@mui/material/Stack';
 
 import { config } from '@/config';
-import GroupDetails from '@/components/dashboard/group/group-details';
-import InvitationDetails from '@/components/dashboard/group/invitation-details';
+import GroupDetails from '@/components/allocation/group/group-details';
+import InvitationDetails from '@/components/allocation/group/invitation-details';
 
 export const metadata = { title: `Customers | Dashboard | ${config.site.name}` } satisfies Metadata;
 

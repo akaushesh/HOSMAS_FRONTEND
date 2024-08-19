@@ -4,10 +4,10 @@ import Grid from '@mui/material/Unstable_Grid2';
 import { Stack } from '@mui/system';
 
 import { config } from '@/config';
-import { AccountDetailsForm } from '@/components/dashboard/account/account-details-form';
-import { HostelAllotmentOverview } from '@/components/dashboard/overview/hostel-allotment-overview';
-import { RoomAllotmentOverview } from '@/components/dashboard/overview/room-allotment-overview';
-import { UserName } from '@/components/dashboard/overview/user-name';
+import { AccountDetailsForm } from '@/components/allocation/account/account-details-form';
+import { HostelAllotmentOverview } from '@/components/overview/hostel-allotment-overview';
+import { RoomAllotmentOverview } from '@/components/overview/room-allotment-overview';
+import { UserName } from '@/components/overview/user-name';
 
 export const metadata = { title: `Overview | Dashboard | ${config.site.name}` } satisfies Metadata;
 

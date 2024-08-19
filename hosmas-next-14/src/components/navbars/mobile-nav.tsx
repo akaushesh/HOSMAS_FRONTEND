@@ -15,7 +15,7 @@ import { paths } from '@/paths';
 import { isNavItemActive } from '@/lib/is-nav-item-active';
 import { Logo } from '@/components/core/logo';
 
-import { navSubItems } from './config';
+import { allocationSubItems } from './config';
 import { navIcons } from './nav-icons';
 
 export interface MobileNavProps {
@@ -74,7 +74,7 @@ export function MobileNav({ open, onClose }: MobileNavProps): React.JSX.Element 
 
       <Divider sx={{ borderColor: 'var(--mui-palette-text-secondary)' }} />
       <Box component="nav" sx={{ flex: '1 1 auto', px: 3, mt: 6 }}>
-        {renderNavItems({ pathname, items: navSubItems })}
+        {renderNavItems({ pathname, items: allocationSubItems })}
       </Box>
 
       <Divider sx={{ borderColor: 'var(--mui-palette-text-secondary)' }} />

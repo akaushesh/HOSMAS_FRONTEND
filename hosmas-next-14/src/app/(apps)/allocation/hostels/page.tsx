@@ -3,8 +3,8 @@
 import * as React from 'react';
 import { Box } from '@mui/material';
 
-import HostelCarousel from '@/components/dashboard/hostels/HostelCarousel';
-import HostelSelectors from '@/components/dashboard/hostels/HostelSelectors';
+import HostelCarousel from '@/components/allocation/hostels/HostelCarousel';
+import HostelSelectors from '@/components/allocation/hostels/HostelSelectors';
 
 import hostels from './assets/HostelData';
 

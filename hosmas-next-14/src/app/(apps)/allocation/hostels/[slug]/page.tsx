@@ -7,8 +7,8 @@ import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
 import { Box, Divider, Paper, Typography } from '@mui/material';
 
 import type { hostel } from '@/types/hostels';
-import HostelCollage from '@/components/dashboard/hostels/slug/HostelCollage';
-import HostelDescription from '@/components/dashboard/hostels/slug/HostelDescription';
+import HostelCollage from '@/components/allocation/hostels/slug/HostelCollage';
+import HostelDescription from '@/components/allocation/hostels/slug/HostelDescription';
 
 import hostels from '../assets/HostelData';
 import CustomModal from '@/components/core/custom-modal';

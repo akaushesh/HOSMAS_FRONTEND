@@ -8,7 +8,7 @@ import type { AxiosResponse } from 'axios';
 import Masonry from 'react-masonry-css';
 
 import { useFaq } from '@/hooks/query/use-faq';
-import { FAQCard } from '@/components/dashboard/faqs/faq-card';
+import { FAQCard } from '@/components/allocation/faqs/faq-card';
 import styles from '@/styles/masonry.module.css';
 
 const breakpoints = {
