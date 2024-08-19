@@ -41,7 +41,7 @@ const StyledTableCell = styled(TableCell)(() => ({
 
 export default function LaundryTable({ slips }: EleProps): React.JSX.Element {
   return (
-    <Paper sx={{ borderRadius: '8px', overflowY: 'auto', overflowX: 'hidden', height: '35.5vh' }} elevation={10}>
+    <Paper sx={{ borderRadius: '8px', overflowY: 'auto', overflowX: 'hidden', height: '35.5 vh' }} elevation={10}>
       <Table stickyHeader>
         <TableHead>
           <TableRow sx={{ borderRadius: '8px', backgroundColor: 'red' }}>
