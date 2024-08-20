@@ -19,7 +19,7 @@ export default function HostelSelectors({
 }: PropsType): React.JSX.Element {
   const router = useRouter();
   const handleHostelClick = (path: string): void => {
-    router.push(`/dashboard/hostels/${path}`);
+    router.push(`/allocation/hostels/${path}`);
   };
 
   return (

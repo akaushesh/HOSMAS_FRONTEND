@@ -98,7 +98,10 @@ function renderNavItems({ items, pathname }: { items?: NavItemConfig[]; pathname
     <List sx={{ listStyle: 'none', m: 0, p: 0 }}>
       {items?.map((item) => {
         const Icon = item.icon ? navIcons[item.icon] : null;
-        const [open, setOpen] = React.useState(false);
+        const active = isNavItemActive({ disabled:item.disabled, external:item.external, href:item.href, matcher:item.matcher, pathname });
+        const [open, setOpen] = React.useState(item.isNested && active);
+
+      
 
         return (
           <Box key={item.key}>
@@ -109,8 +112,8 @@ function renderNavItems({ items, pathname }: { items?: NavItemConfig[]; pathname
                     alignItems: 'center',
                     borderRadius: 1,
                     // color: 'var(--NavItem-color)',
-                    color: open?'var(--NavItem-color)':'var(--NavSubItem-color)',
-                    border: open?'1px solid var(--NavItem-color)':'',
+                    color: (open || active)?'var(--NavItem-color)':'var(--NavSubItem-color)',
+                    border: (open || active)?'1px solid var(--NavItem-color)':'',
                     cursor: 'pointer',
                     gap: 1,
                     p: '6px 16px',

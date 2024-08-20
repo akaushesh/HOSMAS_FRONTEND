@@ -10,8 +10,7 @@ export function isNavItemActive({
     return false;
   }
   
-
-  if (pathname.startsWith(`${href}/`)&&href!=='/dashboard') {
+  if (pathname.startsWith(`${href}/`)) {
     return true;
   }
   return pathname===href;

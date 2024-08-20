@@ -18,22 +18,22 @@ import { Logo } from '@/components/core/logo';
 import { allocationSubItems } from './config';
 import { navIcons } from './nav-icons';
 
-export interface MobileNavProps {
+export interface HamBurgerProps {
   onClose?: () => void;
   open?: boolean;
   items?: NavItemConfig[];
+  title?: string;
 }
 
-export function MobileNav({ open, onClose }: MobileNavProps): React.JSX.Element {
+export function HamBurger({ open, onClose,items,title }: HamBurgerProps): React.JSX.Element {
   const pathname = usePathname();
-
   return (
     <Drawer
       PaperProps={{
         sx: {
-          '--MobileNav-background': 'var(--mui-palette-common-white)',
-          '--MobileNav-color': 'var(--mui-palette-common-white)',
-          '--MobileNav-logo-background': 'var(--mui-palette-primary-main)',
+          '--HamBurger-background': 'var(--mui-palette-common-white)',
+          '--HamBurger-color': 'var(--mui-palette-common-white)',
+          '--HamBurger-logo-background': 'var(--mui-palette-primary-main)',
           '--NavItem-color': 'var(--mui-palette-text-secondary)',
           '--NavItem-hover-background': 'var(--mui-palette-primary-main)',
           '--NavItem-active-background': 'var(--mui-palette-primary-main)',
@@ -42,14 +42,14 @@ export function MobileNav({ open, onClose }: MobileNavProps): React.JSX.Element 
           '--NavItem-icon-color': 'var(--mui-palette-text-primaryChannel)',
           '--NavItem-icon-active-color': 'var(--mui-palette-primary-contrastText)',
           '--NavItem-icon-disabled-color': 'var(--mui-palette-neutral-600)',
-          bgcolor: 'var(--MobileNav-background)',
-          color: 'var(--MobileNav-color)',
+          bgcolor: 'var(--HamBurger-background)',
+          color: 'var(--HamBurger-color)',
           display: 'flex',
           flexDirection: 'column',
           maxWidth: '100%',
           scrollbarWidth: 'none',
-          width: 'var(--MobileNav-width)',
-          zIndex: 'var(--MobileNav-zIndex)',
+          width: 'var(--HamBurger-width)',
+          zIndex: 'var(--HamBurger-zIndex)',
           '&::-webkit-scrollbar': { display: 'none' },
           px: 2,
         },
@@ -73,8 +73,14 @@ export function MobileNav({ open, onClose }: MobileNavProps): React.JSX.Element 
       </Stack>
 
       <Divider sx={{ borderColor: 'var(--mui-palette-text-secondary)' }} />
-      <Box component="nav" sx={{ flex: '1 1 auto', px: 3, mt: 6 }}>
-        {renderNavItems({ pathname, items: allocationSubItems })}
+     
+      <Box sx={{ my:3 }}>
+        <Typography color="var(--mui-palette-text-primaryChannel)" ml={4} letterSpacing="3px" variant='h5'>{title}</Typography>
+      </Box>
+
+
+      <Box component="nav" sx={{ flex: '1 1 auto', px: 3, mt: 1 }}>
+        {renderNavItems({ pathname, items })}
       </Box>
 
       <Divider sx={{ borderColor: 'var(--mui-palette-text-secondary)' }} />
@@ -148,6 +154,10 @@ function NavItem({ disabled, external, href, icon, matcher, pathname, title }: N
             bgcolor: 'var(--NavItem-disabled-background)',
             color: 'var(--NavItem-disabled-color)',
             cursor: 'not-allowed',
+          }),
+          ...(disabled && {
+            pointerEvents: 'none',
+            opacity: 0.45,
           }),
           ...(active && { bgcolor: 'var(--NavItem-active-background)', color: 'var(--NavItem-active-color)' }),
         }}

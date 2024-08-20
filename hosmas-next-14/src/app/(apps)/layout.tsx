@@ -7,6 +7,7 @@ import { AuthGuard } from '@/components/auth/auth-guard';
 import { Ellipse2 } from '@/components/core/ellipse';
 import { MainNav } from '@/components/navbars/main-nav';
 import { SideNav } from '@/components/navbars/side-nav';
+import { BottomNav } from '@/components/navbars/bottom-nav';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -61,6 +62,9 @@ export default function Layout({ children }: LayoutProps): React.JSX.Element {
             </Container>
           </main>
         </Box>
+
+        <BottomNav />
+
       </Box>
     </AuthGuard>
   );

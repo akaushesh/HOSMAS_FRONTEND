@@ -24,22 +24,34 @@ export default function Page(): React.JSX.Element {
         '--Room-Color': 'var(--mui-palette-secondary-main)',
       }}
     >
-      <Typography variant="h3" sx={{ color: 'var(--Page-HeadColor)' }}>
-        Laundry Management
-      </Typography>
 
-      <Box
-        sx={{ display: 'flex', alignItems: 'stretch', justifyContent: 'center', minHeight: '60vh', mt: 5 }}
-        gap="4%"
-        width={1}
-      >
-        <Box width="54%">
-          <LeftCont/>
+      <Box sx={{display:{xs:'none',sm:'block'}}} >
+
+        <Typography variant="h3" sx={{ color: 'var(--Page-HeadColor)' }}>
+          Laundry Management
+        </Typography>
+
+        <Box
+          sx={{ display: 'flex', alignItems: 'stretch', justifyContent: 'center', minHeight: '60vh', mt: 5 }}
+          gap="4%"
+          width={1}
+        >
+          <Box width="54%">
+            <LeftCont/>
+          </Box>
+          <Box width="42%">
+            <RightCont/>
+          </Box>
         </Box>
-        <Box width="42%">
-          <RightCont/>
-        </Box>
+
       </Box>
+
+
+
+
+
+
+
     </Stack>
   );
 }

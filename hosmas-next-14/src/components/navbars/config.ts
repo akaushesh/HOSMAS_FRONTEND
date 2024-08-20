@@ -12,7 +12,7 @@ export const allocationSubItems = [
   
 export const navItems = [
     { key: 'overview', title: 'Overview', href: paths.overview, icon: 'chart-pie',isNested:false },
-    { key: 'allocation', title: 'Allocation', icon: 'chart-pie', items: allocationSubItems,isNested:true },
+    { key: 'allocation', title: 'Allocation', href: paths.allocation.default, icon: 'chart-pie', items: allocationSubItems,isNested:true },
     { key: 'cleaning', title: 'Cleaning', href: paths.cleaning, icon: 'broom',isNested:false},
     { key: 'laundry', title: 'Laundry', href: paths.laundry, icon: 'shirt',isNested:false},
     { key: 'settings', title: 'Settings', href: paths.settings, icon: 'gear-six' },

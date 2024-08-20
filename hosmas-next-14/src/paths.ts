@@ -2,6 +2,7 @@ export const paths = {
   home: '/',
   auth: { signIn: '/auth/sign-in', signUp: '/auth/sign-up', resetPassword: '/auth/reset-password' },
   allocation: {
+    default: '/allocation',
     group: '/allocation/group',
     account: '/allocation/account',
     customers: '/allocation/customers',

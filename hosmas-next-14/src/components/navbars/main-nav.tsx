@@ -12,13 +12,21 @@ import { List as ListIcon } from '@phosphor-icons/react/dist/ssr/List';
 
 import { usePopover } from '@/hooks/use-popover';
 
-import { MobileNav } from './mobile-nav';
+// import { MobileNav } from './mobile-nav';
 import { UserPopover } from './user-popover';
+import { Typography } from '@mui/material';
+import { usePathname } from 'next/navigation';
 
 export function MainNav(): React.JSX.Element {
-  const [openNav, setOpenNav] = React.useState<boolean>(false);
-
+  // const [openNav, setOpenNav] = React.useState<boolean>(false);
+  const pathname = usePathname();
   const userPopover = usePopover<HTMLDivElement>();
+
+  const str = pathname
+  .substring(1)
+  .split('/')
+  .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+  .join(' | ');
 
   return (
     <React.Fragment>
@@ -34,18 +42,10 @@ export function MainNav(): React.JSX.Element {
       >
         <Stack
           direction="row"
-          spacing={6}
-          sx={{ alignItems: 'center', justifyContent: 'space-between', minHeight: '64px', px: 2 }}
+          sx={{ alignItems: 'center', justifyContent: {xs:'space-between',lg:"flex-end"}, minHeight: '64px', pr: 2,pl:1 }}
         >
-          <Stack sx={{ alignItems: 'center' }} direction="row" spacing={3} m={2}>
-            <IconButton
-              onClick={(): void => {
-                setOpenNav(true);
-              }}
-              sx={{ display: { lg: 'none', xs: 'flex' } }}
-            >
-              <ListIcon />
-            </IconButton>
+          <Stack sx={{ display:{xs:'flex',lg:'none'},alignItems: 'center' }} direction="row" width={1} spacing={3} m={2}>
+            <Typography variant='h6' color="var(--mui-palette-text-secondaryChannel)">{str}</Typography>
           </Stack>
 
           <Stack direction="row" spacing={2} sx={{ alignItems: 'center', justifyContent: 'flex-end' }} m={2}>
@@ -66,12 +66,7 @@ export function MainNav(): React.JSX.Element {
         </Stack>
       </Box>
       <UserPopover anchorEl={userPopover.anchorRef.current} onClose={userPopover.handleClose} open={userPopover.open} />
-      <MobileNav
-        onClose={() => {
-          setOpenNav(false);
-        }}
-        open={openNav}
-      />
+     
     </React.Fragment>
   );
 }
