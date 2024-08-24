@@ -17,22 +17,7 @@ export default function LowerRightCont(): React.JSX.Element {
   const submit = '4567';
   const get = ['2123', '8971', '8789'];
 
-  const [laundryData, setLaundryData] = React.useState<Record<string, number>>({
-    Jeans: 0,
-    Pants: 0,
-    Pyjama: 0,
-    Shorts: 0,
-    Shirts: 0,
-    'T-Shirts': 0,
-    'Kurta/Salwar': 0,
-    Skirt: 0,
-    Dupatta: 0,
-    'Bed Sheet': 0,
-    'Pillow Cover': 0,
-    'Towel/H-Towel': 0,
-    Turban: 0,
-    'Upper Hood': 0,
-  });
+
 
   const isSubmitted = false;
   const isCollectEmpty = get.length === 0;
@@ -66,7 +51,7 @@ export default function LowerRightCont(): React.JSX.Element {
       </Box>
 
 
-      <LaundryForm laundryData={laundryData} setLaundryData={setLaundryData} toggleForm={toggleForm} setToggleForm={setToggleForm} />
+      <LaundryForm toggleForm={toggleForm} setToggleForm={setToggleForm} />
     </Paper>
   );
 }

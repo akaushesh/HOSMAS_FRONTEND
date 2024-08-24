@@ -15,16 +15,29 @@ import {
 } from '@mui/material';
 
 interface LaundryFormProps{
-    laundryData:Record<string, number>;
-    setLaundryData:(prev:Record<string, number>)=>void;
     toggleForm:boolean;
     setToggleForm:(prev:boolean)=>void;
 }
 
-export default function LaundryForm({toggleForm,setToggleForm,laundryData, setLaundryData}:LaundryFormProps): React.JSX.Element {
+export default function LaundryForm({toggleForm,setToggleForm}:LaundryFormProps): React.JSX.Element {
 
-    const totalClothes = Object.values(laundryData).reduce((total, count) => total + count, 0);
-
+  const [laundryData, setLaundryData] = React.useState<Record<string, number>>({
+    Jeans: 0,
+    Pants: 0,
+    Pyjama: 0,
+    Shorts: 0,
+    Shirts: 0,
+    'T-Shirts': 0,
+    'Kurta/Salwar': 0,
+    Skirt: 0,
+    Dupatta: 0,
+    'Bed Sheet': 0,
+    'Pillow Cover': 0,
+    'Towel/H-Towel': 0,
+    Turban: 0,
+    'Upper Hood': 0,
+  });
+  const totalClothes = Object.values(laundryData).reduce((total, count) => total + count, 0);
 
   return (
     <Paper>
