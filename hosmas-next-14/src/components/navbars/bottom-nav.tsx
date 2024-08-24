@@ -1,19 +1,13 @@
 'use client';
 
 import * as React from 'react';
-import RouterLink from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { ExpandLess, ExpandMore } from '@mui/icons-material';
-import { Collapse, Link, List, ListItemButton, Paper, SvgIcon } from '@mui/material';
+import { SvgIcon } from '@mui/material';
 import Box from '@mui/material/Box';
-import Divider from '@mui/material/Divider';
-import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 
 import type { NavItemConfig } from '@/types/nav';
-import { paths } from '@/paths';
 import { isNavItemActive } from '@/lib/is-nav-item-active';
-import { Logo } from '@/components/core/logo';
 
 import { navItems } from './config';
 import { navIcons } from './nav-icons';
@@ -73,10 +67,6 @@ function renderNavItems({ items, pathname }: { items?: NavItemConfig[]; pathname
         }}
     >
       {items?.map((item) => {
-        const Icon = item.icon ? navIcons[item.icon] : null;
-        const [open, setOpen] = React.useState(false);
-        const active = isNavItemActive({ disabled:item.disabled, external:item.external, href:item.href, matcher:item.matcher, pathname });
-
         return (
           <Box key={item.key}>
               <NavItem items={item.items} isNested={item.isNested} pathname={pathname} {...item} />
@@ -100,7 +90,7 @@ function NavItem({ disabled, external, href, icon, matcher, pathname, title ,isN
 
   const [openNav, setOpenNav] = React.useState(false);
 
-  const handleClick = () => {
+  const handleClick = ():void => {
     if(isNested){
         if(!openNav) setOpenNav(true);
     }
@@ -152,9 +142,7 @@ function NavItem({ disabled, external, href, icon, matcher, pathname, title ,isN
           ) : null}
         </Box>
        
-        {(active||openNav)&&(
-         
-          <Box 
+        {(active||openNav) ? <Box 
               sx={{transition: 'ease-in-out 200ms',}}
           >
             <Typography
@@ -165,8 +153,7 @@ function NavItem({ disabled, external, href, icon, matcher, pathname, title ,isN
             >
               {title}
             </Typography>
-          </Box>
-        )}
+          </Box> : null}
 
             <HamBurger
               onClose={() => {

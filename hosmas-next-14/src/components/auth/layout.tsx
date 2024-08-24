@@ -44,12 +44,12 @@ export function Layout({ children }: LayoutProps): React.JSX.Element {
               href="/"
               sx={{
                 display: 'inline-flex',
-                height: 48,
-                width: 48,
+                height: { xs: '50px', md: '70px' },
+                width: { xs: '140px', md: '220px' },
               }}
             >
               {/* <Logo /> */}
-              <DynamicLogo colorDark="light" colorLight="dark" height={32} width={122} />
+              <DynamicLogo colorDark="light" colorLight="dark" height={1} width={1} />
             </Box>
           </Box>
 

@@ -20,10 +20,10 @@ export default function RightCont(): React.JSX.Element {
       gap="4%"
       width={1}
     >
-      <Box sx={{width:1,height:"fit-content"}}>
+      <Box sx={{width:1,height:1}}>
         <UpperRightCont/>
       </Box>
-      <Box sx={{width:1,height:0.75}}>
+      <Box sx={{width:1,height:1}}>
         <LowerRightCont/>
       </Box>
     </Box>

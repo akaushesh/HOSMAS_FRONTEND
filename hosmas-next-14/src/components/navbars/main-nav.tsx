@@ -8,7 +8,6 @@ import IconButton from '@mui/material/IconButton';
 import Stack from '@mui/material/Stack';
 import Tooltip from '@mui/material/Tooltip';
 import { Bell as BellIcon } from '@phosphor-icons/react/dist/ssr/Bell';
-import { List as ListIcon } from '@phosphor-icons/react/dist/ssr/List';
 
 import { usePopover } from '@/hooks/use-popover';
 
@@ -45,7 +44,7 @@ export function MainNav(): React.JSX.Element {
           sx={{ alignItems: 'center', justifyContent: {xs:'space-between',lg:"flex-end"}, minHeight: '64px', pr: 2,pl:1 }}
         >
           <Stack sx={{ display:{xs:'flex',lg:'none'},alignItems: 'center' }} direction="row" width={1} spacing={3} m={2}>
-            <Typography variant='h6' color="var(--mui-palette-text-secondaryChannel)">{str}</Typography>
+            <Typography variant='h6' color="var(--mui-palette-text-primary)" sx={{fontSize:"19px"}}>{str}</Typography>
           </Stack>
 
           <Stack direction="row" spacing={2} sx={{ alignItems: 'center', justifyContent: 'flex-end' }} m={2}>

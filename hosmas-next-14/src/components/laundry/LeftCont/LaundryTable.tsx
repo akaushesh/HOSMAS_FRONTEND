@@ -88,7 +88,7 @@ function RowLaundry({ slip }: { slip: ClothingTransaction }): React.JSX.Element 
         <TableCell align="center">{dayjs(slip.dateOfDelivery).format('DD MMM YYYY')}</TableCell>
       </TableRow>
 
-      <Dialog disableEscapeKeyDown open={open} onClose={handleClose}>
+      <Dialog open={open} onClose={handleClose}>
         <DialogTitle fontSize={22} fontWeight={600} >{`Laundry Details - ${dayjs(slip.dateGiven).format('DD MMM YYYY')}`}</DialogTitle>
         <DialogContent>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 5, py: 1 }} gap={6}>

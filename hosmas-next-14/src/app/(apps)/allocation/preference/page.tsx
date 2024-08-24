@@ -260,7 +260,7 @@ export default function Page(): React.JSX.Element {
         flexDirection:{md:'row',xs:'column'},alignItems:"center", gap: 2
        }}>
         <Box>
-          <Typography variant="h3" sx={{ color: 'var(--Page-HeadColor)', mb: 1 }}>
+          <Typography variant="h3" sx={{  color: 'var(--Page-HeadColor)', mb: 1 }}>
             Hostel Preference Order
           </Typography>
 

@@ -18,7 +18,7 @@ export default function Rooms(): React.JSX.Element {
   const [selectedRooms, setSelectedRooms] = React.useState<SelectedRoomProps[]>(selectedRooms1);
   const [floor, setFloor] = React.useState<string>('  ');
 
-  const [stage, setStage] = React.useState<boolean>(true);
+  const [stage, setStage] = React.useState<boolean>(false);
 
   const handlechange = ():void => {
     setStage(!stage);

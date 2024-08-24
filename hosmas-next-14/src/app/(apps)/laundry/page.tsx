@@ -6,6 +6,7 @@ import { Stack } from '@mui/system';
 import { config } from '@/config';
 import LeftCont from '@/components/laundry/LeftCont/LeftCont';
 import RightCont from '@/components/laundry/RightCont/RightCont';
+import LaundryMobile from '@/components/laundry/Mobile/LaundryMobile';
 
 export const metadata = { title: `Laundry | ${config.site.name}` } satisfies Metadata;
 
@@ -25,7 +26,7 @@ export default function Page(): React.JSX.Element {
       }}
     >
 
-      <Box sx={{display:{xs:'none',sm:'block'}}} >
+      <Box sx={{display:{xs:'none',md:'block'}}} >
 
         <Typography variant="h3" sx={{ color: 'var(--Page-HeadColor)' }}>
           Laundry Management
@@ -44,11 +45,18 @@ export default function Page(): React.JSX.Element {
           </Box>
         </Box>
 
+      </Box >
+
+
+      <Box sx={{display:{xs:'block',md:'none'}}} >
+          
+          <Typography variant="h5" sx={{ fontSize:"25px",color: 'var(--Page-HeadColor)' }}>
+            Laundry Management
+          </Typography>
+          
+          <LaundryMobile/>
+          
       </Box>
-
-
-
-
 
 
 

@@ -9,7 +9,7 @@ export default function UpperRightCont():React.JSX.Element{
   return (
     <Paper elevation={10} sx={{width:1,height:1,p:3}}>
       
-      <Typography variant="h6">Unique Laundary Number</Typography>
+      <Typography variant="h5">Unique Laundary Number</Typography>
       
       <Typography variant="h3" my={2} fontWeight={700} display="block">
         {UniqueNum}
