@@ -17,4 +17,10 @@ export const paths = {
   laundry:'/laundry',
   cleaning:'/cleaning',
   errors: { notFound: '/errors/not-found' },
+  disabled:[
+    // {path:'/allocation',allChildren:false},
+    {path:'/allocation/rooms',allChildren:false},
+  ],
+
+
 } as const;
