@@ -4,9 +4,7 @@ import { Box, Typography } from '@mui/material';
 import { Stack } from '@mui/system';
 
 import { config } from '@/config';
-import LeftCont from '@/components/laundry/LeftCont/LeftCont';
-import RightCont from '@/components/laundry/RightCont/RightCont';
-import LaundryMobile from '@/components/laundry/Mobile/LaundryMobile';
+import Laundry from '@/components/laundry/Laundry';
 
 export const metadata = { title: `Laundry | ${config.site.name}` } satisfies Metadata;
 
@@ -26,35 +24,14 @@ export default function Page(): React.JSX.Element {
       }}
     >
 
-      <Box sx={{display:{xs:'none',md:'block'}}} >
 
-        <Typography variant="h3" sx={{ color: 'var(--Page-HeadColor)' }}>
-          Laundry Management
-        </Typography>
-
-        <Box
-          sx={{ display: 'flex', alignItems: 'stretch', justifyContent: 'center', minHeight: '60vh', mt: 5 }}
-          gap="4%"
-          width={1}
-        >
-          <Box width="54%">
-            <LeftCont/>
-          </Box>
-          <Box width="42%">
-            <RightCont/>
-          </Box>
-        </Box>
-
-      </Box >
-
-
-      <Box sx={{display:{xs:'block',md:'none'}}} >
+      <Box>
           
-          <Typography variant="h5" sx={{ fontSize:"25px",color: 'var(--Page-HeadColor)' }}>
-            Laundry Management
+          <Typography variant="h4" sx={{ fontSize:'30px',color: 'var(--Page-HeadColor)' }}>
+            Laundry Management 
           </Typography>
           
-          <LaundryMobile/>
+          <Laundry/>
           
       </Box>
 

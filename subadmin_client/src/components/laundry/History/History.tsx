@@ -19,7 +19,7 @@ interface ClothingTransaction {
   details: [string, number, number][];
 }
 
-export default function LeftCont(): React.JSX.Element {
+export default function History(): React.JSX.Element {
   const [slips, setSlips] = React.useState<ClothingTransaction[]>([
     {
       id: "1",
