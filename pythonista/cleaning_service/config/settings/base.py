@@ -43,6 +43,11 @@ INSTALLED_APPS = [
     'rest_framework',
     'import_export',
     'corsheaders',
+    
+    #django apps
+    'slots',
+    'cleaning_request',
+    'worker',
 ]
 
 MIDDLEWARE = [
