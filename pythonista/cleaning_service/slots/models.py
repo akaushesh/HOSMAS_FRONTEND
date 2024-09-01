@@ -11,4 +11,4 @@ class Slot(models.Model):
         unique_together = ('hostel_id', 'start', 'end')
     
     def __str__(self):
-        return self.hostel + " " + str(self.start) + " - " + str(self.end)
+        return str(self.hostel_id) + " " + str(self.start) + " - " + str(self.end)
