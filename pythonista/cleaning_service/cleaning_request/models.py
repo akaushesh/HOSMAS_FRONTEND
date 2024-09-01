@@ -9,7 +9,7 @@ status_options = [
 # Create your models here.
 class CleaningRequest(models.Model):
     student = models.IntegerField()
-    worker = models.ForeignKey('worker.Worker', on_delete=models.SET_NULL, null=True)
+    worker = models.ForeignKey('worker.Worker', on_delete=models.SET_NULL, null=True, blank=True)
     slot = models.ForeignKey('slots.Slot', on_delete=models.CASCADE)
     hostel_id = models.IntegerField()
     # hostel_name = models.CharField(max_length=50)
@@ -18,12 +18,12 @@ class CleaningRequest(models.Model):
     status = models.CharField(max_length=10, choices=status_options, default='Pending')
     
     def __str__(self):
-        return self.hostel + " " + self.block + " " + self.room_number + " " + str(self.slot)
+        return str(self.hostel_id) + " " + self.block + " " + self.room_number + " " + str(self.slot)
     
 class Feedback(models.Model):
     request = models.ForeignKey(CleaningRequest, on_delete=models.CASCADE)
     photo = models.URLField(max_length=2000, blank=True,null=True)
-    rating = models.PositiveSmallIntegerField(max=5, min=1)
+    rating = models.PositiveSmallIntegerField()
     comments = models.TextField()
     
     def __str__(self):
@@ -34,7 +34,3 @@ class Feedback(models.Model):
         self.request.save()
         return super().save(*args, **kwargs)
     
-    def delete(self, *args, **kwargs):
-        self.request.status = 'Assigned'
-        self.request.save()
-        return super().delete(*args, **kwargs)
