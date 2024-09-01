@@ -19,6 +19,7 @@ class getCleaningRequests(APIView):
         #         'room_number': request.room_number,
         #         'status': request.status
         #     })
+        print(requests)
         serializer = CleaningRequestSerializer(requests, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
