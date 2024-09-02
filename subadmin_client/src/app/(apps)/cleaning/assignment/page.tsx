@@ -6,6 +6,7 @@ import { Stack } from '@mui/system';
 import { config } from '@/config';
 import dayjs from 'dayjs';
 import { HostelName } from '@/components/overview/user-name';
+import { Assignment } from '@/components/cleaning/Assignment/Assignment';
 
 export const metadata = { title: `Assignment | Cleaning | ${config.site.name}` } satisfies Metadata;
 
@@ -46,6 +47,7 @@ export default function Page(): React.JSX.Element {
           </Typography>
       </Stack>   
           
+          <Assignment/>
       
 
     </Stack>

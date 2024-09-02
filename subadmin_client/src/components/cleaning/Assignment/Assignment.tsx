@@ -8,8 +8,8 @@ import { Requests } from './Requests';
 export interface RequestProps {
   id: string;
   roomName: string;
-  slots: [string];
-  assigned: string;
+  slots: { from: string; to: string }[];
+  assigned?: string;
 }
 
 export interface CleanerProps {
@@ -17,7 +17,7 @@ export interface CleanerProps {
   name: string;
   present: boolean;
   img: string;
-  assigned: [{ roomName: string; slot: string }];
+  assigned?: [{ roomName: string; slot:{from: string; to: string}}];
 }
 
 export function Assignment(): React.JSX.Element {
@@ -29,12 +29,12 @@ export function Assignment(): React.JSX.Element {
     img: '',
     assigned: [{
         roomName: '',
-        slot: '',
+        slot: {from: '', to: ''},
     }],
   });
 
   return (
-    <Stack direction="row" gap={2}>
+    <Stack direction="row" gap={2} width={1} mt={4}>
       <Requests selectedCleaner={selectedCleaner} />
     </Stack>
   );

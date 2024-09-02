@@ -2,90 +2,12 @@
 
 import * as React from 'react';
 import { Box,Button,Checkbox, Divider, Paper, Stack, Typography } from '@mui/material';
+import { tempCleaners } from '../TempDataRequests';
 
 export default function Attendance(): React.JSX.Element {
  
 
-  const [cleaners, setCleaners] = React.useState([
-    {
-      id: '123',
-      name: 'Rajesh',
-      present: false,
-      img: 'https://miro.medium.com/v2/resize:fit:640/format:webp/0*iAtFOZfZYrLepZyG.jpg',
-    },
-    {
-      id: '456',
-      name: 'Vinesh',
-      present: false,
-      img: 'https://miro.medium.com/v2/resize:fit:640/format:webp/0*iAtFOZfZYrLepZyG.jpg',
-    },
-    {
-      id: '789',
-      name: 'Dinesh',
-      present: false,
-      img: 'https://miro.medium.com/v2/resize:fit:640/format:webp/0*iAtFOZfZYrLepZyG.jpg',
-    },
-    {
-      id: '21',
-      name: 'Minesh',
-      present: false,
-      img: 'https://miro.medium.com/v2/resize:fit:640/format:webp/0*iAtFOZfZYrLepZyG.jpg',
-    },
-    {
-      id: '1233',
-      name: 'Kanishk',
-      present: false,
-      img: 'https://miro.medium.com/v2/resize:fit:640/format:webp/0*iAtFOZfZYrLepZyG.jpg',
-    },
-    {
-      id: '1234',
-      name: 'Jagya',
-      present: false,
-      img: 'https://miro.medium.com/v2/resize:fit:640/format:webp/0*iAtFOZfZYrLepZyG.jpg',
-    },
-    {
-      id: '12343',
-      name: 'Suresh',
-      present: false,
-      img: 'https://miro.medium.com/v2/resize:fit:640/format:webp/0*iAtFOZfZYrLepZyG.jpg',
-    },
-    {
-      id: '12223',
-      name: 'Gadhesh',
-      present: false,
-      img: 'https://miro.medium.com/v2/resize:fit:640/format:webp/0*iAtFOZfZYrLepZyG.jpg',
-    },
-    {
-      id: '1293',
-      name: 'Madhesh',
-      present: false,
-      img: 'https://miro.medium.com/v2/resize:fit:640/format:webp/0*iAtFOZfZYrLepZyG.jpg',
-    },
-    {
-      id: '1283',
-      name: 'Rajesh',
-      present: true,
-      img: 'https://miro.medium.com/v2/resize:fit:640/format:webp/0*iAtFOZfZYrLepZyG.jpg',
-    },
-    {
-      id: '1273',
-      name: 'Rajesh',
-      present: false,
-      img: 'https://miro.medium.com/v2/resize:fit:640/format:webp/0*iAtFOZfZYrLepZyG.jpg',
-    },
-    {
-      id: '1263',
-      name: 'Rajesh',
-      present: true,
-      img: 'https://miro.medium.com/v2/resize:fit:640/format:webp/0*iAtFOZfZYrLepZyG.jpg',
-    },
-    {
-      id: '1253',
-      name: 'Rajesh',
-      present: true,
-      img: 'https://miro.medium.com/v2/resize:fit:640/format:webp/0*iAtFOZfZYrLepZyG.jpg',
-    },
-  ]);
+  const [cleaners, setCleaners] = React.useState(tempCleaners);
 
   const totalCleaners = 10;
   const present = 8;
