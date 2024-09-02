@@ -15,7 +15,12 @@ export const paths = {
   overview: '/overview',
   settings:'/settings',
   laundry:'/laundry',
-  cleaning:'/cleaning',
+  cleaning:{
+    default:'/cleaning',
+    attendance:'/cleaning/attendance',
+    assignment:'/cleaning/assignment',
+    cleaners:'/cleaning/cleaners',
+  },
   errors: { notFound: '/errors/not-found' },
 
 
