@@ -43,8 +43,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'import_export',
     'corsheaders',
-    
-    #django apps
+
+    # django apps
     'slots',
     'cleaning_request',
     'worker',
@@ -161,3 +161,7 @@ REST_FRAMEWORK = {
 
 
 CSRF_TRUSTED_ORIGINS = [host.strip() for host in config('CSRF_TRUSTED_ORIGINS').split(',')]
+
+
+# url for other services
+CENTRAL_REPOSITORY_URL = config("CENTRAL_REPOSITORY_URL")
