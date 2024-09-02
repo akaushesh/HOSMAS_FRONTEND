@@ -9,6 +9,9 @@ class Hostel(TimeStampedModel):
     class Meta:
         db_table = "hostel"
 
+    def __str__(self):
+        return self.name
+
 
 class RoomType(TimeStampedModel):
     name = models.CharField(max_length=50)
@@ -23,6 +26,9 @@ class RoomType(TimeStampedModel):
     class Meta:
         db_table = "room_type"
 
+    def __str__(self):
+        return f"{self.name} - {self.hostel.name}"
+
 
 class Level(TimeStampedModel):
     name = models.CharField(max_length=10)
@@ -34,6 +40,9 @@ class Level(TimeStampedModel):
     class Meta:
         db_table = "level"
 
+    def __str__(self):
+        return f"{self.name} - {self.hostel.name}"
+
 
 class Block(TimeStampedModel):
     name = models.CharField(max_length=10)
@@ -44,6 +53,9 @@ class Block(TimeStampedModel):
 
     class Meta:
         db_table = "block"
+
+    def __str__(self):
+        return f"{self.name} - {self.hostel.name}"
 
 
 class Room(TimeStampedModel):
@@ -66,3 +78,6 @@ class Room(TimeStampedModel):
 
     class Meta:
         db_table = "room"
+
+    def __str__(self):
+        return f"{self.name} {self.block.name if self.block is not None else ''} {self.level.name} - {self.level.hostel.name}"

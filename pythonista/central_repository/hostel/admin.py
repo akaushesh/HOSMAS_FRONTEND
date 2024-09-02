@@ -1,5 +1,4 @@
 from django.contrib import admin
-from django.db.models import Count, Sum
 
 from .models import Block, Hostel, Level, Room, RoomType
 
@@ -15,14 +14,20 @@ class HostelAdmin(admin.ModelAdmin):
         return obj.blocks.count()
 
     def rooms(self, obj):
-        return obj.levels.aggregate(rooms_count=Count("rooms")).aggregate(
-            Sum("rooms_count")
-        )
+        levels = obj.levels.all()
+        rooms_cnt = 0
+        for level in levels:
+            rooms_cnt += level.rooms.count()
+        return rooms_cnt
 
     def students(self, obj):
-        return obj.levels.aggregate(students_count=Count("rooms__students")).aggregate(
-            Sum("students_count")
-        )
+        levels = obj.levels.all()
+        students_cnt = 0
+        for level in levels:
+            rooms = level.rooms.all()
+            for room in rooms:
+                students_cnt += room.students.count()
+        return students_cnt
 
     list_display = ("id", "name", "room_types", "levels", "blocks", "rooms", "students")
     search_fields = ("name", "room_types")
@@ -33,9 +38,11 @@ class RoomTypeAdmin(admin.ModelAdmin):
         return obj.rooms.count()
 
     def students(self, obj):
-        return obj.rooms.aggregate(students_count=Count("students")).aggregate(
-            Sum("students_count")
-        )
+        rooms = obj.rooms.all()
+        students_cnt = 0
+        for room in rooms:
+            students_cnt += room.students.count()
+        return students_cnt
 
     list_display = (
         "id",
@@ -56,9 +63,11 @@ class LevelAdmin(admin.ModelAdmin):
         return obj.rooms.count()
 
     def students(self, obj):
-        return obj.rooms.aggregate(students_count=Count("students")).aggregate(
-            Sum("students_count")
-        )
+        rooms = obj.rooms.all()
+        students_cnt = 0
+        for room in rooms:
+            students_cnt += room.students.count()
+        return students_cnt
 
     list_display = ("id", "name", "hostel__name", "rooms", "students")
     list_filter = ("hostel__name",)
@@ -70,9 +79,11 @@ class BlockAdmin(admin.ModelAdmin):
         return obj.rooms.count()
 
     def students(self, obj):
-        return obj.rooms.aggregate(students_count=Count("students")).aggregate(
-            Sum("students_count")
-        )
+        rooms = obj.rooms.all()
+        students_cnt = 0
+        for room in rooms:
+            students_cnt += room.students.count()
+        return students_cnt
 
     list_display = ("id", "name", "hostel__name", "rooms", "students")
     list_filter = ("hostel__name",)

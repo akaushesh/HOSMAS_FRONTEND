@@ -1,11 +1,31 @@
 from django.contrib import admin
 from django.contrib.auth.models import Group
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.core.exceptions import ObjectDoesNotExist
 
 from .models import Student, Supervisor, User
 
 
-class UserAdmin(admin.ModelAdmin):
+class UserAdmin(BaseUserAdmin):
+    fieldsets = (
+        (
+            None,
+            {
+                "fields": ("email", "password", "is_active", "is_admin"),
+            },
+        ),
+    )
+
+    add_fieldsets = (
+        (
+            None,
+            {
+                "classes": ("wide",),
+                "fields": ("email", "password1", "password2", "is_admin", "is_active"),
+            },
+        ),
+    )
+
     def user_type(self, obj):
         try:
             obj.student
@@ -44,6 +64,8 @@ class UserAdmin(admin.ModelAdmin):
         "student__roll_number",
         "supervisor__name",
     )
+    filter_horizontal = ()
+    ordering = ()
 
 
 class StudentAdmin(admin.ModelAdmin):

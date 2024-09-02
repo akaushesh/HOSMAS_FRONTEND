@@ -62,6 +62,9 @@ class Student(TimeStampedModel):
     class Meta:
         db_table = "student"
 
+    def __str__(self):
+        return f"{self.roll_number} - {self.name}"
+
 
 class Supervisor(TimeStampedModel):
     name = models.CharField(max_length=200)
@@ -77,3 +80,6 @@ class Supervisor(TimeStampedModel):
 
     class Meta:
         db_table = "supervisor"
+
+    def __str__(self):
+        return f"{self.name} - {self.hostel.name}"
