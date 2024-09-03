@@ -1,7 +1,8 @@
 from django.urls import path
 
-from .views import getCleaningRequests
+from .views import *
 
 urlpatterns = [
-    path('get_cleaning_requests/', getCleaningRequests.as_view())
+    path('getCleaningRequests/', getCleaningRequests.as_view()),
+    path('getCleaningRequests/<int:slug>/', getSingleCleaningRequest.as_view()),
 ]
