@@ -6,14 +6,17 @@ from rest_framework import status
 from .serializers import *
 
 from config.services import *
-
+from rest_framework.permissions import IsAuthenticated
 from config.pagination import ResponsePagination
 
 class getCleaningRequests(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request):
         filters = request.query_params.dict()
-        cleaning_requests = filter_objects(CleaningRequest.objects, **filters)
-        # print(requests)
+        if (request.user['role'] == 'student'):
+            cleaning_requests = filter_objects(CleaningRequest.objects, **filters, student_id=request.user['student']['id'])
+        elif (request.user['role'] == 'supervisor'):
+            cleaning_requests = filter_objects(CleaningRequest.objects, **filters, hostel_id=request.user['supervisor']['hostel'])
         paginator = ResponsePagination()
         paginated_queryset = paginator.paginate_queryset(cleaning_requests, request)
         
@@ -22,6 +25,7 @@ class getCleaningRequests(APIView):
     
     
 class getSingleCleaningRequest(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request, slug):
         #todo: get the student details and return it
         cleaning_request = get_object(CleaningRequest.objects, id=slug)
@@ -29,9 +33,16 @@ class getSingleCleaningRequest(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
     
 class createCleaningRequests(APIView):
+    permission_classes = [IsAuthenticated]
     def post(self, request):
         #student id
         data = request.data
+        data['student_id'] = request.user['student']['id']
+        data['hostel_id'] = request.user['student']['room']['hostel']['id']
+        data['hostel_name'] = request.user['student']['room']['hostel']['name']
+        data['block']=request.user['student']['room']['block']['name']
+        data['room_number']=request.user['student']['room']['name']
+        
         serializer = CleaningRequestSerializer(data=data)
         if serializer.is_valid():
             serializer.save()

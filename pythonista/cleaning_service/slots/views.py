@@ -7,15 +7,17 @@ from serializers import *
 class getSlots(APIView):
     def get(self, request):
         #user = request.user
-        #slots = all_objects(Slot.objects, hostel_id=user.student.hostel.id)
-        slots = filter_objects(Slot.objects, hostel_id = request.data.get('hostel_id')) # to be replaced later after integration
+        slots = all_objects(Slot.objects, hostel_id=request.user['hostel']['id'])
+        # slots = filter_objects(Slot.objects, hostel_id = request.data.get('hostel_id')) # to be replaced later after integration
         serializer = SlotSerializer(slots, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
     
 class createSlot(APIView):
     def post(self, request):
+        
         data = request.data
+        data['hostel_id'] = request.user['supervisor']['hostel']['id']
         serializer = SlotSerializer(data=data)
         if serializer.is_valid():
             serializer.save()

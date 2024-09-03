@@ -8,11 +8,11 @@ status_options = [
 
 # Create your models here.
 class CleaningRequest(models.Model):
-    student = models.IntegerField()
+    student_id = models.IntegerField()
     worker = models.ForeignKey('worker.Worker', on_delete=models.SET_NULL, null=True, blank=True)
     slot = models.ForeignKey('slots.Slot', on_delete=models.CASCADE)
     hostel_id = models.IntegerField()
-    # hostel_name = models.CharField(max_length=50)
+    hostel_name = models.CharField(max_length=50)
     block = models.CharField(max_length=3)
     room_number = models.CharField(max_length=10)
     status = models.CharField(max_length=10, choices=status_options, default='Pending')
