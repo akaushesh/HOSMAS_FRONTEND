@@ -27,8 +27,9 @@ export function Requests({ selectedCleaner }: RequestsProps): React.JSX.Element 
                 <Typography variant="h6" fontSize="20px" fontWeight={500}>
                   {request.roomName}
                 </Typography>
-
-                <SpecialButton slots={request.slots} />
+                <Box >
+                  <SpecialButton slots={request.slots} />
+                </Box>
               </Stack>
               {cleaningRequests.length - 1 !== index && <Divider sx={{ my: 0.4 }} />}
             </Box>
@@ -49,6 +50,7 @@ export function Requests({ selectedCleaner }: RequestsProps): React.JSX.Element 
 
 
 
+
 function SpecialButton({ slots }: { slots: { from: string; to: string }[] }): React.JSX.Element {
   const timings = [9, 10, 11, 12, 1, 2, 3, 4, 5];
 
@@ -60,17 +62,7 @@ function SpecialButton({ slots }: { slots: { from: string; to: string }[] }): Re
 
   return (
     <Box>
-      <ButtonGroup
-        sx={{
-          borderRadius: 0,
-          '& .MuiButtonGroup-grouped': {
-            borderColor: 'transparent',
-            borderRight: 'none',
-          },
-          width: 1,
-        }}
-        variant="text"
-      >
+      <Stack direction="row" justifyContent="center" width={1}>
         {timings.map((time, index) => {
           const [selectSlot, setSelectSlot] = React.useState(false);
           const dividerColorCondition=activeSlots.flat().includes(time)||(
@@ -100,10 +92,9 @@ function SpecialButton({ slots }: { slots: { from: string; to: string }[] }): Re
               </Stack>
 
               <Button
-                key={time}
+                variant="text"
                 sx={{
                   m: 0,
-                  px:selectSlot?{xl:3.34,lg:1}:{xl:4,lg:1},
                   py: 2,
                   height: 0.3,
                   borderRadius: 0,
@@ -123,9 +114,9 @@ function SpecialButton({ slots }: { slots: { from: string; to: string }[] }): Re
               </Button>
 
             </Stack>
-          );
+          )
         })}
-      </ButtonGroup>
+      </Stack >
     </Box>
   );
 }
