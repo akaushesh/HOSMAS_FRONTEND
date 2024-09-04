@@ -6,7 +6,7 @@ from rest_framework import status
 from .serializers import *
 
 from config.services import *
-from rest_framework.permissions import IsAuthenticated
+from config.permissions import IsAuthenticated
 from config.pagination import ResponsePagination
 
 class getCleaningRequests(APIView):
@@ -16,7 +16,7 @@ class getCleaningRequests(APIView):
         if (request.user['role'] == 'student'):
             cleaning_requests = filter_objects(CleaningRequest.objects, **filters, student_id=request.user['student']['id'])
         elif (request.user['role'] == 'supervisor'):
-            cleaning_requests = filter_objects(CleaningRequest.objects, **filters, hostel_id=request.user['supervisor']['hostel'])
+            cleaning_requests = filter_objects(CleaningRequest.objects, **filters, hostel_id=request.user['supervisor']['hostel']['id'])
         paginator = ResponsePagination()
         paginated_queryset = paginator.paginate_queryset(cleaning_requests, request)
         
@@ -40,8 +40,8 @@ class createCleaningRequests(APIView):
         data['student_id'] = request.user['student']['id']
         data['hostel_id'] = request.user['student']['room']['hostel']['id']
         data['hostel_name'] = request.user['student']['room']['hostel']['name']
-        data['block']=request.user['student']['room']['block']['name']
-        data['room_number']=request.user['student']['room']['name']
+        data['block'] = request.user['student']['room']['block']
+        data['room_number'] = request.user['student']['room']['name']
         
         serializer = CleaningRequestSerializer(data=data)
         if serializer.is_valid():
