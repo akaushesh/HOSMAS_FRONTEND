@@ -1,5 +1,3 @@
-version: '3'
-
 services:
   hosmas-central-repository:
     image: hosmas-central-repository
