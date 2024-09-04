@@ -2,6 +2,7 @@ from cleaning_request.models import *
 from slots.models import *
 from worker.models import *
 
+
 def get_object(objects, **kwargs):
     try:
         return objects.get(**kwargs)

@@ -1,4 +1,6 @@
 from django.db import models
+from django.contrib.postgres.fields import ArrayField
+
 
 status_options = [
     ('Pending', 'Pending'),
@@ -8,12 +10,13 @@ status_options = [
 
 # Create your models here.
 class CleaningRequest(models.Model):
-    student = models.IntegerField()
+    student_id = models.IntegerField()
     worker = models.ForeignKey('worker.Worker', on_delete=models.SET_NULL, null=True, blank=True)
-    slot = models.ForeignKey('slots.Slot', on_delete=models.CASCADE)
     hostel_id = models.IntegerField()
-    # hostel_name = models.CharField(max_length=50)
-    block = models.CharField(max_length=3)
+    hostel_name = models.CharField(max_length=50, default=' ')
+    preferred_slots = ArrayField(models.IntegerField(), null=True, blank=True)
+    slot = models.ForeignKey('slots.Slot', on_delete=models.SET_NULL, null=True, blank=True)
+    block = models.CharField(max_length=3, null=True, blank=True)
     room_number = models.CharField(max_length=10)
     status = models.CharField(max_length=10, choices=status_options, default='Pending')
     

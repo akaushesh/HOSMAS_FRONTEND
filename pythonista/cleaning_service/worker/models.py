@@ -6,7 +6,7 @@ class Worker(models.Model):
     name = models.CharField(max_length=50)
     phone = models.CharField(max_length=12, unique=True)
     photo = models.URLField(max_length=2000, blank=True, null=True)
-    hostel = models.CharField(max_length=50)
+    hostel_id = models.IntegerField(default=0)
     is_active = models.BooleanField(default=True)
     
     def __str__(self):

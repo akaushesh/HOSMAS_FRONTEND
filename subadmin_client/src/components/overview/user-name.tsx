@@ -17,3 +17,14 @@ export function UserName(): React.JSX.Element {
     </div>
   );
 }
+
+export function HostelName(): React.JSX.Element {
+  const { data: profile } = useProfile();
+  const userProfile = profile as AxiosResponse<ProfileResponse>;
+
+  return (
+    <>
+      HOSTEL D
+    </>
+  );
+}

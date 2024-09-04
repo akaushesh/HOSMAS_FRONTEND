@@ -4,7 +4,7 @@ from .models import Worker, Attendance
 class WorkerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Worker
-        fields = ['id', 'name', 'phone', 'photo', 'hostel']
+        fields = fields = '__all__'
 
 class AttendanceSerializer(serializers.ModelSerializer):
     worker_name = serializers.CharField(source='worker.name', read_only=True)

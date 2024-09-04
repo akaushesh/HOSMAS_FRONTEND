@@ -10,7 +10,7 @@ LOGGING = {
         'logfile': {
             'level': 'ERROR',
             'class': 'logging.FileHandler',
-            'filename': os.path.join(LOGS_ROOT, 'error.log'),
+            'filename': LOGS_ROOT / 'error.log',
         },
         'console': {
             'level': 'INFO',
