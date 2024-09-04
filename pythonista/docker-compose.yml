@@ -1,0 +1,24 @@
+version: '3'
+
+services:
+  hosmas-central-repository:
+    image: hosmas-central-repository
+    build:
+      context: central_repository
+      dockerfile: ./Dockerfile
+    volumes:
+      - ./central_repository/static/:/app/static/
+      - ./central_repository/logs/:/app/logs/
+    network_mode: "host"
+    command: "sh run.sh"
+  
+  hosmas-cleaning-service:
+    image: hosmas-cleaning-service
+    build:
+      context: cleaning_service
+      dockerfile: ./Dockerfile
+    volumes:
+      - ./cleaning_service/static/:/app/static/
+      - ./cleaning_service/logs/:/app/logs/
+    network_mode: "host"
+    command: "sh run.sh"
