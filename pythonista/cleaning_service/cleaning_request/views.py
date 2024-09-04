@@ -48,3 +48,26 @@ class createCleaningRequests(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class assignCleaningRequests(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self, request, worker_id):
+        worker = get_object(Worker.objects, id=worker_id)
+        if not worker:
+            return Response({"detail": "Worker not found."}, status=status.HTTP_404_NOT_FOUND)
+        
+        request_ids = request.data.get('request_ids', [])
+        if not request_ids:
+            return Response({"detail": "No cleaning requests provided."}, status=status.HTTP_400_BAD_REQUEST)
+
+        cleaning_requests = filter_objects(CleaningRequest.objects, id__in=request_ids)
+
+        if not cleaning_requests.exists():
+            return Response({"detail": "No matching cleaning requests found."}, status=status.HTTP_404_NOT_FOUND)
+
+        for cleaning_request in cleaning_requests:
+            cleaning_request.worker = worker
+            cleaning_request.status = 'Assigned'
+            cleaning_request.save()
+
+        return Response({"detail": "Cleaning requests assigned successfully."}, status=status.HTTP_200_OK)
