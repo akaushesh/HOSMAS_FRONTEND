@@ -52,6 +52,8 @@ class createCleaningRequests(APIView):
 class assignCleaningRequests(APIView):
     permission_classes = [IsAuthenticated]
     def post(self, request, worker_id):
+        if request.user['role'] != 'supervisor':
+            return Response({'error': 'You are not authorized to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         worker = get_object(Worker.objects, id=worker_id)
         if not worker:
             return Response({"detail": "Worker not found."}, status=status.HTTP_404_NOT_FOUND)

@@ -10,7 +10,7 @@ class Worker(models.Model):
     is_active = models.BooleanField(default=True)
     
     def __str__(self):
-        return self.name + ' ' + self.hostel
+        return self.name + ' ' + str(self.hostel_id)
     
     
 class Attendance(models.Model):
