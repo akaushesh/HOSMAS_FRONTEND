@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Box, Button, ButtonGroup, Divider, Paper, Stack, Typography } from '@mui/material';
+import { Box, Button, Divider, Paper, Stack, Typography } from '@mui/material';
 
 import { tempRequests } from '../TempDataRequests';
 import { type CleanerProps, type RequestProps } from './Assignment';
@@ -13,13 +13,16 @@ interface RequestsProps {
 export function Requests({ selectedCleaner }: RequestsProps): React.JSX.Element {
   const [cleaningRequests, setCleaningRequests] = React.useState<RequestProps[]>(tempRequests);
 
+  const isDisabled=selectedCleaner.id==='';
   return (
-    <Paper elevation={10} sx={{ p: 3, width: 0.65 }}>
+    <Paper elevation={10} sx={{ p: 3, width: 0.65}}>
       <Stack direction="row" justifyContent="space-between">
         <Typography variant="h5">Cleaning Requests</Typography>
         <Box>Filters</Box>
       </Stack>
-      <Box mt={3} sx={{ overflowY: 'auto', height: '47vh', width: 1 }}>
+      <Box mt={3} sx={{overflowY: 'auto', height: '47vh', width: 1,
+        opacity: isDisabled ? 0.5 : 1,
+       }}>
         {cleaningRequests.map((request, index) => {
           return (
             <Box key={request.id}>
@@ -27,8 +30,8 @@ export function Requests({ selectedCleaner }: RequestsProps): React.JSX.Element 
                 <Typography variant="h6" fontSize="20px" fontWeight={500}>
                   {request.roomName}
                 </Typography>
-                <Box >
-                  <SpecialButton slots={request.slots} />
+                <Box zIndex={1}>
+                  <SpecialButton isDisabled={isDisabled} slots={request.slots} />
                 </Box>
               </Stack>
               {cleaningRequests.length - 1 !== index && <Divider sx={{ my: 0.4 }} />}
@@ -38,7 +41,7 @@ export function Requests({ selectedCleaner }: RequestsProps): React.JSX.Element 
       </Box>
 
       <Stack direction="row" justifyContent="space-between" mt={4} width={1}>
-        <Typography variant="body1">Select a worker to assign cleaning</Typography>
+        <Typography variant="h6">* Select a worker to assign cleaning</Typography>
         <Button variant="contained" sx={{ px: 6 }} color="primary">
           Save
         </Button>
@@ -51,7 +54,7 @@ export function Requests({ selectedCleaner }: RequestsProps): React.JSX.Element 
 
 
 
-function SpecialButton({ slots }: { slots: { from: string; to: string }[] }): React.JSX.Element {
+function SpecialButton({ slots,isDisabled }: { slots: { from: string; to: string }[]; isDisabled:boolean; }): React.JSX.Element {
   const timings = [9, 10, 11, 12, 1, 2, 3, 4, 5];
 
   const activeSlots = slots.map((slot) => {
@@ -100,7 +103,7 @@ function SpecialButton({ slots }: { slots: { from: string; to: string }[] }): Re
                   borderRadius: 0,
                   fontWeight: 800,
                   backgroundColor: activeSlots.flat().includes(time) ?'#F4C9C9':'transparent',
-                  pointerEvents: activeSlots.flat().includes(time) ? 'auto' : 'none',
+                  pointerEvents: (activeSlots.flat().includes(time)&&!isDisabled) ? 'auto' : 'none',
                   '&:hover': {
                     backgroundColor: activeSlots.flat().includes(time) ?'#F4C9C9':'transparent',
                   }

@@ -4,6 +4,7 @@ import * as React from 'react';
 import { Stack } from '@mui/material';
 
 import { Requests } from './Requests';
+import { CleanerSelect } from './CleanerSelect';
 
 export interface RequestProps {
   id: string;
@@ -34,8 +35,9 @@ export function Assignment(): React.JSX.Element {
   });
 
   return (
-    <Stack direction="row" gap={2} width={1} mt={4}>
+    <Stack direction="row" justifyContent='space-between' alignItems='stretch' height='66vh' width={1} mt={4}>
       <Requests selectedCleaner={selectedCleaner} />
+      <CleanerSelect selectedCleaner={selectedCleaner} setSelectedCleaner={setSelectedCleaner} />
     </Stack>
   );
 }
