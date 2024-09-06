@@ -11,8 +11,8 @@ class getMultipleWorkers(APIView):
     def get(self, request):
         if (request.user['role'] != 'supervisor'):
             return Response({'error': 'You are not authorized to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
-        workers = filter_objects(Worker.objects, id=request.user['supervisor']['hostel']['id'])
-        serializer = WorkerSerializer(workers)
+        workers = filter_objects(Worker.objects, hostel_id=request.user['supervisor']['hostel']['id'])
+        serializer = WorkerSerializer(workers, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
 class getSingleWorker(APIView):

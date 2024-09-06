@@ -7,8 +7,8 @@ class WorkerSerializer(serializers.ModelSerializer):
         fields = fields = '__all__'
 
 class AttendanceSerializer(serializers.ModelSerializer):
-    worker_name = serializers.CharField(source='worker.name', read_only=True)
+    # worker_name = serializers.CharField(source='worker.name', read_only=True)
 
     class Meta:
         model = Attendance
-        fields = ['id', 'worker', 'worker_name', 'date', 'is_present']
+        fields = ['id', 'worker', 'date', 'is_present']

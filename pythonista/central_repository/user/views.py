@@ -13,3 +13,12 @@ class ProfileView(APIView):
         return Response(
             user_services.get_user_detailed_profile(request.user.id), status=HTTP_200_OK
         )
+        
+        
+class getStudentProfile(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, slug):
+        return Response(
+            user_services.get_user_detailed_profile(slug), status=HTTP_200_OK
+        )
