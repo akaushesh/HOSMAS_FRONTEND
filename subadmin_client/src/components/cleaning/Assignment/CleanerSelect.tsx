@@ -3,16 +3,15 @@
 import * as React from 'react';
 import { Divider, Paper, Stack, Typography } from '@mui/material';
 
-import { tempCleaners } from '../TempDataRequests';
 import { type CleanerProps } from './Assignment';
 
 interface CleanerSelectorProps {
   selectedCleaner: CleanerProps;
   setSelectedCleaner: (val: CleanerProps) => void;
+  cleaners: CleanerProps[];
 }
 
-export function CleanerSelect({ selectedCleaner, setSelectedCleaner }: CleanerSelectorProps): React.JSX.Element {
-  const cleaners = tempCleaners.filter((cleaner) => !cleaner.present);
+export function CleanerSelect({ cleaners,selectedCleaner, setSelectedCleaner }: CleanerSelectorProps): React.JSX.Element {
 
   const handleCleanerClick = (cleaner: CleanerProps): void => {
     if (cleaner.id === selectedCleaner.id) {

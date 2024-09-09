@@ -165,7 +165,7 @@ interface RequestProps {
     name: string;
     present: boolean;
     img: string;
-    assigned?: [{ roomName: string; slot:{from: string; to: string}}];
+    assigned?: [{requestId:string; roomName: string; slot:{from: string; to: string}}];
   }
 
   export  const tempCleaners:CleanerProps[]= [
@@ -173,78 +173,78 @@ interface RequestProps {
       id: '123',
       name: 'Rajesh',
       present: false,
-      img: 'https://miro.medium.com/v2/resize:fit:640/format:webp/0*iAtFOZfZYrLepZyG.jpg',
+      img: 'https://i.pinimg.com/236x/2e/4d/ea/2e4deab459e175b27cb1aea34212cb2d.jpg',
     },
     {
       id: '456',
       name: 'Vinesh',
       present: false,
-      img: 'https://miro.medium.com/v2/resize:fit:640/format:webp/0*iAtFOZfZYrLepZyG.jpg',
+      img: 'https://i.pinimg.com/236x/2e/4d/ea/2e4deab459e175b27cb1aea34212cb2d.jpg',
     },
     {
       id: '789',
       name: 'Dinesh',
       present: false,
-      img: 'https://miro.medium.com/v2/resize:fit:640/format:webp/0*iAtFOZfZYrLepZyG.jpg',
+      img: 'https://i.pinimg.com/236x/2e/4d/ea/2e4deab459e175b27cb1aea34212cb2d.jpg',
     },
     {
       id: '21',
       name: 'Minesh',
       present: false,
-      img: 'https://miro.medium.com/v2/resize:fit:640/format:webp/0*iAtFOZfZYrLepZyG.jpg',
+      img: 'https://i.pinimg.com/236x/2e/4d/ea/2e4deab459e175b27cb1aea34212cb2d.jpg',
     },
     {
       id: '1233',
       name: 'Kanishk',
       present: false,
-      img: 'https://miro.medium.com/v2/resize:fit:640/format:webp/0*iAtFOZfZYrLepZyG.jpg',
+      img: 'https://i.pinimg.com/236x/2e/4d/ea/2e4deab459e175b27cb1aea34212cb2d.jpg',
     },
     {
       id: '1234',
       name: 'Jagya',
       present: false,
-      img: 'https://miro.medium.com/v2/resize:fit:640/format:webp/0*iAtFOZfZYrLepZyG.jpg',
+      img: 'https://i.pinimg.com/236x/2e/4d/ea/2e4deab459e175b27cb1aea34212cb2d.jpg',
     },
     {
       id: '12343',
       name: 'Suresh',
       present: false,
-      img: 'https://miro.medium.com/v2/resize:fit:640/format:webp/0*iAtFOZfZYrLepZyG.jpg',
+      img: 'https://i.pinimg.com/236x/2e/4d/ea/2e4deab459e175b27cb1aea34212cb2d.jpg',
     },
     {
       id: '12223',
       name: 'Gadhesh',
       present: false,
-      img: 'https://miro.medium.com/v2/resize:fit:640/format:webp/0*iAtFOZfZYrLepZyG.jpg',
+      img: 'https://i.pinimg.com/236x/2e/4d/ea/2e4deab459e175b27cb1aea34212cb2d.jpg',
     },
     {
       id: '1293',
       name: 'Madhesh',
       present: false,
-      img: 'https://miro.medium.com/v2/resize:fit:640/format:webp/0*iAtFOZfZYrLepZyG.jpg',
+      img: 'https://i.pinimg.com/236x/2e/4d/ea/2e4deab459e175b27cb1aea34212cb2d.jpg',
     },
     {
       id: '1283',
       name: 'Rajesh',
       present: true,
-      img: 'https://miro.medium.com/v2/resize:fit:640/format:webp/0*iAtFOZfZYrLepZyG.jpg',
+      img: 'https://i.pinimg.com/236x/2e/4d/ea/2e4deab459e175b27cb1aea34212cb2d.jpg',
     },
     {
       id: '1273',
       name: 'Rajesh',
       present: false,
-      img: 'https://miro.medium.com/v2/resize:fit:640/format:webp/0*iAtFOZfZYrLepZyG.jpg',
+      img: 'https://i.pinimg.com/236x/2e/4d/ea/2e4deab459e175b27cb1aea34212cb2d.jpg',
     },
     {
       id: '1263',
       name: 'Rajesh',
       present: true,
-      img: 'https://miro.medium.com/v2/resize:fit:640/format:webp/0*iAtFOZfZYrLepZyG.jpg',
+      img: 'https://i.pinimg.com/236x/2e/4d/ea/2e4deab459e175b27cb1aea34212cb2d.jpg',
     },
     {
       id: '1253',
       name: 'Rajesh',
       present: true,
-      img: 'https://miro.medium.com/v2/resize:fit:640/format:webp/0*iAtFOZfZYrLepZyG.jpg',
+      img: 'https://i.pinimg.com/236x/2e/4d/ea/2e4deab459e175b27cb1aea34212cb2d.jpg',
     },
   ];
