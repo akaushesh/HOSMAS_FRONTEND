@@ -6,7 +6,7 @@ from worker.models import *
 def get_object(objects, **kwargs):
     try:
         return objects.get(**kwargs)
-    except objects.DoesNotExist:
+    except objects.model.DoesNotExist:
         return None
     
 def filter_objects(objects, **kwargs):

@@ -2,36 +2,69 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-
+import requests
+from django.conf import settings
 from .serializers import *
 
 from config.services import *
 from config.permissions import IsAuthenticated
 from config.pagination import ResponsePagination
 
+from rest_framework.exceptions import APIException
+
+
 class getCleaningRequests(APIView):
     permission_classes = [IsAuthenticated]
+
     def get(self, request):
+
         filters = request.query_params.dict()
-        if (request.user['role'] == 'student'):
+
+        page = filters.pop('page', None)
+        page_size = filters.pop('page_size', None)
+
+        if request.user['role'] == 'student':
             cleaning_requests = filter_objects(CleaningRequest.objects, **filters, student_id=request.user['student']['id'])
-        elif (request.user['role'] == 'supervisor'):
+        elif request.user['role'] == 'supervisor':
             cleaning_requests = filter_objects(CleaningRequest.objects, **filters, hostel_id=request.user['supervisor']['hostel']['id'])
+
         paginator = ResponsePagination()
         paginated_queryset = paginator.paginate_queryset(cleaning_requests, request)
-        
+
         serializer = CleaningRequestSerializer(paginated_queryset, many=True)
         return paginator.get_paginated_response(serializer.data)
+
     
     
 class getSingleCleaningRequest(APIView):
     permission_classes = [IsAuthenticated]
+
     def get(self, request, slug):
-        #todo: get the student details and return it
+        # student_details = request.user['student']
+        try:
+            jwt_token = request.META.get("HTTP_AUTHORIZATION")
+            student_details = requests.get(
+            f"{settings.CENTRAL_REPOSITORY_URL}/user/{slug}", headers={"Authorization": jwt_token}
+        )
+            student_details.raise_for_status()
+            student_details = student_details.json()
+        except requests.exceptions.RequestException as e:
+            raise APIException(f"Failed to fetch student details: {e}")
+
         cleaning_request = get_object(CleaningRequest.objects, id=slug)
-        serializer = CleaningRequestSerializer(cleaning_request)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    
+        
+        if cleaning_request is None:
+            return Response({"detail": "Cleaning request not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        cleaning_request_serializer = CleaningRequestSerializer(cleaning_request)
+
+        response_data = {
+            "student_details": student_details,  # Directly copy student details
+            "cleaning_request": cleaning_request_serializer.data  # Cleaning request data
+        }
+
+        return Response(response_data, status=status.HTTP_200_OK)
+
 class createCleaningRequests(APIView):
     permission_classes = [IsAuthenticated]
     def post(self, request):
@@ -48,3 +81,28 @@ class createCleaningRequests(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class assignCleaningRequests(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self, request, worker_id):
+        if request.user['role'] != 'supervisor':
+            return Response({'error': 'You are not authorized to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
+        worker = get_object(Worker.objects, id=worker_id)
+        if not worker:
+            return Response({"detail": "Worker not found."}, status=status.HTTP_404_NOT_FOUND)
+        
+        request_ids = request.data.get('request_ids', [])
+        if not request_ids:
+            return Response({"detail": "No cleaning requests provided."}, status=status.HTTP_400_BAD_REQUEST)
+
+        cleaning_requests = filter_objects(CleaningRequest.objects, id__in=request_ids)
+
+        if not cleaning_requests.exists():
+            return Response({"detail": "No matching cleaning requests found."}, status=status.HTTP_404_NOT_FOUND)
+
+        for cleaning_request in cleaning_requests:
+            cleaning_request.worker = worker
+            cleaning_request.status = 'Assigned'
+            cleaning_request.save()
+
+        return Response({"detail": "Cleaning requests assigned successfully."}, status=status.HTTP_200_OK)

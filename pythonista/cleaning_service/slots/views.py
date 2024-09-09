@@ -2,17 +2,17 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from config.services import *
-from serializers import *
+from .serializers import *
 from config.permissions import IsAuthenticated
 
 class getSlots(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request):
         #user = request.user
         if request.user['role'] == 'student':
-            slots = all_objects(Slot.objects, hostel_id=request.user['student']['room']['hostel']['id'])
+            slots = filter_objects(Slot.objects, hostel_id=request.user['student']['room']['hostel']['id'])
         else:
-            slots = all_objects(Slot.objects, hostel_id=request.user['supervisor']['hostel']['id'])
-        # slots = filter_objects(Slot.objects, hostel_id = request.data.get('hostel_id')) # to be replaced later after integration
+            slots = filter_objects(Slot.objects, hostel_id=request.user['supervisor']['hostel']['id'])
         serializer = SlotSerializer(slots, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     

@@ -27,7 +27,7 @@ def get_user_instance(user_id: int) -> User:
 
 
 # Build the response for User profile view
-def get_user_detailed_profile(user_id: int) -> dict:
+def         get_user_detailed_profile(user_id: int) -> dict:
     user = get_user_instance(user_id)
 
     # check if user is student
