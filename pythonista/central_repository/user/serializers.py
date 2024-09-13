@@ -16,27 +16,24 @@ class StudentProfileSerializer(serializers.ModelSerializer):
     room = serializers.SerializerMethodField()
 
     def get_room(self, obj):
-        return (
+        res = (
             {
                 "id": obj.room.id,
                 "name": obj.room.name,
-                "level": (obj.room.level.name if obj.room.level is not None else None),
-                "block": (obj.room.block.name if obj.room.block is not None else None),
-                "room_type": (
-                    obj.room.room_type.name if obj.room.room_type is not None else None
-                ),
+                "level": obj.room.level.name,
+                "block": obj.room.level.block.name,
+                "room_type": obj.room.room_type.name,
                 "hostel": (
                     {
-                        "id": obj.room.level.hostel.id,
-                        "name": obj.room.level.hostel.name,
+                        "id": obj.room.level.block.hostel.id,
+                        "name": obj.room.level.block.hostel.name,
                     }
-                    if obj.room.level is not None and obj.room.level.hostel is not None
-                    else None
                 ),
             }
             if obj.room is not None
             else None
         )
+        return res
 
     class Meta:
         model = Student

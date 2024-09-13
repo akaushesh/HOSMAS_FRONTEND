@@ -28,4 +28,6 @@ urlpatterns = [
     path("token/refresh/", TokenRefreshView.as_view()),
     # User related routes
     path("user/", include("user.urls")),
+    # Hostel related routes
+    path("hostels/", include("hostel.urls")),
 ]
