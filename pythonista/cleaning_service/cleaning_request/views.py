@@ -1,16 +1,19 @@
-from django.shortcuts import render
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
 import requests
+
 from django.conf import settings
+from django.shortcuts import render
+
+from rest_framework import status
+from rest_framework.exceptions import APIException
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
 from .serializers import *
+from . import services as cleaning_request_services
 
 from config.services import *
-from config.permissions import IsAuthenticated
+from config.permissions import IsAuthenticated, IsSupervisor
 from config.pagination import ResponsePagination
-
-from rest_framework.exceptions import APIException
 
 
 class getCleaningRequests(APIView):
@@ -71,7 +74,9 @@ class createCleaningRequests(APIView):
         #student id
         data = request.data
         data['student_id'] = request.user['student']['id']
+        data['room_id'] = request.user['student']['room']['id']
         data['hostel_id'] = request.user['student']['room']['hostel']['id']
+        data['level_id'] = request.user['student']['room']['level']['id']
         data['hostel_name'] = request.user['student']['room']['hostel']['name']
         data['block'] = request.user['student']['room']['block']
         data['room_number'] = request.user['student']['room']['name']
@@ -106,3 +111,19 @@ class assignCleaningRequests(APIView):
             cleaning_request.save()
 
         return Response({"detail": "Cleaning requests assigned successfully."}, status=status.HTTP_200_OK)
+
+
+class AssignFloorsToWorkersView(APIView):
+    permission_classes = [IsAuthenticated, IsSupervisor]
+
+    def get(self, request):
+        cleaning_request_services.assign_floors_to_workers(request.user['supervisor']['hostel']['id'])
+        return Response(status=status.HTTP_200_OK)
+
+
+class AssignRequestsToWorkersView(APIView):
+    permission_classes = [IsAuthenticated, IsSupervisor]
+
+    def get(self, request):
+        cleaning_request_services.assign_requests_to_workers(request.user['supervisor']['hostel']['id'])
+        return Response(status=status.HTTP_200_OK)

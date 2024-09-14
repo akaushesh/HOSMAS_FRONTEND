@@ -2,6 +2,7 @@ from django.contrib import admin
 from .models import CleaningRequest
 
 class CleaningRequestAdmin(admin.ModelAdmin):
-    list_display = ('id', 'student_id', 'worker', 'hostel_id', 'hostel_name', 'preferred_slots', 'slot', 'block', 'room_number', 'status')
+    list_display = ('id', 'student_id', 'worker', 'slot', 'date', 'hostel_id', 'level_id', 'hostel_name', 'preferred_slots', 'preferred_dates', 'block', 'room_number', 'status')
+    list_filter = ('status', 'worker', 'date', 'hostel_name')
 
 admin.site.register(CleaningRequest, CleaningRequestAdmin)
