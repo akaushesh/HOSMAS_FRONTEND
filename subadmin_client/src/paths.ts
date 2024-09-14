@@ -17,10 +17,11 @@ export const paths = {
   laundry:'/laundry',
   cleaning:{
     default:'/cleaning',
+    dashboard:'/cleaning/dashboard',
     attendance:'/cleaning/attendance',
     assignment:'/cleaning/assignment',
-    cleaners:'/cleaning/cleaners',
   },
+  cleaners:'/cleaners',
   errors: { notFound: '/errors/not-found' },
 
 

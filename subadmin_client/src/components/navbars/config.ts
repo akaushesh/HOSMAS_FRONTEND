@@ -11,15 +11,16 @@ export const allocationSubItems = [
 ] satisfies NavItemConfig[];
 
 export const cleaningSubItems = [
+  { key: 'dashboard', title: 'Dashboard', href: paths.cleaning.dashboard, icon: 'users' },
   { key: 'attendance', title: 'Attendance', href: paths.cleaning.attendance, icon: 'userList'},
   { key: 'assignment', title: 'Assignment', href: paths.cleaning.assignment, icon: 'ListChecks' },
-  { key: 'cleaners', title: 'Cleaners', href: paths.cleaning.cleaners, icon: 'users' },
 ] satisfies NavItemConfig[];
   
 export const navItems = [
     { key: 'overview', title: 'Overview', href: paths.overview, icon: 'house',isNested:false },
     { key: 'allocation', title: 'Allocation', href: paths.allocation.default, icon: 'allocation', items: allocationSubItems,isNested:true },
     { key: 'cleaning', title: 'Cleaning', href: paths.cleaning.default, icon: 'broom',isNested:true,items:cleaningSubItems},
+    { key: 'cleaners', title: 'Cleaners', href: paths.cleaners, icon: 'shirt',isNested:false},
     { key: 'laundry', title: 'Laundry', href: paths.laundry, icon: 'shirt',isNested:false},
     { key: 'settings', title: 'Settings', href: paths.settings, icon: 'gear-six' },
 ] satisfies NavItemConfig[];
