@@ -28,8 +28,8 @@ def assign_floors_to_workers(hostel_id):
     
     workers_list = []
     for worker in common_services.filter_objects(Worker.objects, hostel_id=hostel_id).all():
-        attentance = common_services.filter_objects(Attendance.objects, worker=worker, date=datetime.now().date()).first()
-        if attentance is not None and attentance.is_present:
+        attendance = common_services.filter_objects(Attendance.objects, worker=worker, date=datetime.now().date()).first()
+        if attendance is not None and attendance.is_present:
             workers_list.append(worker)
     
     print('workers list', workers_list)
@@ -144,8 +144,8 @@ def assign_requests_to_workers(hostel_id):
 
     workers = []
     for worker in common_services.filter_objects(Worker.objects, hostel_id=hostel_id).all():
-        attentance = common_services.filter_objects(Attendance.objects, worker=worker, date=datetime.now().date()).first()
-        if attentance is not None and attentance.is_present:
+        attendance = common_services.filter_objects(Attendance.objects, worker=worker, date=datetime.now().date()).first()
+        if attendance is not None and attendance.is_present:
             workers.append(worker)
     
     print(workers)
