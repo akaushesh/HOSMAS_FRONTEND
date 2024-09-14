@@ -8,25 +8,28 @@ class HostelAdmin(admin.ModelAdmin):
         return obj.room_types.count()
 
     def levels(self, obj):
-        return obj.levels.count()
+        cnt = 0
+        for b in obj.blocks.all():
+            cnt += b.levels.count()
+        return cnt
 
     def blocks(self, obj):
         return obj.blocks.count()
 
     def rooms(self, obj):
-        levels = obj.levels.all()
         rooms_cnt = 0
-        for level in levels:
-            rooms_cnt += level.rooms.count()
+        for block in obj.blocks.all():
+            for level in block.levels.all():
+                rooms_cnt += level.rooms.count()
         return rooms_cnt
 
     def students(self, obj):
-        levels = obj.levels.all()
         students_cnt = 0
-        for level in levels:
-            rooms = level.rooms.all()
-            for room in rooms:
-                students_cnt += room.students.count()
+        for block in obj.blocks.all():
+            for level in block.levels.all():
+                rooms = level.rooms.all()
+                for room in rooms:
+                    students_cnt += room.students.count()
         return students_cnt
 
     list_display = ("id", "name", "room_types", "levels", "blocks", "rooms", "students")
@@ -69,23 +72,36 @@ class LevelAdmin(admin.ModelAdmin):
             students_cnt += room.students.count()
         return students_cnt
 
-    list_display = ("id", "name", "hostel__name", "rooms", "students")
-    list_filter = ("hostel__name",)
+    list_display = (
+        "id",
+        "name",
+        "block__name",
+        "block__hostel__name",
+        "rooms",
+        "students",
+    )
+    list_filter = ("block__hostel__name",)
     search_fields = ("name",)
 
 
 class BlockAdmin(admin.ModelAdmin):
+    def levels(self, obj):
+        return obj.levels.count()
+
     def rooms(self, obj):
-        return obj.rooms.count()
+        rooms_cnt = 0
+        for level in obj.levels.all():
+            rooms_cnt += level.rooms.count()
+        return rooms_cnt
 
     def students(self, obj):
-        rooms = obj.rooms.all()
         students_cnt = 0
-        for room in rooms:
-            students_cnt += room.students.count()
+        for level in obj.levels.all():
+            for room in level.rooms.all():
+                students_cnt += room.students.count()
         return students_cnt
 
-    list_display = ("id", "name", "hostel__name", "rooms", "students")
+    list_display = ("id", "name", "hostel__name", "levels", "rooms", "students")
     list_filter = ("hostel__name",)
     search_fields = ("name",)
 
@@ -99,11 +115,11 @@ class RoomAdmin(admin.ModelAdmin):
         "name",
         "room_type__name",
         "level__name",
-        "block__name",
-        "level__hostel__name",
+        "level__block__name",
+        "level__block__hostel__name",
         "students",
     )
-    list_filter = (("level__hostel__name"),)
+    list_filter = (("level__block__hostel__name"),)
     search_fields = ("name",)
 
 

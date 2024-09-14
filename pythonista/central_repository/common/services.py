@@ -19,8 +19,6 @@ def prefetch_related_decorator(service_func: callable) -> callable:
     return prefetch_related_wrapper
 
 
-@select_related_decorator
-@prefetch_related_decorator
 def get_object(objects, **kwargs):
     return objects.get(**kwargs)
 

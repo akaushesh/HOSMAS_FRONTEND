@@ -78,10 +78,10 @@ class StudentAdmin(admin.ModelAdmin):
         "room__name",
         "room__room_type__name",
         "room__level__name",
-        "room__block__name",
-        "room__level__hostel__name",
+        "room__level__block__name",
+        "room__level__block__hostel__name",
     )
-    list_filter = ("room__level__hostel__name",)
+    list_filter = ("room__level__block__hostel__name",)
     search_fields = ("name", "roll_number", "phone_number", "user__email")
 
 
