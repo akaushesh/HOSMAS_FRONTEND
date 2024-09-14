@@ -11,7 +11,8 @@ export interface RequestProps {
   id: string;
   roomName: string;
   slots: { from: string; to: string }[];
-  assigned?: string;
+  assignedId?: string;
+  assignedName?: string;
   selectedSlot?: { from: string; to: string };
 }
 
@@ -72,6 +73,7 @@ export function Assignment(): React.JSX.Element {
       }
     }
 
+    console.log(cleaners);
 
   return (
     <Stack direction="row" justifyContent='space-between' alignItems='stretch' height='66vh' width={1} mt={4}>

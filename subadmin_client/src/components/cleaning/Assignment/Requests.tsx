@@ -21,7 +21,8 @@ export function Requests({ handleAssignCleaner,selectedCleaner }: RequestsProps)
         // Setting Requests
         setCleaningRequests([...cleaningRequests.map((req) => {
           if(req.id===id){
-            req.assigned = selectedCleaner.id;
+            req.assignedId = selectedCleaner.id;
+            req.assignedName = selectedCleaner.name;
             req.selectedSlot = req.slots[slot];
           }
           return req;
@@ -37,7 +38,8 @@ export function Requests({ handleAssignCleaner,selectedCleaner }: RequestsProps)
         // Setting Cleaners
         setCleaningRequests([...cleaningRequests.map((req) => {
           if(req.id===id){
-            req.assigned = '';
+            req.assignedId = '';
+            req.assignedName = '';
             req.selectedSlot = {from:'',to:''};
           }
           return req;
@@ -68,7 +70,9 @@ export function Requests({ handleAssignCleaner,selectedCleaner }: RequestsProps)
                   {request.roomName}
                 </Typography>
                 <Box zIndex={1}>
-                  <SpecialButton handleAssign={handleAssign} isDisabled={isDisabled} id={request.id} slots={request.slots} />
+                  <SpecialButton handleAssign={handleAssign} isDisabled={isDisabled} id={request.id} slots={request.slots}
+                  assigned={request.assignedName}
+                  />
                 </Box>
               </Stack>
               {cleaningRequests.length - 1 !== index && <Divider sx={{ my: 0.4 }} />}
@@ -91,8 +95,9 @@ export function Requests({ handleAssignCleaner,selectedCleaner }: RequestsProps)
 
 
 
-function SpecialButton({ slots,isDisabled,handleAssign ,id}: { slots: { from: string; to: string }[]; isDisabled:boolean;handleAssign:(slot:number,assign:boolean,id:string)=>void; id:string}): React.JSX.Element {
+function SpecialButton({ slots,isDisabled,handleAssign ,id,assigned}: { slots: { from: string; to: string }[]; isDisabled:boolean;handleAssign:(slot:number,assign:boolean,id:string)=>void; id:string;assigned:string;}): React.JSX.Element {
   const timings = [9, 10, 11, 12, 1, 2, 3, 4, 5];
+  const timingsPrint = ["9AM", "10AM", "11AM", "12PM", "1PM", "2PM", "3PM", "4PM", "5PM"];
 
   const activeSlots = slots.map((slot) => {
     const from = new Date(slot.from).getHours();
@@ -120,7 +125,7 @@ function SpecialButton({ slots,isDisabled,handleAssign ,id}: { slots: { from: st
 
               <Stack direction="column" alignItems="center" width="14px">
                 <Typography variant="caption" sx={{ p: 0, color: 'var(--TextMain-Color)' }}>
-                  {time}
+                  {timingsPrint[index]}
                 </Typography>
 
                 <Divider
