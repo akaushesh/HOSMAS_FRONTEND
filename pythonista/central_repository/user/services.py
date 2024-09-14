@@ -16,9 +16,8 @@ def get_user_instance(user_id: int) -> User:
         objects=User.objects,
         id=user_id,
         select_related=(
-            "student__room__level__hostel",
+            "student__room__level__block__hostel",
             "student__room__room_type",
-            "student__room__block",
             "supervisor",
         ),
     ).first()
