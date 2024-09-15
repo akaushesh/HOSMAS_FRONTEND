@@ -1,7 +1,10 @@
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 import logging, requests
 
 from django.conf import settings
 from django.db import transaction
+from django.db.models import Q
 from django.shortcuts import render
 
 from rest_framework import status
@@ -85,12 +88,13 @@ class createCleaningRequests(APIView):
         data['hostel_id'] = request.user['student']['room']['hostel']['id']
         data['level_id'] = request.user['student']['room']['level']['id']
         data['hostel_name'] = request.user['student']['room']['hostel']['name']
+        data['level'] = request.user['student']['room']['level']['name']
         data['block'] = request.user['student']['room']['block']['name']
         data['room_number'] = request.user['student']['room']['name']
 
         logger.debug(f"Cleaning request data: {data}")
 
-        if filter_objects(CleaningRequest.objects, room_id=data['room_id'], status='Pending').exists():
+        if CleaningRequest.objects.filter(Q(room_id=data['room_id']), ~Q(status='Completed')).exists():
             logger.warning("There is already a pending request for this room")
             return Response({"detail": "There is already a pending request for this room"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -179,6 +183,12 @@ class MarkRequestComplete(APIView):
 
             cleaning_request.status = "Completed"
             cleaning_request.save()
+        
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(str(cleaning_request.worker.id), {
+            'type': 'request.done',
+            'id': cleaning_request.id,
+        })
 
         logger.info(f"Cleaning request {request_id} marked as complete with given feedback.")
         return Response({

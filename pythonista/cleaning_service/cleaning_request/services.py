@@ -1,3 +1,5 @@
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 from collections import defaultdict
 from datetime import datetime
 import math, requests
@@ -184,6 +186,21 @@ def mark_request_assignment_to_worker(request, slot, date, worker):
     request.worker = worker
     request.status = 'Assigned'
     request.save()
+
+    # send message to all websocket clients listening for pending requests of alloted worker
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)(str(worker.id), {
+        'type': 'request.assign',
+        'id': request.id,
+        'room': request.room_number,
+        'level': request.level,
+        'block': request.block,
+        'slot': {
+            'id': slot.id,
+            'start_time': slot.start.strftime("%H:%M"),
+            'end_time': slot.end.strftime("%H:%M")
+        }
+    })
 
 
 # To assign a worker for an immediate request

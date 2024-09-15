@@ -18,6 +18,7 @@ class CleaningRequest(models.Model):
     
     hostel_name = models.CharField(max_length=50, default=' ')
     block = models.CharField(max_length=3, null=True, blank=True)
+    level = models.CharField(max_length=3, null=True, blank=True)
     room_number = models.CharField(max_length=10)
     
     preferred_slots = ArrayField(models.IntegerField(), null=True, blank=True, default=list)
