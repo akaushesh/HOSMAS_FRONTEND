@@ -23,6 +23,10 @@ LOGGING = {
             'level': 'INFO',
             'propagate': True,
         },
+        'cleaning_request': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+        },
     },
 }
 

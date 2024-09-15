@@ -11,6 +11,7 @@ from worker.models import Worker, Attendance
 from .models import CleaningRequest
 
 
+# To assign floors to the workers after daily attendance
 def assign_floors_to_workers(hostel_id):
     print('starting assingment', hostel_id)
 
@@ -136,6 +137,7 @@ def mark_floor_assignment_of_workers(worker_floor_map):
         attendance_instance.save()
 
 
+# To assign requests to workers after daily attendance
 def assign_requests_to_workers(hostel_id):
     cleaning_requests = common_services.filter_objects(CleaningRequest.objects, status='Pending', hostel_id=hostel_id).all()
     organized_requests = organize_cleaning_requests(cleaning_requests)
@@ -182,3 +184,37 @@ def mark_request_assignment_to_worker(request, slot, date, worker):
     request.worker = worker
     request.status = 'Assigned'
     request.save()
+
+
+# To assign a worker for an immediate request
+def assign_worker_to_request(logger, cleaning_request):
+    logger.info(f"Attempting to assign worker for cleaning request {cleaning_request.id}")
+
+    workers = common_services.filter_objects(Worker.objects, hostel_id=cleaning_request.hostel_id, is_active=True).all()
+    logger.debug(f"Found {workers.count()} active workers in hostel {cleaning_request.hostel_id}")
+
+    for worker in workers:
+        logger.debug(f"Checking availability for worker {worker.id}")
+        attendance = common_services.filter_objects(Attendance.objects, worker=worker, date=datetime.now().date()).first()
+        
+        if attendance and attendance.is_present and cleaning_request.level_id in attendance.levels:
+            logger.debug(f"Worker {worker.id} is present and assigned to level {cleaning_request.level_id}")
+            for i in range(len(cleaning_request.preferred_slots)):
+                slot_id = cleaning_request.preferred_slots[i]
+                date = cleaning_request.preferred_dates[i]
+                if date!=datetime.now().date():
+                    # only try to assign if slot is for same date
+                    logger.debug(f"Skipping date {date} for slot id {slot_id}")
+                    continue
+
+                slot = common_services.get_object(Slot.objects, id=slot_id)
+                logger.debug(f"Checking slot {slot_id} for worker {worker.id}")
+                
+                if is_worker_available(worker, slot_id, date):
+                    logger.info(f"Worker {worker.id} assigned to cleaning request {cleaning_request.id} for slot {slot_id} on {date}")
+                    mark_request_assignment_to_worker(cleaning_request, slot, date, worker)
+                    return
+        else:
+            logger.debug(f"Worker {worker.id} is not available for this request")
+    
+    logger.info(f"No available worker found for cleaning request {cleaning_request.id}")
