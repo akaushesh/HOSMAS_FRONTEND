@@ -12,7 +12,6 @@ from decouple import config
 
 from django.core.asgi import get_asgi_application
 from channels.routing import ProtocolTypeRouter, URLRouter
-from channels.security.websocket import AllowedHostsOriginValidator
 
 from cleaning_request.routing import websocket_url_patterns
 
@@ -22,9 +21,7 @@ django_asgi_app = get_asgi_application()
 
 application = ProtocolTypeRouter({
     "http": django_asgi_app,
-    "websocket": AllowedHostsOriginValidator(
-        URLRouter(
-            websocket_url_patterns
-        )
+    "websocket": URLRouter(
+        websocket_url_patterns
     )
 })
