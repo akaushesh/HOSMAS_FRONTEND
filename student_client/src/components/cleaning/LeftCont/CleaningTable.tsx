@@ -48,7 +48,7 @@ const StyledTableCell = styled(TableCell)(() => ({
 
 export default function CleaningTable({ tasks }: EleProps): React.JSX.Element {
   return (
-    <Paper sx={{ borderRadius: '8px', overflowY: 'auto', overflowX: 'hidden', height: '42vh' }} elevation={10}>
+    <Paper sx={{ borderRadius: '8px', overflowY: 'auto', overflowX: 'hidden', maxHeight: '50vh' }} elevation={10}>
       <Table stickyHeader>
         <TableHead>
           <TableRow sx={{ borderRadius: '8px', backgroundColor: 'red' }}>
@@ -68,8 +68,6 @@ export default function CleaningTable({ tasks }: EleProps): React.JSX.Element {
     </Paper>
   );
 }
-
-
 
 function RowCleaning({ task }: { task: Task }): React.JSX.Element {
   const [value, setValue] = React.useState({ rating: task.rating, status: task.status });
@@ -93,7 +91,7 @@ function RowCleaning({ task }: { task: Task }): React.JSX.Element {
 
   return (
     <>
-       <TableRow
+      <TableRow
         onClick={handleOpen}
         sx={{
           cursor: 'pointer',
@@ -108,52 +106,61 @@ function RowCleaning({ task }: { task: Task }): React.JSX.Element {
         <TableCell align="center">{task.janitor}</TableCell>
         <TableCell align="center">{task.status}</TableCell>
         <TableCell align="center">
-          <Rating name="read-only"
-              sx={{color:"var(--mui-palette-text-secondaryChannel)"}}
-              size='small'
-              value={task.rating} readOnly />
+          <Rating
+            name="read-only"
+            sx={{ color: 'var(--mui-palette-text-secondaryChannel)' }}
+            size="small"
+            value={task.rating}
+            readOnly
+          />
         </TableCell>
       </TableRow>
 
       <Dialog disableEscapeKeyDown open={open} onClose={handleClose}>
-        <DialogTitle>{`Review Form - ${dayjs(task.date).format("DD MMM YYYY")}`}</DialogTitle>
+        <DialogTitle>{`Review Form - ${dayjs(task.date).format('DD MMM YYYY')}`}</DialogTitle>
         <DialogContent>
-          <Box sx={{display:"flex",alignItems:"center",justifyContent:"space-between",px:8,py:1}} gap={6}>
-
-          <Box>
-            <InputLabel sx={{mb:1}} id="demo-dialog-select-label">Ratings</InputLabel>
-            <Rating
-              sx={{color:"var(--mui-palette-text-secondaryChannel)"}}
-              name="simple-controlled"
-              value={value.rating}
-              size='large'
-              onChange={(event, newValue) => {
-                setValue({ rating: newValue || 0, status: value.status });
-              }}
-            />
-          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 8, py: 1 }} gap={6}>
+            <Box>
+              <InputLabel sx={{ mb: 1 }} id="demo-dialog-select-label">
+                Ratings
+              </InputLabel>
+              <Rating
+                sx={{ color: 'var(--mui-palette-text-secondaryChannel)' }}
+                name="simple-controlled"
+                value={value.rating}
+                size="large"
+                onChange={(event, newValue) => {
+                  setValue({ rating: newValue || 0, status: value.status });
+                }}
+              />
+            </Box>
 
             <FormControl>
-              <InputLabel sx={{mb:1}} id="status-label">Status</InputLabel>
+              <InputLabel sx={{ mb: 1 }} id="status-label">
+                Status
+              </InputLabel>
               <Select
-                sx={{width:"9rem"}}
+                sx={{ width: '9rem' }}
                 labelId="status-label"
                 id="status-label"
                 label="Status"
                 value={value.status}
                 onChange={handleChange}
                 input={<OutlinedInput label="Status" />}
-                >
+              >
                 <MenuItem value="Pending">Pending</MenuItem>
                 <MenuItem value="Completed">Completed</MenuItem>
               </Select>
-          </FormControl>
-
+            </FormControl>
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} variant="contained">Cancel</Button>
-          <Button onClick={handleSubmit} variant='contained'>Submit</Button>
+          <Button onClick={handleClose} variant="contained">
+            Cancel
+          </Button>
+          <Button onClick={handleSubmit} variant="contained">
+            Submit
+          </Button>
         </DialogActions>
       </Dialog>
     </>

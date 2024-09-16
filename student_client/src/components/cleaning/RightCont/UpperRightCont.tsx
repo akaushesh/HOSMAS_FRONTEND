@@ -1,41 +1,50 @@
 'use client';
-import { useProfile } from '@/hooks/query/use-profile';
+
+import * as React from 'react';
 import { type ProfileResponse } from '@/services/profile';
-import { Button, Checkbox, FormControlLabel, Paper, Typography } from '@mui/material'
+import { Button, Paper, Rating, Stack, Typography } from '@mui/material';
 import { type AxiosResponse } from 'axios';
-import * as React from 'react'
 
-export default function UpperRightCont():React.JSX.Element{
-  
-  const{data:profile}=useProfile()
-  const user=profile as AxiosResponse<ProfileResponse>;
+import { logger } from '@/lib/default-logger';
+import { useProfile } from '@/hooks/query/use-profile';
+import TagButton from '@/components/core/tag-button';
 
-  const [submit,setSubmit]=React.useState<boolean>(false);
+export default function UpperRightCont(): React.JSX.Element {
+  const { data: profile } = useProfile();
+  const user = profile as AxiosResponse<ProfileResponse>;
 
-  const handleSubmit=():void=>{
-    setSubmit(!submit);
-  }
+  const handleSubmit = (): void => {
+    logger.debug('Request Cleaning');
+  };
+
+  const [value, setValue] = React.useState<number | null>(null);
 
   return (
-    <Paper elevation={10} sx={{width:1,height:1,p:3}}>
-      <Typography variant="h5">{user?.data?.alloted_hostel?.hostel} | {user?.data?.alloted_room?.number||"NULL"}</Typography>
-      
-      <Typography variant="caption" display="block">
-        {user?.data?.alloted_hostel?.room_type}
+    <Paper elevation={10} sx={{ p: 3, width: '100%' }}>
+      <Typography variant="h5">
+        {user?.data?.alloted_hostel?.hostel} {user?.data?.alloted_room?.number || 'NULL'}
       </Typography>
 
-      <Button variant="contained" color="primary" sx={{width:submit?"50%":"40%",mt:2,display:"block",py:submit?2:'auto'}} onClick={handleSubmit}>{submit?`Cancel Request`:`Request Room Cleaning`}</Button>
+      <Stack mt={1}>
+        <TagButton color="green">Assigned</TagButton>
+      </Stack>
 
+      <Rating
+        name="worker-rating"
+        value={value}
+        size="large"
+        sx={{ mt: 3 }}
+        onChange={(event, newValue) => {
+          setValue(newValue);
+        }}
+      />
 
-      {!submit ? <FormControlLabel
-        sx={{mt:1}}
-        label="Request Immediate Room Cleaning"
-        control={<Checkbox sx={{'& .MuiSvgIcon-root': { fontSize: 26 }}} defaultChecked color="primary" />}
-        /> : null
-      }
-
-     
-
+      <Stack spacing={1} mt={3}>
+        <Button variant="contained" color="primary" onClick={handleSubmit}>
+          Mark as done
+        </Button>
+        <Button variant="outlined">Cancel Request</Button>
+      </Stack>
     </Paper>
-  )
+  );
 }
