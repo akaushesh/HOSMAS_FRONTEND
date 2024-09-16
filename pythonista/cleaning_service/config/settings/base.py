@@ -32,6 +32,8 @@ ALLOWED_HOSTS = [host.strip() for host in config('ALLOWED_HOSTS').split(',')]
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -78,7 +80,8 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'config.wsgi.application'
+# WSGI_APPLICATION = 'config.wsgi.application'
+ASGI_APPLICATION = 'config.asgi.application'
 
 
 # Database
@@ -165,3 +168,14 @@ CSRF_TRUSTED_ORIGINS = [host.strip() for host in config('CSRF_TRUSTED_ORIGINS').
 
 # url for other services
 CENTRAL_REPOSITORY_URL = config("CENTRAL_REPOSITORY_URL")
+
+
+# Django Channels Layer configuration
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [(config('REDIS_HOST', default='127.0.0.1'), config('REDIS_PORT', default=6379, cast=int))],
+        },
+    },
+}

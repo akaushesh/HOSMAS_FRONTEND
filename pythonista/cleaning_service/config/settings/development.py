@@ -8,7 +8,7 @@ LOGGING = {
     'disable_existing_loggers': False,
     'handlers': {
         'console': {
-            'level': 'INFO',
+            'level': 'DEBUG',
             'class': 'logging.StreamHandler',
         },
     },
@@ -21,6 +21,10 @@ LOGGING = {
         'celery': {
             'handlers': ['console'],
             'level': 'INFO',
+        },
+        'cleaning_request': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
         },
     },
 }

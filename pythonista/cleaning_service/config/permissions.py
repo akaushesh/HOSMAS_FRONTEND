@@ -21,3 +21,15 @@ class IsAuthenticated(BasePermission):
         elif r.status_code == 401:
             raise AuthenticationFailed("Invalid Token")
         return False
+
+
+# Please use this only when IsAuthenticated is already used and hence request.user is populated from central repo
+class IsSupervisor(BasePermission):
+    def has_permission(self, request, view):
+        return request.user is not None and request.user.get('role')=='supervisor'
+
+
+# Please use this only when IsAuthenticated is already used and hence request.user is populated from central repo
+class IsStudent(BasePermission):
+    def has_permission(self, request, view):
+        return request.user is not None and request.user.get('role')=='student'

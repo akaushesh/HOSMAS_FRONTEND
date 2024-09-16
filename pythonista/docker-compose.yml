@@ -1,6 +1,7 @@
 services:
   hosmas-central-repository:
     image: hosmas-central-repository
+    container_name: hosmas-central-repository
     build:
       context: central_repository
       dockerfile: ./Dockerfile
@@ -12,6 +13,7 @@ services:
   
   hosmas-cleaning-service:
     image: hosmas-cleaning-service
+    container_name: hosmas-cleaning-service
     build:
       context: cleaning_service
       dockerfile: ./Dockerfile
