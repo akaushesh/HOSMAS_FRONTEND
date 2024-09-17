@@ -14,6 +14,10 @@ import {
   type SelectChangeEvent,
 } from '@mui/material';
 
+import { logger } from '@/lib/default-logger';
+import { useCreateCleaningRequest } from '@/hooks/mutation/use-cleaning';
+import { useSlots } from '@/hooks/query/use-cleaning';
+
 const generateTimeSlots = (): string[] => {
   const slots: string[] = [];
   for (let hour = 9; hour < 18; hour++) {
@@ -27,6 +31,18 @@ const generateTimeSlots = (): string[] => {
 export default function LowerRightCont(): React.JSX.Element {
   const slots = generateTimeSlots();
   const [selectedSlots, setSelectedSlots] = React.useState<string[]>(['', '', '']);
+
+  const onHandleConfirmSlots = (): void => {
+    createCleaningRequest({
+      preferred_slots: [1, 2, 3],
+      preferred_dates: ['2024-09-16', '2024-09-16', '2024-09-16'],
+    });
+  };
+
+  const { data: availableSlots } = useSlots();
+  logger.debug('Available slots:', availableSlots);
+
+  const { mutate: createCleaningRequest } = useCreateCleaningRequest({});
 
   const handleSlotChange = (index: number) => (event: SelectChangeEvent) => {
     const newSelectedSlots = [...selectedSlots];
@@ -70,7 +86,7 @@ export default function LowerRightCont(): React.JSX.Element {
       </Grid>
 
       <Stack direction="row" spacing={2} mt={3}>
-        <Button variant="contained" color="primary">
+        <Button variant="contained" color="primary" onClick={onHandleConfirmSlots}>
           Confirm Slots
         </Button>
         <Button variant="outlined" color="primary">

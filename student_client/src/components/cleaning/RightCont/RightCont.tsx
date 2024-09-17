@@ -13,11 +13,11 @@ export interface SlotProps {
 
 export default function RightCont(): React.JSX.Element {
   return (
-    <Grid container rowGap={3}>
-      <Grid lg={12}>
+    <Grid container gap={3}>
+      <Grid xs={12}>
         <UpperRightCont />
       </Grid>
-      <Grid lg={12}>
+      <Grid xs={12}>
         <LowerRightCont />
       </Grid>
     </Grid>

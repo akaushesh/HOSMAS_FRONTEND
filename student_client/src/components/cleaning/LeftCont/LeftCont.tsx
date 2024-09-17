@@ -3,6 +3,9 @@
 import * as React from 'react';
 import { Box, Paper, Typography } from '@mui/material';
 
+import { logger } from '@/lib/default-logger';
+import { useCleaningRequests } from '@/hooks/query/use-cleaning';
+
 import CleaningTable from './CleaningTable';
 
 interface Task {
@@ -14,6 +17,9 @@ interface Task {
 }
 
 export default function LeftCont(): React.JSX.Element {
+  const { data: groupDetails } = useCleaningRequests({ room: 500, page: 1, page_size: 10 });
+  logger.debug('useCleaningRequests', groupDetails);
+
   const [tasks] = React.useState<Task[]>([
     {
       id: 'task-1',
@@ -30,13 +36,6 @@ export default function LeftCont(): React.JSX.Element {
       rating: 5,
     },
     {
-      id: 'task-3',
-      date: '2024-07-29T19:40',
-      janitor: 'Prakash',
-      status: 'Completed',
-      rating: 5,
-    },
-    {
       id: 'task-4',
       date: '2024-03-19T19:40',
       janitor: 'Prakash',
@@ -44,53 +43,11 @@ export default function LeftCont(): React.JSX.Element {
       rating: 4,
     },
     {
-      id: 'task-5',
-      date: '2024-03-17T19:40',
-      janitor: 'Prakash',
-      status: 'Completed',
-      rating: 4,
-    },
-    {
-      id: 'task-6',
-      date: '2024-03-12T19:40',
-      janitor: 'Prakash',
-      status: 'Completed',
-      rating: 5,
-    },
-    {
       id: 'task-7',
       date: '2024-03-11T19:40',
       janitor: 'Prakash',
       status: 'Cancelled',
       rating: 1,
-    },
-    {
-      id: 'task-8',
-      date: '2024-07-30T19:40',
-      janitor: 'Prakash',
-      status: 'Completed',
-      rating: 0,
-    },
-    {
-      id: 'task-6',
-      date: '2024-03-12T19:40',
-      janitor: 'Prakash',
-      status: 'Completed',
-      rating: 5,
-    },
-    {
-      id: 'task-7',
-      date: '2024-03-11T19:40',
-      janitor: 'Prakash',
-      status: 'Cancelled',
-      rating: 1,
-    },
-    {
-      id: 'task-8',
-      date: '2024-07-30T19:40',
-      janitor: 'Prakash',
-      status: 'Completed',
-      rating: 0,
     },
   ]);
 

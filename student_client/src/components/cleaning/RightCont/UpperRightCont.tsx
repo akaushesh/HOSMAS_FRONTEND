@@ -6,6 +6,7 @@ import { Button, Paper, Rating, Stack, Typography } from '@mui/material';
 import { type AxiosResponse } from 'axios';
 
 import { logger } from '@/lib/default-logger';
+import { useMarkCleaningRequestComplete } from '@/hooks/mutation/use-cleaning';
 import { useProfile } from '@/hooks/query/use-profile';
 import TagButton from '@/components/core/tag-button';
 
@@ -14,8 +15,11 @@ export default function UpperRightCont(): React.JSX.Element {
   const user = profile as AxiosResponse<ProfileResponse>;
 
   const handleSubmit = (): void => {
-    logger.debug('Request Cleaning');
+    markDone({ requestId: 1, rating: 5, comments: 'Great job!' });
+    logger.debug('Cleaning request marked as done');
   };
+
+  const { mutate: markDone } = useMarkCleaningRequestComplete({});
 
   const [value, setValue] = React.useState<number | null>(null);
 
