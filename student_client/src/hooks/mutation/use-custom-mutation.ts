@@ -3,20 +3,25 @@ import { useMutation } from '@tanstack/react-query';
 import type { UseMutationResult } from '@tanstack/react-query';
 import type { AxiosError, AxiosResponse } from 'axios';
 
-export interface ResolutionFunctions {
-  onSuccess?: (response: AxiosResponse) => void;
+export interface ResolutionFunctions<TData = never> {
+  onSuccess?: (response: AxiosResponse<TData>) => void;
   onError?: (error: AxiosError<ErrorResponse>) => void;
 }
 
-export interface CustomMutationInterface extends ResolutionFunctions {
-  mutationFn: MutationFunction;
+export interface CustomMutationInterface<TArgs = never, TData = never> extends ResolutionFunctions<TData> {
+  mutationFn: (args: TArgs) => Promise<AxiosResponse<TData>>;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- we do not need to know the types of arguments
-type MutationFunction = (...args: any[]) => Promise<AxiosResponse>;
-
-export const useCustomMutation = ({ mutationFn, onSuccess, onError }: CustomMutationInterface): UseMutationResult => {
-  return useMutation({
+export const useCustomMutation = <TArgs = never, TData = never>({
+  mutationFn,
+  onSuccess,
+  onError,
+}: CustomMutationInterface<TArgs, TData>): UseMutationResult<
+  AxiosResponse<TData>,
+  AxiosError<ErrorResponse>,
+  TArgs
+> => {
+  return useMutation<AxiosResponse<TData>, AxiosError<ErrorResponse>, TArgs>({
     mutationFn,
     onSuccess,
     onError,

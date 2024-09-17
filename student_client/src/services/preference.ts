@@ -57,7 +57,7 @@ interface RoomData {
   priority: number;
 }
 
-interface CreatePreferenceResponse {
+export interface CreatePreferenceResponse {
   status: string;
   data: RoomData[];
 }
@@ -136,8 +136,6 @@ export const setRetain = async (): Promise<AxiosResponse<SuccessResponse>> => {
 
 export const createPreference = async (data: PreferenceOrder): Promise<AxiosResponse<CreatePreferenceResponse>> => {
   const token = (await authClient.getToken()).data;
-
-  console.log(data);
 
   if (token === null || token === undefined) {
     throw new Error('You must be logged in to perform this action');

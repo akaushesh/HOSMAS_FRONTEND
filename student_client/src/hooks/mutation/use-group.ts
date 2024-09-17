@@ -1,21 +1,41 @@
 import { leaveGroup, searchStudent, transferOwnersip } from '@/services/group';
+import type { Student, StudentData } from '@/services/group';
+import type { OkResponse } from '@/services/profile';
 import type { UseMutationResult } from '@tanstack/react-query';
+import type { AxiosError, AxiosResponse } from 'axios';
 
-import { useCustomMutation } from './use-custom-mutation';
-import type { ResolutionFunctions } from './use-custom-mutation';
+import { useCustomMutation, type ResolutionFunctions } from './use-custom-mutation';
 
-export const useLogin = ({ onSuccess, onError }: ResolutionFunctions): UseMutationResult => {
-  return useCustomMutation({ mutationFn: searchStudent, onSuccess, onError });
+export const useSearchStudent = ({
+  onSuccess,
+  onError,
+}: ResolutionFunctions<Student>): UseMutationResult<AxiosResponse<Student>, AxiosError, StudentData> => {
+  return useCustomMutation<StudentData, Student>({
+    mutationFn: searchStudent,
+    onSuccess,
+    onError,
+  });
 };
 
-export const useTransferOwnership = ({ onSuccess, onError }: ResolutionFunctions): UseMutationResult => {
-  return useCustomMutation({ mutationFn: transferOwnersip, onSuccess, onError });
+export const useTransferOwnership = ({
+  onSuccess,
+  onError,
+}: ResolutionFunctions<OkResponse>): UseMutationResult<AxiosResponse<OkResponse>, AxiosError, StudentData> => {
+  return useCustomMutation<StudentData, OkResponse>({
+    mutationFn: transferOwnersip,
+    onSuccess,
+    onError,
+  });
 };
 
-export const useSearchStudent = ({ onSuccess, onError }: ResolutionFunctions): UseMutationResult => {
-  return useCustomMutation({ mutationFn: searchStudent, onSuccess, onError });
-};
-
-export const useLeaveGroup = ({ onSuccess, onError }: ResolutionFunctions): UseMutationResult => {
-  return useCustomMutation({ mutationFn: leaveGroup, onSuccess, onError });
+export const useLeaveGroup = ({
+  onSuccess,
+  onError,
+}: ResolutionFunctions<OkResponse>): UseMutationResult<AxiosResponse<OkResponse>, AxiosError, void> => {
+  // eslint-disable-next-line @typescript-eslint/no-invalid-void-type -- void is correct for no arguments
+  return useCustomMutation<void, OkResponse>({
+    mutationFn: leaveGroup,
+    onSuccess,
+    onError,
+  });
 };

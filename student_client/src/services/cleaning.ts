@@ -27,15 +27,23 @@ export interface CleaningRequestParams {
   page_size: number;
 }
 
-interface CleaningRequestCompleteData {
+export interface CleaningRequestCompleteData {
   request_id: number;
   rating: number;
   comments: string;
 }
 
-interface CreateCleaningRequestParams {
+export interface CreateCleaningRequestParams {
   preferred_slots: number[];
   preferred_dates: string[];
+}
+
+export interface CleaningRequestCompleteResponse {
+  status: string;
+}
+
+export interface CreateCleaningRequestResponse {
+  status: string;
 }
 
 export const getCleaningRequests = async (
@@ -77,7 +85,9 @@ export const getSlots = async (): Promise<AxiosResponse> => {
   return res;
 };
 
-export const markCleaningRequestComplete = async (params: CleaningRequestCompleteData): Promise<AxiosResponse> => {
+export const markCleaningRequestComplete = async (
+  params: CleaningRequestCompleteData
+): Promise<AxiosResponse<CleaningRequestCompleteResponse>> => {
   const token = (await authClient.getToken()).data;
 
   if (token === null || token === undefined) {
@@ -96,7 +106,9 @@ export const markCleaningRequestComplete = async (params: CleaningRequestComplet
   return res;
 };
 
-export const createCleaningRequest = async (params: CreateCleaningRequestParams): Promise<AxiosResponse> => {
+export const createCleaningRequest = async (
+  params: CreateCleaningRequestParams
+): Promise<AxiosResponse<CreateCleaningRequestResponse>> => {
   const token = (await authClient.getToken()).data;
 
   if (token === null || token === undefined) {

@@ -24,11 +24,11 @@ interface Invitation {
 
 export type ReceivedInvitationResponse = AxiosResponse<Invitation[]>;
 
-interface InvitationData {
+export interface InvitationData {
   id: number;
 }
 
-interface TokenData {
+export interface TokenData {
   token: string;
 }
 

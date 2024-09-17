@@ -53,7 +53,7 @@ export interface ProfileResponse {
   group_size_limit: number;
 }
 
-interface ResetPasswordData {
+export interface ResetPasswordData {
   password: string;
 }
 

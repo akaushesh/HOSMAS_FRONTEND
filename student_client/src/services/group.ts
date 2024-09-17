@@ -26,7 +26,7 @@ export interface GroupResponse {
   role: string;
 }
 
-interface Student {
+export interface Student {
   name: string;
   rollno: string;
 }
