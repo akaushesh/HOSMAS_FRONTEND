@@ -22,4 +22,4 @@ class HostelSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Hostel
-        fields = ("id", "name", "blocks")
+        fields = ("id", "name", "image_url", "blocks")
