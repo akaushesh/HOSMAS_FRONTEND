@@ -32,7 +32,16 @@ class HostelAdmin(admin.ModelAdmin):
                     students_cnt += room.students.count()
         return students_cnt
 
-    list_display = ("id", "name", "room_types", "levels", "blocks", "rooms", "students")
+    list_display = (
+        "id",
+        "name",
+        "room_types",
+        "levels",
+        "blocks",
+        "rooms",
+        "students",
+        "image_url",
+    )
     search_fields = ("name", "room_types")
 
 

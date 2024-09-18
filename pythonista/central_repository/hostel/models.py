@@ -5,6 +5,7 @@ from common.models import TimeStampedModel
 
 class Hostel(TimeStampedModel):
     name = models.CharField(max_length=100)
+    image_url = models.URLField(max_length=5000, null=True, default=None)
 
     class Meta:
         db_table = "hostel"
