@@ -56,7 +56,7 @@ class createWorker(APIView):
             return Response({'error': 'You are not authorized to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         data = request.data
         data['hostel_id'] = request.user['supervisor']['hostel']['id']
-        serializer = WorkerSerializer(data=data)
+        serializer = WorkerSerializer(data=data, exclude_fields=('attendance',))
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
