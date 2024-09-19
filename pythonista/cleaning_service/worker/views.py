@@ -29,7 +29,8 @@ class HostelWorkersPublicView(APIView):
                 if attentance is not None and attentance.is_present==presence_bool:
                     workers_list.append(worker)
         
-        serializer = WorkerSerializer(workers_list, many=True, exclude_fields=('hostel_id',))
+        attendance_date = request.GET.get('attendance_date', datetime.now().date())
+        serializer = WorkerSerializer(workers_list, many=True, exclude_fields=('hostel_id',), context={'attendance_date': attendance_date})
         return Response(serializer.data, status = status.HTTP_200_OK)
 
 
@@ -43,7 +44,8 @@ class getSingleWorker(APIView):
         if (worker.hostel_id != request.user['supervisor']['hostel']['id']):
             return Response({'error': 'You are not authorized to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         
-        serializer = WorkerSerializer(worker)
+        attendance_date = request.GET.get('attendance_date', datetime.now().date())
+        serializer = WorkerSerializer(worker, context={'attendance_date': attendance_date})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
