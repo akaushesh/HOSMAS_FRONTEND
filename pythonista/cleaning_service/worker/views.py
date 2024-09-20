@@ -11,25 +11,41 @@ from config.permissions import IsAuthenticated
 from config.services import *
 
 
-class getMultipleWorkers(APIView):
-    permission_classes = [IsAuthenticated]
-    def get(self, request):
-        if (request.user['role'] != 'supervisor'):
-            return Response({'error': 'You are not authorized to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
-        workers = filter_objects(Worker.objects, hostel_id=request.user['supervisor']['hostel']['id'])
-        serializer = WorkerSerializer(workers, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+class HostelWorkersPublicView(APIView):
+    def get(self, request, hostel_id):
+        base_qs = filter_objects(Worker.objects, is_active=True)
+        if hostel_id!=0:
+            base_qs = filter_objects(base_qs, hostel_id=hostel_id)
+        
+        attendance_status = request.GET.get('attendance', 'all')
+        presence_bool = attendance_status=='present'
+        
+        if attendance_status=='all':
+            workers_list = base_qs
+        else:
+            workers_list = []
+            for worker in base_qs.all():
+                attentance = filter_objects(Attendance.objects, worker=worker, date=datetime.now().date()).first()
+                if attentance is not None and attentance.is_present==presence_bool:
+                    workers_list.append(worker)
+        
+        attendance_date = request.GET.get('attendance_date', datetime.now().date())
+        serializer = WorkerSerializer(workers_list, many=True, exclude_fields=('hostel_id',), context={'attendance_date': attendance_date})
+        return Response(serializer.data, status = status.HTTP_200_OK)
 
 
 class getSingleWorker(APIView):
     permission_classes = [IsAuthenticated]
-    def get(self, request, slug):
+    def get(self, request, worker_id):
         if (request.user['role'] != 'supervisor' ):
             return Response({'error': 'You are not authorized to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
-        worker = get_object(Worker.objects, id=slug)
+        
+        worker = get_object(Worker.objects, id=worker_id)
         if (worker.hostel_id != request.user['supervisor']['hostel']['id']):
             return Response({'error': 'You are not authorized to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
-        serializer = WorkerSerializer(worker)
+        
+        attendance_date = request.GET.get('attendance_date', datetime.now().date())
+        serializer = WorkerSerializer(worker, context={'attendance_date': attendance_date})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -40,7 +56,7 @@ class createWorker(APIView):
             return Response({'error': 'You are not authorized to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         data = request.data
         data['hostel_id'] = request.user['supervisor']['hostel']['id']
-        serializer = WorkerSerializer(data=data)
+        serializer = WorkerSerializer(data=data, exclude_fields=('attendance',))
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -67,19 +83,3 @@ class markWorkerAttendance(APIView):
 
         serializer = AttendanceSerializer(attendance)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-class HostelWorkersPublicView(APIView):
-    def get(self, request, hostel_id):
-        base_qs = filter_objects(Worker.objects, is_active=True)
-        if hostel_id!=0:
-            base_qs = filter_objects(base_qs, hostel_id=hostel_id)
-        
-        workers_list = []
-        for worker in base_qs.all():
-            attentance = filter_objects(Attendance.objects, worker=worker, date=datetime.now().date()).first()
-            if attentance is not None and attentance.is_present:
-                workers_list.append(worker)
-        
-        serializer = WorkerSerializer(workers_list, many=True, exclude_fields=('hostel_id', 'is_active'))
-        return Response(serializer.data, status = status.HTTP_200_OK)
