@@ -1,7 +1,7 @@
-import { getCleaningRequests, getSlots, type CleaningRequestParams } from '@/services/cleaning';
+import { getCleaningRequests, getSlots, type CleaningRequestParams, type SlotResponse } from '@/services/cleaning';
 import { useQuery, type UseQueryResult } from '@tanstack/react-query';
 
-export const useCleaningRequests = (params: CleaningRequestParams): UseQueryResult => {
+export const useCleaningRequests = (params: CleaningRequestParams): UseQueryResult<SlotResponse> => {
   return useQuery({ queryFn: () => getCleaningRequests(params), queryKey: ['getCleaningRequests'] });
 };
 

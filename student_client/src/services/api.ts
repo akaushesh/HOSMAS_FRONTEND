@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 export const url = 'https://api.hosmas.ccstiet.com/';
+export const centralUrl = 'https://central.hosmas.ccstiet.com/';
 export const cleaningUrl = 'https://cleaning.hosmas.ccstiet.com/';
 
 export const authApi = axios.create({
@@ -29,6 +30,10 @@ export const preferenceApi = axios.create({
 
 export const roomApi = axios.create({
   baseURL: `${url}preferences/alloted-hostel-levels/`,
+});
+
+export const centralApi = axios.create({
+  baseURL: centralUrl,
 });
 
 export const cleaningApi = axios.create({

@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { type SlotResponse } from '@/services/cleaning';
 import {
   Button,
   FormControl,
@@ -13,44 +14,49 @@ import {
   Typography,
   type SelectChangeEvent,
 } from '@mui/material';
+import { type AxiosResponse } from 'axios';
 
 import { logger } from '@/lib/default-logger';
 import { useCreateCleaningRequest } from '@/hooks/mutation/use-cleaning';
 import { useSlots } from '@/hooks/query/use-cleaning';
 
-const generateTimeSlots = (): string[] => {
-  const slots: string[] = [];
-  for (let hour = 9; hour < 18; hour++) {
-    const start = `${hour.toString().padStart(2, '0')}:00`;
-    const end = `${(hour + 1).toString().padStart(2, '0')}:00`;
-    slots.push(`${start} - ${end}`);
-  }
-  return slots;
-};
+interface SelectedSlot {
+  id: number;
+  time: string;
+}
 
 export default function LowerRightCont(): React.JSX.Element {
-  const slots = generateTimeSlots();
-  const [selectedSlots, setSelectedSlots] = React.useState<string[]>(['', '', '']);
+  const [selectedSlots, setSelectedSlots] = React.useState<SelectedSlot[]>([
+    { id: 0, time: '' },
+    { id: 0, time: '' },
+    { id: 0, time: '' },
+  ]);
+
+  const { mutate: createCleaningRequest } = useCreateCleaningRequest({});
+  const { data } = useSlots();
+  const slotData = data as AxiosResponse<SlotResponse>;
+
+  const slots = slotData?.data ?? [];
+  logger.debug('Slot Data:', slots);
+
+  const handleSlotChange = (index: number) => (event: SelectChangeEvent) => {
+    const selectedSlot = slots.find((slot) => slot.start === event.target.value);
+    if (selectedSlot) {
+      const newSelectedSlots = [...selectedSlots];
+      newSelectedSlots[index] = { id: selectedSlot.id, time: selectedSlot.start };
+      setSelectedSlots(newSelectedSlots);
+    }
+  };
 
   const onHandleConfirmSlots = (): void => {
+    const selectedSlotIds = selectedSlots.map((slot) => slot.id);
     createCleaningRequest({
-      preferred_slots: [1, 2, 3],
+      preferred_slots: selectedSlotIds,
       preferred_dates: ['2024-09-16', '2024-09-16', '2024-09-16'],
     });
   };
 
-  const { data: availableSlots } = useSlots();
-  logger.debug('Available slots:', availableSlots);
-
-  const { mutate: createCleaningRequest } = useCreateCleaningRequest({});
-
-  const handleSlotChange = (index: number) => (event: SelectChangeEvent) => {
-    const newSelectedSlots = [...selectedSlots];
-    newSelectedSlots[index] = event.target.value;
-    setSelectedSlots(newSelectedSlots);
-  };
-
-  const isSlotDisabled = (slot: string): boolean => selectedSlots.includes(slot);
+  const isSlotDisabled = (slot: string): boolean => selectedSlots.some((selectedSlot) => selectedSlot.time === slot);
 
   return (
     <Paper elevation={10} sx={{ width: 1, height: 1, p: 3 }}>
@@ -61,22 +67,22 @@ export default function LowerRightCont(): React.JSX.Element {
 
       <Grid container spacing={2} mt={3}>
         {selectedSlots.map((selectedSlot, index) => (
-          <Grid item xs={4} key={`slot-${String(index)}-${selectedSlot}`}>
+          <Grid item xs={4} key={`slot-${String(index)}-${selectedSlot.time}`}>
             <FormControl fullWidth>
               <InputLabel id={`slot-label-${String(index)}`}>Slot {index + 1}</InputLabel>
               <Select
                 labelId={`slot-label-${String(index)}`}
-                value={selectedSlot}
+                value={selectedSlot.time}
                 label={`Slot ${String(index + 1)}`}
                 onChange={handleSlotChange(index)}
               >
                 {slots.map((slot) => (
                   <MenuItem
-                    key={`slot-item-${slot}`}
-                    value={slot}
-                    disabled={isSlotDisabled(slot) && selectedSlot !== slot}
+                    key={`slot-item-${String(slot.id)}`}
+                    value={slot.start}
+                    disabled={isSlotDisabled(slot.start) && selectedSlot.time !== slot.start}
                   >
-                    {slot}
+                    {slot.start} - {slot.end}
                   </MenuItem>
                 ))}
               </Select>
