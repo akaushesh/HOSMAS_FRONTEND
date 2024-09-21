@@ -8,4 +8,5 @@ urlpatterns = [
     path("<int:slug>/", views.getStudentProfile.as_view()),
     path("initiate-reset-password/", views.EmailResetPasswordView.as_view()),
     path("reset-password/", views.ResetPasswordView.as_view()),
+    path("import-students/", views.ImportStudentsView.as_view()),
 ]

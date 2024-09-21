@@ -204,3 +204,8 @@ EMAIL_HOST_USERS_COUNT = config("EMAIL_HOST_USERS_COUNT", cast=int)
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
+
+
+# Admin and Developer details
+ADMIN_EMAIL = config("ADMIN_EMAIL")
+DEVELOPER_EMAIL = config("DEVELOPER_EMAIL")

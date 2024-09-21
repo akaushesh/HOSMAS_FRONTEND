@@ -1,14 +1,19 @@
+from datetime import datetime
+from openpyxl import load_workbook
 from random import choice
-import string
+import string, os
 
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.status import HTTP_200_OK, HTTP_202_ACCEPTED, HTTP_400_BAD_REQUEST
 from rest_framework.response import Response
+
+from django.core.files.storage import default_storage
+from django.conf import settings
 
 from . import services as user_services
 from .models import User
-from .tasks import send_password_reset_mail
+from .tasks import import_students, send_password_reset_mail
 
 import common.services as common_services
 
@@ -84,3 +89,60 @@ class ResetPasswordView(APIView):
         user.save()
 
         return Response(status=HTTP_200_OK)
+
+
+class ImportStudentsView(APIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    studentfileformat = (
+        "roll number",
+        "email",
+        "name",
+        "gender",
+        "room",
+        "room type",
+        "hostel",
+    )
+
+    def post(self, request):
+        file = request.data.get("file")
+
+        if file is None:
+            return Response({"detail": "File Not Found!"}, status=HTTP_400_BAD_REQUEST)
+
+        filename = f"{datetime.now().strftime('%Y%m%d_%H%M')}_{file.name}"
+
+        if filename.split(".")[-1] != "xlsx":
+            return Response(
+                {"detail": "Only xlsx file format supported!"},
+                status=HTTP_400_BAD_REQUEST,
+            )
+
+        storage = default_storage
+        storage.location = os.path.join(settings.BASE_DIR, "imported_data", "student")
+        filename = storage.save(filename, file)
+
+        path = os.path.join(settings.BASE_DIR, "imported_data", "student", filename)
+        wb = load_workbook(path)
+        ws = wb.active
+
+        # Check if all fields are present in given data
+        for row in ws.iter_rows(min_row=1, max_row=1):
+            if len(row) != len(self.studentfileformat):
+                return Response(
+                    {
+                        "detail": f"Invalid File Format. Correct File Format is {str(self.studentfileformat)}. File's header length is {len(row)}"
+                    },
+                    status=HTTP_400_BAD_REQUEST,
+                )
+            for i in range(len(row)):
+                if row[i].value.strip().lower() != self.studentfileformat[i]:
+                    return Response(
+                        {
+                            "detail": f"Invalid File Format. Found {row[i].value}, but required was {self.studentfileformat[i]}, Correct File Format is {str(self.studentfileformat)}"
+                        },
+                        status=HTTP_400_BAD_REQUEST,
+                    )
+
+        import_students.delay(filename)
+
+        return Response(status=HTTP_202_ACCEPTED)

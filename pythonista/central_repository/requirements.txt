@@ -16,8 +16,10 @@ django-cors-headers==4.4.0
 django-import-export==4.1.1
 djangorestframework==3.15.2
 djangorestframework-simplejwt==5.3.1
+et-xmlfile==1.1.0
 idna==3.8
 kombu==5.4.2
+openpyxl==3.1.5
 prompt_toolkit==3.0.47
 psycopg2==2.9.9
 PyJWT==2.9.0
