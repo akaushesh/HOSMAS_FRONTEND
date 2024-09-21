@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { type CleaningRequest } from '@/services/cleaning';
 import {
   Button,
   Dialog,
@@ -19,24 +20,13 @@ import {
   TableCell,
   TableHead,
   TableRow,
+  Typography,
   type SelectChangeEvent,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { tableCellClasses } from '@mui/material/TableCell';
 import { Box } from '@mui/system';
 import dayjs from 'dayjs';
-
-interface Task {
-  id: string;
-  date: string;
-  janitor: string;
-  status: string;
-  rating: number;
-}
-
-interface EleProps {
-  tasks: Task[];
-}
 
 const StyledTableCell = styled(TableCell)(() => ({
   [`&.${tableCellClasses.head}`]: {
@@ -46,8 +36,16 @@ const StyledTableCell = styled(TableCell)(() => ({
   },
 }));
 
+interface EleProps {
+  tasks: CleaningRequest[] | undefined;
+}
+
 export default function CleaningTable({ tasks }: EleProps): React.JSX.Element {
-  return (
+  return tasks?.length === 0 ? (
+    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mt: '30%' }}>
+      <Typography variant="body2">No Cleaning Requests Yet!</Typography>
+    </Box>
+  ) : (
     <Paper sx={{ borderRadius: '8px', overflowY: 'auto', overflowX: 'hidden', maxHeight: '50vh' }} elevation={10}>
       <Table stickyHeader>
         <TableHead>
@@ -60,17 +58,15 @@ export default function CleaningTable({ tasks }: EleProps): React.JSX.Element {
           </TableRow>
         </TableHead>
         <TableBody sx={{ borderRadius: '8px' }}>
-          {tasks.map((task) => (
-            <RowCleaning key={task.id} task={task} />
-          ))}
+          {tasks?.map((task) => <RowCleaning key={task?.date} task={task} />)}
         </TableBody>
       </Table>
     </Paper>
   );
 }
 
-function RowCleaning({ task }: { task: Task }): React.JSX.Element {
-  const [value, setValue] = React.useState({ rating: task.rating, status: task.status });
+function RowCleaning({ task }: { task: CleaningRequest }): React.JSX.Element {
+  const [value, setValue] = React.useState({ rating: 0, status: task.status });
   const [open, setOpen] = React.useState(false);
 
   const handleOpen = (): void => {
@@ -103,14 +99,14 @@ function RowCleaning({ task }: { task: Task }): React.JSX.Element {
       >
         <TableCell align="center">{dayjs(task.date).format('DD MMM YYYY')}</TableCell>
         <TableCell align="center">{dayjs(task.date).format('hh:mm A')}</TableCell>
-        <TableCell align="center">{task.janitor}</TableCell>
+        <TableCell align="center">{task.worker}</TableCell>
         <TableCell align="center">{task.status}</TableCell>
         <TableCell align="center">
           <Rating
             name="read-only"
             sx={{ color: 'var(--mui-palette-text-secondaryChannel)' }}
             size="small"
-            value={task.rating}
+            value={0}
             readOnly
           />
         </TableCell>

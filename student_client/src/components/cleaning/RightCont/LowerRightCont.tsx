@@ -1,7 +1,6 @@
 'use client';
 
 import * as React from 'react';
-import { type SlotResponse } from '@/services/cleaning';
 import {
   Button,
   FormControl,
@@ -14,7 +13,6 @@ import {
   Typography,
   type SelectChangeEvent,
 } from '@mui/material';
-import { type AxiosResponse } from 'axios';
 
 import { logger } from '@/lib/default-logger';
 import { useCreateCleaningRequest } from '@/hooks/mutation/use-cleaning';
@@ -34,7 +32,7 @@ export default function LowerRightCont(): React.JSX.Element {
 
   const { mutate: createCleaningRequest } = useCreateCleaningRequest({});
   const { data } = useSlots();
-  const slotData = data as AxiosResponse<SlotResponse>;
+  const slotData = data!;
 
   const slots = slotData?.data ?? [];
   logger.debug('Slot Data:', slots);
@@ -95,7 +93,7 @@ export default function LowerRightCont(): React.JSX.Element {
         <Button variant="contained" color="primary" onClick={onHandleConfirmSlots}>
           Confirm Slots
         </Button>
-        <Button variant="outlined" color="primary">
+        <Button disabled variant="outlined" color="primary">
           Emergency
         </Button>
       </Stack>

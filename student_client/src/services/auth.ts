@@ -41,13 +41,13 @@ export const newLogin = async (data: LoginData): Promise<AxiosResponse<TokenResp
 };
 
 export const initiatePasswordReset = async (data: InitiatePasswordResetData): Promise<AxiosResponse<OkResponse>> => {
-  const res = await authApi.post('auth/initiate-reset-password/', data);
+  const res = await centralApi.post('user/initiate-reset-password/', data);
   logger.debug('initiate password reset', res.data);
   return res;
 };
 
 export const resetPassword = async (data: ResetPasswordData): Promise<AxiosResponse<OkResponse>> => {
-  const res = await authApi.post('auth/reset-password/', data);
+  const res = await centralApi.post('user/reset-password/', data);
   logger.debug('initiate password reset', res.data);
   return res;
 };

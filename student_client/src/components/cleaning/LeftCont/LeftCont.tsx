@@ -1,55 +1,24 @@
 'use client';
 
 import * as React from 'react';
+import { type CentralProfileResponse } from '@/services/profile';
 import { Box, Paper, Typography } from '@mui/material';
+import { type AxiosResponse } from 'axios';
 
 import { logger } from '@/lib/default-logger';
 import { useCleaningRequests } from '@/hooks/query/use-cleaning';
+import { useProfile } from '@/hooks/query/use-profile';
 
 import CleaningTable from './CleaningTable';
 
-interface Task {
-  id: string;
-  date: string;
-  janitor: string;
-  status: string;
-  rating: number;
-}
-
 export default function LeftCont(): React.JSX.Element {
-  const { data: groupDetails } = useCleaningRequests({ room: 500, page: 1, page_size: 10 });
-  logger.debug('useCleaningRequests', groupDetails);
+  const { data: profileData } = useProfile();
+  const profile = profileData as AxiosResponse<CentralProfileResponse>;
+  const room = profile?.data?.student?.room?.id;
 
-  const [tasks] = React.useState<Task[]>([
-    {
-      id: 'task-1',
-      date: '2024-07-31T00:00',
-      janitor: 'Prakash',
-      status: 'Pending',
-      rating: 0,
-    },
-    {
-      id: 'task-2',
-      date: '2024-07-30T19:40',
-      janitor: 'Prakash',
-      status: 'Completed',
-      rating: 5,
-    },
-    {
-      id: 'task-4',
-      date: '2024-03-19T19:40',
-      janitor: 'Prakash',
-      status: 'Completed',
-      rating: 4,
-    },
-    {
-      id: 'task-7',
-      date: '2024-03-11T19:40',
-      janitor: 'Prakash',
-      status: 'Cancelled',
-      rating: 1,
-    },
-  ]);
+  const { data: cleaningData } = useCleaningRequests({ room, page: 1, page_size: 10 });
+  const cleaningRequests = cleaningData!;
+  logger.debug('useCleaningRequests', cleaningRequests);
 
   return (
     <Paper elevation={10} sx={{ width: 1, height: 1, p: 3 }}>
@@ -59,7 +28,7 @@ export default function LeftCont(): React.JSX.Element {
       </Typography>
 
       <Box mt={2}>
-        <CleaningTable tasks={tasks} />
+        <CleaningTable tasks={cleaningData?.data?.results} />
       </Box>
     </Paper>
   );

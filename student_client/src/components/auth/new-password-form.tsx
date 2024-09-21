@@ -2,28 +2,33 @@
 
 import * as React from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import Alert from '@mui/material/Alert';
-import Button from '@mui/material/Button';
-import FormControl from '@mui/material/FormControl';
-import FormHelperText from '@mui/material/FormHelperText';
-import InputLabel from '@mui/material/InputLabel';
-import OutlinedInput from '@mui/material/OutlinedInput';
-import Stack from '@mui/material/Stack';
-import Typography from '@mui/material/Typography';
+import { Alert, Button, Stack, TextField, Typography } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import { z as zod } from 'zod';
 
 import { authClient } from '@/lib/auth/client';
+import { logger } from '@/lib/default-logger';
 
 interface NewPasswordProps {
   slug: string;
 }
 
-const schema = zod.object({ password: zod.string().min(8, { message: 'Password should be atleast 8 characters' }) });
+const schema = zod
+  .object({
+    password: zod.string().min(8, 'Password should be at least 8 characters'),
+    confirmPassword: zod.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ['confirmPassword'],
+  });
 
-type Values = zod.infer<typeof schema>;
+type FormValues = zod.infer<typeof schema>;
 
-const defaultValues = { password: '' } satisfies Values;
+const defaultValues: FormValues = {
+  password: '',
+  confirmPassword: '',
+};
 
 export function NewPasswordForm({ slug }: NewPasswordProps): React.JSX.Element {
   const [isPending, setIsPending] = React.useState<boolean>(false);
@@ -32,33 +37,36 @@ export function NewPasswordForm({ slug }: NewPasswordProps): React.JSX.Element {
     control,
     handleSubmit,
     setError,
+    reset,
     formState: { errors },
-  } = useForm<Values>({ defaultValues, resolver: zodResolver(schema) });
+  } = useForm<FormValues>({
+    defaultValues,
+    resolver: zodResolver(schema),
+  });
 
   const onSubmit = React.useCallback(
-    async (values: Values): Promise<void> => {
+    async (values: FormValues): Promise<void> => {
       setIsPending(true);
-
       const data = {
         slug,
         password: values.password,
       };
       const { error } = await authClient.resetPassword(data);
-
       if (error) {
         setError('root', { type: 'server', message: error });
-        setIsPending(false);
-        return;
+      } else {
+        // Clear form inputs
+        reset(defaultValues);
+        // Redirect to confirm password reset
+        logger.debug('Password reset successfully');
       }
       setIsPending(false);
-
-      // Redirect to confirm password reset
     },
-    [setError, slug]
+    [setError, slug, reset]
   );
 
   return (
-    <Stack spacing={4}>
+    <Stack spacing={4} maxWidth="400px" margin="auto">
       <Typography variant="h5">Reset password</Typography>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Stack spacing={2}>
@@ -66,15 +74,34 @@ export function NewPasswordForm({ slug }: NewPasswordProps): React.JSX.Element {
             control={control}
             name="password"
             render={({ field }) => (
-              <FormControl error={Boolean(errors.password)}>
-                <InputLabel>Email address</InputLabel>
-                <OutlinedInput {...field} label="New Password" type="password" />
-                {errors.password ? <FormHelperText>{errors.password.message}</FormHelperText> : null}
-              </FormControl>
+              <TextField
+                {...field}
+                label="New Password"
+                type="password"
+                error={Boolean(errors.password)}
+                helperText={errors.password?.message}
+                fullWidth
+                autoComplete="new-password"
+              />
+            )}
+          />
+          <Controller
+            control={control}
+            name="confirmPassword"
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label="Confirm Password"
+                type="password"
+                error={Boolean(errors.confirmPassword)}
+                helperText={errors.confirmPassword?.message}
+                fullWidth
+                autoComplete="new-password"
+              />
             )}
           />
           {errors.root ? <Alert color="error">{errors.root.message}</Alert> : null}
-          <Button disabled={isPending} type="submit" variant="contained">
+          <Button disabled={isPending} type="submit" variant="contained" fullWidth>
             Reset Password
           </Button>
         </Stack>

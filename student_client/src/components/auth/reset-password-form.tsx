@@ -45,8 +45,6 @@ export function ResetPasswordForm(): React.JSX.Element {
       }
       setIsSent(true);
       setIsPending(false);
-
-      // Redirect to confirm password reset
     },
     [setError]
   );

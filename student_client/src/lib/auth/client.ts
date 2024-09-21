@@ -1,6 +1,6 @@
 'use client';
 
-import { initiatePasswordReset, login, newLogin, resetPassword } from '@/services/auth';
+import { initiatePasswordReset, newLogin, resetPassword } from '@/services/auth';
 import type { AxiosError } from 'axios';
 
 import type { User } from '@/types/user';
@@ -68,18 +68,13 @@ class AuthClient {
   async signInWithPassword(params: SignInWithPasswordParams): Promise<{ error?: string }> {
     const { email, password } = params;
     let token: string | null;
-    let newToken: string | null;
 
     try {
-      const response = await login({ email, password });
-      const successResponse = response;
+      const loginResponse = await newLogin({ email, password });
+      const successLoginResponse = loginResponse;
 
-      const newLoginResponse = await newLogin({ email: 'aparmar_be21@thapar.edu', password: 'red2BLUE' });
-      const successNewLoginResponse = newLoginResponse;
-
-      token = successResponse?.data?.access;
-      newToken = successNewLoginResponse?.data?.access;
-      logger.debug('signInWithPassword', response);
+      token = successLoginResponse?.data?.access;
+      logger.debug('signInWithPassword', successLoginResponse);
     } catch (err) {
       const axiosError = err as AxiosError<CustomErrorResponse>;
       logger.error('signInWithPassword', axiosError);
@@ -91,7 +86,6 @@ class AuthClient {
     }
 
     localStorage.setItem('custom-auth-token', token);
-    localStorage.setItem('new-custom-auth-token', newToken);
     return {};
   }
 

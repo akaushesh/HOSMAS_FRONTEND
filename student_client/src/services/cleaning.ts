@@ -1,24 +1,24 @@
 import type { AxiosResponse } from 'axios';
 
+import { authClient } from '@/lib/auth/client';
 // import { authClient } from '@/lib/auth/client';
 import { logger } from '@/lib/default-logger';
 
 import { cleaningApi } from './api';
 
-interface CleaningRequestsResponse {
+export interface CleaningRequestsResponse {
   count: number;
   next: string;
   previous: string;
   results: CleaningRequest[];
 }
 
-interface CleaningRequest {
-  id: number;
-  room: string;
-  level: number;
+export interface CleaningRequest {
+  student_id: number;
+  worker: string;
+  slot: string;
+  date: string;
   status: string;
-  created_at: string;
-  updated_at: string;
 }
 
 export interface CleaningRequestParams {
@@ -28,7 +28,6 @@ export interface CleaningRequestParams {
 }
 
 export interface CleaningRequestCompleteData {
-  request_id: number;
   rating: number;
   comments: string;
 }
@@ -59,8 +58,7 @@ interface Slot {
 export const getCleaningRequests = async (
   params: CleaningRequestParams
 ): Promise<AxiosResponse<CleaningRequestsResponse>> => {
-  // const token = (await authClient.getToken()).data;
-  const token = localStorage.getItem('new-custom-auth-token');
+  const token = (await authClient.getToken()).data;
 
   if (token === null || token === undefined) {
     throw new Error('You must be logged in to perform this action');
@@ -80,8 +78,7 @@ export const getCleaningRequests = async (
 };
 
 export const getSlots = async (): Promise<AxiosResponse<SlotResponse>> => {
-  // const token = (await authClient.getToken()).data;
-  const token = localStorage.getItem('new-custom-auth-token');
+  const token = (await authClient.getToken()).data;
 
   if (token === null || token === undefined) {
     throw new Error('You must be logged in to perform this action');
@@ -100,8 +97,7 @@ export const getSlots = async (): Promise<AxiosResponse<SlotResponse>> => {
 export const markCleaningRequestComplete = async (
   params: CleaningRequestCompleteData
 ): Promise<AxiosResponse<CleaningRequestCompleteResponse>> => {
-  // const token = (await authClient.getToken()).data;
-  const token = localStorage.getItem('new-custom-auth-token');
+  const token = (await authClient.getToken()).data;
 
   if (token === null || token === undefined) {
     throw new Error('You must be logged in to perform this action');
@@ -122,8 +118,7 @@ export const markCleaningRequestComplete = async (
 export const createCleaningRequest = async (
   params: CreateCleaningRequestParams
 ): Promise<AxiosResponse<CreateCleaningRequestResponse>> => {
-  // const token = (await authClient.getToken()).data;
-  const token = localStorage.getItem('new-custom-auth-token');
+  const token = (await authClient.getToken()).data;
 
   if (token === null || token === undefined) {
     throw new Error('You must be logged in to perform this action');
