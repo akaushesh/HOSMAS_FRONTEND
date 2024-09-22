@@ -209,3 +209,6 @@ EMAIL_USE_TLS = True
 # Admin and Developer details
 ADMIN_EMAIL = config("ADMIN_EMAIL")
 DEVELOPER_EMAIL = config("DEVELOPER_EMAIL")
+
+# Frontend Links
+STUDENT_PORTAL_URL = config("STUDENT_PORTAL_URL")

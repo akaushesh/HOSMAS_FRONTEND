@@ -35,6 +35,7 @@ def send_password_reset_mail(name, url, email):
     context = {
         "name": name,
         "url": url,
+        "student_portal_url": settings.STUDENT_PORTAL_URL,
     }
     html_message = render_to_string("user/password_reset.html", context)
     msg = strip_tags(html_message)
@@ -48,7 +49,6 @@ def send_password_reset_mail(name, url, email):
     )
     email_message.attach_alternative(html_message, "text/html")
     email_message.send()
-    # send_mail(subject, msg, settings.EMAIL_HOST_USERS[idx], (email, ), html_message=html_message, connection=connection, fail_silently=False)
     connection.close()
 
     return f"\n password reset mail sent to {email}\n"

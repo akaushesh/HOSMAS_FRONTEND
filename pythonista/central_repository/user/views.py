@@ -55,8 +55,6 @@ class EmailResetPasswordView(APIView):
             user.password_reset_slug = slug
             user.save()
 
-        print(user.password_reset_slug)
-
         try:
             name = user.student.name
         except:
@@ -66,7 +64,7 @@ class EmailResetPasswordView(APIView):
                 name = "Admin"
 
         url = (
-            "https://allotment.onlinehostel.in/auth/forgot-password/"
+            f"{settings.STUDENT_PORTAL_URL}/auth/reset-password/"
             + user.password_reset_slug
         )
         send_password_reset_mail.delay(name, url, user.email)
