@@ -81,8 +81,14 @@ class ResetPasswordView(APIView):
         ).first()
         password = request.data.get("password")
 
-        if user is None or password is None:
-            return Response(status=HTTP_400_BAD_REQUEST)
+        if user is None:
+            return Response({"detail": "Invalid Slug!"}, status=HTTP_400_BAD_REQUEST)
+
+        if password is None or len(password) < 8:
+            return Response(
+                {"detail": "Password should be atleast 8 characters long!"},
+                status=HTTP_400_BAD_REQUEST,
+            )
 
         user.set_password(password)
         user.password_reset_slug = None

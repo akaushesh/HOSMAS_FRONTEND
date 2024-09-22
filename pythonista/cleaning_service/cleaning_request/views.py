@@ -152,7 +152,7 @@ class MarkRequestComplete(APIView):
         
         if not cleaning_request:
             logger.error(f"No suitable cleaning request found for room id {request.user['student']['room']['id']}")
-            return Response({"detail": "Cleaning request not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": "No Cleaning Request found."}, status=status.HTTP_404_NOT_FOUND)
 
         logger.debug(f"Cleaning request found: {cleaning_request}")
 
