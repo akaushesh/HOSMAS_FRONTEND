@@ -1,10 +1,8 @@
 'use client';
 
 import * as React from 'react';
-import type { ProfileResponse } from '@/services/profile';
-import Button from '@mui/material/Button';
+import type { CentralProfileResponse } from '@/services/profile';
 import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import CardHeader from '@mui/material/CardHeader';
 import Divider from '@mui/material/Divider';
@@ -18,7 +16,7 @@ import { useProfile } from '@/hooks/query/use-profile';
 
 export function AccountDetailsForm(): React.JSX.Element {
   const { data } = useProfile();
-  const profile = data as AxiosResponse<ProfileResponse>;
+  const profile = data as AxiosResponse<CentralProfileResponse>;
   const student = profile?.data;
 
   return (
@@ -34,31 +32,37 @@ export function AccountDetailsForm(): React.JSX.Element {
           <Grid container spacing={3}>
             <Grid md={6} xs={12}>
               <FormControl disabled fullWidth>
-                <InputLabel>{student?.name}</InputLabel>
+                <InputLabel>{student?.student?.name}</InputLabel>
                 <OutlinedInput defaultValue="" label="Name" name="firstName" />
               </FormControl>
             </Grid>
             <Grid md={6} xs={12}>
               <FormControl disabled fullWidth>
-                <InputLabel>{student?.rollno}</InputLabel>
+                <InputLabel>{student?.student?.roll_number}</InputLabel>
                 <OutlinedInput defaultValue="" label="Roll Number" name="lastName" />
               </FormControl>
             </Grid>
             <Grid md={6} xs={12}>
               <FormControl disabled fullWidth>
-                <InputLabel>{student?.user?.email}</InputLabel>
+                <InputLabel>{student?.student?.email}</InputLabel>
                 <OutlinedInput defaultValue="" label="Email address" name="email" />
               </FormControl>
             </Grid>
             <Grid md={6} xs={12}>
               <FormControl disabled fullWidth>
-                <InputLabel>{student?.phoneno}</InputLabel>
-                <OutlinedInput label="Phone number" name="phone" type="tel" />
+                <InputLabel>{student?.student?.room?.name}</InputLabel>
+                <OutlinedInput label="Room" name="room" />
               </FormControl>
             </Grid>
-            <Grid md={6} xs={12}>
+            {/* <Grid md={6} xs={12}>
               <FormControl disabled fullWidth>
-                <InputLabel>{student?.cg}</InputLabel>
+                <InputLabel>{student?.student?.phone_number}</InputLabel>
+                <OutlinedInput label="Phone number" name="phone" type="tel" />
+              </FormControl>
+            </Grid> */}
+            {/* <Grid md={6} xs={12}>
+              <FormControl disabled fullWidth>
+                <InputLabel>{student?.student?.}</InputLabel>
                 <OutlinedInput label="CGPA" name="phone" />
               </FormControl>
             </Grid>
@@ -67,13 +71,13 @@ export function AccountDetailsForm(): React.JSX.Element {
                 <InputLabel>{student?.token}</InputLabel>
                 <OutlinedInput label="private-token" />
               </FormControl>
-            </Grid>
+            </Grid> */}
           </Grid>
         </CardContent>
-        <Divider />
-        <CardActions sx={{ justifyContent: 'flex-end' }}>
+        <Divider sx={{ mb: 8 }} />
+        {/* <CardActions sx={{ justifyContent: 'flex-end' }}>
           <Button variant="contained">Confirm</Button>
-        </CardActions>
+        </CardActions> */}
       </Card>
     </form>
   );

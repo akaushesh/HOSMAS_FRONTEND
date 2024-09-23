@@ -1,0 +1,77 @@
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --mui-palette-background-default: #f7f7f7;
+  --Page-HeadColor: #b30000; /* Primary red 500 */
+  --TextMain-Color: #3a3a3a; /* Text 600 */
+  --PButton-Color: #b30000; /* Primary red 500 */
+  --PButton-HoverColor: #910303; /* Primary red 600 */
+  --SButton-Color: #7a7e86; /* Secondary grey 500 */
+  --SButton-HoverColor: #b6b6b8; /* Secondary grey 400 */
+  --Button-FontColor: #ffffff; /* Common white */
+  --Room-Available: transparent;
+  --Room-Allotted: #32a83c;
+  --Room-Color: #7a7e86; /* Secondary grey 500 */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  text-align: left;
+}
+
+body {
+  color: var(--TextMain-Color);
+  font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  height: 100vh;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+@media (prefers-color-scheme: light) {
+  html {
+    color-scheme: light;
+  }
+}
+
+*:focus-visible {
+  outline: 2px solid #3a3a3a;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #7a7e86;
+  border-radius: 80px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #7a7e86;
+}

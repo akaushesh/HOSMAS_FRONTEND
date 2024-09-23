@@ -8,9 +8,10 @@ services:
     volumes:
       - ./central_repository/static/:/app/static/
       - ./central_repository/logs/:/app/logs/
+      - ./central_repository/imported_data/:/app/imported_data/
     network_mode: "host"
     command: "sh run.sh"
-  
+
   hosmas-cleaning-service:
     image: hosmas-cleaning-service
     container_name: hosmas-cleaning-service
@@ -22,3 +23,15 @@ services:
       - ./cleaning_service/logs/:/app/logs/
     network_mode: "host"
     command: "sh run.sh"
+
+  hosmas-second-celery:
+    image: hosmas-second-celery
+    container_name: hosmas-second-celery
+    build:
+      context: central_repository
+      dockerfile: ./Dockerfile
+    volumes:
+      - ./logs/:/app/logs/
+      - ./central_repository/imported_data/:/app/imported_data/
+    command: celery -A config worker -l info --pool=gevent --concurrency=1 -n worker@%h --without-mingle --without-gossip --without-heartbeat
+    network_mode: "host"

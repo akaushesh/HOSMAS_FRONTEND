@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { type ProfileResponse } from '@/services/profile';
+import { type CentralProfileResponse } from '@/services/profile';
 import { Button, Paper, Rating, Stack, Typography } from '@mui/material';
 import { type AxiosResponse } from 'axios';
 
@@ -12,10 +12,10 @@ import TagButton from '@/components/core/tag-button';
 
 export default function UpperRightCont(): React.JSX.Element {
   const { data: profile } = useProfile();
-  const user = profile as AxiosResponse<ProfileResponse>;
+  const user = profile as AxiosResponse<CentralProfileResponse>;
 
   const handleSubmit = (): void => {
-    markDone({ requestId: 1, rating: 5, comments: 'Great job!' });
+    markDone({ rating: value ? value : 0, comments: '' });
     logger.debug('Cleaning request marked as done');
   };
 
@@ -26,7 +26,7 @@ export default function UpperRightCont(): React.JSX.Element {
   return (
     <Paper elevation={10} sx={{ p: 3, width: '100%' }}>
       <Typography variant="h5">
-        {user?.data?.alloted_hostel?.hostel} {user?.data?.alloted_room?.number || 'NULL'}
+        {user?.data?.student?.room?.hostel?.name} {user?.data?.student?.room?.name || 'NULL'}
       </Typography>
 
       <Stack mt={1}>
@@ -47,7 +47,7 @@ export default function UpperRightCont(): React.JSX.Element {
         <Button variant="contained" color="primary" onClick={handleSubmit}>
           Mark as done
         </Button>
-        <Button variant="outlined">Cancel Request</Button>
+        {/* <Button variant="outlined">Cancel Request</Button> */}
       </Stack>
     </Paper>
   );

@@ -3,7 +3,7 @@ import type { AxiosResponse } from 'axios';
 import { authClient } from '@/lib/auth/client';
 import { logger } from '@/lib/default-logger';
 
-import { authApi } from './api';
+import { authApi, centralApi } from './api';
 
 interface Batch {
   id: number;
@@ -57,17 +57,66 @@ export interface ResetPasswordData {
   password: string;
 }
 
+export interface CentralProfileResponse {
+  role: string;
+  student: CentralStudent;
+}
+
+export interface CentralStudent {
+  id: number;
+  name: string;
+  roll_number: string;
+  email: string;
+  phone_number: string;
+  branch: string;
+  room: CentralRoom;
+}
+
+export interface CentralRoom {
+  id: number;
+  name: string;
+  room_type: CentralRoomType;
+  level: Level;
+  block: Block;
+  hostel: CentralHostel;
+}
+
+export interface CentralRoomType {
+  id: number;
+  name: string;
+}
+
+export interface Level {
+  id: number;
+  name: string;
+}
+
+export interface Block {
+  id: number;
+  name: string;
+}
+
+export interface CentralHostel {
+  id: number;
+  name: string;
+}
+
 //eslint-disable-next-line @typescript-eslint/no-empty-interface -- Empty 200 Ok reponses are causing ESlint errors
 export interface OkResponse {}
 
-export const getProfile = async (): Promise<AxiosResponse<ProfileResponse>> => {
+export const getProfile = async (): Promise<AxiosResponse<CentralProfileResponse>> => {
   const token = (await authClient.getToken()).data;
 
   if (token === null || token === undefined) {
     throw new Error('You must be logged in to perform this action');
   }
 
-  const res = await authApi.get('student/profile/', {
+  // const res = await authApi.get('student/profile/', {
+  //   headers: {
+  //     Authorization: `Bearer ${token}`,
+  //   },
+  // });
+  const res = await centralApi.get('user/', {
     headers: {
       Authorization: `Bearer ${token}`,
     },

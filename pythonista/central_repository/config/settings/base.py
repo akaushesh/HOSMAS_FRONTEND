@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "import_export",
+    "django_celery_results",
     "corsheaders",
 ]
 
@@ -184,3 +185,30 @@ SIMPLE_JWT = {
 CSRF_TRUSTED_ORIGINS = [
     host.strip() for host in config("CSRF_TRUSTED_ORIGINS").split(",")
 ]
+
+# Celery Settings
+CELERY_BROKER_URL = f"redis://{config("REDIS_HOST", default="127.0.0.1")}:{config("REDIS_PORT", default="6379")}/{config("REDIS_DATABASE", default="0")}"
+CELERY_ACCEPT_CONTENT = ["application/json"]
+CELERY_RESULT_BACKEND = "django-db"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_RESULT_EXTENDED = True
+
+# Email Configurations
+EMAIL_HOST_USERS = config(
+    "EMAIL_HOST_USERS", cast=lambda v: [s.strip() for s in v.split(",")]
+)
+EMAIL_HOST_PASSWORDS = config(
+    "EMAIL_HOST_PASSWORDS", cast=lambda v: [s.strip() for s in v.split(",")]
+)
+EMAIL_HOST_USERS_COUNT = config("EMAIL_HOST_USERS_COUNT", cast=int)
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+
+# Admin and Developer details
+ADMIN_EMAIL = config("ADMIN_EMAIL")
+DEVELOPER_EMAIL = config("DEVELOPER_EMAIL")
+
+# Frontend Links
+STUDENT_PORTAL_URL = config("STUDENT_PORTAL_URL")

@@ -147,25 +147,14 @@ class MarkRequestComplete(APIView):
 
     def post(self, request):
         logger.info(f"Received request to mark cleaning request as complete from user: {request.user['student']['name']}")
-        
-        request_id = request.data.get('request_id')
-        if not request_id:
-            logger.warning("Request ID not provided in the request")
-            return Response({"detail": "Please provide a request ID."}, status=status.HTTP_400_BAD_REQUEST)
 
-        logger.debug(f"Attempting to fetch cleaning request with ID: {request_id}")
-        cleaning_request = filter_objects(CleaningRequest.objects, id=request_id).first()
+        cleaning_request = filter_objects(CleaningRequest.objects, room_id=request.user['student']['room']['id'], status='Assigned').last()
         
         if not cleaning_request:
-            logger.error(f"Cleaning request with ID {request_id} not found")
-            return Response({"detail": "Cleaning request not found."}, status=status.HTTP_404_NOT_FOUND)
+            logger.error(f"No suitable cleaning request found for room id {request.user['student']['room']['id']}")
+            return Response({"detail": "No Cleaning Request found."}, status=status.HTTP_404_NOT_FOUND)
 
         logger.debug(f"Cleaning request found: {cleaning_request}")
-
-        # Check if the request belongs to the current user
-        if cleaning_request.student_id != request.user['student']['id']:
-            logger.warning(f"User {request.user['student']['name']} attempted to complete a request that doesn't belong to them")
-            return Response({"detail": "You are not authorized to complete this request."}, status=status.HTTP_403_FORBIDDEN)
 
         # Check if the request is already completed
         if cleaning_request.status == 'Completed':
@@ -190,7 +179,7 @@ class MarkRequestComplete(APIView):
             'id': cleaning_request.id,
         })
 
-        logger.info(f"Cleaning request {request_id} marked as complete with given feedback.")
+        logger.info(f"Cleaning request {cleaning_request.id} marked as complete with given feedback.")
         return Response({
             "detail": "Cleaning request marked as complete.",
             "data": FeedbackSerializer(feedback).data

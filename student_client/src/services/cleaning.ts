@@ -1,24 +1,24 @@
 import type { AxiosResponse } from 'axios';
 
 import { authClient } from '@/lib/auth/client';
+// import { authClient } from '@/lib/auth/client';
 import { logger } from '@/lib/default-logger';
 
 import { cleaningApi } from './api';
 
-interface CleaningRequestsResponse {
+export interface CleaningRequestsResponse {
   count: number;
   next: string;
   previous: string;
   results: CleaningRequest[];
 }
 
-interface CleaningRequest {
-  id: number;
-  room: string;
-  level: number;
+export interface CleaningRequest {
+  student_id: number;
+  worker: string;
+  slot: string;
+  date: string;
   status: string;
-  created_at: string;
-  updated_at: string;
 }
 
 export interface CleaningRequestParams {
@@ -28,7 +28,6 @@ export interface CleaningRequestParams {
 }
 
 export interface CleaningRequestCompleteData {
-  request_id: number;
   rating: number;
   comments: string;
 }
@@ -44,6 +43,16 @@ export interface CleaningRequestCompleteResponse {
 
 export interface CreateCleaningRequestResponse {
   status: string;
+}
+
+export type SlotResponse = Slot[];
+
+interface Slot {
+  id: number;
+  hostel_id: number;
+  start: string;
+  end: string;
+  is_enabled: boolean;
 }
 
 export const getCleaningRequests = async (
@@ -68,7 +77,7 @@ export const getCleaningRequests = async (
   return res;
 };
 
-export const getSlots = async (): Promise<AxiosResponse> => {
+export const getSlots = async (): Promise<AxiosResponse<SlotResponse>> => {
   const token = (await authClient.getToken()).data;
 
   if (token === null || token === undefined) {

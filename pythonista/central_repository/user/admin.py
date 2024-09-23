@@ -77,8 +77,6 @@ class StudentAdmin(admin.ModelAdmin):
         "phone_number",
         "room__name",
         "room__room_type__name",
-        "room__level__name",
-        "room__level__block__name",
         "room__level__block__hostel__name",
     )
     list_filter = ("room__level__block__hostel__name",)
