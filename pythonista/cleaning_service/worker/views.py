@@ -49,24 +49,40 @@ class createWorker(APIView):
 
 class markWorkerAttendance(APIView):
     permission_classes = [IsAuthenticated]
-    def post(self, request, worker_id):
+
+    def post(self, request):
         if request.user['role'] != 'supervisor':
             return Response({'error': 'You are not authorized to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        worker_data = request.data.get('workers', [])
+        responses = []
 
-        worker = get_object(Worker.objects, id=worker_id)
-        if not worker or worker.hostel_id != request.user['supervisor']['hostel']['id']:
-            return Response({"detail": "Worker not found or unauthorized action."}, status=status.HTTP_404_NOT_FOUND)
+        for worker_info in worker_data:
+            worker_id = worker_info.get('id')
+            attendance_status = worker_info.get('is_present')
 
-        today = date.today()
-        attendance = get_object(Attendance.objects, worker=worker, date=today)
+            worker = get_object(Worker.objects, id=worker_id)
+            if not worker or worker.hostel_id != request.user['supervisor']['hostel']['id']:
+                responses.append({
+                    'worker_id': worker_id, 
+                    'detail': 'Worker not found or unauthorized action.'
+                })
+                continue
 
-        if not attendance:
-            attendance = Attendance(worker=worker, date=today, is_present=False)
-        attendance.is_present = not attendance.is_present
-        attendance.save()
+            today = date.today()
+            attendance = get_object(Attendance.objects, worker=worker, date=today)
 
-        serializer = AttendanceSerializer(attendance)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+            if not attendance:
+                attendance = Attendance(worker=worker, date=today, is_present=attendance_status)
+            else:
+                attendance.is_present = attendance_status
+            attendance.save()
+
+            serializer = AttendanceSerializer(attendance)
+            responses.append(serializer.data)
+        
+        return Response(responses, status=status.HTTP_200_OK)
+
 
 
 class HostelWorkersPublicView(APIView):
