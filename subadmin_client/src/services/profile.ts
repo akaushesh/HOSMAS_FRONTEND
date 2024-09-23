@@ -33,24 +33,22 @@ interface Hostel {
   fee: number;
 }
 
-export interface ProfileResponse {
-  rollno: string;
+export interface SuperVisorHostel {
+  id: number;
   name: string;
-  phoneno: string;
-  token: string;
-  gender: string;
-  cg: number;
-  batch: null | Batch;
-  alloted_room: Room;
-  user: User;
-  group: Group;
-  is_preference_filled: boolean;
-  academic_session: string;
-  fee_structure_url: string;
-  current_hostel: null | Hostel;
-  preview_hostel: null | Hostel;
-  alloted_hostel: null | Hostel;
-  group_size_limit: number;
+}
+
+export interface Supervisor {
+  id: number;
+  name: string;
+  email: string;
+  phone_number: string;
+  hostel: SuperVisorHostel;
+}
+
+export interface SupervisorProfileResponse {
+  role: string;
+  supervisor: Supervisor;
 }
 
 interface ResetPasswordData {
@@ -60,14 +58,14 @@ interface ResetPasswordData {
 //eslint-disable-next-line @typescript-eslint/no-empty-interface -- Empty 200 Ok reponses are causing ESlint errors
 export interface OkResponse {}
 
-export const getProfile = async (): Promise<AxiosResponse<ProfileResponse>> => {
+export const getProfile = async (): Promise<AxiosResponse<SupervisorProfileResponse>> => {
   const token = (await authClient.getToken()).data;
 
   if (token === null || token === undefined) {
     throw new Error('You must be logged in to perform this action');
   }
 
-  const res = await authApi.get('student/profile/', {
+  const res = await authApi.get('user/', {
     headers: {
       Authorization: `Bearer ${token}`,
     },

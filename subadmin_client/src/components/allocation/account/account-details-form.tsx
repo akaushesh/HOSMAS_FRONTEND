@@ -19,7 +19,7 @@ import { useProfile } from '@/hooks/query/use-profile';
 export function AccountDetailsForm(): React.JSX.Element {
   const { data } = useProfile();
   const profile = data as AxiosResponse<ProfileResponse>;
-  const student = profile?.data;
+  const supervisor = profile?.data?.supervisor;
 
   return (
     <form
@@ -34,38 +34,26 @@ export function AccountDetailsForm(): React.JSX.Element {
           <Grid container spacing={3}>
             <Grid md={6} xs={12}>
               <FormControl disabled fullWidth>
-                <InputLabel>{student?.name}</InputLabel>
-                <OutlinedInput defaultValue="" label="Name" name="firstName" />
+                <InputLabel>{supervisor?.name}</InputLabel>
+                <OutlinedInput defaultValue="" label="Name" name="name" />
               </FormControl>
             </Grid>
             <Grid md={6} xs={12}>
               <FormControl disabled fullWidth>
-                <InputLabel>{student?.rollno}</InputLabel>
-                <OutlinedInput defaultValue="" label="Roll Number" name="lastName" />
+                <InputLabel>{supervisor?.hostel?.name}</InputLabel>
+                <OutlinedInput defaultValue="" label="Hostel" name="hostel" />
               </FormControl>
             </Grid>
             <Grid md={6} xs={12}>
               <FormControl disabled fullWidth>
-                <InputLabel>{student?.user?.email}</InputLabel>
+                <InputLabel>{supervisor?.email}</InputLabel>
                 <OutlinedInput defaultValue="" label="Email address" name="email" />
               </FormControl>
             </Grid>
             <Grid md={6} xs={12}>
               <FormControl disabled fullWidth>
-                <InputLabel>{student?.phoneno}</InputLabel>
+                <InputLabel>{supervisor?.phone_number}</InputLabel>
                 <OutlinedInput label="Phone number" name="phone" type="tel" />
-              </FormControl>
-            </Grid>
-            <Grid md={6} xs={12}>
-              <FormControl disabled fullWidth>
-                <InputLabel>{student?.cg}</InputLabel>
-                <OutlinedInput label="CGPA" name="phone" />
-              </FormControl>
-            </Grid>
-            <Grid md={6} xs={12}>
-              <FormControl disabled fullWidth>
-                <InputLabel>{student?.token}</InputLabel>
-                <OutlinedInput label="private-token" />
               </FormControl>
             </Grid>
           </Grid>

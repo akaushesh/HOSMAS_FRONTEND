@@ -1,15 +1,65 @@
 'use client';
+'use client';
 
 import * as React from 'react';
+import { assignFloorToWorkers, getWorkersOfHostel, markWorkerAttendance, Worker } from '@/services/cleaning';
 import { Box, Button, Checkbox, Divider, Paper, Stack, Typography } from '@mui/material';
 
-import { tempCleaners } from '../TempDataRequests';
+import { useProfile } from '@/hooks/query/use-profile';
 
 export default function Attendance(): React.JSX.Element {
-  const [cleaners, setCleaners] = React.useState(tempCleaners);
+  const [cleaners, setCleaners] = React.useState<Worker[]>([]);
+  const { data } = useProfile();
 
-  const totalCleaners = 10;
-  const present = 8;
+  React.useEffect(() => {
+    const fetchCleaners = async () => {
+      try {
+        if (data?.data?.supervisor?.hostel?.id) {
+          const response = await getWorkersOfHostel(data.data.supervisor.hostel.id);
+          setCleaners(response.data); // Update state with fetched data
+          console.log('cleaners', response.data);
+        } else {
+          console.log('Hostel ID is not available');
+        }
+      } catch (error) {
+        console.error('Error fetching cleaners:', error);
+      }
+    };
+
+    fetchCleaners();
+  }, [data]);
+
+  const totalCleaners = cleaners.length;
+  const presentCount = cleaners.filter((cleaner) => cleaner.attendance?.is_present).length;
+  const absentCount = totalCleaners - presentCount;
+
+  const handleAttendanceToggle = (id: number) => {
+    setCleaners((prevCleaners) =>
+      prevCleaners.map((cleaner) =>
+        cleaner.id === id
+          ? {
+              ...cleaner,
+              attendance: cleaner.attendance
+                ? { ...cleaner.attendance, is_present: !cleaner.attendance.is_present }
+                : { is_present: true, levels: [] },
+            }
+          : cleaner
+      )
+    );
+  };
+
+  const markAttendance = async () => {
+    try {
+      const updatedWorkers = cleaners.map((cleaner) => ({
+        id: cleaner.id,
+        is_present: cleaner.attendance?.is_present || false,
+      }));
+
+      await markWorkerAttendance(updatedWorkers);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <Paper elevation={10} sx={{ p: 3, mt: 3 }}>
@@ -20,11 +70,11 @@ export default function Attendance(): React.JSX.Element {
         </Typography>
         <Typography variant="body1">
           Present:
-          <span style={{ fontWeight: '600', fontSize: '22px' }}>{present}</span>
+          <span style={{ fontWeight: '600', fontSize: '22px' }}>{presentCount}</span>
         </Typography>
         <Typography variant="body1">
           Absent:
-          <span style={{ fontWeight: '600', fontSize: '22px' }}>{totalCleaners - present}</span>
+          <span style={{ fontWeight: '600', fontSize: '22px' }}>{absentCount}</span>
         </Typography>
       </Stack>
 
@@ -37,65 +87,63 @@ export default function Attendance(): React.JSX.Element {
             justifyItems: 'center',
           }}
         >
-          {cleaners.map((el) => {
-            return (
-              <Box
-                key={el.id}
-                sx={{
-                  width: '100%',
-                  p: 1,
-                  height: '30vh',
-                  background: `url(${el.img})`,
-                  backgroundRepeat: 'no-repeat',
-                  backgroundSize: 'cover',
-                  backgroundPosition: '0 0',
-                  position: 'relative',
-                  borderRadius: 2,
-                  cursor: 'pointer',
-                  transition: 'all 0.3s',
-                  boxShadow: el.present ? '0px 0px 7px 7px rgba(0,0,0,0.25)' : '',
-                  transform: el.present ? 'scale(0.9)' : 'scale(1)',
-                }}
-                onClick={() => {
-                  setCleaners([
-                    ...cleaners.map((cleaner) => {
-                      if (cleaner.id === el.id) {
-                        cleaner.present = !cleaner.present;
-                      }
-                      return cleaner;
-                    }),
-                  ]);
-                }}
-              >
-                <Checkbox
-                  sx={{ background: 'white', borderRadius: 0.6, p: 0, touchAction: 'none', pointerEvents: 'none' }}
-                  checked={el.present}
-                />
+          {cleaners.map((el) => (
+            <Box
+              key={el.id}
+              sx={{
+                width: '100%',
+                p: 1,
+                height: '30vh',
+                background: `url(${el.photo})`,
+                backgroundRepeat: 'no-repeat',
+                backgroundSize: 'cover',
+                backgroundPosition: '0 0',
+                position: 'relative',
+                borderRadius: 2,
+                cursor: 'pointer',
+                transition: 'all 0.3s',
+                boxShadow: el.attendance?.is_present ? '0px 0px 7px 7px rgba(0,0,0,0.25)' : '',
+                transform: el.attendance?.is_present ? 'scale(0.9)' : 'scale(1)',
+              }}
+              onClick={() => handleAttendanceToggle(el.id)}
+            >
+              <Checkbox
+                sx={{ background: 'white', borderRadius: 0.6, p: 0, touchAction: 'none', pointerEvents: 'none' }}
+                checked={el.attendance?.is_present || false}
+                disabled={el.attendance ? true : false}
+              />
 
-                <Typography
-                  sx={{
-                    bottom: 9,
-                    right: 15,
-                    position: 'absolute',
-                    background: '#ffffffcd',
-                    px: 1,
-                    py: 0.5,
-                    borderRadius: 0.5,
-                  }}
-                  color="var(--TextMain-Color)"
-                  fontWeight={700}
-                  variant="h6"
-                >
-                  {el.name}
-                </Typography>
-              </Box>
-            );
-          })}
+              <Typography
+                sx={{
+                  bottom: 9,
+                  right: 15,
+                  position: 'absolute',
+                  background: '#ffffffcd',
+                  px: 1,
+                  py: 0.5,
+                  borderRadius: 0.5,
+                }}
+                color="var(--TextMain-Color)"
+                fontWeight={700}
+                variant="h6"
+              >
+                {el.name}
+              </Typography>
+            </Box>
+          ))}
         </Box>
       </Box>
       <Divider sx={{ my: 2 }} />
       <Stack direction="row" justifyContent="flex-end" mt={2} width={1}>
-        <Button variant="contained" sx={{ px: 6 }} color="primary">
+        <Button
+          variant="contained"
+          sx={{ px: 6 }}
+          color="primary"
+          onClick={() => {
+            markAttendance();
+            assignFloorToWorkers();
+          }}
+        >
           Save
         </Button>
       </Stack>

@@ -31,10 +31,12 @@ interface ResetPasswordData {
 export type LoginResponse = TokenResponse | ErrorResponse;
 
 export const login = async (data: LoginData): Promise<AxiosResponse<LoginResponse>> => {
-  const res = await authApi.post('auth/token/', data);
+  const res = await authApi.post('token/', data);
   logger.debug('login', res.data);
   return res;
 };
+
+// below functions not there yet
 
 export const initiatePasswordReset = async (data: InitiatePasswordResetData): Promise<AxiosResponse<OkResponse>> => {
   const res = await authApi.post('auth/initiate-reset-password/', data);

@@ -13,7 +13,7 @@ export function UserName(): React.JSX.Element {
 
   return (
     <div>
-      <Typography variant="h4">Hi, {userProfile?.data?.name}!</Typography>
+      <Typography variant="h4">Hi, {userProfile?.data?.supervisor?.name}!</Typography>
     </div>
   );
 }
@@ -22,9 +22,5 @@ export function HostelName(): React.JSX.Element {
   const { data: profile } = useProfile();
   const userProfile = profile as AxiosResponse<ProfileResponse>;
 
-  return (
-    <>
-      HOSTEL D
-    </>
-  );
+  return <>HOSTEL D</>;
 }

@@ -158,7 +158,7 @@ class MarkRequestComplete(APIView):
 
         # Check if the request is already completed
         if cleaning_request.status == 'Completed':
-            logger.info(f"Cleaning request {request_id} is already marked as complete")
+            logger.info(f"Cleaning request {cleaning_request.id} is already marked as complete")
             return Response({"detail": "This request is already marked as complete."}, status=status.HTTP_400_BAD_REQUEST)
         
         comments = request.data.get('comments', '')
