@@ -65,7 +65,7 @@ export const getCleaningRequests = async (
   }
 
   const res = await cleaningApi.get(
-    `getCleaningRequests/?page_size=${String(params.page_size)}&page=${String(params.page)}&room_number=${String(params.room)}`,
+    `getCleaningRequests/?page_size=${String(params.page_size)}&page=${String(params.page)}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,

@@ -2,7 +2,13 @@
 'use client';
 
 import * as React from 'react';
-import { assignFloorToWorkers, getWorkersOfHostel, markWorkerAttendance, Worker } from '@/services/cleaning';
+import {
+  assignFloorToWorkers,
+  assignRequestsToWorkers,
+  getWorkersOfHostel,
+  markWorkerAttendance,
+  Worker,
+} from '@/services/cleaning';
 import { Box, Button, Checkbox, Divider, Paper, Stack, Typography } from '@mui/material';
 
 import { useProfile } from '@/hooks/query/use-profile';
@@ -40,7 +46,7 @@ export default function Attendance(): React.JSX.Element {
           ? {
               ...cleaner,
               attendance: cleaner.attendance
-                ? { ...cleaner.attendance, is_present: !cleaner.attendance.is_present }
+                ? { ...cleaner.attendance, is_present: cleaner.attendance.is_present }
                 : { is_present: true, levels: [] },
             }
           : cleaner
@@ -139,9 +145,10 @@ export default function Attendance(): React.JSX.Element {
           variant="contained"
           sx={{ px: 6 }}
           color="primary"
-          onClick={() => {
-            markAttendance();
-            assignFloorToWorkers();
+          onClick={async () => {
+            await markAttendance();
+            await assignFloorToWorkers();
+            await assignRequestsToWorkers();
           }}
         >
           Save
