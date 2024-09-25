@@ -22,7 +22,6 @@ export interface CleaningRequest {
 }
 
 export interface CleaningRequestParams {
-  room: number;
   page: number;
   page_size: number;
 }

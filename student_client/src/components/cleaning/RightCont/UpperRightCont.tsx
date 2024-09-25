@@ -1,18 +1,32 @@
 'use client';
 
 import * as React from 'react';
+import { type CleaningRequest } from '@/services/cleaning';
 import { type CentralProfileResponse } from '@/services/profile';
-import { Button, Paper, Rating, Stack, Typography } from '@mui/material';
+import { Button, Chip, Paper, Rating, Stack, Typography } from '@mui/material';
 import { type AxiosResponse } from 'axios';
 
 import { logger } from '@/lib/default-logger';
 import { useMarkCleaningRequestComplete } from '@/hooks/mutation/use-cleaning';
 import { useProfile } from '@/hooks/query/use-profile';
-import TagButton from '@/components/core/tag-button';
 
-export default function UpperRightCont(): React.JSX.Element {
+const getStatusColor = (status: string): 'default' | 'primary' | 'success' | 'warning' => {
+  switch (status) {
+    case 'Completed':
+      return 'success';
+    case 'Pending':
+      return 'warning';
+    case 'Assigned':
+      return 'primary';
+    default:
+      return 'default';
+  }
+};
+
+export default function UpperRightCont(props: CleaningRequest): React.JSX.Element {
   const { data: profile } = useProfile();
   const user = profile as AxiosResponse<CentralProfileResponse>;
+  logger.debug('UpperRightCont', props);
 
   const handleSubmit = (): void => {
     markDone({ rating: value ? value : 0, comments: '' });
@@ -30,15 +44,20 @@ export default function UpperRightCont(): React.JSX.Element {
       </Typography>
 
       <Stack mt={1}>
-        <TagButton color="green">Assigned</TagButton>
+        <Chip
+          label={props.status}
+          color={getStatusColor(props.status)}
+          sx={{ mt: 1, width: '6rem', fontWeight: 'bold' }}
+        />
       </Stack>
 
       <Rating
         name="worker-rating"
+        disabled={props.status !== 'Assigned'}
         value={value}
         size="large"
         sx={{ mt: 3 }}
-        onChange={(event, newValue) => {
+        onChange={(_event, newValue) => {
           setValue(newValue);
         }}
       />
@@ -47,7 +66,6 @@ export default function UpperRightCont(): React.JSX.Element {
         <Button variant="contained" color="primary" onClick={handleSubmit}>
           Mark as done
         </Button>
-        {/* <Button variant="outlined">Cancel Request</Button> */}
       </Stack>
     </Paper>
   );
