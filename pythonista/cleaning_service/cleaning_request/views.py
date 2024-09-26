@@ -44,7 +44,7 @@ class getCleaningRequests(APIView):
         paginator = ResponsePagination()
         paginated_queryset = paginator.paginate_queryset(cleaning_requests, request)
 
-        serializer = CleaningRequestSerializer(paginated_queryset, many=True)
+        serializer = CleaningRequestSerializer(paginated_queryset, many=True, exclude_fields=('student_id', 'room_id', 'hostel_id', 'level_id'))
         return paginator.get_paginated_response(serializer.data)
 
    
@@ -52,23 +52,25 @@ class getSingleCleaningRequest(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, slug):
-        # student_details = request.user['student']
-        try:
-            jwt_token = request.META.get("HTTP_AUTHORIZATION")
-            student_details = requests.get(
-            f"{settings.CENTRAL_REPOSITORY_URL}/user/{slug}", headers={"Authorization": jwt_token}
-        )
-            student_details.raise_for_status()
-            student_details = student_details.json()
-        except requests.exceptions.RequestException as e:
-            raise APIException(f"Failed to fetch student details: {e}")
-
         cleaning_request = get_object(CleaningRequest.objects, id=slug)
         
         if cleaning_request is None:
             return Response({"detail": "Cleaning request not found."}, status=status.HTTP_404_NOT_FOUND)
 
-        cleaning_request_serializer = CleaningRequestSerializer(cleaning_request)
+        cleaning_request_serializer = CleaningRequestSerializer(cleaning_request, exclude_fields=('student_id', 'room_id', 'hostel_id', 'level_id'))
+
+        if request.user['role']=='supervisor':
+            try:
+                jwt_token = request.META.get("HTTP_AUTHORIZATION")
+                student_details_req = requests.get(
+                    f"{settings.CENTRAL_REPOSITORY_URL}/user/student/{cleaning_request.student_id}", headers={"Authorization": jwt_token}
+                )
+                student_details_req.raise_for_status()
+                student_details = student_details_req.json()
+            except requests.exceptions.RequestException as e:
+                raise APIException(f"Failed to fetch student details: {e}")
+        else:
+            student_details = None
 
         response_data = {
             "student_details": student_details,  # Directly copy student details

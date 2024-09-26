@@ -10,11 +10,14 @@ from rest_framework.response import Response
 
 from django.core.files.storage import default_storage
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
 
 from . import services as user_services
-from .models import User
+from .models import Student, User
+from .serializers import StudentProfileSerializer
 from .tasks import import_students, send_password_reset_mail
 
+from common.permissions import IsSupervisor
 import common.services as common_services
 
 
@@ -28,12 +31,20 @@ class ProfileView(APIView):
 
 
 class getStudentProfile(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsSupervisor]
 
-    def get(self, request, slug):
-        return Response(
-            user_services.get_user_detailed_profile(slug), status=HTTP_200_OK
-        )
+    def get(self, request, student_id):
+        try:
+            student_instance = common_services.get_object(
+                Student.objects, id=student_id
+            )
+        except ObjectDoesNotExist:
+            return Response(
+                {"detail": f"No student found with id {student_id}"},
+                status=HTTP_400_BAD_REQUEST,
+            )
+        serializer = StudentProfileSerializer(student_instance)
+        return Response(serializer.data, status=HTTP_200_OK)
 
 
 class EmailResetPasswordView(APIView):
