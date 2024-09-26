@@ -1,4 +1,5 @@
 from asgiref.sync import async_to_sync
+from datetime import datetime
 from channels.layers import get_channel_layer
 import logging, requests
 
@@ -108,6 +109,20 @@ class createCleaningRequests(APIView):
         if len(data['preferred_dates']) != len(data['preferred_slots']):
             logger.warning("Length of slots is not equal to length of dates in the request")
             return Response({"detail": "Please make sure the length of dates is equal to length of slots."}, status=status.HTTP_400_BAD_REQUEST)
+        if len(data['preferred_slots']) != 3:
+            logger.warning("Length of slots is not equal to 3")
+            return Response({"detail": "Please make sure that there are 3 slots in a cleaning request."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        for i in range(3):
+            slot_id = data['preferred_slots'][i]
+            slot = filter_objects(Slot.objects, id=slot_id).first()
+            if slot is None:
+                logger.warning(f"No slot found with id {slot_id}")
+                return Response({"detail": f"No slot found with id {slot_id}"}, status=status.HTTP_400_BAD_REQUEST)
+            slot_time = datetime.strptime(f"{data['preferred_dates'][i]} {slot.start.strftime('%H:%M')}", "%Y-%m-%d %H:%M")
+            if slot_time <= datetime.now():
+                logger.warning(f"Slot time {slot_time} for slot {slot_id} and date {data['preferred_dates'][i]} is a past time. Current time is {datetime.now()}")
+                return Response({"detail": f"Slot time {slot_time} for slot {slot_id} and date {data['preferred_dates'][i]} is a past time."}, status=status.HTTP_400_BAD_REQUEST)
 
         serializer = CleaningRequestSerializer(data=data)
         if serializer.is_valid():

@@ -4,11 +4,12 @@ from .models import *
 
 class WorkerAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'phone', 'photo', 'hostel_id', 'is_active')
+    list_filter = ('hostel_id', 'is_active')
 
 
 class AttendanceAdmin(admin.ModelAdmin):
-    list_display = ('id', 'worker', 'date', 'levels')
-    list_filter = ('worker', 'date')
+    list_display = ('id', 'worker', 'date', 'is_present', 'levels')
+    list_filter = ('worker', 'date', 'is_present')
     search_fields = ('worker__name', 'worker__phone_number')
 
 admin.site.register(Worker, WorkerAdmin)
