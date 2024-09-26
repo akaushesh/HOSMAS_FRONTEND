@@ -3,7 +3,9 @@
 import * as React from 'react';
 import { type CleaningRequest } from '@/services/cleaning';
 import { type CentralProfileResponse } from '@/services/profile';
-import { Button, Chip, Paper, Rating, Stack, Typography } from '@mui/material';
+import { LoadingButton } from '@mui/lab';
+import { Chip, Paper, Rating, Stack, Typography } from '@mui/material';
+import { useQueryClient } from '@tanstack/react-query';
 import { type AxiosResponse } from 'axios';
 
 import { logger } from '@/lib/default-logger';
@@ -24,12 +26,14 @@ const getStatusColor = (status: string): 'default' | 'primary' | 'success' | 'wa
 };
 
 export default function UpperRightCont(props: CleaningRequest): React.JSX.Element {
-  const { data: profile } = useProfile();
+  const { data: profile, isPending } = useProfile();
+  const queryClient = useQueryClient();
   const user = profile as AxiosResponse<CentralProfileResponse>;
   logger.debug('UpperRightCont', props);
 
-  const handleSubmit = (): void => {
+  const handleSubmit = async (): Promise<void> => {
     markDone({ rating: value ? value : 0, comments: '' });
+    await queryClient.invalidateQueries({ queryKey: ['getProfile'] });
     logger.debug('Cleaning request marked as done');
   };
 
@@ -63,9 +67,9 @@ export default function UpperRightCont(props: CleaningRequest): React.JSX.Elemen
       />
 
       <Stack spacing={1} mt={3}>
-        <Button variant="contained" color="primary" onClick={handleSubmit}>
+        <LoadingButton loading={isPending} variant="contained" color="primary" onClick={handleSubmit}>
           Mark as done
-        </Button>
+        </LoadingButton>
       </Stack>
     </Paper>
   );
