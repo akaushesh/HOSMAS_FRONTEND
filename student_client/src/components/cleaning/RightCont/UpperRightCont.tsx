@@ -4,7 +4,7 @@ import * as React from 'react';
 import { type CleaningRequest } from '@/services/cleaning';
 import { type CentralProfileResponse } from '@/services/profile';
 import { LoadingButton } from '@mui/lab';
-import { Chip, Paper, Rating, Stack, Typography } from '@mui/material';
+import { Chip, FormControl, Grid, InputLabel, OutlinedInput, Paper, Stack, Typography } from '@mui/material';
 import { useQueryClient } from '@tanstack/react-query';
 import { type AxiosResponse } from 'axios';
 
@@ -32,14 +32,14 @@ export default function UpperRightCont(props: CleaningRequest): React.JSX.Elemen
   logger.debug('UpperRightCont', props);
 
   const handleSubmit = async (): Promise<void> => {
-    markDone({ rating: value ? value : 0, comments: '' });
-    await queryClient.invalidateQueries({ queryKey: ['getProfile'] });
+    markDone({ rating: 0, comments: '' });
+    await queryClient.invalidateQueries({ queryKey: ['getCleaningRequests'] });
     logger.debug('Cleaning request marked as done');
   };
 
   const { mutate: markDone } = useMarkCleaningRequestComplete({});
 
-  const [value, setValue] = React.useState<number | null>(null);
+  // const [value, setValue] = React.useState<number | null>(null);
 
   return (
     <Paper elevation={10} sx={{ p: 3, width: '100%' }}>
@@ -47,29 +47,50 @@ export default function UpperRightCont(props: CleaningRequest): React.JSX.Elemen
         {user?.data?.student?.room?.hostel?.name} {user?.data?.student?.room?.name || 'NULL'}
       </Typography>
 
-      <Stack mt={1}>
-        <Chip
-          label={props.status}
-          color={getStatusColor(props.status)}
-          sx={{ mt: 1, width: '6rem', fontWeight: 'bold' }}
-        />
-      </Stack>
+      <Stack mt={2} spacing={3}>
+        <Chip label={props.status} color={getStatusColor(props.status)} sx={{ width: '6rem', fontWeight: 'bold' }} />
 
-      <Rating
-        name="worker-rating"
-        disabled={props.status !== 'Assigned'}
-        value={value}
-        size="large"
-        sx={{ mt: 3 }}
-        onChange={(_event, newValue) => {
-          setValue(newValue);
-        }}
-      />
+        <Grid container spacing={2}>
+          <Grid item md={6} xs={12}>
+            <FormControl fullWidth disabled>
+              <InputLabel>
+                {props.slot ? `${props.slot_details.start} - ${props.slot_details.end}` : 'Slot not assigned'}
+              </InputLabel>
+              <OutlinedInput defaultValue="" label="Slot" />
+            </FormControl>
+          </Grid>
 
-      <Stack spacing={1} mt={3}>
-        <LoadingButton loading={isPending} variant="contained" color="primary" onClick={handleSubmit}>
-          Mark as done
-        </LoadingButton>
+          <Grid item md={6} xs={12}>
+            <FormControl fullWidth disabled>
+              <InputLabel>{props.worker ? props.worker_details.name : 'Cleaner not assigned'}</InputLabel>
+              <OutlinedInput defaultValue="" label="Cleaner" />
+            </FormControl>
+          </Grid>
+        </Grid>
+
+        {/* {props.status !== 'Pending' ? (
+          <Rating
+            name="worker-rating"
+            disabled={props.status === 'Completed'}
+            value={value}
+            size="large"
+            onChange={(_event, newValue) => {
+              setValue(newValue);
+            }}
+          />
+        ) : null} */}
+
+        <Stack spacing={1}>
+          <LoadingButton
+            disabled={props?.status !== 'Assigned'}
+            loading={isPending}
+            variant="contained"
+            color="primary"
+            onClick={handleSubmit}
+          >
+            Mark as done
+          </LoadingButton>
+        </Stack>
       </Stack>
     </Paper>
   );

@@ -43,7 +43,7 @@ export function RoomAllotmentOverview({ sx }: GroupOverviewProps): React.JSX.Ele
           </Stack>
           <Stack spacing={1}>
             <Typography color="text.secondary" gutterBottom variant="overline">
-              Room Booking is not live
+              Room Cleaning is now live
             </Typography>
           </Stack>
         </Stack>

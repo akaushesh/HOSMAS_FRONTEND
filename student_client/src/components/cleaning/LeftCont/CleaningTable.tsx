@@ -2,27 +2,7 @@
 
 import * as React from 'react';
 import { type CleaningRequest } from '@/services/cleaning';
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  OutlinedInput,
-  Paper,
-  Rating,
-  Select,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  Typography,
-  type SelectChangeEvent,
-} from '@mui/material';
+import { Paper, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { tableCellClasses } from '@mui/material/TableCell';
 import { Box } from '@mui/system';
@@ -54,7 +34,7 @@ export default function CleaningTable({ tasks }: EleProps): React.JSX.Element {
             <StyledTableCell align="center">Time</StyledTableCell>
             <StyledTableCell align="center">Janitor</StyledTableCell>
             <StyledTableCell align="center">Status</StyledTableCell>
-            <StyledTableCell align="center">Rating</StyledTableCell>
+            {/* <StyledTableCell align="center">Rating</StyledTableCell> */}
           </TableRow>
         </TableHead>
         <TableBody sx={{ borderRadius: '8px' }}>
@@ -66,29 +46,29 @@ export default function CleaningTable({ tasks }: EleProps): React.JSX.Element {
 }
 
 function RowCleaning({ task }: { task: CleaningRequest }): React.JSX.Element {
-  const [value, setValue] = React.useState({ rating: 0, status: task.status });
-  const [open, setOpen] = React.useState(false);
+  // const [value, setValue] = React.useState({ rating: 0, status: task.status });
+  // const [open, setOpen] = React.useState(false);
 
-  const handleOpen = (): void => {
-    setOpen(true);
-  };
+  // const handleOpen = (): void => {
+  //   setOpen(true);
+  // };
 
-  const handleClose = (): void => {
-    setOpen(false);
-  };
+  // const handleClose = (): void => {
+  //   setOpen(false);
+  // };
 
-  const handleChange = (event: SelectChangeEvent): void => {
-    setValue({ rating: value.rating, status: event.target.value });
-  };
+  // const handleChange = (event: SelectChangeEvent): void => {
+  //   setValue({ rating: value.rating, status: event.target.value });
+  // };
 
-  const handleSubmit = (): void => {
-    setOpen(false);
-  };
+  // const handleSubmit = (): void => {
+  //   setOpen(false);
+  // };
 
   return (
     <>
       <TableRow
-        onClick={handleOpen}
+        // onClick={handleOpen}
         sx={{
           cursor: 'pointer',
           transition: 'background-color 200ms ease-in-out',
@@ -99,9 +79,9 @@ function RowCleaning({ task }: { task: CleaningRequest }): React.JSX.Element {
       >
         <TableCell align="center">{dayjs(task.date).format('DD MMM YYYY')}</TableCell>
         <TableCell align="center">{dayjs(task.date).format('hh:mm A')}</TableCell>
-        <TableCell align="center">{task.worker}</TableCell>
+        <TableCell align="center">{task.worker_details.name}</TableCell>
         <TableCell align="center">{task.status}</TableCell>
-        <TableCell align="center">
+        {/* <TableCell align="center">
           <Rating
             name="read-only"
             sx={{ color: 'var(--mui-palette-text-secondaryChannel)' }}
@@ -109,10 +89,10 @@ function RowCleaning({ task }: { task: CleaningRequest }): React.JSX.Element {
             value={0}
             readOnly
           />
-        </TableCell>
+        </TableCell> */}
       </TableRow>
 
-      <Dialog disableEscapeKeyDown open={open} onClose={handleClose}>
+      {/* <Dialog disableEscapeKeyDown open={open} onClose={handleClose}>
         <DialogTitle>{`Review Form - ${dayjs(task.date).format('DD MMM YYYY')}`}</DialogTitle>
         <DialogContent>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 8, py: 1 }} gap={6}>
@@ -158,7 +138,7 @@ function RowCleaning({ task }: { task: CleaningRequest }): React.JSX.Element {
             Submit
           </Button>
         </DialogActions>
-      </Dialog>
+      </Dialog> */}
     </>
   );
 }

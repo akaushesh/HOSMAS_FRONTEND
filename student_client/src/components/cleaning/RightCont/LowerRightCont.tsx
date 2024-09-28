@@ -36,7 +36,7 @@ export default function LowerRightCont(): React.JSX.Element {
 
   const queryClient = useQueryClient();
 
-  const { mutate: createCleaningRequest, isPending } = useCreateCleaningRequest({});
+  const { mutate: createCleaningRequest, isPending, error } = useCreateCleaningRequest({});
   const { data } = useSlots();
   const slotData = data!;
 
@@ -125,6 +125,12 @@ export default function LowerRightCont(): React.JSX.Element {
           </Grid>
         ))}
       </Grid>
+
+      {error ? (
+        <Typography variant="caption" mt={3}>
+          {error.response?.data}
+        </Typography>
+      ) : null}
 
       <Stack direction="row" spacing={2} mt={3}>
         <LoadingButton loading={isPending} variant="contained" color="primary" onClick={onHandleConfirmSlots}>

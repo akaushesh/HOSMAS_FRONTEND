@@ -15,10 +15,23 @@ export interface CleaningRequestsResponse {
 
 export interface CleaningRequest {
   student_id: number;
-  worker: string;
-  slot: string;
+  worker: number;
+  worker_details: WorkerDetails;
+  slot: number;
+  slot_details: SlotDetails;
   date: string;
   status: string;
+}
+
+export interface SlotDetails {
+  start: string;
+  end: string;
+}
+
+export interface WorkerDetails {
+  name: string;
+  phone: string;
+  photo: string;
 }
 
 export interface CleaningRequestParams {

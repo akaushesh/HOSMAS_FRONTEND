@@ -11,7 +11,7 @@ import CleaningTable from './CleaningTable';
 export default function LeftCont(): React.JSX.Element {
   const { data: cleaningData } = useCleaningRequests({ page: 1, page_size: 10 });
   const cleaningRequests = cleaningData!;
-  const assignedCleaningRequests = cleaningRequests.data.results.filter(
+  const assignedCleaningRequests = cleaningRequests?.data?.results.filter(
     (cleaningRequest) => cleaningRequest.status !== 'Pending'
   );
   logger.debug('useCleaningRequests', cleaningRequests);
