@@ -13,7 +13,8 @@ class CleaningRequestSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CleaningRequest
-        fields = ('student_id',
+        fields = ('id',
+            'student_id',
             'room_id',
             'hostel_id',
             'level_id',

@@ -40,6 +40,8 @@ class getCleaningRequests(APIView):
             cleaning_requests = filter_objects(CleaningRequest.objects, **filters, student_id=request.user['student']['id'])
         elif request.user['role'] == 'supervisor':
             cleaning_requests = filter_objects(CleaningRequest.objects, **filters, hostel_id=request.user['supervisor']['hostel']['id'])
+        
+        cleaning_requests = cleaning_requests.order_by('-created_at', '-id')
 
         paginator = ResponsePagination()
         paginated_queryset = paginator.paginate_queryset(cleaning_requests, request)

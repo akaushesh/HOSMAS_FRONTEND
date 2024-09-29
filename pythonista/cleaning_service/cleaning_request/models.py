@@ -28,6 +28,8 @@ class CleaningRequest(models.Model):
     worker = models.ForeignKey('worker.Worker', on_delete=models.SET_NULL, null=True, blank=True)
     slot = models.ForeignKey('slots.Slot', on_delete=models.SET_NULL, null=True, blank=True)
     date = models.DateField(null=True, default=None, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
         return str(self.hostel_id) + " " + self.block + " " + self.room_number + " " + str(self.slot)
