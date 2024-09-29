@@ -1,6 +1,5 @@
 import type { AxiosResponse } from 'axios';
 
-import { authClient } from '@/lib/auth/client';
 import { logger } from '@/lib/default-logger';
 
 import { authApi, centralApi } from './api';
@@ -105,7 +104,7 @@ export interface CentralHostel {
 export interface OkResponse {}
 
 export const getProfile = async (): Promise<AxiosResponse<CentralProfileResponse>> => {
-  const token = (await authClient.getToken()).data;
+  const token = localStorage.getItem('custom-auth-token');
 
   if (token === null || token === undefined) {
     throw new Error('You must be logged in to perform this action');
@@ -127,7 +126,7 @@ export const getProfile = async (): Promise<AxiosResponse<CentralProfileResponse
 };
 
 export const changePassword = async (values: ResetPasswordData): Promise<AxiosResponse<OkResponse>> => {
-  const token = (await authClient.getToken()).data;
+  const token = localStorage.getItem('custom-auth-token');
 
   if (token === null || token === undefined) {
     throw new Error('You must be logged in to perform this action');

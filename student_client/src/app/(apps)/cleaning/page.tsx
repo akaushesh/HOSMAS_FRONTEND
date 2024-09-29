@@ -29,8 +29,8 @@ export default function Page(): React.JSX.Element {
         Room Cleaning
       </Typography>
 
-      <Grid container gap={3}>
-        <Grid item lg={7.5} md={6} xs={12}>
+      <Grid container gap={3} mb={4}>
+        <Grid item lg={7.5} md={6} xs={12} sx={{ display: { xs: 'none', md: 'block' } }}>
           <LeftCont />
         </Grid>
         <Grid item lg={4} md={5.5} xs={12}>
