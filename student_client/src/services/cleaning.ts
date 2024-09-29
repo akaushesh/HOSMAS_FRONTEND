@@ -14,6 +14,7 @@ export interface CleaningRequestsResponse {
 }
 
 export interface CleaningRequest {
+  id: number;
   student_id: number;
   worker: number;
   worker_details: WorkerDetails;

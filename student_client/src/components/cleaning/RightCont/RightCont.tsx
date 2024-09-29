@@ -23,11 +23,11 @@ export default function RightCont(): React.JSX.Element {
   return (
     <Grid container gap={3}>
       {previousCleaningRequest ? (
-        <Grid xs={12}>
+        <Grid item xs={12}>
           <UpperRightCont {...previousCleaningRequest} />
         </Grid>
       ) : null}
-      <Grid xs={12}>
+      <Grid item xs={12}>
         <LowerRightCont />
       </Grid>
     </Grid>

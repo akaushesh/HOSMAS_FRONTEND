@@ -26,20 +26,22 @@ const getStatusColor = (status: string): 'default' | 'primary' | 'success' | 'wa
 };
 
 export default function UpperRightCont(props: CleaningRequest): React.JSX.Element {
-  const { data: profile, isPending } = useProfile();
   const queryClient = useQueryClient();
+
+  const onSuccess = async (): Promise<void> => {
+    await queryClient.invalidateQueries({ queryKey: ['getCleaningRequests'] });
+    logger.debug('Invalidated query getCleanignRequests');
+  };
+
+  const { mutate: markDone, isPending } = useMarkCleaningRequestComplete({ onSuccess });
+
+  const { data: profile } = useProfile();
   const user = profile as AxiosResponse<CentralProfileResponse>;
   logger.debug('UpperRightCont', props);
 
   const handleSubmit = async (): Promise<void> => {
     markDone({ rating: 0, comments: '' });
-    await queryClient.invalidateQueries({ queryKey: ['getCleaningRequests'] });
-    logger.debug('Cleaning request marked as done');
   };
-
-  const { mutate: markDone } = useMarkCleaningRequestComplete({});
-
-  // const [value, setValue] = React.useState<number | null>(null);
 
   return (
     <Paper elevation={10} sx={{ p: 3, width: '100%' }}>
@@ -67,18 +69,6 @@ export default function UpperRightCont(props: CleaningRequest): React.JSX.Elemen
             </FormControl>
           </Grid>
         </Grid>
-
-        {/* {props.status !== 'Pending' ? (
-          <Rating
-            name="worker-rating"
-            disabled={props.status === 'Completed'}
-            value={value}
-            size="large"
-            onChange={(_event, newValue) => {
-              setValue(newValue);
-            }}
-          />
-        ) : null} */}
 
         <Stack spacing={1}>
           <LoadingButton

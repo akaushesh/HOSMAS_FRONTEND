@@ -30,10 +30,10 @@ export default function Page(): React.JSX.Element {
       </Typography>
 
       <Grid container gap={3}>
-        <Grid lg={7.5} md={6} xs={12}>
+        <Grid item lg={7.5} md={6} xs={12}>
           <LeftCont />
         </Grid>
-        <Grid lg={4} md={5.5} xs={12}>
+        <Grid item lg={4} md={5.5} xs={12}>
           <RightCont />
         </Grid>
       </Grid>

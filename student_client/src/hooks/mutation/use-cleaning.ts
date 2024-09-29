@@ -1,3 +1,4 @@
+import { type ErrorResponse } from '@/services/auth';
 import { createCleaningRequest, markCleaningRequestComplete } from '@/services/cleaning';
 import type {
   CleaningRequestCompleteData,
@@ -15,7 +16,7 @@ export const useMarkCleaningRequestComplete = ({
   onError,
 }: ResolutionFunctions<CleaningRequestCompleteResponse>): UseMutationResult<
   AxiosResponse<CleaningRequestCompleteResponse>,
-  AxiosError,
+  AxiosError<ErrorResponse>,
   CleaningRequestCompleteData
 > => {
   return useCustomMutation<CleaningRequestCompleteData, CleaningRequestCompleteResponse>({
@@ -30,7 +31,7 @@ export const useCreateCleaningRequest = ({
   onError,
 }: ResolutionFunctions<CreateCleaningRequestResponse>): UseMutationResult<
   AxiosResponse<CreateCleaningRequestResponse>,
-  AxiosError,
+  AxiosError<ErrorResponse>,
   CreateCleaningRequestParams
 > => {
   return useCustomMutation<CreateCleaningRequestParams, CreateCleaningRequestResponse>({

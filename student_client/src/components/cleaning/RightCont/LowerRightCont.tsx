@@ -36,7 +36,16 @@ export default function LowerRightCont(): React.JSX.Element {
 
   const queryClient = useQueryClient();
 
-  const { mutate: createCleaningRequest, isPending, error } = useCreateCleaningRequest({});
+  const onSuccess = async (): Promise<void> => {
+    await queryClient.invalidateQueries({ queryKey: ['getCleaningRequests'] });
+    setSelectedSlots([
+      { id: 0, time: '', date: '' },
+      { id: 0, time: '', date: '' },
+      { id: 0, time: '', date: '' },
+    ]);
+  };
+
+  const { mutate: createCleaningRequest, isPending, error } = useCreateCleaningRequest({ onSuccess });
   const { data } = useSlots();
   const slotData = data!;
 
@@ -47,6 +56,10 @@ export default function LowerRightCont(): React.JSX.Element {
   const currentTime = format(now, 'HH:mm:ss');
   const today = format(now, 'yyyy-MM-dd');
   const nextDay = format(new Date(now.setDate(now.getDate() + 1)), 'yyyy-MM-dd');
+
+  const areAllSlotsSelected = (): boolean => {
+    return selectedSlots.every((slot) => slot.id !== 0 && slot.time !== '' && slot.date !== '');
+  };
 
   const filteredSlots = slots
     .filter((slot) => {
@@ -88,8 +101,9 @@ export default function LowerRightCont(): React.JSX.Element {
     };
     logger.debug('Cleaning Request Data:', createCleaningRequestData);
     createCleaningRequest(createCleaningRequestData);
-    await queryClient.invalidateQueries({ queryKey: ['getCleaningRequests'] });
   };
+
+  logger.debug('error', error?.response?.data?.detail);
 
   const isSlotDisabled = (slot: string): boolean => selectedSlots.some((selectedSlot) => selectedSlot.time === slot);
 
@@ -97,7 +111,7 @@ export default function LowerRightCont(): React.JSX.Element {
     <Paper elevation={10} sx={{ width: 1, height: 1, p: 3 }}>
       <Typography variant="h5">Select Room cleaning slots</Typography>
       <Typography variant="caption" gutterBottom>
-        Choose your 3 preferred slots for today or the next day
+        Choose your 3 preferred slots to request for room cleaning
       </Typography>
 
       <Grid container spacing={2} mt={3}>
@@ -127,13 +141,19 @@ export default function LowerRightCont(): React.JSX.Element {
       </Grid>
 
       {error ? (
-        <Typography variant="caption" mt={3}>
-          {error.response?.data}
+        <Typography color="error.main" variant="caption" mt={3}>
+          {error?.response?.data.detail}
         </Typography>
       ) : null}
 
       <Stack direction="row" spacing={2} mt={3}>
-        <LoadingButton loading={isPending} variant="contained" color="primary" onClick={onHandleConfirmSlots}>
+        <LoadingButton
+          loading={isPending}
+          variant="contained"
+          color="primary"
+          onClick={onHandleConfirmSlots}
+          disabled={!areAllSlotsSelected()}
+        >
           Confirm Slots
         </LoadingButton>
         <Button disabled variant="outlined" color="primary">
