@@ -13,7 +13,7 @@ LOGGING = {
             'filename': LOGS_ROOT / 'error.log',
         },
         'console': {
-            'level': 'INFO',
+            'level': 'DEBUG',
             'class': 'logging.StreamHandler',
         },
     },
