@@ -3,9 +3,9 @@
 import * as React from "react";
 import { Stack } from "@mui/system";
 
-import hostels from "./assets/HostelData";
+// import hostels from "./assets/HostelData";
 import CleanerCards from "./cleaner-cards";
-import { tempCleaners } from "./assets/CleanersData";
+// import { tempCleaners } from "./assets/CleanersData";
 import { Box, Typography } from "@mui/material";
 import {
   getCleanersFromHostel,
@@ -15,33 +15,33 @@ import { getAllHostels, Root } from "@/services/hostel";
 
 export default function CleanerHostels(): React.JSX.Element {
   const [pageState, setPageState] = React.useState(0);
-  const [hostel, setHostel] = React.useState("");
+  const [hostel, setHostel] = React.useState(-1);
 
-  // const [hostels, setHostels] = React.useState<Root>([]);
+  const [hostels, setHostels] = React.useState<Root>([]);
 
-  // React.useEffect(() => {
-  //   const fetchHostels = async () => {
-  //     const hostels = await getAllHostels();
-  //     console.log(hostels.data);
-  //     setHostels(hostels.data);
-  //   };
-  //   fetchHostels();
-  // }, []);
+  React.useEffect(() => {
+    const fetchHostels = async () => {
+      const hostels = await getAllHostels();
+      console.log(hostels.data);
+      setHostels(hostels.data);
+    };
+    fetchHostels();
+  }, []);
 
-  // const [cleaners, setCleaners] = React.useState<CleanersResponse>([]);
+  const [cleaners, setCleaners] = React.useState<CleanersResponse>([]);
 
-  // React.useEffect(() => {
-  //   const fetchCleaners = async () => {
-  //     const cleaners = await getCleanersFromHostel(hostel);
-  //     console.log(cleaners.data);
-  //     setCleaners(cleaners.data);
-  //   };
-  //   if (pageState === 1) {
-  //     fetchCleaners();
-  //   }
-  // }, [pageState]);
+  React.useEffect(() => {
+    const fetchCleaners = async () => {
+      const cleaners = await getCleanersFromHostel(hostel.toString());
+      console.log(cleaners.data);
+      setCleaners(cleaners.data);
+    };
+    if (pageState === 1&&hostel!=-1){
+      fetchCleaners();
+    }
+  }, [pageState]);
 
-  const cleaners = tempCleaners;
+  // const cleaners = tempCleaners;
   const hostelsData = hostels;
 
   return (

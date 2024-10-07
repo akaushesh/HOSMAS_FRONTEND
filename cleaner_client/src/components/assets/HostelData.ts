@@ -6,7 +6,7 @@ export interface CleanerHostel {
 }
 const hostels = [
   {
-    id: "hostel-b",
+    id: "6",
     name: "Hostel B",
     image:
       "https://res.cloudinary.com/dmwydl8zn/image/upload/v1714996201/hosmas/hostel_b/lfxcfupvv3q8lnddlom4.jpg",

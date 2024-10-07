@@ -5,8 +5,8 @@ import { Box, Button, Paper, Typography } from "@mui/material";
 import { Stack } from "@mui/system";
 
 interface CleanerCardsProps {
-  data: { id: string; image: string; name: string }[];
-  setHostel?: (hostel: string) => void;
+  data: { id: number; image?: string; name: string,image_url?:string;photo?:string; }[];
+  setHostel?: (hostel: number) => void;
   setPageState?: (val: number) => void;
   pageState?: number;
 }
@@ -18,14 +18,15 @@ export default function CleanerCards({
   pageState,
 }: CleanerCardsProps): React.JSX.Element {
   const router = useRouter();
-  const handleClick = (path: string): void => {
+  const handleClick = (path: number): void => {
     if (pageState === 0 && setHostel && setPageState) {
       setHostel(path);
       setPageState(1);
     } else {
-      router.push(`/cleaners/${path}`);
+      router.push(`/${path}`);
     }
   };
+
 
   return (
     <Stack
@@ -46,7 +47,7 @@ export default function CleanerCards({
             // eslint-disable-next-line @typescript-eslint/no-unused-expressions
             setPageState && setPageState(0);
             // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-            setHostel && setHostel("");
+            setHostel && setHostel(-1);
           }}
         >
           <Typography variant="body2" fontWeight={600} color="#3A3A3A">
@@ -80,6 +81,7 @@ export default function CleanerCards({
             }}
           >
             {data.map((el) => {
+              console.log(el);
               return (
                 <Box
                   key={el.id}
@@ -87,14 +89,15 @@ export default function CleanerCards({
                     width: "100%",
                     height: pageState === 0 ? "23vh" : "30vh",
                     p: 1,
-                    background: `url(${el.image})`,
+                    background: `url(${pageState==0?el.image_url:el.photo})`,
                     backgroundRepeat: "no-repeat",
                     backgroundSize: "cover",
-                    backgroundPosition: "0 0",
+                    backgroundPosition: "center center",
                     position: "relative",
                     borderRadius: 2,
                     cursor: "pointer",
                     transition: "all 0.3s",
+                    backgroundColor:"#f0f0f0"
                   }}
                   onClick={() => {
                     handleClick(el.id);
@@ -104,11 +107,14 @@ export default function CleanerCards({
                     sx={{
                       bottom: 9,
                       right: 15,
+                      width:"fit-content",
+                      textAlign: "right",
                       position: "absolute",
                       background: "white",
                       px: 1,
                       py: 0.2,
-                      borderRadius: 0.5,
+                      ml:2,
+                      borderRadius: 1,
                     }}
                     fontWeight={700}
                     color="var(--TextMain-Color)"
