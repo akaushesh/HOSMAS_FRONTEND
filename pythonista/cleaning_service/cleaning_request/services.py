@@ -162,6 +162,8 @@ def assign_requests_to_workers(hostel_id):
                     continue
                 for i in range(len(request.preferred_slots)):
                     date = request.preferred_dates[i]
+                    if date!=datetime.now().date():
+                        continue
                     slot = common_services.get_object(Slot.objects, id=request.preferred_slots[i])
                     
                     if is_worker_available(worker, slot, date):

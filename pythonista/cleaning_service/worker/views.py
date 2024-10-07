@@ -70,8 +70,12 @@ class markWorkerAttendance(APIView):
         if request.user['role'] != 'supervisor':
             return Response({'error': 'You are not authorized to perform this action'}, status=status.HTTP_401_UNAUTHORIZED)
         
+        if filter_objects(Attendance.objects, date=datetime.now().today()).exists():
+            return Response({"error": "Attendance already marked for today!"}, status=status.HTTP_400_BAD_REQUEST)
+        
         worker_data = request.data.get('workers', [])
         responses = []
+        attendance = None
 
         for worker_info in worker_data:
             worker_id = worker_info.get('id')
