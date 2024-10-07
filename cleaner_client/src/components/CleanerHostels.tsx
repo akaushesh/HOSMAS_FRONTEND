@@ -39,6 +39,7 @@ export default function CleanerHostels(): React.JSX.Element {
     if (pageState === 1&&hostel!=-1){
       fetchCleaners();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pageState]);
 
   // const cleaners = tempCleaners;
