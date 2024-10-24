@@ -46,12 +46,11 @@ export default function LaundryForm({ toggleForm, setToggleForm }: LaundryFormPr
         onClose={() => {
           setToggleForm(false);
         }}
-        // fullWidth
-        maxWidth="lg" // Change to 'md', 'lg', or 'xl' based on your requirement
+        maxWidth="lg"
         sx={{
           '& .MuiDialog-paper': {
-            width: { xs:'90%',lg:"45%"}, // You can adjust this value (e.g., '80%' or '100%' for full width)
-            maxWidth: 'none', // Ensure that maxWidth is overridden if you want full flexibility
+            width: { xs:'90%',lg:"45%"}, 
+            maxWidth: 'none'
           },
         }}
       >
