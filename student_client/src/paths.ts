@@ -13,10 +13,9 @@ export const paths = {
     faqs: '/allocation/faqs',
   },
   overview: '/overview',
-  settings:'/settings',
-  laundry:'/laundry',
-  cleaning:'/cleaning',
+  settings: '/settings',
+  laundry: '/laundry',
+  cleaning: '/cleaning',
+  leave: '/leave',
   errors: { notFound: '/errors/not-found' },
-
-
 } as const;
