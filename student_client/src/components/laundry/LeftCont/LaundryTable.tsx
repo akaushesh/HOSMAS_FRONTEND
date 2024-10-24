@@ -13,6 +13,7 @@ import {
   TableCell,
   TableHead,
   TableRow,
+  Typography,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { tableCellClasses } from '@mui/material/TableCell';
@@ -45,9 +46,9 @@ export default function LaundryTable({ slips }: EleProps): React.JSX.Element {
       <Table stickyHeader>
         <TableHead>
           <TableRow sx={{ borderRadius: '8px', backgroundColor: 'red' }}>
-            <StyledTableCell align="center">Date Given</StyledTableCell>
-            <StyledTableCell align="center">Number of Clothes</StyledTableCell>
-            <StyledTableCell align="center">Date of Delivery</StyledTableCell>
+            <StyledTableCell align="center">Drop-off</StyledTableCell>
+            <StyledTableCell align="center">Clothes</StyledTableCell>
+            <StyledTableCell align="center">Pick-up</StyledTableCell>
           </TableRow>
         </TableHead>
         <TableBody sx={{ borderRadius: '8px' }}>
@@ -88,41 +89,90 @@ function RowLaundry({ slip }: { slip: ClothingTransaction }): React.JSX.Element 
         <TableCell align="center">{dayjs(slip.dateOfDelivery).format('DD MMM YYYY')}</TableCell>
       </TableRow>
 
-      <Dialog open={open} onClose={handleClose}>
-        <DialogTitle fontSize={22} fontWeight={600} >{`Laundry Details - ${dayjs(slip.dateGiven).format('DD MMM YYYY')}`}</DialogTitle>
-        <DialogContent>
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 5, py: 1 }} gap={6}>
-            <Paper elevation={10}  sx={{width:"40vw"}}>
+      <Dialog
+  open={open}
+  onClose={handleClose}
+  maxWidth="lg"
+  sx={{
+    '& .MuiDialog-paper': {
+      width: { xs: '90%', md: '40%' }, // 90% for xs, 40% for md and larger
+      maxWidth: 'none', // Ensure it doesn't shrink unnecessarily
+    },
+  }}
+>
+  <DialogTitle fontSize={25} fontWeight={600}>
+    Laundry Details
+    <Typography variant="body1" fontSize="19px">
+      {dayjs(slip.dateGiven).format('DD MMM YYYY')}
+    </Typography>
+  </DialogTitle>
+  <DialogContent>
+    <Paper elevation={10}>
+      <Table
+        sx={{
+          width: '100%',
+          tableLayout: 'fixed', // Ensure table takes up the full width and doesn't overflow
+        }}
+      >
+        <TableHead sx={{ borderRadius: '8px' }}>
+          <TableRow>
+            <StyledTableCell sx={{ fontSize: 14 }} align="center">
+              Items
+            </StyledTableCell>
+            <StyledTableCell sx={{ fontSize: 14 }} align="center">
+              Quantity
+            </StyledTableCell>
+            <StyledTableCell sx={{ fontSize: 14 }} align="center">
+              Damaged
+            </StyledTableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {slip.details.map((item) => (
+            <TableRow key={item[0]}>
+              <TableCell
+                align="center"
+                sx={{
+                  fontSize: 15,
+                  color: item[2] > 0 ? 'red' : 'green',
+                  wordWrap: 'break-word', // Ensure no content overflow
+                }}
+              >
+                {item[0]}
+              </TableCell>
+              <TableCell
+                align="center"
+                sx={{
+                  fontSize: 15,
+                  color: item[2] > 0 ? 'red' : 'green',
+                  wordWrap: 'break-word',
+                }}
+              >
+                {item[1]}
+              </TableCell>
+              <TableCell
+                align="center"
+                sx={{
+                  fontSize: 15,
+                  color: item[2] > 0 ? 'red' : 'green',
+                  wordWrap: 'break-word',
+                }}
+              >
+                {item[2] === 0 ? 'No' : item[2]}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </Paper>
+  </DialogContent>
+  <DialogActions>
+    <Button onClick={handleClose} sx={{ mb: 1, mr: 3 }} variant="contained">
+      Cancel
+    </Button>
+  </DialogActions>
+</Dialog>
 
-            <Table>
-              <TableHead sx={{ borderRadius: '8px' }}>
-                <TableRow sx={{ borderRadius: '8px' }}>
-                  <StyledTableCell sx={{fontSize:18}} align="center">Items</StyledTableCell>
-                  <StyledTableCell sx={{fontSize:18}} align="center">Quantity</StyledTableCell>
-                  <StyledTableCell sx={{fontSize:18}} align="center">Damaged</StyledTableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody sx={{ borderRadius: '8px' }}>
-                {slip.details.map((item) => (
-                  <TableRow
-                    key={item[0]}
-                    >
-                    <TableCell align="center" sx={{fontSize:15,color:item[2]>0?"red":"green"}} >{item[0]}</TableCell>
-                    <TableCell align="center" sx={{fontSize:15,color:item[2]>0?"red":"green"}} >{item[1]}</TableCell>
-                    <TableCell align="center" sx={{fontSize:15,color:item[2]>0?"red":"green"}} >{item[2]===0?"No":item[2]}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-                </Paper>
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose} sx={{mb:1,mr:3}} variant="contained">
-            Cancel
-          </Button>
-        </DialogActions>
-      </Dialog>
     </>
   );
 }
