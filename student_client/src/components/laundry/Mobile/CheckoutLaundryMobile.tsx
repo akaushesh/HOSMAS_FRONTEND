@@ -21,8 +21,7 @@ export default function CheckoutLaundryMobile({ setPageState }: CheckoutProps): 
   const [toggle, setToggle] = React.useState(true);
   const [toggleLFrom, setToggleLForm] = React.useState(false);
 
-  const isFormFilled = false;
-  const submit = '4567';
+  let submit = '4567';
   const get = [
     { id: '2123', date: '2022-09-17T17:00' },
     { id: '8971', date: '2022-09-19T17:00' },
@@ -87,7 +86,7 @@ export default function CheckoutLaundryMobile({ setPageState }: CheckoutProps): 
         mx={6}
         color="var(--mui-palette-text-primary)"
       >
-        {!isFormFilled && toggle
+        {submit === '' && toggle
           ? 'Fill the Laundry Form to Submit the laundry Request'
           : toggle
             ? 'Scan the QR code to Submit Laundry'
@@ -96,33 +95,33 @@ export default function CheckoutLaundryMobile({ setPageState }: CheckoutProps): 
 
       {toggle ? (
         <Stack alignItems="center">
-          {!isFormFilled ? (
-            <Button
-              fullWidth
-              variant="contained"
-              sx={{ py: 2, mt: 9,mx:6 }}
-              onClick={() => {
-                setToggleLForm(true);
-              }}
-            >
-              <Typography variant="body1"  fontWeight={600}>
-                Submit Laundry
-              </Typography>
-            </Button>
-          ) : (
+          {submit !== '' && (
             <>
-              <QRCode style={{ aspectRatio: '1/1', width: '70%' }} value={submit} />
+              <QRCode style={{ aspectRatio: '1/1', width: '70%', marginTop:"-10px" }} value={submit} />
               <Typography
                 variant="h5"
                 fontWeight={600}
                 textAlign="center"
-                mt={0}
                 color="var(--mui-palette-text-secondaryChannel)"
               >
                 CODE: <span style={{ color: 'var(--mui-palette-text-primary)' }}>{submit}</span>
               </Typography>
             </>
           )}
+
+          <Button
+            fullWidth
+            variant="contained"
+            sx={{ py: 2, mt:submit===''?9:2, mx: 6 }}
+            onClick={() => {
+              setToggleLForm(true);
+            }}
+          >
+            <Typography variant="body1" fontWeight={600}>
+              {submit === '' ? 'Submit Laundry' : 'Update Laundry'}
+            </Typography>
+          </Button>
+
         </Stack>
       ) : (
         <Stack alignItems="center" sx={{ width: 1, position: 'relative', m: 0 }}>

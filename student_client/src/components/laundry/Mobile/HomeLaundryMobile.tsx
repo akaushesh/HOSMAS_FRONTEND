@@ -16,7 +16,7 @@ interface HomeProps{
 export default function HomeLaundryMobile({setPageState}:HomeProps): React.JSX.Element {
   // 0 --> Home
   // 1 --> QR code
-  // 0 --> History
+  // 2 --> History
 
   const isActive = true;
   const nextLaundry = '2022-09-17T17:00';
@@ -35,6 +35,7 @@ export default function HomeLaundryMobile({setPageState}:HomeProps): React.JSX.E
         p={1}
       >
         <Button
+          // eslint-disable-next-line @typescript-eslint/no-unused-expressions -- false positive
           onClick={()=>{isActive?setPageState(1):null}}
           // eslint-disable-next-line react/jsx-no-useless-fragment -- false positive
           endIcon={isActive?<ArrowForwardIosIcon />:<></>}

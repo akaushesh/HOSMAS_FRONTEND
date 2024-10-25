@@ -11,14 +11,14 @@ export default function UpperRightCont():React.JSX.Element{
       
       <Typography variant="h5">Unique Laundary Number</Typography>
       
-      <Typography variant="h3" my={2} fontWeight={700} display="block">
+      <Typography variant="h4" my={2} fontWeight={700} display="block">
         {UniqueNum}
       </Typography>
       
       
       
       
-      <Typography variant="body2"  sx={{color:"var(--mui-palette-text-secondaryChannel)",fontWeight:"700"}} display="block">
+      <Typography variant="body2"  sx={{color:"var(--mui-palette-text-secondaryChannel)",fontWeight:"400"}} display="block">
       Please Do not share your Unique 5-Digits Laundry Number with anyone!
       </Typography>
 

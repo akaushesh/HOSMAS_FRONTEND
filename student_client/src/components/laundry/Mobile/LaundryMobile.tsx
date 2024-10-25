@@ -10,7 +10,7 @@ import HomeLaundryMobile from './HomeLaundryMobile';
 import LeftCont from '../LeftCont/LeftCont';
 
 export default function LaundryMobile(): React.JSX.Element {
-  const [pageState, setPageState] = React.useState(1);
+  const [pageState, setPageState] = React.useState(0);
   // 0 --> Home
   // 1 --> QR code
   // 0 --> History

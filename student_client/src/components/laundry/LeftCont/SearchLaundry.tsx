@@ -23,7 +23,7 @@ export default function SearchLaundry({searchFilters,setSearchFilters}:EleProps)
     <Box mt={1} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }} gap={2}>
       <DatePicker
         slotProps={{ textField: { size: 'small' } }}
-        sx={{ width: '36%' }}
+        sx={{ width:{xs:"60%",md:'36%'} }}
         value={dayjs(searchFilters.dateGiven)}
         onAccept={(newValue) => {
           changeSlot(newValue);

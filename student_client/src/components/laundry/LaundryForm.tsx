@@ -4,23 +4,23 @@ import * as React from 'react';
 import {
   Box,
   Button,
-  ButtonGroup,
   Dialog,
   DialogContent,
   DialogTitle,
   Divider,
+  Grid,
+  IconButton,
   Paper,
   Stack,
   Typography,
 } from '@mui/material';
 
-interface LaundryFormProps{
-    toggleForm:boolean;
-    setToggleForm:(prev:boolean)=>void;
+interface LaundryFormProps {
+  toggleForm: boolean;
+  setToggleForm: (prev: boolean) => void;
 }
 
-export default function LaundryForm({toggleForm,setToggleForm}:LaundryFormProps): React.JSX.Element {
-
+export default function LaundryForm({ toggleForm, setToggleForm }: LaundryFormProps): React.JSX.Element {
   const [laundryData, setLaundryData] = React.useState<Record<string, number>>({
     Jeans: 0,
     Pants: 0,
@@ -28,7 +28,7 @@ export default function LaundryForm({toggleForm,setToggleForm}:LaundryFormProps)
     Shorts: 0,
     Shirts: 0,
     'T-Shirts': 0,
-    'Kurta/Salwar': 0,
+    'Kurta/ Salwar': 0,
     Skirt: 0,
     Dupatta: 0,
     'Bed Sheet': 0,
@@ -46,77 +46,108 @@ export default function LaundryForm({toggleForm,setToggleForm}:LaundryFormProps)
         onClose={() => {
           setToggleForm(false);
         }}
-        fullWidth
+        maxWidth="lg"
+        sx={{
+          '& .MuiDialog-paper': {
+            width: { xs:'90%',lg:"45%"}, 
+            maxWidth: 'none'
+          },
+        }}
       >
         <DialogTitle fontSize={28} fontWeight={600}>
           Fill Laundry Form
         </DialogTitle>
         <DialogContent >
+        <Grid container spacing={1}>
+
           {Object.keys(laundryData).map((item) => {
-            
             // const isEven=index%2===0;
 
-            return(
-            <Box key={item} 
-              // sx={{background:isEven?"var(--mui-palette-secondary-light)":""}}
-            >
-              <Divider />
-
-              <Stack direction="row" justifyContent="space-between" alignItems="center" gap={6} sx={{ my: 0.37 }}>
-                <Typography variant="h6">{item}</Typography>
-
-                <Stack direction="row" justifyContent="flex-right" alignItems="center" gap={2}>
-                  <Paper
+            return (
+              <Grid item xs={12} md={6} key={item}>
+                <Box>
+                  <Stack
+                    direction="row"
+                    justifyContent="space-between"
+                    alignItems="center"
+                    gap={6}
                     sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      borderRadius: 0.8,
-                      px: 0.8,
+                      background:"var(--mui-palette-secondary-light)",
                       border: '1px solid var(--mui-palette-secondary-main)',
-                      py: 0.15,
+                      borderRadius: 1,
+                      px: 2,
+                      py: 0.5,
                     }}
                   >
-                    {laundryData[item]}
-                  </Paper>
-                  <ButtonGroup size="small">
-                    <Button
-                      disabled={totalClothes >= 10}
-                      onClick={() => {
-                        setLaundryData({ ...laundryData, [item]: laundryData[item] + 1 });
-                      }}
-                      sx={{
-                        py:0.7,
-                        '&:disabled': {
-                          color: 'var(--mui-palette-secondary-dark)',
-                          border: '1px solid var(--mui-palette-secondary-main)',
-                          opacity: 0.8,
-                        },
-                      }}
+                    <Typography variant="h6" sx={{ justifySelf: 'flex-start' }}>
+                      {item}
+                    </Typography>
+
+                    <Stack
+                      sx={{ justifySelf: 'flex-end' }}
+                      direction="row"
+                      justifyContent="flex-right"
+                      alignItems="center"
+                      gap={1}
                     >
-                      <Typography variant="h6">+</Typography>
-                    </Button>
-                    <Button
-                      disabled={laundryData[item] <= 0}
-                      onClick={() => {
-                        setLaundryData({ ...laundryData, [item]: laundryData[item] - 1 });
-                      }}
-                      sx={{
-                        py:0.7,
-                        '&:disabled': {
-                          color: 'var(--mui-palette-secondary-dark)',
+                      <IconButton
+                        disabled={totalClothes >= 10}
+                        onClick={() => {
+                          setLaundryData({ ...laundryData, [item]: laundryData[item] + 1 });
+                        }}
+                        sx={{
+                          py: 0.7,
+                          color: 'var(--mui-palette-primary-main)',
+                          '&:disabled': {
+                            color: 'var(--mui-palette-secondary-dark)',
+                            // border: '1px solid var(--mui-palette-secondary-main)',
+                            opacity: 0.8,
+                          },
+                        }}
+                      >
+                        <Typography variant="h6">+</Typography>
+                      </IconButton>
+
+                      <Paper
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          borderRadius: 0.8,
+                          px: 0.8,
                           border: '1px solid var(--mui-palette-secondary-main)',
-                          opacity: 0.8,
-                        },
-                      }}
-                    >
-                      <Typography variant="h6">-</Typography>
-                    </Button>
-                  </ButtonGroup>
-                </Stack>
-              </Stack>
-            </Box>
-          )})}
+                          py: 0.15,
+                        }}
+                      >
+                        {laundryData[item]}
+                      </Paper>
+
+                      <IconButton
+                        disabled={laundryData[item] <= 0}
+                        onClick={() => {
+                          setLaundryData({ ...laundryData, [item]: laundryData[item] - 1 });
+                        }}
+                        sx={{
+                          py: 0.7,
+                          color: 'var(--mui-palette-primary-main)',
+                          '&:disabled': {
+                            color: 'var(--mui-palette-secondary-dark)',
+                            // border: '1px solid var(--mui-palette-secondary-main)',
+                            opacity: 0.8,
+                          },
+                        }}
+                      >
+                        <Typography variant="h6">-</Typography>
+                      </IconButton>
+
+                    </Stack>
+                  </Stack>
+                </Box>
+              </Grid>
+            );
+          })}
+        </Grid>
+
           <Divider />
           <Stack direction="row" justifyContent="flex-end" gap={2} sx={{ mt: 2 }}>
             <Button
@@ -126,7 +157,7 @@ export default function LaundryForm({toggleForm,setToggleForm}:LaundryFormProps)
               sx={{
                 fontWeight: 600,
                 borderRadius: 1,
-                px:5,
+                px: 5,
                 background: 'var(--mui-palette-secondary-dark)',
                 color: 'var(--mui-palette-common-white)',
                 '&:hover': { background: 'var(--mui-palette-secondary-main)' },
@@ -144,7 +175,7 @@ export default function LaundryForm({toggleForm,setToggleForm}:LaundryFormProps)
               sx={{
                 fontWeight: 600,
                 borderRadius: 1,
-                px:5,
+                px: 5,
               }}
             >
               Submit

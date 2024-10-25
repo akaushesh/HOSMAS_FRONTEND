@@ -37,9 +37,9 @@ export default function Layout({ children }: LayoutProps): React.JSX.Element {
           minHeight: '100%',
         }}
       >
-        <Box sx={{ position: 'absolute', top: 0, left: '35%', zIndex: 0 }}>
+        {/* <Box sx={{ position: 'absolute', top: 0, left: '35%', zIndex: 0 }}>
           <Ellipse2 />
-        </Box>
+        </Box> */}
 
         {/* <Box  sx={{position:"absolute",bottom:0,left:"60%",zIndex:0}}>
           <Ellipse1/>
