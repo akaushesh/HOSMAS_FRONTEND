@@ -5,8 +5,8 @@ import { Stack } from '@mui/system';
 
 import { config } from '@/config';
 import LeftCont from '@/components/laundry/LeftCont/LeftCont';
-import RightCont from '@/components/laundry/RightCont/RightCont';
 import LaundryMobile from '@/components/laundry/Mobile/LaundryMobile';
+import RightCont from '@/components/laundry/RightCont/RightCont';
 
 export const metadata = { title: `Laundry | ${config.site.name}` } satisfies Metadata;
 
@@ -25,9 +25,7 @@ export default function Page(): React.JSX.Element {
         '--Room-Color': 'var(--mui-palette-secondary-main)',
       }}
     >
-
-      <Box sx={{display:{xs:'none',md:'block'}}} >
-
+      <Box sx={{ display: { xs: 'none', md: 'block' } }}>
         <Typography variant="h3" sx={{ color: 'var(--Page-HeadColor)' }}>
           Laundry Management
         </Typography>
@@ -38,28 +36,21 @@ export default function Page(): React.JSX.Element {
           width={1}
         >
           <Box width="54%">
-            <LeftCont/>
+            <LeftCont />
           </Box>
           <Box width="42%">
-            <RightCont/>
+            <RightCont />
           </Box>
         </Box>
-
-      </Box >
-
-
-      <Box sx={{display:{xs:'block',md:'none'}}} >
-          
-          <Typography variant="h5" sx={{ fontSize:"25px",color: 'var(--Page-HeadColor)' }}>
-            Laundry Management
-          </Typography>
-          
-          <LaundryMobile/>
-          
       </Box>
 
+      <Box sx={{ display: { xs: 'block', md: 'none' } }}>
+        <Typography variant="h5" sx={{ fontSize: '25px', color: 'var(--Page-HeadColor)' }}>
+          Laundry Management
+        </Typography>
 
-
+        <LaundryMobile />
+      </Box>
     </Stack>
   );
 }
