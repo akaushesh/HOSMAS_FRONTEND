@@ -17,7 +17,6 @@ import {
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { tableCellClasses } from '@mui/material/TableCell';
-import { Box } from '@mui/system';
 import dayjs from 'dayjs';
 
 interface ClothingTransaction {
