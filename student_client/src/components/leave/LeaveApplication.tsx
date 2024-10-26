@@ -9,7 +9,7 @@ import LeaveTimeline from './LeaveTimeline';
 import Pass from './Pass';
 
 export default function LeaveApplication(): React.JSX.Element {
-  const [phase, setPhase] = React.useState(1);
+  const [phase, setPhase] = React.useState(0);
 
   const setPhaseOne = (): void => {
     setPhase(1);
