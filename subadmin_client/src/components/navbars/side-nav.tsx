@@ -163,7 +163,7 @@ function renderNavItems({ items, pathname }: { items?: NavItemConfig[]; pathname
                 </Collapse>
               </>
             ) : (
-              <NavItem isSub={false} pathname={pathname} {...item} />
+              <NavItem isSub={false} pathname={pathname}  {...item} />
             )}
           </Box>
         );

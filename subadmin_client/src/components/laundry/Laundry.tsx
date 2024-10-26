@@ -1,17 +1,21 @@
 'use client';
 
 import * as React from 'react';
-import { Box, Button, Typography } from '@mui/material';
-import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
-import { Stack } from '@mui/system';
-import History from './History/History';
+import { Box} from '@mui/material';
 import HomeLaundry from './HomeLaundry';
 import Scanner from './Scanner';
+import LaundryData from './LaundryData';
+import CollectData from './CollectData';
 
+export interface QRDataProps {
+  details: Record<string, number>; 
+  LaundryId: string; 
+  transactionId: string; 
+}
 
 export default function Laundry(): React.JSX.Element {
   const [pageState, setPageState] = React.useState(0);
-  const [QRData, setQRData] = React.useState('');
+  const [QRData, setQRData] = React.useState<QRDataProps|null>(null);
   // 0 --> Home
   // 1 --> QR code
   // 0 --> History
@@ -20,30 +24,13 @@ export default function Laundry(): React.JSX.Element {
     <Box>
       {pageState === 0 && <HomeLaundry setPageState={setPageState} />}
 
-      {pageState === 1 && <Scanner setPageState={setPageState} setQRData={setQRData} mode='recieve' />}
+      {pageState === 1 && <Scanner setPageState={setPageState} setQRData={setQRData} mode='drop' />}
 
-      {pageState === 2 && <Scanner setPageState={setPageState} setQRData={setQRData} mode='return' />}
+      {pageState === 2 && <Scanner setPageState={setPageState} setQRData={setQRData} mode='pick' />}
 
-      {pageState === 3 && (
-        <Stack alignItems="center">
-          <Button
-            startIcon={<ArrowBackIosIcon />}
-            sx={{ mt: 1, alignSelf: 'flex-start' }}
-            onClick={() => {
-              setPageState(0);
-            }}
-          >
-            <Typography variant="body1" color="var(--mui-palette-text-primary)">
-              back to main page
-            </Typography>
-          </Button>
-
-            <Box mt={2}>
-              <History/>
-            </Box>
-         
-        </Stack>
-      )}
+      {pageState === 3 && (<LaundryData data={QRData} setPageState={setPageState} />)}
+      
+      {pageState === 4 && (<CollectData data={QRData} setPageState={setPageState} />)}
     </Box>
   );
 }

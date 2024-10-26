@@ -4,7 +4,7 @@ import Container from '@mui/material/Container';
 import GlobalStyles from '@mui/material/GlobalStyles';
 
 import { AuthGuard } from '@/components/auth/auth-guard';
-import { Ellipse2 } from '@/components/core/ellipse';
+// import { Ellipse2 } from '@/components/core/ellipse';
 import { MainNav } from '@/components/navbars/main-nav';
 import { SideNav } from '@/components/navbars/side-nav';
 import { BottomNav } from '@/components/navbars/bottom-nav';
@@ -57,7 +57,7 @@ export default function Layout({ children }: LayoutProps): React.JSX.Element {
           <MainNav />
 
           <main>
-            <Container maxWidth="xl" sx={{ py: '64px' }}>
+            <Container maxWidth="xl" sx={{ pt:5,pb: '64px' }}>
               {children}
             </Container>
           </main>
