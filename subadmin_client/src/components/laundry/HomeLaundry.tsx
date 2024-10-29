@@ -1,20 +1,51 @@
 'use client';
 
 import * as React from 'react';
-import { Box, Button, Divider, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, Divider, Typography } from '@mui/material';
 import { Stack } from '@mui/system';
 import dayjs from 'dayjs';
+import { useProfile } from '@/hooks/query/use-profile';
+import { type AxiosError, type AxiosResponse } from 'axios';
+import { type SupervisorProfileResponse } from '@/services/profile';
+import { useLaundryDetails } from '@/hooks/mutation/use-laundry';
+import {type  LaundryDetailsResponse } from '@/services/laundry';
+import { type ErrorResponse } from '@/services/auth';
+import { logger } from '@/lib/default-logger';
 
 interface HomeProps{
   setPageState: (val:number)=>void;
 }
 
+
 export default function HomeLaundry({setPageState}:HomeProps): React.JSX.Element {
 
-  const hostel="Hostel O";
+  
 
-  const students=70;
-  const garments=888;
+  const [laundryDetails,setLaundryDetails]=React.useState<LaundryDetailsResponse|null>(null)
+  
+  const { data: profile } = useProfile();
+  const user = profile as AxiosResponse<SupervisorProfileResponse>;
+  const hostelID=user?.data?.supervisor?.hostel?.id;
+
+  const hostel=user?.data?.supervisor?.hostel?.name;
+  
+  const onSuccess = async (res: AxiosResponse<LaundryDetailsResponse>): Promise<void> => {
+    setLaundryDetails(res.data);
+  };
+
+  const onError = (error: AxiosError<ErrorResponse>): void => {
+    logger.error(error);
+  };
+
+  const {mutate:laundryDetailsRes, }=useLaundryDetails({onSuccess,onError});
+
+  React.useEffect(()=>{
+    if(hostelID){
+      laundryDetailsRes(hostelID);
+    }
+    
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- single dep
+  },[hostelID])
 
   return (
     <Stack alignItems='center'>
@@ -63,7 +94,9 @@ export default function HomeLaundry({setPageState}:HomeProps): React.JSX.Element
           </Typography>
           <Box sx={{aspectRatio:1/1,p:1,borderRadius:1,width:'70%',display:"flex",alignItems:"center",justifyContent:"center"}} bgcolor='var(--mui-palette-primary-main)'>
             <Typography variant="h2" alignItems='center' color='var(--mui-palette-common-white)'>
-              {students}
+              {laundryDetails?laundryDetails.total_slips:(
+                <CircularProgress size="35px" thickness={6} sx={{color:"white"}}/>
+              )}
             </Typography>
           </Box>
 
@@ -88,7 +121,9 @@ export default function HomeLaundry({setPageState}:HomeProps): React.JSX.Element
           </Typography>
           <Box sx={{aspectRatio:1/1,p:1,borderRadius:1,width:'70%',display:"flex",alignItems:"center",justifyContent:"center"}} bgcolor='var(--mui-palette-primary-main)'>
             <Typography variant="h2" alignItems='center' color='var(--mui-palette-common-white)'>
-              {garments}
+              {laundryDetails?laundryDetails.total_items:(
+                <CircularProgress size="35px" thickness={6} sx={{color:"white"}}/>
+              )}
             </Typography>
           </Box>
 

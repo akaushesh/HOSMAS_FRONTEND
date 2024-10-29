@@ -7,6 +7,11 @@ import QrScanner from 'qr-scanner';
 
 import DottedLoader from '../core/dotted-loader';
 import { type QRDataProps } from './Laundry';
+import {type AxiosError, type AxiosResponse } from 'axios';
+import {type LaundrySlipResponse } from '@/services/laundry';
+import { logger } from '@/lib/default-logger';
+import {type ErrorResponse } from '@/services/auth';
+import { useVerifySlip } from '@/hooks/mutation/use-laundry';
 
 interface CheckoutProps {
   setQRData: (val: QRDataProps) => void;
@@ -17,44 +22,60 @@ interface CheckoutProps {
 export default function Scanner({ setPageState, setQRData, mode }: CheckoutProps): React.JSX.Element {
   const videoRef = React.useRef<HTMLVideoElement | null>(null);
   const [camError, setCamError] = React.useState<string | null>(null);
-  const [loading, setLoading] = React.useState<boolean>(false);
   const [error, setError] = React.useState<string | null>(null);
 
-  const fetchData = async (data: string): Promise<void> => {
-    setLoading(true);
 
-    let res = {};
-
-    setTimeout(() => {
-      setLoading(false);
-    }, 3000);
-
-    if (res?.data?.isValidId) {
-      if (mode === res?.data?.mode) {
-        // setQRData(data);
-        setError(null); 
-        setPageState(mode === 'drop' ? 3 : 4);
-      } else {
-        const action = mode === 'drop' ? 'Submit' : 'Collect';
-        setError(`Please show the ${action} QR code.`);
-        setTimeout(() => {
-          setError(null);
-        }, 3000);
-      }
-    } else {
-      setError('Invalid QR code');
-      setTimeout(() => {
-        setError(null);
-      }, 3000);
-    }
+  const onSuccess = async (res: AxiosResponse<LaundrySlipResponse>): Promise<void> => {
+    logger.debug(res.data);
+    const { LaundrySlipID: _LaundrySlipID, id: _id, ...rest } = res.data.items;
+    const items: Record<string, number> = rest;
+    setQRData({
+      details:items,
+      LaundryId:String(res.data.user_id),
+      transactionId:res.data.transaction_id
+    })
+    setError(null); 
+    setPageState(mode === 'drop' ? 3 : 4);
   };
 
-  const verifyInitials = (
-    // data: string
-  ): boolean => {
-    // return data.startsWith('hosmas-laundry-');
-    return true;
-  }
+
+  const onError = (err: AxiosError<ErrorResponse>): void => {
+    logger.error(err);
+    let nl="";
+    if(err.status===412||err.status===410){
+      nl="Invalid QR Code"
+    }
+    else if(err.status===409){
+      nl="Show Submit QR code"
+    }
+    else{
+      nl="Server Error"
+    }
+    setError(`${err.response?.data?.details || " "}<br/>${nl}`);
+    setTimeout(() => {
+      setError(null);
+    }, 3000);
+  };  
+
+  const {mutate:verifySlip,isPending}=useVerifySlip({onSuccess,onError});
+
+
+
+  const fetchData = (data: string): void => {
+
+    verifySlip({
+      transaction_id: data,
+      action: mode
+    })
+
+  };
+
+  // const verifyInitials = (
+  //   data: string
+  // ): boolean => {
+  //   // return data.startsWith('hosmas-laundry-');
+  //   return true;
+  // }
 
   React.useEffect(() => {
     let qrScanner: QrScanner | null = null;
@@ -62,19 +83,20 @@ export default function Scanner({ setPageState, setQRData, mode }: CheckoutProps
     if (videoRef.current) {
       qrScanner = new QrScanner(
         videoRef.current,
-        async (result) => {
-          console.log('Decoded QR code:', result.data);
-          if (!verifyInitials(result.data)) {
-            setError('Invalid QR code');
-            setTimeout(() => {
-              setError(null);
-            }, 3000);
-          }
-          else{
-            await fetchData(result.data);
-            setQRData(result.data);
+        async (result:{data:string}) => {
+          
+          // if (!verifyInitials(result.data)){
+
+          //   setError('Invalid QR code');
+          //   setTimeout(() => {
+          //     setError(null);
+          //   }, 3000);
+
+          // }
+          // else{
+            fetchData(result.data);
             setCamError(null);
-          }
+          // }
         },
         {
           preferredCamera: 'environment',
@@ -95,6 +117,7 @@ export default function Scanner({ setPageState, setQRData, mode }: CheckoutProps
         qrScanner.destroy();
       }
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- limited deps
   }, [setQRData, mode]);
 
   return (
@@ -119,13 +142,13 @@ export default function Scanner({ setPageState, setQRData, mode }: CheckoutProps
       </Typography>
 
       <Stack alignItems="center" mt={8} sx={{ position: 'relative', width: 1 }}>
-        {loading ? (
+        {isPending ? (
           <Box sx={{ position: 'absolute', top: '55%', left: '50%', zIndex: 20 }}>
             <DottedLoader />
           </Box>
         ) : null}
 
-        <Stack alignItems="center" sx={{ width: { xs: 0.7, sm: 0.6, md: 0.4, lg: 0.3 }, opacity: loading ? 0.4 : 1 }}>
+        <Stack alignItems="center" sx={{ width: { xs: 0.7, sm: 0.6, md: 0.4, lg: 0.3 }, opacity: isPending ? 0.4 : 1 }}>
           {camError ? (
             <Typography color="error" variant="h5" textAlign="center" mt={8}>
               {camError}
@@ -211,10 +234,8 @@ export default function Scanner({ setPageState, setQRData, mode }: CheckoutProps
         </Stack>
       </Stack>
       {error ? (
-        <Typography color="error" variant="h5" textAlign="center" mt={5}>
-          {error}
-        </Typography>
+        <Typography color="error" variant="h6" textAlign="center" mt={5} dangerouslySetInnerHTML={{ __html: error.replace(/<br\s*\/?>/g, '<br />') }} />
       ) : null}
     </Stack>
   );
-}
+} 

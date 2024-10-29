@@ -16,7 +16,8 @@ export interface TokenResponse {
 }
 
 export interface ErrorResponse {
-  detail: string;
+  detail?: string;
+  details?: string;
 }
 
 interface InitiatePasswordResetData {

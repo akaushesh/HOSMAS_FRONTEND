@@ -16,9 +16,6 @@ export interface QRDataProps {
 export default function Laundry(): React.JSX.Element {
   const [pageState, setPageState] = React.useState(0);
   const [QRData, setQRData] = React.useState<QRDataProps|null>(null);
-  // 0 --> Home
-  // 1 --> QR code
-  // 0 --> History
 
   return (
     <Box>

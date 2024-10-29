@@ -5,6 +5,12 @@ import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import { Box, Button, CircularProgress, Divider, Grid, Stack, Typography } from '@mui/material';
 
 import { type QRDataProps } from './Laundry';
+import { laundryItems, useDeliverLaundry } from '@/hooks/mutation/use-laundry';
+import { LoadingButton } from '@mui/lab';
+import { type AxiosError, type AxiosResponse } from 'axios';
+import { type SubmissionResponse } from '@/services/laundry';
+import { type ErrorResponse } from '@/services/auth';
+import { logger } from '@/lib/default-logger';
 
 interface LaundryFormProps {
   data: QRDataProps | null;
@@ -14,23 +20,43 @@ interface LaundryFormProps {
 export default function CollectData({ data, setPageState }: LaundryFormProps): React.JSX.Element {
   const timeCount = 5;
   const [timer, setTimer] = React.useState(timeCount);
+  const [success, setSuccess] = React.useState(false);
 
-  const [laundryData, setLaundryData] = React.useState<Record<string, number>>({
-    Jeans: 0,
-    Pants: 0,
-    Pyjama: 2,
-    Shorts: 0,
-    Shirts: 1,
-    'T-Shirts': 3,
-    'Kurta/Salwar': 4,
-    Skirt: 4,
-    Dupatta: 1,
-    'Bed Sheet': 1,
-    'Pillow Cover': 2,
-    'Towel/H-Towel': 0,
-    Turban: 0,
-    'Upper Hood': 0,
-  });
+
+  const laundryData:Record<string, number>= data ? data.details : {
+    jeans: 0,
+    pants: 0,
+    pyjama: 0,
+    shorts: 0,
+    shirts: 0,
+    tshirts: 0,
+    kurta_salwar: 0,
+    skirts: 0,
+    dupatta: 0,
+    bedsheet: 0,
+    pillow_cover: 0,
+    towel_hand_towel: 0,
+    turban: 0,
+    upper_hood: 0,
+  };
+
+
+  const onSuccess = async (res: AxiosResponse<SubmissionResponse>): Promise<void> => {
+    // setLaundryData(res.data);
+    logger.debug(res.data);
+    setSuccess(true);
+    setTimer(timeCount);
+  };
+
+  const onError = (error: AxiosError<ErrorResponse>): void => {
+    logger.error(error);
+  };  
+
+  const {mutate:deliverSlip,isPending}=useDeliverLaundry({onSuccess,onError});
+
+  const handleSubmit = (): void => {
+    deliverSlip(data?.transactionId);
+  };
 
 
   const handleSkip = (): void => {
@@ -41,20 +67,22 @@ export default function CollectData({ data, setPageState }: LaundryFormProps): R
     // eslint-disable-next-line no-undef -- setInterval is a NodeJS API
     let countdownInterval: NodeJS.Timeout;
 
-    if (timer > 0) {
+    if (success && timer > 0) {
       countdownInterval = setInterval(() => {
         setTimer((prev) => prev - 1);
       }, 1000);
     }
 
     if (timer === 0) {
+      setSuccess(false);
       setPageState(2);
     }
 
     return () => {
       clearInterval(countdownInterval);
     };
-  }, [timer, setPageState]);
+  }, [success, timer, setPageState]);
+
 
   return (
     <Stack alignItems="center">
@@ -69,6 +97,58 @@ export default function CollectData({ data, setPageState }: LaundryFormProps): R
           back to main page
         </Typography>
       </Button>
+
+
+      {success ? (
+        <Stack alignItems="center" py="50%">
+          <Typography variant="h5" fontSize="27px" px={1} fontWeight={600}>
+            Laundry Delivered
+          </Typography>
+
+          <Stack mt={3} direction="row" alignItems="center" justifyContent="center">
+            <Typography variant="body1" color="var(--mui-palette-primary-main)" px={1} fontWeight={600}>
+              Redirecting in {timer} seconds
+            </Typography>
+            <Box sx={{ position: 'relative', display: 'inline-flex' }}>
+              <CircularProgress variant="determinate" value={(100 / timeCount) * (timeCount - timer + 1)} />
+              <Box
+                sx={{
+                  top: 0,
+                  left: 0,
+                  bottom: 0,
+                  right: 0,
+                  position: 'absolute',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Typography
+                  variant="body1"
+                  component="div"
+                  sx={{ color: 'var(--mui-palette-primary-main)', fontWeight: 600 }}
+                >
+                  {timer}
+                </Typography>
+              </Box>
+            </Box>
+          </Stack>
+          <Button
+            variant="outlined"
+            onClick={handleSkip}
+            sx={{
+              fontWeight: 500,
+              borderRadius: 1,
+              border: '1px solid var(--mui-palette-primary-main)',
+              px: 6,
+              py: 0.3,
+              mt: 1,
+            }}
+          >
+            Skip
+          </Button>
+        </Stack>
+      ) : (
 
         <Box mt={2.5}>
           <Typography variant="h5" px={1} fontWeight={600}>
@@ -98,7 +178,7 @@ export default function CollectData({ data, setPageState }: LaundryFormProps): R
                         }}
                       >
                         <Typography variant="h6" sx={{ justifySelf: 'flex-start' }}>
-                          {item}
+                          {laundryItems[item]}
                         </Typography>
                         
                         <Typography variant="body1" mr={1} sx={{ justifySelf: 'flex-end' }}>
@@ -113,53 +193,44 @@ export default function CollectData({ data, setPageState }: LaundryFormProps): R
             </Grid>
 
             <Divider />
-            <Stack mt={2} mb={4} alignItems="center">
 
-              <Stack mt={3} direction="row" alignItems="center" justifyContent="center">
-                <Typography variant="body1" color="var(--mui-palette-texxt-primary)" px={1} fontWeight={600}>
-                  Redirecting in {timer} seconds
-                </Typography>
-                <Box sx={{ position: 'relative', display: 'inline-flex' }}>
-                  <CircularProgress variant="determinate" value={(100 / timeCount) * (timeCount - timer + 1)} />
-                  <Box
-                    sx={{
-                      top: 0,
-                      left: 0,
-                      bottom: 0,
-                      right: 0,
-                      position: 'absolute',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                    >
-                    <Typography
-                      variant="body1"
-                      component="div"
-                      sx={{ color: 'var(--mui-palette-texxt-primary)', fontWeight: 600 }}
-                      >
-                      {timer}
-                    </Typography>
-                  </Box>
-                </Box>
-              </Stack>
+            <Stack direction="row" justifyContent="center" gap={2} sx={{ mt: 4, mb: 3 }}>
               <Button
-                variant="outlined"
-                onClick={handleSkip}
-                sx={{
-                  fontWeight: 500,
-                  borderRadius: 1,
-                  border: '1px solid var(--mui-palette-primary-main)',
-                  px: 6,
-                  py: 0.3,
-                  mt: 1,
+                onClick={() => {
+                  setPageState(2);
                 }}
-                >
-                Skip
+                sx={{
+                  fontWeight: 600,
+                  borderRadius: 1,
+                  px: 5,
+                  background: 'var(--mui-palette-secondary-dark)',
+                  color: 'var(--mui-palette-common-white)',
+                  '&:hover': { background: 'var(--mui-palette-secondary-main)' },
+                }}
+                variant="contained"
+              >
+                Cancel
               </Button>
+              <LoadingButton
+                variant="contained"
+                onClick={() => {
+                  handleSubmit();
+                }}
+                loading={isPending}
+                sx={{
+                  fontWeight: 600,
+                  borderRadius: 1,
+                  px: 5,
+                }}
+              >
+                Confirm
+              </LoadingButton>
             </Stack>
+            
           </Stack>
         </Box>
+            )}
+
     </Stack>
   );
 }

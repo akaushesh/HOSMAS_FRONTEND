@@ -3,7 +3,14 @@
 import * as React from 'react';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import { Box, Button, CircularProgress, Divider, Grid, IconButton, Paper, Stack, Typography } from '@mui/material';
+
 import { type QRDataProps } from './Laundry';
+import { laundryItems, useCheckoutSlip } from '@/hooks/mutation/use-laundry';
+import { type AxiosError, type AxiosResponse } from 'axios';
+import { type SubmissionResponse} from '@/services/laundry';
+import { type ErrorResponse } from '@/services/auth';
+import { logger } from '@/lib/default-logger';
+import { LoadingButton } from '@mui/lab';
 
 interface LaundryFormProps {
   data: QRDataProps | null;
@@ -15,27 +22,49 @@ export default function LaundryData({ data, setPageState }: LaundryFormProps): R
   const [success, setSuccess] = React.useState(false);
   const [timer, setTimer] = React.useState(timeCount);
 
-  const [laundryData, setLaundryData] = React.useState<Record<string, number>>({
-    Jeans: 0,
-    Pants: 0,
-    Pyjama: 0,
-    Shorts: 0,
-    Shirts: 0,
-    'T-Shirts': 0,
-    'Kurta/Salwar': 0,
-    Skirt: 0,
-    Dupatta: 0,
-    'Bed Sheet': 0,
-    'Pillow Cover': 0,
-    'Towel/H-Towel': 0,
-    Turban: 0,
-    'Upper Hood': 0,
+  const [laundryData, setLaundryData] = React.useState<Record<string, number>>(data ? data.details : {
+    jeans: 0,
+    pants: 0,
+    pyjama: 0,
+    shorts: 0,
+    shirts: 0,
+    tshirts: 0,
+    kurta_salwar: 0,
+    skirts: 0,
+    dupatta: 0,
+    bedsheet: 0,
+    pillow_cover: 0,
+    towel_hand_towel: 0,
+    turban: 0,
+    upper_hood: 0,
   });
+
+  const laundryKeys: string[] = Object.keys(laundryData);
+
   const totalClothes = Object.values(laundryData).reduce((total, count) => total + count, 0);
 
-  const handleSubmit = (): void => {
+  const onSuccess = async (res: AxiosResponse<SubmissionResponse>): Promise<void> => {
+    // setLaundryData(res.data);
+    logger.debug(res.data);
     setSuccess(true);
     setTimer(timeCount);
+  };
+
+  const onError = (error: AxiosError<ErrorResponse>): void => {
+    logger.error(error);
+  };  
+
+  const {mutate:checkoutSlip,isPending}=useCheckoutSlip({onSuccess,onError});
+
+
+
+
+  const handleSubmit = (): void => {
+    const obj={
+      transaction_id:data?.transactionId,
+      items:laundryData
+    }
+    checkoutSlip(obj);
   };
 
   const handleSkip = (): void => {
@@ -62,6 +91,9 @@ export default function LaundryData({ data, setPageState }: LaundryFormProps): R
     };
   }, [success, timer, setPageState]);
 
+
+
+
   return (
     <Stack alignItems="center">
       <Button
@@ -81,13 +113,13 @@ export default function LaundryData({ data, setPageState }: LaundryFormProps): R
           <Typography variant="h5" fontSize="27px" px={1} fontWeight={600}>
             Laundry Submitted
           </Typography>
-          
+
           <Stack mt={3} direction="row" alignItems="center" justifyContent="center">
             <Typography variant="body1" color="var(--mui-palette-primary-main)" px={1} fontWeight={600}>
               Redirecting in {timer} seconds
             </Typography>
             <Box sx={{ position: 'relative', display: 'inline-flex' }}>
-            <CircularProgress variant="determinate" value={(100 / timeCount) * (timeCount - timer + 1)} />
+              <CircularProgress variant="determinate" value={(100 / timeCount) * (timeCount - timer + 1)} />
               <Box
                 sx={{
                   top: 0,
@@ -100,12 +132,15 @@ export default function LaundryData({ data, setPageState }: LaundryFormProps): R
                   justifyContent: 'center',
                 }}
               >
-                <Typography variant="body1" component="div" sx={{ color: 'var(--mui-palette-primary-main)', fontWeight:600 }}>
+                <Typography
+                  variant="body1"
+                  component="div"
+                  sx={{ color: 'var(--mui-palette-primary-main)', fontWeight: 600 }}
+                >
                   {timer}
                 </Typography>
               </Box>
             </Box>
-            
           </Stack>
           <Button
             variant="outlined"
@@ -125,15 +160,14 @@ export default function LaundryData({ data, setPageState }: LaundryFormProps): R
       ) : (
         <Box mt={2.5}>
           <Typography variant="h5" px={1} fontWeight={600}>
-            Verify Laundry 
+            Verify Laundry
           </Typography>
-          <Typography variant="body1" px={2} color="var(--mui-palette-primary-main)">{data?.LaundryId} 
+          <Typography variant="body1" px={2} color="var(--mui-palette-primary-main)">
+            {data?.LaundryId}
           </Typography>
           <Stack mt={2} px={1.5}>
             <Grid container spacing={1}>
-              {Object.keys(laundryData).map((item) => {
-                // const isEven=index%2===0;
-
+              {laundryKeys.map((item) => {
                 return (
                   <Grid item xs={12} md={6} key={item}>
                     <Box>
@@ -151,7 +185,9 @@ export default function LaundryData({ data, setPageState }: LaundryFormProps): R
                         }}
                       >
                         <Typography variant="h6" sx={{ justifySelf: 'flex-start' }}>
-                          {item}
+                          {
+                            laundryItems[item]
+                          }
                         </Typography>
 
                         <Stack
@@ -236,11 +272,12 @@ export default function LaundryData({ data, setPageState }: LaundryFormProps): R
               >
                 Cancel
               </Button>
-              <Button
+              <LoadingButton
                 variant="contained"
                 onClick={() => {
                   handleSubmit();
                 }}
+                loading={isPending}
                 disabled={totalClothes <= 0}
                 sx={{
                   fontWeight: 600,
@@ -249,7 +286,7 @@ export default function LaundryData({ data, setPageState }: LaundryFormProps): R
                 }}
               >
                 Verify
-              </Button>
+              </LoadingButton>
             </Stack>
           </Stack>
         </Box>

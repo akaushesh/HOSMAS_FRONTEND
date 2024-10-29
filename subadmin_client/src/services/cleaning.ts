@@ -28,7 +28,7 @@ export const getWorkersOfHostel = async (hostelId: number): Promise<AxiosRespons
     throw new Error('You must be logged in to perform this action');
   }
 
-  const res = await cleaningApi.get(`hostels/${hostelId}/workers/`, {
+  const res = await cleaningApi.get(`hostels/${String(hostelId)}/workers/`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
