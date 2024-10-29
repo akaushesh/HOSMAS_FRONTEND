@@ -100,8 +100,11 @@ export default function CollectData({ data, setPageState }: LaundryFormProps): R
 
 
       {success ? (
-        <Stack alignItems="center" py="50%">
-          <Typography variant="h5" fontSize="27px" px={1} fontWeight={600}>
+        <Stack alignItems="center" justifyContent="flex-start" mt={5}>
+
+          <img src="/assets/success2.gif" alt="laundry" style={{marginTop:"0px",width:"80%" }} />
+
+          <Typography variant="h5" fontSize="27px" px={1} mt={2} fontWeight={600}>
             Laundry Delivered
           </Typography>
 

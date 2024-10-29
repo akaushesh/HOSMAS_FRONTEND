@@ -1,16 +1,17 @@
 'use client';
 
 import * as React from 'react';
+import { type ErrorResponse } from '@/services/auth';
+import { type SubmissionResponse } from '@/services/laundry';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import { LoadingButton } from '@mui/lab';
 import { Box, Button, CircularProgress, Divider, Grid, IconButton, Paper, Stack, Typography } from '@mui/material';
+import { type AxiosError, type AxiosResponse } from 'axios';
+
+import { logger } from '@/lib/default-logger';
+import { laundryItems, useCheckoutSlip } from '@/hooks/mutation/use-laundry';
 
 import { type QRDataProps } from './Laundry';
-import { laundryItems, useCheckoutSlip } from '@/hooks/mutation/use-laundry';
-import { type AxiosError, type AxiosResponse } from 'axios';
-import { type SubmissionResponse} from '@/services/laundry';
-import { type ErrorResponse } from '@/services/auth';
-import { logger } from '@/lib/default-logger';
-import { LoadingButton } from '@mui/lab';
 
 interface LaundryFormProps {
   data: QRDataProps | null;
@@ -22,22 +23,26 @@ export default function LaundryData({ data, setPageState }: LaundryFormProps): R
   const [success, setSuccess] = React.useState(false);
   const [timer, setTimer] = React.useState(timeCount);
 
-  const [laundryData, setLaundryData] = React.useState<Record<string, number>>(data ? data.details : {
-    jeans: 0,
-    pants: 0,
-    pyjama: 0,
-    shorts: 0,
-    shirts: 0,
-    tshirts: 0,
-    kurta_salwar: 0,
-    skirts: 0,
-    dupatta: 0,
-    bedsheet: 0,
-    pillow_cover: 0,
-    towel_hand_towel: 0,
-    turban: 0,
-    upper_hood: 0,
-  });
+  const [laundryData, setLaundryData] = React.useState<Record<string, number>>(
+    data
+      ? data.details
+      : {
+          jeans: 0,
+          pants: 0,
+          pyjama: 0,
+          shorts: 0,
+          shirts: 0,
+          tshirts: 0,
+          kurta_salwar: 0,
+          skirts: 0,
+          dupatta: 0,
+          bedsheet: 0,
+          pillow_cover: 0,
+          towel_hand_towel: 0,
+          turban: 0,
+          upper_hood: 0,
+        }
+  );
 
   const laundryKeys: string[] = Object.keys(laundryData);
 
@@ -52,18 +57,15 @@ export default function LaundryData({ data, setPageState }: LaundryFormProps): R
 
   const onError = (error: AxiosError<ErrorResponse>): void => {
     logger.error(error);
-  };  
+  };
 
-  const {mutate:checkoutSlip,isPending}=useCheckoutSlip({onSuccess,onError});
-
-
-
+  const { mutate: checkoutSlip, isPending } = useCheckoutSlip({ onSuccess, onError });
 
   const handleSubmit = (): void => {
-    const obj={
-      transaction_id:data?.transactionId,
-      items:laundryData
-    }
+    const obj = {
+      transaction_id: data?.transactionId,
+      items: laundryData,
+    };
     checkoutSlip(obj);
   };
 
@@ -91,9 +93,6 @@ export default function LaundryData({ data, setPageState }: LaundryFormProps): R
     };
   }, [success, timer, setPageState]);
 
-
-
-
   return (
     <Stack alignItems="center">
       <Button
@@ -109,9 +108,11 @@ export default function LaundryData({ data, setPageState }: LaundryFormProps): R
       </Button>
 
       {success ? (
-        <Stack alignItems="center" py="50%">
-          <Typography variant="h5" fontSize="27px" px={1} fontWeight={600}>
-            Laundry Submitted
+        <Stack alignItems="center" justifyContent="flex-start" mt={5}>
+          <img src="/assets/success2.gif" alt="laundry" style={{ marginTop: '0px', width: '80%' }} />
+
+          <Typography variant="h5" fontSize="27px" px={1} mt={2} fontWeight={600}>
+            Laundry Delivered
           </Typography>
 
           <Stack mt={3} direction="row" alignItems="center" justifyContent="center">
@@ -185,9 +186,7 @@ export default function LaundryData({ data, setPageState }: LaundryFormProps): R
                         }}
                       >
                         <Typography variant="h6" sx={{ justifySelf: 'flex-start' }}>
-                          {
-                            laundryItems[item]
-                          }
+                          {laundryItems[item]}
                         </Typography>
 
                         <Stack
