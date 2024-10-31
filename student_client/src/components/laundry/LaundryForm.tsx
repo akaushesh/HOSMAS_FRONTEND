@@ -14,30 +14,79 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
+import { laundryItems, useCreateLaundrySlip, useUpdateLaundrySlip } from '@/hooks/mutation/use-laundry';
+import { type QRDataProps } from './RightCont/LowerRightCont';
+import { type LaundrySlipResponse } from '@/services/laundry';
+import { type AxiosError, type AxiosResponse } from 'axios';
+import { logger } from '@/lib/default-logger';
+import { type ErrorResponse } from '@/services/auth';
+import { LoadingButton } from '@mui/lab';
 
 interface LaundryFormProps {
   toggleForm: boolean;
   setToggleForm: (prev: boolean) => void;
+  QRData: QRDataProps | null;
+  setQRData: (val:QRDataProps | null)=>void;
 }
 
-export default function LaundryForm({ toggleForm, setToggleForm }: LaundryFormProps): React.JSX.Element {
-  const [laundryData, setLaundryData] = React.useState<Record<string, number>>({
-    Jeans: 0,
-    Pants: 0,
-    Pyjama: 0,
-    Shorts: 0,
-    Shirts: 0,
-    'T-Shirts': 0,
-    'Kurta/ Salwar': 0,
-    Skirt: 0,
-    Dupatta: 0,
-    'Bed Sheet': 0,
-    'Pillow Cover': 0,
-    'Towel/H-Towel': 0,
-    Turban: 0,
-    'Upper Hood': 0,
+export default function LaundryForm({QRData,setQRData, toggleForm, setToggleForm }: LaundryFormProps): React.JSX.Element {
+
+  const [laundryData, setLaundryData] = React.useState<Record<string, number>>(QRData ? QRData.details :{
+    jeans: 0,
+    pants: 0,
+    pyjama: 0,
+    shorts: 0,
+    shirts: 0,
+    tshirts: 0,
+    kurta_salwar: 0,
+    skirts: 0,
+    dupatta: 0,
+    bedsheet: 0,
+    pillow_cover: 0,
+    towel_hand_towel: 0,
+    turban: 0,
+    upper_hood: 0,
   });
+
+  
   const totalClothes = Object.values(laundryData).reduce((total, count) => total + count, 0);
+
+  const onSuccess = async (res: AxiosResponse<LaundrySlipResponse>): Promise<void> => {
+    // setLaundryData(res.data);
+    logger.debug(res.data);
+
+    const { LaundrySlipID: _LaundrySlipID, id: _id, ...rest } = res.data.items;
+    const items: Record<string, number> = rest;
+
+    setQRData({
+      details: items,
+      LaundryId: String(res.data.user_id),
+      transactionId: res.data.transaction_id,
+    });
+    setToggleForm(false);
+  };
+
+  const onError = (error: AxiosError<ErrorResponse>): void => {
+    logger.error(error);
+  };
+
+  const { mutate: createSlip, isPending } = useCreateLaundrySlip({ onSuccess, onError });
+  const { mutate: updateSlip, isPending:isPendingUpdate } = useUpdateLaundrySlip({ onSuccess, onError });
+
+  const handleSubmit = (): void => {
+    if(!QRData){
+      createSlip({
+        items: laundryData,
+      });
+    }
+    else{
+      updateSlip({
+        transaction_id: QRData?.transactionId || '' ,
+        items: laundryData,
+      });
+    }
+  }
+
 
   return (
     <Paper>
@@ -60,8 +109,6 @@ export default function LaundryForm({ toggleForm, setToggleForm }: LaundryFormPr
         <DialogContent>
           <Grid container spacing={1}>
             {Object.keys(laundryData).map((item) => {
-              // const isEven=index%2===0;
-
               return (
                 <Grid item xs={12} md={6} key={item}>
                   <Box>
@@ -79,7 +126,7 @@ export default function LaundryForm({ toggleForm, setToggleForm }: LaundryFormPr
                       }}
                     >
                       <Typography variant="h6" sx={{ justifySelf: 'flex-start' }}>
-                        {item}
+                        {laundryItems[item]}
                       </Typography>
 
                       <Stack
@@ -164,11 +211,12 @@ export default function LaundryForm({ toggleForm, setToggleForm }: LaundryFormPr
             >
               Cancel
             </Button>
-            <Button
+            <LoadingButton
               variant="contained"
               onClick={() => {
-                setToggleForm(false);
+                handleSubmit();
               }}
+              loading={isPending||isPendingUpdate}
               disabled={totalClothes <= 0}
               sx={{
                 fontWeight: 600,
@@ -177,7 +225,7 @@ export default function LaundryForm({ toggleForm, setToggleForm }: LaundryFormPr
               }}
             >
               Submit
-            </Button>
+            </LoadingButton>
           </Stack>
         </DialogContent>
       </Dialog>

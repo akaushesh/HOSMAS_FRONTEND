@@ -12,23 +12,52 @@ import QRCode from 'react-qr-code';
 import LaundryForm from '../LaundryForm';
 import Carousel from 'react-material-ui-carousel';
 import dayjs from 'dayjs';
-import { border } from '@mui/system';
+import { LaundrySlipResponse } from '@/services/laundry';
+import { AxiosError, AxiosResponse } from 'axios';
+import { ErrorResponse } from '@/services/auth';
+import { logger } from '@/lib/default-logger';
+import { useCreateLaundrySlip } from '@/hooks/mutation/use-laundry';
+
+
+export interface QRDataProps {
+  details: Record<string, number>; 
+  LaundryId: string; 
+  transactionId: string; 
+}
+interface CollectQRProps {
+  transactionId: string; 
+  date: string; 
+}
+
 
 export default function LowerRightCont(): React.JSX.Element {
 
-  let submit = "";
-  const get = [
-    { id: '2123', date: '2022-09-17T17:00' },
-    { id: '8971', date: '2022-09-19T17:00' },
-    { id: '8789', date: '2022-09-21T17:00' },
-  ];
+  const [QRData,setQRData] = React.useState<QRDataProps|null>(null);
+ 
+  const [collectQR, setcollectQR] = React.useState<CollectQRProps[]>([
+    // { transactionId: '2123', date: '2022-09-17T17:00' },
+    // { transactionId: '8971', date: '2022-09-19T17:00' },
+    // { transactionId: '8789', date: '2022-09-21T17:00' },
+  ]);
+
+
   const [active,isActive] = React.useState(true);
 
-  const [toggle, setToggle] = React.useState(true);
+
+  const onSuccessCreate = async (res: AxiosResponse<LaundrySlipResponse>): Promise<void> => {
+    // setLaundryData(res.data);
+    logger.debug(res.data);
+  };
+
+  const onErrorCreate = (error: AxiosError<ErrorResponse>): void => {
+    logger.error(error);
+  };
+
+  const { mutate: createSlip, isPending } = useCreateLaundrySlip({ onSuccess: onSuccessCreate, onError:onErrorCreate });
+
+
   const [toggleForm, setToggleForm] = React.useState(false);
 
-  const isSubmitted = false;
-  const isCollectEmpty = get.length === 0;
 
   const fetchSubmit=():void=>{
     if(active){
@@ -57,7 +86,7 @@ export default function LowerRightCont(): React.JSX.Element {
             onClick={()=>{fetchSubmit();}} 
           >
             <Typography variant="body1" fontWeight={600}>
-              {submit===""?'Submit Laundry': active?`Update Laundry`:`View submit QR`}
+              {!QRData?'Submit Laundry': active?`Update Laundry`:`View submit QR`}
             </Typography>
           </Button>
 
@@ -70,7 +99,7 @@ export default function LowerRightCont(): React.JSX.Element {
         
         <Box width={0.45} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           {active ? 
-            (submit==="")?(
+            (!QRData)?(
               <Stack sx={{aspectRatio: '1/1', width: 1, p:2}} justifyContent="center"
               alignItems="center">
 
@@ -82,10 +111,21 @@ export default function LowerRightCont(): React.JSX.Element {
                 </Stack>
               </Stack>
             ):(
-              <QRCode style={{ aspectRatio: '1/1', width: '70%' }} value={submit} />
+              <QRCode style={{ aspectRatio: '1/1', width: '70%' }} value={QRData.transactionId} />
             )
             :
           (
+            (collectQR.length===0)?(
+              <Stack sx={{aspectRatio: '1/1', width: 1, p:2}} justifyContent="center"
+              alignItems="center">
+
+                <Stack sx={{aspectRatio: '1/1', width: 1,border:"1px dashed var(--mui-palette-secondary-main)", background:"var(--mui-palette-secondary-light)",borderRadius: 2, fontWeight:500, fontSize:"19px",textAlign:"center",p:3}} justifyContent="center"
+                alignItems="center" 
+                >
+                  Nothing to Collect
+                </Stack>
+              </Stack>
+            ):(
           <Carousel
             strictIndexing
             autoPlay={false}
@@ -105,13 +145,13 @@ export default function LowerRightCont(): React.JSX.Element {
               width: 1,
             }}
           >
-            {get.map((val) => {
+            {collectQR.map((val) => {
               return (
                 <Stack
                   alignItems="center"
-                  key={val.id}
+                  key={val.transactionId}
                 >
-                  <QRCode style={{ aspectRatio: 1 / 1, width: '55%' }} value={val.id} />
+                  <QRCode style={{ aspectRatio: 1 / 1, width: '55%' }} value={val.transactionId} />
                   <Typography
                     variant="h6"
                     fontWeight={600}
@@ -119,7 +159,7 @@ export default function LowerRightCont(): React.JSX.Element {
                     mt="-30px"
                     color="var(--mui-palette-text-secondaryChannel)"
                   >
-                    CODE: <span style={{ color: 'var(--mui-palette-text-primary)' }}>{val.id}</span>
+                    CODE: <span style={{ color: 'var(--mui-palette-text-primary)' }}>{val.transactionId}</span>
                   </Typography>
                   <Typography variant="body1" textAlign="center" mt={1} color="var(--mui-palette-text-primary)">
                     {dayjs(val.date).format('D MMMM, dddd')}
@@ -128,13 +168,14 @@ export default function LowerRightCont(): React.JSX.Element {
               );
             })}
           </Carousel>
+            )
           )
           }
         </Box>
       </Box>
 
 
-      <LaundryForm toggleForm={toggleForm} setToggleForm={setToggleForm} />
+      <LaundryForm QRData={QRData} setQRData={setQRData} toggleForm={toggleForm} setToggleForm={setToggleForm} />
     </Paper>
   );
 }
