@@ -16,6 +16,7 @@ export const paths = {
   settings: '/settings',
   laundry: '/laundry',
   cleaning: '/cleaning',
+  mess: '/mess',
   leave: '/leave',
   errors: { notFound: '/errors/not-found' },
 } as const;

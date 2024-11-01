@@ -45,7 +45,6 @@ export default function Complaint(): React.JSX.Element {
         value={complaint.title}
         onChange={handleComplaint}
         fullWidth
-       
       />
 
       <TextField
@@ -61,25 +60,25 @@ export default function Complaint(): React.JSX.Element {
       />
 
       <label htmlFor="file-input" style={{ display: 'flex', alignItems: 'flex-end' }} id="file-label">
-	  <Button
-        variant="outlined"
-        sx={{
-          px: 4,
-          fontSize: '16px',
-          borderWidth: files?'2px':'1px',
-          borderRadius: 0.8,
-          py: 0.6,
-          borderColor: files ? 'var(--mui-palette-primary-main)' : 'var(--mui-palette-secondary-main)',
-          color: files ? 'var(--mui-palette-primary-main)' : 'var(--mui-palette-secondary-dark)',
-          '&:hover': {
+        <Button
+          variant="outlined"
+          sx={{
+            px: { xs: 2, md: 4 },
+            fontSize: '16px',
+            borderWidth: files ? '2px' : '1px',
+            borderRadius: 0.8,
+            py: 0.6,
             borderColor: files ? 'var(--mui-palette-primary-main)' : 'var(--mui-palette-secondary-main)',
-          borderWidth: files?'2px':'1px',
-            backgroundColor: 'transparent', 
-          },
-        }}
-        startIcon={<AddIcon />}
-        component="span"
-      >
+            color: files ? 'var(--mui-palette-primary-main)' : 'var(--mui-palette-secondary-dark)',
+            '&:hover': {
+              borderColor: files ? 'var(--mui-palette-primary-main)' : 'var(--mui-palette-secondary-main)',
+              borderWidth: files ? '2px' : '1px',
+              backgroundColor: 'transparent',
+            },
+          }}
+          startIcon={<AddIcon />}
+          component="span"
+        >
           Attach Files
         </Button>
 
@@ -92,7 +91,7 @@ export default function Complaint(): React.JSX.Element {
 
       <Divider />
 
-      <Stack direction="row" justifyContent="flex-end" spacing={2} sx={{ mt: 2 }}>
+      <Stack direction="row" gap={2} sx={{ mt: 0.6, justifyContent: { xs: 'center', md: 'flex-end' } }}>
         <Button
           onClick={() => {
             handleReset();

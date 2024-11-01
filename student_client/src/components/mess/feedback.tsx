@@ -48,11 +48,11 @@ export default function Feedback({ timing }: FeedbackProps): React.JSX.Element {
         {Object.keys(menuItems).map((item) => {
           return (
             <Paper
-              key={item}
+              key={`${timing}-${item}`}
               sx={{
-                px: 2,
-                py: 0.4,
-                mx: 2,
+                px: { xs: 1, md: 2 },
+                py: { xs: 0, md: 0.4 },
+                mx: { xs: 1, md: 2 },
                 my: 1,
                 background: 'var(--mui-palette-secondary-light)',
                 border: '1px dashed var(--mui-palette-secondary-main)',
@@ -60,27 +60,36 @@ export default function Feedback({ timing }: FeedbackProps): React.JSX.Element {
               elevation={10}
             >
               <Stack direction="row" alignItems="center" justifyContent="space-between">
-                <Stack sx={{ ml: 2 }} direction="row" alignItems="center" justifyContent="flex-start" spacing={6}>
-
-				  <Stack
-                    sx={{ p: 0, border: menuItems[item].type === 'veg' ? '4px solid green' : '4px solid #8C0606',borderRadius:0.4 }}
+                <Stack
+                  sx={{ ml: { xs: 0, md: 2 },gap:{xs:3,md:6} }}
+                  direction="row"
+                  alignItems="center"
+                  justifyContent="flex-start"
+                >
+                  <Stack
+                    sx={{
+                      p: 0,
+                      border: menuItems[item].type === 'veg' ? '4px solid green' : '4px solid #8C0606',
+                      borderRadius: 0.4,
+                      borderWidth:{xs:'3px',md:'4px'}
+                    }}
                     alignItems="center"
                     justifyContent="center"
-					>
-                    <FiberManualRecordIcon sx={{ color: menuItems[item].type === 'veg' ? 'green' : '#8C0606' }} />
+                  >
+                    <FiberManualRecordIcon sx={{ fontSize:{xs:"15px",md:"20px"}, color: menuItems[item].type === 'veg' ? 'green' : '#8C0606' }} />
                   </Stack>
 
-                  <Typography variant="h6">{item}</Typography>
+                  <Typography variant="h6" sx={{fontSize:{xs:"16px",md:"19px"}}}>{item}</Typography>
                 </Stack>
 
-                <Stack direction="row" alignItems="center" justifyContent="flex-start" spacing={2}>
+                <Stack direction="row" alignItems="center" justifyContent="flex-start" sx={{gap:{xs:0,md:2}}}>
                   <IconButton
                     onClick={() => {
                       handleFeedback(item, true);
                     }}
                     size="medium"
                   >
-                    <ThumbUpIcon sx={{ color: menuItems[item].response === true ? 'green' : '', fontSize: '27px' }} />
+                    <ThumbUpIcon sx={{ color: menuItems[item].response === true ? 'green' : '', fontSize: {xs:"24px",md:'27px'} }} />
                   </IconButton>
 
                   <IconButton
@@ -91,7 +100,7 @@ export default function Feedback({ timing }: FeedbackProps): React.JSX.Element {
                   >
                     <ThumbDownIcon
                       fontSize="inherit"
-                      sx={{ color: menuItems[item].response === false ? 'red' : '', fontSize: '27px' }}
+                      sx={{ color: menuItems[item].response === false ? 'red' : '', fontSize: {xs:"22px",md:'27px'} }}
                     />
                   </IconButton>
                 </Stack>
@@ -100,8 +109,8 @@ export default function Feedback({ timing }: FeedbackProps): React.JSX.Element {
           );
         })}
       </Box>
-      <Divider sx={{mt:1}} />
-      <Stack direction="row" justifyContent="flex-end" gap={2} sx={{ mt: 2 }}>
+      <Divider sx={{ mt: 1 }} />
+      <Stack direction="row" gap={2} sx={{ mt: 2,justifyContent:{xs:"center",md:"flex-end"} }}>
         <Button
           onClick={() => {
             handleReset();

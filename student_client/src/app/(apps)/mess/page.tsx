@@ -6,7 +6,7 @@ import { Stack } from '@mui/system';
 import { config } from '@/config';
 import Home from '@/components/mess/home';
 
-export const metadata = { title: `Laundry | ${config.site.name}` } satisfies Metadata;
+export const metadata = { title: `Mess | ${config.site.name}` } satisfies Metadata;
 
 export default function Page(): React.JSX.Element {
   return (
