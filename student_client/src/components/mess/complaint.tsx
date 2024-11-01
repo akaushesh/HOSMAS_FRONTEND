@@ -68,10 +68,10 @@ export default function Complaint(): React.JSX.Element {
             borderWidth: files ? '2px' : '1px',
             borderRadius: 0.8,
             py: 0.6,
-            borderColor: files ? 'var(--mui-palette-primary-main)' : 'var(--mui-palette-secondary-main)',
-            color: files ? 'var(--mui-palette-primary-main)' : 'var(--mui-palette-secondary-dark)',
+            borderColor: files ? 'var(--mui-palette-primary-main)' : 'var(--mui-palette-secondary-dark)',
+            color: files ? 'var(--mui-palette-primary-main)' : 'var(--mui-palette-text-primaryChannel)',
             '&:hover': {
-              borderColor: files ? 'var(--mui-palette-primary-main)' : 'var(--mui-palette-secondary-main)',
+              borderColor: files ? 'var(--mui-palette-primary-main)' : 'var(--mui-palette-secondary-dark)',
               borderWidth: files ? '2px' : '1px',
               backgroundColor: 'transparent',
             },
