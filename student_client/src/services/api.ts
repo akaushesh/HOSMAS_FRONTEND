@@ -4,6 +4,7 @@ export const url = 'https://api.hosmas.ccstiet.com/';
 export const centralUrl = 'https://central.hosmas.ccstiet.com/';
 export const cleaningUrl = 'https://cleaning.hosmas.ccstiet.com/';
 export const laundryUrl = 'https://hosmas-laundry.ccstiet.com/';
+export const leaveUrl = 'https://hosmas-mess-leave.ccstiet.com/';
 
 export const authApi = axios.create({
   baseURL: url,
@@ -43,4 +44,8 @@ export const cleaningApi = axios.create({
 
 export const laundryApi = axios.create({
   baseURL: laundryUrl,
+});
+
+export const leaveApi = axios.create({
+  baseURL: leaveUrl,
 });
