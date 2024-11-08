@@ -7,11 +7,15 @@ import { laundryApi } from './api';
 export interface LaundrySlipResponse {
   id: number;
   transaction_id: string;
+  code:string;
   user_id: number;
   items: LaundryResponseItemTypes;
   is_checked_out: boolean;
   is_delivered: boolean;
-  last_modified: string;
+  item_count: number;
+  creation_time: string;
+  delievery_time: string;
+  dropoff_time: string;
 }
 
 export interface SubmissionResponse {

@@ -1,111 +1,74 @@
 'use client';
 
 import * as React from 'react';
-import {
-  Box,
-  Pagination,
-  Paper,
-  Typography,
-} from '@mui/material';
+import { type LaundrySlipResponse } from '@/services/laundry';
+import { Box, CircularProgress, Pagination, Paper, Typography } from '@mui/material';
 
-import SearchLaundry from './SearchLaundry';
 import LaundryTable from './LaundryTable';
+// import SearchLaundry from './SearchLaundry';
 
-interface ClothingTransaction {
-  id: string;
-  dateGiven: string;
-  numberOfClothes: number;
-  dateOfDelivery: string;
-  details: [string, number, number][];
+interface HistoryDataProps {
+  historyData: LaundrySlipResponse[] | null;
 }
 
-export default function LeftCont(): React.JSX.Element {
-  const [slips, setSlips] = React.useState<ClothingTransaction[]>([
-    {
-      id: "1",
-      dateGiven: "2024-05-04T00:00:00",
-      numberOfClothes: 8,
-      dateOfDelivery: "2024-05-11T00:00:00",
-      details: [
-        ["Tshirt", 4, 0],
-        ["Lower", 3, 1]
-      ]
-    },
-    {
-      id: "2",
-      dateGiven: "2024-04-31T00:00:00",
-      numberOfClothes: 7,
-      dateOfDelivery: "2024-05-04T00:00:00",
-      details: [
-        ["Shirt", 3, 0],
-        ["Jeans", 2, 1],
-        ["Towel", 2, 0]
-      ]
-    },
-    {
-      id: "3",
-      dateGiven: "2024-04-31T00:00:00",
-      numberOfClothes: 7,
-      dateOfDelivery: "2024-05-04T00:00:00",
-      details: [
-        ["Shorts", 2, 0],
-        ["BedSheet", 2, 0],
-        ["Pants", 3, 1]
-      ]
-    },
-    {
-      id: "4",
-      dateGiven: "2024-04-31T00:00:00",
-      numberOfClothes: 7,
-      dateOfDelivery: "2024-05-04T00:00:00",
-      details: [
-        ["Hoodie", 2, 0],
-        ["Zipper", 2, 0],
-        ["PillowCovers", 3, 1]
-      ]
-    },
-    {
-      id: "5",
-      dateGiven: "2024-04-31T00:00:00",
-      numberOfClothes: 7,
-      dateOfDelivery: "2024-05-04T00:00:00",
-      details: [
-        ["Sweater", 2, 0],
-        ["HandTowel", 3, 1],
-        ["Skirts", 2, 0]
-      ]
-    }
-  ]);
+export default function LeftCont({ historyData }: HistoryDataProps): React.JSX.Element {
+  const recordsPerPage = 5;
+  const totalPages = historyData ? Math.ceil(historyData.length / recordsPerPage) : 1;
 
-  const [pagination, setPagination] = React.useState({ page: 1, totalPages: 1 });
-  
-  const [searchFilters,setSearchFilters]=React.useState({dateGiven:""});
+  const [pagination, setPagination] = React.useState({ page: 1, totalPages });
+  // const [searchFilters, setSearchFilters] = React.useState({ dateGiven: '' });
 
   const handleChangePage = (event: React.ChangeEvent<unknown>, page: number): void => {
     if (page === pagination.page) return;
-    setPagination({ ...pagination, page });
+    setPagination((prev) => ({ ...prev, page }));
   };
+
+  const paginatedData = historyData
+    ? historyData.slice((pagination.page - 1) * recordsPerPage, pagination.page * recordsPerPage)
+    : [];
+
+  React.useEffect(() => {
+    setPagination((prev) => ({ ...prev, totalPages }));
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- limited deps
+  }, [historyData]);
+
 
   return (
     <Paper elevation={10} sx={{ width: 1, height: 1, p: 3 }}>
       <Typography variant="h5">Laundry History</Typography>
-      <Typography variant="body2" mt={0.2}>
+      <Typography variant="body2" mt={0.4} lineHeight={1.3}>
         You can view your current and past laundry. Gets cleared after every 30 days.
       </Typography>
 
       <Box mt={3}>
-        <SearchLaundry searchFilters={searchFilters} setSearchFilters={setSearchFilters} />
+        {/* <SearchLaundry searchFilters={searchFilters} setSearchFilters={setSearchFilters} /> */}
       </Box>
 
+      {historyData === null || historyData?.length === 0 ? (
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center',height:0.7}}>
+          {historyData === null ? (
+            <CircularProgress size={35}/>
+          ) : (
+            <Typography variant="h6">No Previous Records</Typography>
+          )}
+        </Box>
+      ) : (
+        <>
+          <Box mt={3}>
+            <LaundryTable laundrySlips={paginatedData} />
+          </Box>
 
-
-      <Box mt={2}>
-        <LaundryTable slips={slips}/>
-      </Box>
-
-      <Box sx={{ mt: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', bottom: 0 }}>
-        <Pagination count={pagination.totalPages} onChange={handleChangePage} variant="outlined" color="primary" />
-      </Box>
+          <Box sx={{ mt: 2, display: pagination.totalPages>1 ?'flex':'none', alignItems: 'center', justifyContent: 'center' }}>
+            <Pagination
+              count={pagination.totalPages}
+              page={pagination.page}
+              onChange={handleChangePage}
+              variant="outlined"
+              color="primary"
+            />
+          </Box>
+        </>
+      )}
     </Paper>
   );
 }

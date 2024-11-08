@@ -11,15 +11,17 @@ import dayjs from 'dayjs';
 
 interface HomeProps{
   setPageState: (val:number)=>void;
+  isActive: boolean;
+  nextDate: string;
+  laundryNumber:string;
 }
 
-export default function HomeLaundryMobile({setPageState}:HomeProps): React.JSX.Element {
+export default function HomeLaundryMobile({isActive,nextDate,setPageState}:HomeProps): React.JSX.Element {
   // 0 --> Home
   // 1 --> QR code
   // 2 --> History
 
-  const isActive = true;
-  const nextLaundry = '2022-09-17T17:00';
+  const nextLaundry = nextDate||"";
   const notice=""
 
   return (
@@ -27,7 +29,11 @@ export default function HomeLaundryMobile({setPageState}:HomeProps): React.JSX.E
       <Typography variant="h6" color='var(--mui-palette-text-primary)' sx={{ mt:0.5,fontSize:"18px"}}>
             {dayjs().format('D MMMM, dddd')}
       </Typography>
-      
+{/*       
+      <Typography variant="h4" mt={4} fontWeight={700} display="block">
+        {laundryNumber||"ABC-123"}
+      </Typography> */}
+
       <Box
         bgcolor={isActive ? 'var(--mui-palette-primary-main)' : 'var(--mui-palette-secondary-dark)'}
         sx={{ color: 'var(--mui-palette-common-white)', borderRadius: 1 }}

@@ -12,6 +12,7 @@ import {type LaundrySlipResponse } from '@/services/laundry';
 import { logger } from '@/lib/default-logger';
 import {type ErrorResponse } from '@/services/auth';
 import { useVerifySlip } from '@/hooks/mutation/use-laundry';
+import dayjs from 'dayjs';
 
 interface CheckoutProps {
   setQRData: (val: QRDataProps) => void;
@@ -27,6 +28,13 @@ export default function Scanner({ setPageState, setQRData, mode }: CheckoutProps
 
   const onSuccess = async (res: AxiosResponse<LaundrySlipResponse>): Promise<void> => {
     logger.debug(res.data);
+    if(mode!=='drop' && dayjs(res.data.dropoff_time).format('DD MMM YYYY') === dayjs().format('DD MMM YYYY')){
+      setError('Cannot deliver the laundry <br/> on the same day');
+      setTimeout(() => {
+        setError(null);
+      }, 3000);
+      return;
+    }
     const { LaundrySlipID: _LaundrySlipID, id: _id, ...rest } = res.data.items;
     const items: Record<string, number> = rest;
     setQRData({

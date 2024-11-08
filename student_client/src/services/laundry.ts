@@ -8,11 +8,22 @@ import { laundryApi } from './api';
 export interface LaundrySlipResponse {
   id: number;
   transaction_id: string;
+  code:string;
   user_id: number;
   items: LaundryResponseItemTypes;
   is_checked_out: boolean;
   is_delivered: boolean;
-  last_modified: string;
+  item_count: number;
+  creation_time: string;
+  delievery_time: string;
+  dropoff_time: string;
+}
+
+export interface LaundryInitResponse{
+  is_active: boolean;
+  next_date: string;
+  laundry_number:string;
+  laundry_slips:LaundrySlipResponse[];
 }
 
 interface LaundryResponseItemTypes {
@@ -81,7 +92,7 @@ export const createLaundrySlip = async (params: LaundryItems): Promise<AxiosResp
   return res;
 };
 
-export const getLaundrySlips = async (): Promise<AxiosResponse<LaundrySlipResponse>> => {
+export const getLaundrySlips = async (): Promise<AxiosResponse<LaundryInitResponse>> => {
   const token = (await authClient.getToken()).data;
 
   if (token === null || token === undefined) {

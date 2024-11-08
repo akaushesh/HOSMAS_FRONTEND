@@ -15,7 +15,7 @@ export const allocationSubItems: NavItems = [
   { key: 'group', title: 'Group', href: paths.allocation.group, icon: 'users' },
   { key: 'hostels', title: 'View Hostels', href: paths.allocation.hostels, icon: 'City' },
   { key: 'preferences', title: 'Preferences', href: paths.allocation.preference, icon: 'list-dashes' },
-  { key: 'rooms', title: 'Room Allocation', href: paths.allocation.rooms, icon: 'room-door', disabled: true },
+  { key: 'rooms', title: 'Room Allocation', href: paths.allocation.rooms, icon: 'room-door', disabled: false },
   { key: 'faqs', title: 'FAQs', href: paths.allocation.faqs, icon: 'user' },
 ] satisfies NavItemConfig[];
 

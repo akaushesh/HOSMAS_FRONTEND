@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { type LaundrySlipResponse } from '@/services/laundry';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import { Button, Paper, Stack, Typography } from '@mui/material';
 import dayjs from 'dayjs';
@@ -11,22 +12,38 @@ import LaundryForm from '../LaundryForm';
 
 interface CheckoutProps {
   setPageState: (val: number) => void;
+  submitQr: LaundrySlipResponse | null;
+  collectQrs: LaundrySlipResponse[] | null;
+  isAllowedSubmit: boolean | null;
 }
 
-export default function CheckoutLaundryMobile({ setPageState }: CheckoutProps): React.JSX.Element {
+interface QRDataProps {
+  details: Record<string, number> | null;
+  transactionId: string;
+}
+
+export default function CheckoutLaundryMobile({
+  isAllowedSubmit,
+  submitQr,
+  collectQrs,
+  setPageState,
+}: CheckoutProps): React.JSX.Element {
   // 0 --> Home
   // 1 --> QR code
   // 0 --> History
+  const [QRData, setQRData] = React.useState<QRDataProps | null>(null);
+
+  React.useEffect(() => {
+    if (submitQr?.items) {
+      setQRData({
+        details: (({ LaundrySlipID: _LaundrySlipID, id: _id, ...rest }) => rest)(submitQr.items),
+        transactionId: submitQr.transaction_id,
+      });
+    }
+  }, [submitQr]);
 
   const [toggle, setToggle] = React.useState(true);
   const [toggleLFrom, setToggleLForm] = React.useState(false);
-
-  let submit = '4567';
-  const get = [
-    { id: '2123', date: '2022-09-17T17:00' },
-    { id: '8971', date: '2022-09-19T17:00' },
-    { id: '8789', date: '2022-09-21T17:00' },
-  ];
 
   return (
     <Stack alignItems="center">
@@ -60,7 +77,7 @@ export default function CheckoutLaundryMobile({ setPageState }: CheckoutProps): 
             Submit
           </Button>
           <Button
-            disabled={get.length === 0}
+            disabled={!collectQrs || collectQrs.length === 0}
             variant={toggle ? 'text' : 'contained'}
             onClick={() => {
               setToggle(false);
@@ -86,42 +103,44 @@ export default function CheckoutLaundryMobile({ setPageState }: CheckoutProps): 
         mx={6}
         color="var(--mui-palette-text-primary)"
       >
-        {submit === '' && toggle
-          ? 'Fill the Laundry Form to Submit the laundry Request'
-          : toggle
-            ? 'Scan the QR code to Submit Laundry'
-            : 'Scan the QR code to Collect Laundry'}
+        {isAllowedSubmit
+          ? !QRData && toggle
+            ? 'Fill the Laundry Form to Submit the laundry Request'
+            : toggle
+              ? 'Scan the QR code to Submit Laundry'
+              : 'Scan the QR code to Collect Laundry'
+          : 'You have already submitted the laundry'}
       </Typography>
 
       {toggle ? (
         <Stack alignItems="center">
-          {submit !== '' && (
+          {QRData ? (
             <>
-              <QRCode style={{ aspectRatio: '1/1', width: '70%', marginTop:"-10px" }} value={submit} />
-              <Typography
+              <QRCode style={{ aspectRatio: '1/1', width: '70%', marginTop: '-10px' }} value={QRData.transactionId} />
+              {/* <Typography
                 variant="h5"
                 fontWeight={600}
                 textAlign="center"
                 color="var(--mui-palette-text-secondaryChannel)"
               >
-                CODE: <span style={{ color: 'var(--mui-palette-text-primary)' }}>{submit}</span>
-              </Typography>
+                CODE: <span style={{ color: 'var(--mui-palette-text-primary)' }}>{QRData.transactionId}</span>
+              </Typography> */}
             </>
-          )}
+          ) : null}
 
           <Button
             fullWidth
             variant="contained"
-            sx={{ py: 2, mt:submit===''?9:2, mx: 6 }}
+            sx={{ py: 2, mt: !QRData ? 9 : 2, mx: 6 }}
+            disabled={!isAllowedSubmit}
             onClick={() => {
               setToggleLForm(true);
             }}
           >
             <Typography variant="body1" fontWeight={600}>
-              {submit === '' ? 'Submit Laundry' : 'Update Laundry'}
+              {isAllowedSubmit ? (!QRData ? 'Submit Laundry' : 'Update Laundry') : 'Already Submitted'}
             </Typography>
           </Button>
-
         </Stack>
       ) : (
         <Stack alignItems="center" sx={{ width: 1, position: 'relative', m: 0 }}>
@@ -135,37 +154,33 @@ export default function CheckoutLaundryMobile({ setPageState }: CheckoutProps): 
             navButtonsWrapperProps={{ style: { marginTop: '-42px' } }}
             sx={{
               width: 1,
-              // display:"flex",justifyContent:"center",alignItems:"center",gap:4, flexDirection:"column"
             }}
           >
-            {get.map((val) => {
-              return (
-                <Stack
-                  alignItems="center"
-                  key={val.id}
-                  // sx={{width:"70%",position:"relative"}}
-                >
-                  <QRCode style={{ aspectRatio: 1 / 1, width: '45%' }} value={val.id} />
-                  <Typography
+            {!collectQrs || collectQrs.length === 0
+              ? null
+              : collectQrs.map((val) => {
+                  return (
+                    <Stack alignItems="center" key={val.id}>
+                      <QRCode style={{ aspectRatio: 1 / 1, width: '45%' }} value={val.transaction_id} />
+                      <Typography
                     variant="h5"
+                    fontSize={18}
                     fontWeight={600}
                     textAlign="center"
-                    mt={0}
+                    mt="-10px"
                     color="var(--mui-palette-text-secondaryChannel)"
                   >
-                    CODE: <span style={{ color: 'var(--mui-palette-text-primary)' }}>{val.id}</span>
-                  </Typography>
-                  <Typography variant="h6" textAlign="center" mt={1} color="var(--mui-palette-text-primary)">
-                    {dayjs(val.date).format('D MMMM, dddd')}
-                  </Typography>
-                </Stack>
-              );
-            })}
+                    DATE: <span style={{ color: 'var(--mui-palette-text-primary)' }}>{dayjs(val.dropoff_time).format('D MMMM, dddd')}</span>
+                    </Typography>
+                      
+                    </Stack>
+                  );
+                })}
           </Carousel>
         </Stack>
       )}
 
-      <LaundryForm toggleForm={toggleLFrom} setToggleForm={setToggleLForm} />
+      <LaundryForm QRData={QRData} setQRData={setQRData} toggleForm={toggleLFrom} setToggleForm={setToggleLForm} />
     </Stack>
   );
 }

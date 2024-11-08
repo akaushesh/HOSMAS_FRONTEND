@@ -12,48 +12,41 @@ import QRCode from 'react-qr-code';
 import LaundryForm from '../LaundryForm';
 import Carousel from 'react-material-ui-carousel';
 import dayjs from 'dayjs';
-import { LaundrySlipResponse } from '@/services/laundry';
-import { AxiosError, AxiosResponse } from 'axios';
-import { ErrorResponse } from '@/services/auth';
-import { logger } from '@/lib/default-logger';
-import { useCreateLaundrySlip } from '@/hooks/mutation/use-laundry';
-
+import {type LaundrySlipResponse } from '@/services/laundry';
 
 export interface QRDataProps {
-  details: Record<string, number>; 
-  LaundryId: string; 
+  details: Record<string, number>|null; 
   transactionId: string; 
 }
-interface CollectQRProps {
-  transactionId: string; 
-  date: string; 
+
+interface LowerRightContProps {
+  isAllowedSubmit: boolean|null;
+  submitQr: LaundrySlipResponse|null;
+  collectQrs: LaundrySlipResponse[]|null;
+  isLaundry: boolean;
+  nextDate: string;
 }
 
 
-export default function LowerRightCont(): React.JSX.Element {
+
+export default function LowerRightCont({isAllowedSubmit,submitQr,collectQrs,isLaundry,nextDate}:LowerRightContProps): React.JSX.Element {
 
   const [QRData,setQRData] = React.useState<QRDataProps|null>(null);
- 
-  const [collectQR, setcollectQR] = React.useState<CollectQRProps[]>([
-    // { transactionId: '2123', date: '2022-09-17T17:00' },
-    // { transactionId: '8971', date: '2022-09-19T17:00' },
-    // { transactionId: '8789', date: '2022-09-21T17:00' },
-  ]);
+
+
+  React.useEffect(() => {
+    if (submitQr?.items){
+      setQRData({
+        details: (({ LaundrySlipID: _LaundrySlipID, id: _id, ...rest }) => rest)(submitQr.items),
+        transactionId: submitQr.transaction_id,
+      });
+    }
+  }, [submitQr]);
+
 
 
   const [active,isActive] = React.useState(true);
 
-
-  const onSuccessCreate = async (res: AxiosResponse<LaundrySlipResponse>): Promise<void> => {
-    // setLaundryData(res.data);
-    logger.debug(res.data);
-  };
-
-  const onErrorCreate = (error: AxiosError<ErrorResponse>): void => {
-    logger.error(error);
-  };
-
-  const { mutate: createSlip, isPending } = useCreateLaundrySlip({ onSuccess: onSuccessCreate, onError:onErrorCreate });
 
 
   const [toggleForm, setToggleForm] = React.useState(false);
@@ -78,16 +71,24 @@ export default function LowerRightCont(): React.JSX.Element {
         p: 3,
       }}
     >
-      <Typography variant="h5">Laundry Checkout</Typography>
+      <Typography variant="h5">{isLaundry?"Laundry Checkout":"Upcoming Laundry"}</Typography>
+      <Typography
+            variant="caption"
+          >
+            <span>{ isLaundry? dayjs().format('D MMMM, dddd') : dayjs(nextDate).format('D MMMM, dddd')}</span>
+          </Typography>
 
       <Box sx={{ width: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-evenly', gap: 0 }}>
         <Stack alignItems="center" width={0.4} gap={2}>
-          <Button fullWidth variant={!active?"outlined":"contained"} sx={{ py: 2 }}
+          <Button fullWidth variant={!active?"outlined":"contained"} disabled={!isAllowedSubmit} sx={{ py: 2 }}
             onClick={()=>{fetchSubmit();}} 
           >
             <Typography variant="body1" fontWeight={600}>
-              {!QRData?'Submit Laundry': active?`Update Laundry`:`View submit QR`}
-            </Typography>
+              {isAllowedSubmit?
+              !QRData?'Submit Laundry': active?`Update Laundry`:`View submit QR`:
+              "Already Submitted"
+            }
+              </Typography>
           </Button>
 
           <Button fullWidth variant={active?"outlined":"contained"}  sx={{ py: 2 }}
@@ -105,17 +106,17 @@ export default function LowerRightCont(): React.JSX.Element {
 
                 <Stack sx={{aspectRatio: '1/1', width: 1,border:"1px dashed var(--mui-palette-secondary-main)", background:"var(--mui-palette-secondary-light)",cursor :"pointer",borderRadius: 2, fontWeight:500, fontSize:"28px"}} justifyContent="center"
                 alignItems="center"
-                onClick={()=>{setToggleForm(true);}}
+                onClick={()=>{if(isAllowedSubmit)setToggleForm(true);}}
                 >
                   +
                 </Stack>
               </Stack>
             ):(
-              <QRCode style={{ aspectRatio: '1/1', width: '70%' }} value={QRData.transactionId} />
+              <QRCode style={{ aspectRatio: '1/1', width: '70%' }} value={QRData?.transactionId} />
             )
             :
           (
-            (collectQR.length===0)?(
+            (!collectQrs||collectQrs?.length===0)?(
               <Stack sx={{aspectRatio: '1/1', width: 1, p:2}} justifyContent="center"
               alignItems="center">
 
@@ -145,24 +146,21 @@ export default function LowerRightCont(): React.JSX.Element {
               width: 1,
             }}
           >
-            {collectQR.map((val) => {
+            {collectQrs.map((val) => {
               return (
                 <Stack
                   alignItems="center"
-                  key={val.transactionId}
+                  key={val.transaction_id}
                 >
-                  <QRCode style={{ aspectRatio: 1 / 1, width: '55%' }} value={val.transactionId} />
+                  <QRCode style={{ aspectRatio: 1 / 1, width: '70%' }} value={val.transaction_id} />
                   <Typography
                     variant="h6"
                     fontWeight={600}
                     textAlign="center"
-                    mt="-30px"
+                    mt="-20px"
                     color="var(--mui-palette-text-secondaryChannel)"
                   >
-                    CODE: <span style={{ color: 'var(--mui-palette-text-primary)' }}>{val.transactionId}</span>
-                  </Typography>
-                  <Typography variant="body1" textAlign="center" mt={1} color="var(--mui-palette-text-primary)">
-                    {dayjs(val.date).format('D MMMM, dddd')}
+                    DATE: <span style={{ color: 'var(--mui-palette-text-primary)' }}>{dayjs(val.dropoff_time).format('D MMMM, dddd')}</span>
                   </Typography>
                 </Stack>
               );
@@ -175,7 +173,7 @@ export default function LowerRightCont(): React.JSX.Element {
       </Box>
 
 
-      <LaundryForm QRData={QRData} setQRData={setQRData} toggleForm={toggleForm} setToggleForm={setToggleForm} />
+      <LaundryForm QRData={QRData}  setQRData={setQRData} toggleForm={toggleForm} setToggleForm={setToggleForm} />
     </Paper>
   );
 }

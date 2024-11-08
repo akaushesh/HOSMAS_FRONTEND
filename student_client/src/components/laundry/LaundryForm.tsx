@@ -30,24 +30,28 @@ interface LaundryFormProps {
 }
 
 export default function LaundryForm({QRData,setQRData, toggleForm, setToggleForm }: LaundryFormProps): React.JSX.Element {
+const [laundryData, setLaundryData] = React.useState<Record<string, number>>({
+  jeans: 0,
+  pants: 0,
+  pyjama: 0,
+  shorts: 0,
+  shirts: 0,
+  tshirts: 0,
+  kurta_salwar: 0,
+  skirts: 0,
+  dupatta: 0,
+  bedsheet: 0,
+  pillow_cover: 0,
+  towel_hand_towel: 0,
+  turban: 0,
+  upper_hood: 0,
+});
 
-  const [laundryData, setLaundryData] = React.useState<Record<string, number>>(QRData ? QRData.details :{
-    jeans: 0,
-    pants: 0,
-    pyjama: 0,
-    shorts: 0,
-    shirts: 0,
-    tshirts: 0,
-    kurta_salwar: 0,
-    skirts: 0,
-    dupatta: 0,
-    bedsheet: 0,
-    pillow_cover: 0,
-    towel_hand_towel: 0,
-    turban: 0,
-    upper_hood: 0,
-  });
-
+React.useEffect(() => {
+  if (QRData?.details) {
+    setLaundryData(QRData.details);
+  }
+}, [QRData]);
   
   const totalClothes = Object.values(laundryData).reduce((total, count) => total + count, 0);
 
@@ -60,7 +64,6 @@ export default function LaundryForm({QRData,setQRData, toggleForm, setToggleForm
 
     setQRData({
       details: items,
-      LaundryId: String(res.data.user_id),
       transactionId: res.data.transaction_id,
     });
     setToggleForm(false);

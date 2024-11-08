@@ -2,9 +2,12 @@
 import { Paper, Typography } from '@mui/material';
 import * as React from 'react'
 
-export default function UpperRightCont():React.JSX.Element{
+interface UpperRightContProps {
+  laundryNumber:string;
+}
+
+export default function UpperRightCont({laundryNumber}:UpperRightContProps):React.JSX.Element{
   
-  const UniqueNum="ABC-123";
 
   return (
     <Paper elevation={10} sx={{width:1,height:1,p:3}}>
@@ -12,7 +15,7 @@ export default function UpperRightCont():React.JSX.Element{
       <Typography variant="h5">Unique Laundary Number</Typography>
       
       <Typography variant="h4" my={2} fontWeight={700} display="block">
-        {UniqueNum}
+        {laundryNumber}
       </Typography>
       
       

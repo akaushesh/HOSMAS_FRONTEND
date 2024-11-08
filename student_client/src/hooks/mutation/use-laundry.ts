@@ -11,6 +11,24 @@ import type { AxiosError, AxiosResponse } from 'axios';
 
 import { useCustomMutation, type ResolutionFunctions } from './use-custom-mutation';
 
+
+export const laundryItems:Record<string,string>={
+  jeans: 'Jeans',
+  pants: 'Pants',
+  pyjama: 'Pyjama',
+  shorts: 'Shorts',
+  shirts: 'Shirts',
+  tshirts: 'T-Shirts',
+  kurta_salwar: 'Kurta/Salwar',
+  skirts: 'Skirt',
+  dupatta: 'Dupatta',
+  bedsheet: 'Bed Sheet',
+  pillow_cover: 'Pillow Cover',
+  towel_hand_towel: 'Towel/H-Towel',
+  turban: 'Turban',
+  upper_hood: 'Upper Hood',
+}
+
 export const useCreateLaundrySlip = ({
   onSuccess,
   onError,
