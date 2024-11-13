@@ -98,7 +98,7 @@ function renderNavItems({ items, pathname }: { items?: NavItemConfig[]; pathname
     <List sx={{ listStyle: 'none', m: 0, p: 0 }}>
       {items?.map((item) => {
         const Icon = item.icon ? navIcons[item.icon] : null;
-        const active = isNavItemActive({ disabled:item.disabled, external:item.external, href:item.href, matcher:item.matcher, pathname });
+        const active = isNavItemActive({ invisible:item.invisible, disabled:item.disabled, external:item.external, href:item.href, matcher:item.matcher, pathname });
         const [open, setOpen] = React.useState(item.isNested && active);
 
       
@@ -124,6 +124,9 @@ function renderNavItems({ items, pathname }: { items?: NavItemConfig[]; pathname
                     '&:hover': {
                       color: 'var(--NavSubItem-hover-background)',
                     },
+                    ...(item.invisible ? {
+                      display: 'none',
+                    }:{}),
                     ...(item.disabled && {
                       pointerEvents: 'none',
                       opacity: 0.45,
@@ -193,7 +196,7 @@ interface NavItemProps extends Omit<NavItemConfig, 'items'> {
   isSub: boolean;
 }
 
-function NavItem({ disabled, external, href, icon, matcher, pathname, title, isSub }: NavItemProps): React.JSX.Element {
+function NavItem({invisible, disabled, external, href, icon, matcher, pathname, title, isSub }: NavItemProps): React.JSX.Element {
   const active = isNavItemActive({ disabled, external, href, matcher, pathname });
   const Icon = icon ? navIcons[icon] : null;
   const router = useRouter();
@@ -205,7 +208,13 @@ function NavItem({ disabled, external, href, icon, matcher, pathname, title, isS
   };
 
   return (
-    <li>
+    <li
+      style={
+        invisible
+          ? { display: 'none' }
+          : undefined
+      }
+    >
       <Box
         onClick={() => {
           const link = href!;

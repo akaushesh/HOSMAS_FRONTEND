@@ -68,7 +68,11 @@ function renderNavItems({ items, pathname }: { items?: NavItemConfig[]; pathname
     >
       {items?.map((item) => {
         return (
-          <Box key={item.key}>
+          <Box key={item.key} sx={{
+            ...(item.invisible && {
+              display: 'none',
+            })
+          }}>
               <NavItem items={item.items} isNested={item.isNested} pathname={pathname} {...item} />
           </Box>
         );
@@ -83,7 +87,7 @@ interface NavItemProps extends Omit<NavItemConfig, 'items'> {
   items?: NavItemConfig[];
 }
 
-function NavItem({ disabled, external, href, icon, matcher, pathname, title ,isNested,items }: NavItemProps): React.JSX.Element {
+function NavItem({invisible, disabled, external, href, icon, matcher, pathname, title ,isNested,items }: NavItemProps): React.JSX.Element {
   const active = isNavItemActive({ disabled, external, href, matcher, pathname });
   const Icon = icon ? navIcons[icon] : null;
   const router = useRouter();
@@ -103,7 +107,11 @@ function NavItem({ disabled, external, href, icon, matcher, pathname, title ,isN
   }
 
   return (
-    <li>
+    <li style={{
+      ...(invisible && {
+        display: 'none',
+      }),
+    }}>
       <Box
         onClick={handleClick}
         sx={{

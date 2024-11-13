@@ -2,6 +2,7 @@ export interface NavItemConfig {
   key: string;
   title?: string;
   disabled?: boolean;
+  invisible?: boolean;
   external?: boolean;
   label?: string;
   icon?: string;

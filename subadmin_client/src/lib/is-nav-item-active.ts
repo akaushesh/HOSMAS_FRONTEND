@@ -2,11 +2,12 @@ import type { NavItemConfig } from '@/types/nav';
 
 export function isNavItemActive({
   disabled,
+  invisible,
   external,
   href,
   pathname,
-}: Pick<NavItemConfig, 'disabled' | 'external' | 'href' | 'matcher'> & { pathname: string }): boolean {
-  if (disabled || !href || external) {
+}: Pick<NavItemConfig, 'invisible' | 'disabled' | 'external' | 'href' | 'matcher'> & { pathname: string }): boolean {
+  if (disabled || !href || external || invisible) {
     return false;
   }
   

@@ -15,7 +15,6 @@ import { paths } from '@/paths';
 import { isNavItemActive } from '@/lib/is-nav-item-active';
 import { Logo } from '@/components/core/logo';
 
-import { allocationSubItems } from './config';
 import { navIcons } from './nav-icons';
 
 export interface HamBurgerProps {
@@ -25,7 +24,7 @@ export interface HamBurgerProps {
   title?: string;
 }
 
-export function HamBurger({ open, onClose,items,title }: HamBurgerProps): React.JSX.Element {
+export function HamBurger({ open, onClose, items, title }: HamBurgerProps): React.JSX.Element {
   const pathname = usePathname();
   return (
     <Drawer
@@ -73,11 +72,12 @@ export function HamBurger({ open, onClose,items,title }: HamBurgerProps): React.
       </Stack>
 
       <Divider sx={{ borderColor: 'var(--mui-palette-text-secondary)' }} />
-     
-      <Box sx={{ my:3 }}>
-        <Typography color="var(--mui-palette-text-primaryChannel)" ml={4} letterSpacing="3px" variant='h5'>{title}</Typography>
-      </Box>
 
+      <Box sx={{ my: 3 }}>
+        <Typography color="var(--mui-palette-text-primaryChannel)" ml={4} letterSpacing="3px" variant="h5">
+          {title}
+        </Typography>
+      </Box>
 
       <Box component="nav" sx={{ flex: '1 1 auto', px: 3, mt: 1 }}>
         {renderNavItems({ pathname, items })}
@@ -123,12 +123,16 @@ interface NavItemProps extends Omit<NavItemConfig, 'items'> {
   pathname: string;
 }
 
-function NavItem({ disabled, external, href, icon, matcher, pathname, title }: NavItemProps): React.JSX.Element {
+function NavItem({ invisible,disabled, external, href, icon, matcher, pathname, title }: NavItemProps): React.JSX.Element {
   const active = isNavItemActive({ disabled, external, href, matcher, pathname });
   const Icon = icon ? navIcons[icon] : null;
 
   return (
-    <li>
+    <li style={{
+      ...(invisible ?{
+        display: 'none',
+      }:{}),
+    }}>
       <Box
         {...(href
           ? {

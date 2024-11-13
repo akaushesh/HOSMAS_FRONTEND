@@ -13,10 +13,14 @@ export function NavigationRestrictor({ children }: NavigationRestrictorProps): R
   const pathname = usePathname();
 
   const disabledNavItems = navItems
-    .filter((item) => item?.disabled || item?.items?.some((subItem) => subItem.disabled))
+    .filter(
+      (item) =>
+        item?.disabled || item?.invisible || item?.items?.some((subItem) => subItem.disabled || subItem.invisible)
+    )
     .flatMap((item) => {
-      const disabledItems = item.disabled ? [item.href] : [];
-      const disabledSubItems = item.items?.filter((subItem) => subItem?.disabled).map((subItem) => subItem?.href) || [];
+      const disabledItems = item.disabled || item.invisible ? [item.href] : [];
+      const disabledSubItems =
+        item.items?.filter((subItem) => subItem?.disabled || subItem?.invisible).map((subItem) => subItem?.href) || [];
 
       return [...disabledItems, ...disabledSubItems];
     });
