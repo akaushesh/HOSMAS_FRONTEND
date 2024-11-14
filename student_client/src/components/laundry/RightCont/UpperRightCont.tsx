@@ -12,7 +12,7 @@ export default function UpperRightCont({laundryNumber}:UpperRightContProps):Reac
   return (
     <Paper elevation={10} sx={{width:1,height:1,p:3}}>
       
-      <Typography variant="h5">Unique Laundary Number</Typography>
+      <Typography variant="h5">Unique Laundry Number</Typography>
       
       <Typography variant="h4" my={2} fontWeight={700} display="block">
         {laundryNumber}
