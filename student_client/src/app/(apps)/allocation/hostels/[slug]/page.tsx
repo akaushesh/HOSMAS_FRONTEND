@@ -11,8 +11,8 @@ import HostelCollage from '@/components/allocation/hostels/slug/HostelCollage';
 import HostelDescription from '@/components/allocation/hostels/slug/HostelDescription';
 
 import hostels from '../assets/HostelData';
-import CustomModal from '@/components/core/custom-modal';
-import PopupGallery from '@/components/core/PopupGallery';
+// import CustomModal from '@/components/core/custom-modal';
+// import PopupGallery from '@/components/core/PopupGallery';
 
 export default function Page({ params }: { params: { slug: string } }): React.JSX.Element {
   const id = params.slug;
@@ -34,9 +34,9 @@ export default function Page({ params }: { params: { slug: string } }): React.JS
   return (
     <Box sx={{ position: 'relative',height:"fit-content" }} >
 
-      <CustomModal open={popup} onClose={():void => { handlePopup(false); }}>
+      {/* <CustomModal open={popup} onClose={():void => { handlePopup(false); }}>
         <PopupGallery images={images} handlePopup={handlePopup} />
-      </CustomModal>
+      </CustomModal> */}
 
       {/* {popup ? <PopupGallery images={images} handlePopup={handlePopup} /> : null} */}
 
