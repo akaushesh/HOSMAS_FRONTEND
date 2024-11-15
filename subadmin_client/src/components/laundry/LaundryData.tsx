@@ -45,6 +45,8 @@ export default function LaundryData({ data, setPageState }: LaundryFormProps): R
   );
 
   const laundryKeys: string[] = Object.keys(laundryData);
+  const sortedLaundryKeys = [...laundryKeys].sort((a, b) => laundryData[b] - laundryData[a]);
+
 
   const totalClothes = Object.values(laundryData).reduce((total, count) => total + count, 0);
 
@@ -168,7 +170,7 @@ export default function LaundryData({ data, setPageState }: LaundryFormProps): R
           </Typography>
           <Stack mt={2} px={1.5}>
             <Grid container spacing={1}>
-              {laundryKeys.map((item) => {
+              {sortedLaundryKeys.map((item) => {
                 return (
                   <Grid item xs={12} md={6} key={item}>
                     <Box>
