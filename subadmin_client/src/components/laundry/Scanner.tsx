@@ -24,6 +24,7 @@ export default function Scanner({ setPageState, setQRData, mode }: CheckoutProps
   const videoRef = React.useRef<HTMLVideoElement | null>(null);
   const [camError, setCamError] = React.useState<string | null>(null);
   const [error, setError] = React.useState<string | null>(null);
+  const errorRef = React.useRef<HTMLDivElement | null>(null);
 
 
   const onSuccess = async (res: AxiosResponse<LaundrySlipResponse>): Promise<void> => {
@@ -128,6 +129,13 @@ export default function Scanner({ setPageState, setQRData, mode }: CheckoutProps
   // eslint-disable-next-line react-hooks/exhaustive-deps -- limited deps
   }, [setQRData, mode]);
 
+
+  React.useEffect(() => {
+    if (error && errorRef.current) {
+      errorRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [error]);
+
   return (
     <Stack alignItems="center">
       <Button
@@ -149,7 +157,7 @@ export default function Scanner({ setPageState, setQRData, mode }: CheckoutProps
         {mode === 'drop' ? 'Drop' : 'Collect'} QR scanner
       </Typography>
 
-      <Stack alignItems="center" mt={8} sx={{ position: 'relative', width: 1 }}>
+      <Stack alignItems="center" mt={4} sx={{ position: 'relative', width: 1 }}>
         {isPending ? (
           <Box sx={{ position: 'absolute', top: '55%', left: '50%', zIndex: 20 }}>
             <DottedLoader />
@@ -242,7 +250,7 @@ export default function Scanner({ setPageState, setQRData, mode }: CheckoutProps
         </Stack>
       </Stack>
       {error ? (
-        <Typography color="error" variant="h6" textAlign="center" mt={5} dangerouslySetInnerHTML={{ __html: error.replace(/<br\s*\/?>/g, '<br />') }} />
+        <Typography color="error" ref={errorRef} mb={4} variant="h6" textAlign="center" mt={5} dangerouslySetInnerHTML={{ __html: error.replace(/<br\s*\/?>/g, '<br />') }} />
       ) : null}
     </Stack>
   );
