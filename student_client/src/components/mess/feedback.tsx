@@ -2,119 +2,118 @@
 
 import * as React from 'react';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
-import ThumbDownIcon from '@mui/icons-material/ThumbDown';
-import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import { LoadingButton } from '@mui/lab';
-import { Box, Button, Divider, IconButton, Paper, Stack, Typography } from '@mui/material';
+import { Box, Button, Divider, Paper, Rating, Stack, Typography } from '@mui/material';
+
+
+type Items = Record<string, 'veg' | 'non-veg'>;
+
+type MealTimings = Record<string, Items>;
+
+interface MenuItems {
+  Breakfast: MealTimings;
+  Lunch: MealTimings;
+  Dinner: MealTimings;
+}
 
 interface FeedbackProps {
-  timing: string;
+  timing: 'Breakfast' | 'Lunch' | 'Dinner';
+  day: string;
+  menuItems: MenuItems;
 }
 
-interface MenuItemProps {
-  type: 'veg' | 'non-veg';
-  response: boolean | null;
-}
+export default function Feedback({ timing, day, menuItems }: FeedbackProps): React.JSX.Element {
+  const currentMenuItems = menuItems[timing][day] || {};
 
-export default function Feedback({ timing }: FeedbackProps): React.JSX.Element {
-  const [menuItems, setMenuItems] = React.useState<Record<string, MenuItemProps>>({
-    'Rajma Rice': { type: 'veg', response: null },
-    'Lime water': { type: 'veg', response: null },
-    'Green Salad': { type: 'veg', response: null },
-    'Boiled Eggs': { type: 'non-veg', response: null },
-    'Boiled ': { type: 'non-veg', response: null },
-    BoilEggs: { type: 'non-veg', response: null },
-    Boilegs: { type: 'non-veg', response: null },
-  });
+  const [ratings, setRatings] = React.useState<Record<string, number>>(
+    Object.keys(currentMenuItems).reduce<Record<string, number>>((acc, item) => {
+      acc[item] = 0; 
+      return acc;
+    }, {})
+  );
 
-  const handleFeedback = (item: string, response: boolean): void => {
-    setMenuItems((prevMenuItems) => ({
-      ...prevMenuItems,
-      [item]: { ...prevMenuItems[item], response },
-    }));
+  const handleRatingChange = (item: string, value: number | null):void => {
+    if (value !== null) {
+      setRatings((prevRatings) => ({
+        ...prevRatings,
+        [item]: value,
+      }));
+    }
   };
 
   const handleReset = (): void => {
-    setMenuItems((prevMenuItems) =>
-      Object.fromEntries(Object.entries(prevMenuItems).map(([key, value]) => [key, { ...value, response: null }]))
+    setRatings(
+      Object.keys(currentMenuItems).reduce<Record<string, number>>((acc, item) => {
+        acc[item] = 0; 
+        return acc;
+      }, {})
     );
   };
 
-  const isDisabled = Object.values(menuItems).every((item) => item.response === null);
+  const isDisabled = Object.values(ratings).every((rating) => rating === 0);
 
   return (
     <Stack>
       <Box sx={{ height: '43vh', overflowY: 'auto', pb: 1.5 }}>
-        {Object.keys(menuItems).map((item) => {
-          return (
-            <Paper
-              key={`${timing}-${item}`}
-              sx={{
-                px: { xs: 1, md: 2 },
-                py: { xs: 0, md: 0.4 },
-                mx: { xs: 1, md: 2 },
-                my: 1,
-                background: 'var(--mui-palette-secondary-light)',
-                border: '1px dashed var(--mui-palette-secondary-main)',
-              }}
-              elevation={10}
-            >
-              <Stack direction="row" alignItems="center" justifyContent="space-between">
+        {Object.entries(currentMenuItems).map(([item, type]) => (
+          <Paper
+            key={`${timing}-${item}`}
+            sx={{
+              px: { xs: 1, md: 2 },
+              py: 1.5,
+              mx: { xs: 1, md: 2 },
+              my: 1,
+              background: 'var(--mui-palette-secondary-light)',
+              border: '1px dashed var(--mui-palette-secondary-main)',
+            }}
+            elevation={10}
+          >
+            <Stack direction="row" alignItems="center" justifyContent="space-between" gap={1}>
+              <Stack direction="row" alignItems="center" sx={{ ml: { xs: 0, md: 2 }, gap: { xs: 3, md: 6 } }}>
                 <Stack
-                  sx={{ ml: { xs: 0, md: 2 },gap:{xs:3,md:6} }}
-                  direction="row"
+                  sx={{
+                    p: 0,
+                    border: type === 'veg' ? '4px solid green' : '4px solid #8C0606',
+                    borderRadius: 0.4,
+                    borderWidth: { xs: '2px', md: '3px' },
+                  }}
                   alignItems="center"
-                  justifyContent="flex-start"
+                  justifyContent="center"
                 >
-                  <Stack
+                  <FiberManualRecordIcon
                     sx={{
-                      p: 0,
-                      border: menuItems[item].type === 'veg' ? '4px solid green' : '4px solid #8C0606',
-                      borderRadius: 0.4,
-                      borderWidth:{xs:'3px',md:'4px'}
+                      fontSize: { xs: '13px', md: '16px' },
+                      color: type === 'veg' ? 'green' : '#8C0606',
                     }}
-                    alignItems="center"
-                    justifyContent="center"
-                  >
-                    <FiberManualRecordIcon sx={{ fontSize:{xs:"15px",md:"20px"}, color: menuItems[item].type === 'veg' ? 'green' : '#8C0606' }} />
-                  </Stack>
-
-                  <Typography variant="h6" sx={{fontSize:{xs:"16px",md:"19px"}}}>{item}</Typography>
+                  />
                 </Stack>
 
-                <Stack direction="row" alignItems="center" justifyContent="flex-start" sx={{gap:{xs:0,md:2}}}>
-                  <IconButton
-                    onClick={() => {
-                      handleFeedback(item, true);
-                    }}
-                    size="medium"
-                  >
-                    <ThumbUpIcon sx={{ color: menuItems[item].response === true ? 'green' : '', fontSize: {xs:"24px",md:'27px'} }} />
-                  </IconButton>
-
-                  <IconButton
-                    onClick={() => {
-                      handleFeedback(item, false);
-                    }}
-                    size="medium"
-                  >
-                    <ThumbDownIcon
-                      fontSize="inherit"
-                      sx={{ color: menuItems[item].response === false ? 'red' : '', fontSize: {xs:"22px",md:'27px'} }}
-                    />
-                  </IconButton>
-                </Stack>
+                <Typography variant="h6" sx={{ fontSize: { xs: '14px', md: '19px' } }}>
+                  {item}
+                </Typography>
               </Stack>
-            </Paper>
-          );
-        })}
+
+              <Rating
+                name={`rating-${item}`}
+                value={ratings[item]}
+                onChange={(event, newValue) => { handleRatingChange(item, newValue); }}
+                sx={{
+                  '& .MuiRating-icon': {
+                    
+                    fontSize: { xs: '18px', sm: '27px' },
+                    color:'var(--mui-palette-primary-main)'
+                  },
+                }}
+              />
+            </Stack>
+          </Paper>
+        ))}
       </Box>
+
       <Divider sx={{ mt: 1 }} />
-      <Stack direction="row" gap={2} sx={{ mt: 2,justifyContent:{xs:"center",md:"flex-end"} }}>
+      <Stack direction="row" gap={2} sx={{ mt: 2, justifyContent: { xs: 'center', md: 'flex-end' } }}>
         <Button
-          onClick={() => {
-            handleReset();
-          }}
+          onClick={handleReset}
           sx={{
             fontWeight: 600,
             borderRadius: 1,
@@ -129,10 +128,6 @@ export default function Feedback({ timing }: FeedbackProps): React.JSX.Element {
         </Button>
         <LoadingButton
           variant="contained"
-          //   onClick={() => {
-          //     handleSubmit();
-          //   }}
-          //   loading={isDisabled}
           disabled={isDisabled}
           sx={{
             fontWeight: 600,
