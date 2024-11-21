@@ -1,10 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
-import { LoadingButton } from '@mui/lab';
-import { Box, Stack, TextField } from '@mui/material';
-import { DatePicker } from '@mui/x-date-pickers';
+import { Box, Button, Grid, Link, MenuItem, TextField, Typography } from '@mui/material';
 import { useQueryClient } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import { Controller, useForm } from 'react-hook-form';
@@ -13,150 +10,156 @@ import { logger } from '@/lib/default-logger';
 import { useCreateLeaveSlip } from '@/hooks/mutation/use-leave';
 
 interface LeaveFormInputs {
-  startDate: Date | null;
-  endDate: Date | null;
-  location: string | null;
-  reason: string | null;
+  reason: string;
+  startDate: string;
+  endDate: string;
+  place: string;
+  parentEmail: string;
 }
 
 export default function LeaveForm(): React.JSX.Element {
-  const { control, handleSubmit, reset, watch } = useForm<LeaveFormInputs>({
-    defaultValues: {
-      startDate: null,
-      endDate: null,
-      location: null,
-      reason: null,
-    },
-  });
-
   const queryClient = useQueryClient();
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LeaveFormInputs>();
 
   const onSuccess = async (): Promise<void> => {
     await queryClient.invalidateQueries({ queryKey: ['getLeaves'] });
-    reset();
   };
 
-  const { mutate: createLeaveSlip, isPending } = useCreateLeaveSlip({ onSuccess });
-
-  const startDate = watch('startDate');
+  const { mutate: createLeaveSlip } = useCreateLeaveSlip({ onSuccess });
 
   const onSubmit = (data: LeaveFormInputs): void => {
     const formattedData = {
+      reason: data.reason,
       leaveDateFrom: dayjs(data.startDate).format('YYYY-MM-DDTHH:mm:ss[Z]'),
       leaveDateTo: dayjs(data.endDate).format('YYYY-MM-DDTHH:mm:ss[Z]'),
+      place: data.place,
+      parentEmail: data.parentEmail,
     };
 
     createLeaveSlip(formattedData);
-
     logger.debug('LeaveForm', formattedData);
   };
 
   return (
-    <Box
-      component="form"
-      onSubmit={handleSubmit(onSubmit)}
-      sx={{
-        maxWidth: 500,
-        mx: 'auto',
-        p: 3,
-      }}
-    >
-      <Stack spacing={3}>
-        <Controller
-          name="startDate"
-          control={control}
-          rules={{ required: 'Please enter start date' }}
-          render={({ field: { onChange, value, ...fieldProps }, fieldState: { error } }) => (
-            <DatePicker
-              label="Start Date"
-              value={value}
-              onChange={onChange}
-              format="DD/MM/YYYY"
-              minDate={dayjs()}
-              slotProps={{
-                textField: {
-                  fullWidth: true,
-                  error: Boolean(error),
-                  helperText: error?.message,
-                  ...fieldProps,
-                },
-              }}
+    <>
+      <Typography variant="h5" sx={{ mb: 3 }}>
+        Submit New Leave
+      </Typography>
+      <Box component="form" noValidate autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
+        <Grid container spacing={2} sx={{ mb: 2 }}>
+          <Grid item xs={12} sm={6}>
+            <Controller
+              name="reason"
+              control={control}
+              defaultValue=""
+              rules={{ required: 'Reason is required' }}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  select
+                  label="Reason"
+                  fullWidth
+                  error={Boolean(errors.reason)}
+                  helperText={errors.reason?.message}
+                >
+                  <MenuItem value="Sick">Sick</MenuItem>
+                  <MenuItem value="Personal">Personal</MenuItem>
+                  <MenuItem value="Vacation">Vacation</MenuItem>
+                </TextField>
+              )}
             />
-          )}
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <Controller
+              name="place"
+              control={control}
+              defaultValue=""
+              rules={{ required: 'Place is required' }}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  label="Place"
+                  fullWidth
+                  error={Boolean(errors.place)}
+                  helperText={errors.place?.message}
+                />
+              )}
+            />
+          </Grid>
+        </Grid>
+
+        <Grid container spacing={2} sx={{ mb: 2 }}>
+          <Grid item xs={12} sm={6}>
+            <Controller
+              name="startDate"
+              control={control}
+              defaultValue=""
+              rules={{ required: 'Start date is required' }}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  label="From"
+                  type="date"
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                  error={Boolean(errors.startDate)}
+                  helperText={errors.startDate?.message}
+                />
+              )}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <Controller
+              name="endDate"
+              control={control}
+              defaultValue=""
+              rules={{ required: 'End date is required' }}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  label="To"
+                  type="date"
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                  error={Boolean(errors.endDate)}
+                  helperText={errors.endDate?.message}
+                />
+              )}
+            />
+          </Grid>
+        </Grid>
+
+        <TextField
+          label="Parent's Mail"
+          type="email"
+          fullWidth
+          value="Caretaker.D@thapar.edu"
+          disabled
+          sx={{ mb: 3 }}
         />
 
-        <Controller
-          name="endDate"
-          control={control}
-          rules={{
-            required: 'Please enter end date',
-            validate: (value) =>
-              !startDate || dayjs(value).isAfter(dayjs(startDate)) || 'End date must be after start date',
-          }}
-          render={({ field: { onChange, value, ...fieldProps }, fieldState: { error } }) => (
-            <DatePicker
-              label="End Date"
-              value={value}
-              onChange={onChange}
-              format="DD/MM/YYYY"
-              minDate={startDate ? dayjs(startDate).add(1, 'day') : dayjs()}
-              slotProps={{
-                textField: {
-                  fullWidth: true,
-                  error: Boolean(error),
-                  helperText: error?.message,
-                  ...fieldProps,
-                },
-              }}
-            />
-          )}
-        />
-
-        <Controller
-          name="location"
-          control={control}
-          rules={{ required: 'Please enter your location' }}
-          render={({ field: { ref, ...fieldProps }, fieldState: { error } }) => (
-            <TextField
-              inputRef={ref}
-              {...fieldProps}
-              label="Location"
-              error={Boolean(error)}
-              helperText={error?.message}
-              fullWidth
-            />
-          )}
-        />
-
-        <Controller
-          name="reason"
-          control={control}
-          rules={{ required: 'Please fill the reason for this leave' }}
-          render={({ field: { ref, ...fieldProps }, fieldState: { error } }) => (
-            <TextField
-              inputRef={ref}
-              {...fieldProps}
-              label="Reason for Leave"
-              multiline
-              rows={4}
-              error={Boolean(error)}
-              helperText={error?.message}
-              fullWidth
-            />
-          )}
-        />
-
-        <LoadingButton
-          loading={isPending}
-          type="submit"
-          variant="contained"
-          size="large"
-          endIcon={<ArrowRightAltIcon />}
-          sx={{ mt: 2 }}
-        >
-          Next
-        </LoadingButton>
-      </Stack>
-    </Box>
+        <Grid container justifyContent="space-between" alignItems="center">
+          <Grid item>
+            <Typography variant="body2" sx={{ mt: 2, textAlign: 'center' }}>
+              <strong>To : </strong>
+              <Link>Caretaker.D@thapar.edu</Link>
+            </Typography>
+          </Grid>
+          <Grid item>
+            <Button
+              variant="contained"
+              type="submit"
+              sx={{ pl: 6, pr: 6, mt: 2, fontSize: '1rem', fontWeight: 'bold' }}
+            >
+              Submit
+            </Button>
+          </Grid>
+        </Grid>
+      </Box>
+    </>
   );
 }

@@ -6,10 +6,18 @@ import dayjs from 'dayjs';
 
 import { useLeaves } from '@/hooks/query/use-leave';
 
-import Confirmation from './Confirmation';
 import LeaveForm from './LeaveForm';
-import LeaveTimeline from './LeaveTimeline';
-import Pass from './Pass';
+import LeaveHistory from './LeaveHistory';
+import LeaveStatus from './LeaveStatus';
+
+const leaveRecords = [
+  { title: 'Visiting Parents', location: 'Kapurthala', from: '27/07', to: '30/07' },
+  { title: 'Picnic', location: 'Kasol', from: '27/07', to: '30/07' },
+  { title: 'Hackathon', location: 'Chandigarh', from: '27/07', to: '30/07' },
+  { title: 'Visiting Parents', location: 'Kapurthala', from: '27/07', to: '30/07' },
+  { title: 'Visiting Parents', location: 'Kapurthala', from: '27/07', to: '30/07' },
+  { title: 'Visiting Parents', location: 'Kapurthala', from: '27/07', to: '30/07' },
+];
 
 export default function LeaveApplication(): React.JSX.Element {
   let phase = 2;
@@ -25,21 +33,35 @@ export default function LeaveApplication(): React.JSX.Element {
   }
 
   return (
-    <Paper elevation={10} sx={{ p: 3 }}>
-      {isLoading ? (
-        <Grid container justifyContent="center" alignItems="center">
-          <CircularProgress />
-        </Grid>
-      ) : (
-        <Grid container justifyContent="space-between" alignItems="center">
-          <Grid item xs={12} md={6}>
-            {phase === 0 ? <LeaveForm /> : phase === 1 ? <Confirmation /> : <Pass latestLeave={latestLeave} />}
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <LeaveTimeline phase={phase} />
-          </Grid>
-        </Grid>
-      )}
-    </Paper>
+    <Grid container spacing={2}>
+      <Grid item xs={12} md={7}>
+        <Paper elevation={10} sx={{ p: 3 }}>
+          <Paper elevation={0} sx={{ p: 3, backgroundColor: '#f9f9f9', maxHeight: '58vh', overflowY: 'scroll' }}>
+            {isLoading ? (
+              <Grid container justifyContent="center">
+                <CircularProgress />
+              </Grid>
+            ) : phase === 0 ? (
+              <LeaveForm />
+            ) : (
+              <LeaveStatus />
+            )}
+          </Paper>
+        </Paper>
+      </Grid>
+      <Grid item xs={12} md={5}>
+        <Paper elevation={10} sx={{ p: 3 }}>
+          <Paper elevation={0} sx={{ p: 3, backgroundColor: '#f9f9f9', maxHeight: '58vh', overflowY: 'scroll' }}>
+            {isLoading ? (
+              <Grid container justifyContent="center">
+                <CircularProgress />
+              </Grid>
+            ) : (
+              <LeaveHistory leaveRecords={leaveRecords} />
+            )}
+          </Paper>
+        </Paper>
+      </Grid>
+    </Grid>
   );
 }
