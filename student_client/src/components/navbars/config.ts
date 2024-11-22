@@ -33,7 +33,7 @@ export const navItems = [
   },
   { key: 'cleaning', title: 'Cleaning', href: paths.cleaning, icon: 'broom', isNested: false },
   { key: 'laundry', title: 'Laundry', href: paths.laundry, icon: 'shirt', isNested: false },
-  { key: 'mess', title: 'Mess', href: paths.mess, icon: 'cookingPot', isNested: false,invisible:false  },
+  { key: 'mess', title: 'Mess', href: paths.mess, icon: 'cookingPot', isNested: false,invisible:true  },
   { key: 'leave', title: 'Leave', href: paths.leave, icon: 'house', isNested: false },
   { key: 'settings', title: 'Settings', href: paths.settings, icon: 'gear-six' },
 ] satisfies NavItemConfig[];

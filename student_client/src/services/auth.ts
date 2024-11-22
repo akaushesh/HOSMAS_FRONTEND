@@ -24,7 +24,6 @@ export interface InitiatePasswordResetData {
 }
 
 export interface ResetPasswordData {
-  slug: string;
   password: string;
 }
 

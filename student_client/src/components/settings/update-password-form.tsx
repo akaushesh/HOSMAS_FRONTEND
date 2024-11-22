@@ -18,12 +18,16 @@ import type { AxiosError, AxiosResponse } from 'axios';
 import { logger } from '@/lib/default-logger';
 
 import { useChangePassword } from '@/hooks/mutation/use-auth';
+import { Alert, Snackbar } from '@mui/material';
 
 export function UpdatePasswordForm(): React.JSX.Element {
-  const [password, setPassword] = React.useState('');
+  const [password, setPassword] = React.useState<string>('');
   const [confirmPassword, setConfirmPassword] = React.useState('');
   const [passwordError, setPasswordError] = React.useState('');
   const [confirmPasswordError, setConfirmPasswordError] = React.useState('');
+
+  const [success, setSuccess] = React.useState("");
+  const [error, setError] = React.useState("");
 
   const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     setPassword(event.target.value);
@@ -39,11 +43,12 @@ export function UpdatePasswordForm(): React.JSX.Element {
     event.preventDefault();
 
     if (password.length < 8) {
-      setPasswordError('Password must be at least 8 characters');
+      setError('Password must be at least 8 characters');
+      return;
     }
 
     if (password !== confirmPassword) {
-      setConfirmPasswordError("Passwords don't match");
+      setError("Passwords don't match");
       return;
     }
 
@@ -55,12 +60,26 @@ export function UpdatePasswordForm(): React.JSX.Element {
     changePassword({ password });
   };
 
+
+  const ResetSnackBar = (event?: React.SyntheticEvent | Event, reason?: string): void => {
+    if (reason === 'clickaway') {
+      return;
+    }
+      setSuccess('');      
+      setError('');
+  };
+
   const onSuccess = (res: AxiosResponse<OkResponse>): void => {
     logger.debug('Updated password', res);
+    setSuccess('Password updated successfully');
+    setPassword('');
+    setConfirmPassword('');
+    
   };
 
   const onError = (err: AxiosError<ErrorResponse>): void => {
     logger.error('Error', err);
+    setError(err.response?.data.detail || 'An error occurred');
   };
 
   const { mutate: changePassword, isPending } = useChangePassword({ onSuccess, onError });
@@ -108,6 +127,15 @@ export function UpdatePasswordForm(): React.JSX.Element {
           </LoadingButton>
         </CardActions>
       </Card>
+
+      <Snackbar open={error!==""|| success!==""} autoHideDuration={2500} onClose={ResetSnackBar}
+      anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert onClose={ResetSnackBar} variant="filled" severity={success!=="" ? 'success' : 'error'} sx={{ width: '100%' }}>
+          {success!=="" ? success : error}
+        </Alert>
+      </Snackbar>
+
     </form>
   );
 }

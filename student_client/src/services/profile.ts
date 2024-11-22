@@ -137,7 +137,7 @@ export const changePassword = async (values: ResetPasswordData): Promise<AxiosRe
   };
   logger.debug('changePassword', data);
 
-  const res = await authApi.post('auth/change-password/', data, {
+  const res = await authApi.post('user/reset-password/', data, {
     headers: {
       Authorization: `Bearer ${token}`,
     },

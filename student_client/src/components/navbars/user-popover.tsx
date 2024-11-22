@@ -76,12 +76,12 @@ export function UserPopover({ anchorEl, onClose, open }: UserPopoverProps): Reac
           </ListItemIcon>
           Settings
         </MenuItem>
-        <MenuItem component={RouterLink} href={paths.allocation.account} onClick={onClose}>
+        {/* <MenuItem component={RouterLink} href={paths.overview} onClick={onClose}>
           <ListItemIcon>
             <UserIcon fontSize="var(--icon-fontSize-md)" />
           </ListItemIcon>
           Profile
-        </MenuItem>
+        </MenuItem> */}
         <MenuItem onClick={handleSignOut}>
           <ListItemIcon>
             <SignOutIcon fontSize="var(--icon-fontSize-md)" />
