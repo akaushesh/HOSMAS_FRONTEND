@@ -48,7 +48,7 @@ export default function MenuTable({ timing, day, menuItems }: MenuProps): React.
                   background: 'var(--mui-palette-secondary-light)',
                   border: '1px dashed var(--mui-palette-secondary-main)',
                 }}
-                elevation={10}
+                elevation={1}
               >
                 <Stack
                   sx={{ ml: { xs: 0, md: 2 }, gap: { xs: 3, md: 6 } }}

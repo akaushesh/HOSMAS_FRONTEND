@@ -54,7 +54,7 @@ export default function LeftCont({ historyData }: HistoryDataProps): React.JSX.E
         </Box>
       ) : (
         <>
-          <Box mt={3}>
+          <Box mt={3} sx={{minHeight:{xs:"42vh",md:"36vh"}}}>
             <LaundryTable laundrySlips={paginatedData} />
           </Box>
 

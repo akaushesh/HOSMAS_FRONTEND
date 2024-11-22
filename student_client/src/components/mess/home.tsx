@@ -120,32 +120,10 @@ export default function Home(): React.JSX.Element {
           Feedback
         </Button>
 
-        {pageState === 1 && (
-          <Select
-            value={day}
-            onChange={handleChangeDay}
-            displayEmpty
-            sx={{
-              fontSize: { xs: '12px', md: '15px', lg: '17px' },
-              borderRadius: 0.7,
-              display: { xs: 'none', md: 'block' },
-            }}
-            inputProps={{ 'aria-label': 'Without label' }}
-            size="small"
-          >
-            {days.map((val) => {
-              return (
-                <MenuItem key={val} value={val}>
-                  {val}
-                </MenuItem>
-              );
-            })}
-          </Select>
-        )}
-
+     
+        {pageState === 0 && (
         <Select
           value={messTiming}
-          disabled={pageState === 2}
           onChange={handleChangeMessTiming}
           displayEmpty
           sx={{
@@ -159,7 +137,7 @@ export default function Home(): React.JSX.Element {
           <MenuItem value="Breakfast">Breakfast</MenuItem>
           <MenuItem value="Lunch">Lunch</MenuItem>
           <MenuItem value="Dinner">Dinner</MenuItem>
-        </Select>
+        </Select>)}
 
         <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }} />
 
@@ -184,7 +162,7 @@ export default function Home(): React.JSX.Element {
         </Button> */}
       </Stack>
 
-      <Stack direction="row" alignItems="center" justifyContent="flex-start" gap={1}>
+      <Stack direction="row" alignItems="center" justifyContent="flex-start" gap={1} sx={{display:pageState===1?"none":"flex"}}>
         <Select
           value={day}
           onChange={handleChangeDay}

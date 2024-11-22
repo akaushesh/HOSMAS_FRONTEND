@@ -21,6 +21,12 @@ export const paths = {
     attendance:'/cleaning/attendance',
     assignment:'/cleaning/assignment',
   },
+  mess:{
+    default:'/mess',
+    dashboard:'/mess/dashboard',
+    menu:'/mess/menu',
+    feedback:'/mess/feedback',
+  },
   cleaners:'/cleaners',
   errors: { notFound: '/errors/not-found' },
 

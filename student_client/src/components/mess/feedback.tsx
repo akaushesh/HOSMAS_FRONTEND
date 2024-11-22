@@ -3,8 +3,7 @@
 import * as React from 'react';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import { LoadingButton } from '@mui/lab';
-import { Box, Button, Divider, Paper, Rating, Stack, Typography } from '@mui/material';
-
+import { Box, Button, Divider, Paper, Rating, Stack, TextField, Typography } from '@mui/material';
 
 type Items = Record<string, 'veg' | 'non-veg'>;
 
@@ -16,45 +15,103 @@ interface MenuItems {
   Dinner: MealTimings;
 }
 
+interface FormProps {
+  rating:number;
+  feedback:string;
+}
+
 interface FeedbackProps {
   timing: 'Breakfast' | 'Lunch' | 'Dinner';
   day: string;
   menuItems: MenuItems;
 }
 
-export default function Feedback({ timing, day, menuItems }: FeedbackProps): React.JSX.Element {
-  const currentMenuItems = menuItems[timing][day] || {};
+export default function Feedback(
+  { timing, day, menuItems }: FeedbackProps
+): React.JSX.Element {
+  // const currentMenuItems = menuItems[timing][day] || {};
 
-  const [ratings, setRatings] = React.useState<Record<string, number>>(
-    Object.keys(currentMenuItems).reduce<Record<string, number>>((acc, item) => {
-      acc[item] = 0; 
-      return acc;
-    }, {})
-  );
+  const [form, setForm] = React.useState<FormProps>({
+    rating:0,
+    feedback:""
+  });
 
-  const handleRatingChange = (item: string, value: number | null):void => {
-    if (value !== null) {
-      setRatings((prevRatings) => ({
-        ...prevRatings,
-        [item]: value,
-      }));
-    }
-  };
+  // const [ratings, setRatings] = React.useState<Record<string, number>>(
+  //   Object.keys(currentMenuItems).reduce<Record<string, number>>((acc, item) => {
+  //     acc[item] = 0;
+  //     return acc;
+  //   }, {})
+  // );
+
+  // const handleRatingChange = (item: string, value: number | null): void => {
+  //   if (value !== null) {
+  //     setRatings((prevRatings) => ({
+  //       ...prevRatings,
+  //       [item]: value,
+  //     }));
+  //   }
+  // };
+
+  // const handleReset = (): void => {
+  //   setRatings(
+  //     Object.keys(currentMenuItems).reduce<Record<string, number>>((acc, item) => {
+  //       acc[item] = 0;
+  //       return acc;
+  //     }, {})
+  //   );
+  // };
+
+  // const isDisabled = Object.values(ratings).every((r) => r === 0);
 
   const handleReset = (): void => {
-    setRatings(
-      Object.keys(currentMenuItems).reduce<Record<string, number>>((acc, item) => {
-        acc[item] = 0; 
-        return acc;
-      }, {})
-    );
+    setForm({rating:0,feedback:""});
   };
 
-  const isDisabled = Object.values(ratings).every((rating) => rating === 0);
+  const isDisabled = form.rating===0;
 
   return (
-    <Stack>
-      <Box sx={{ height: '43vh', overflowY: 'auto', pb: 1.5 }}>
+    <Stack alignItems="center">
+
+      <Typography variant="h4" sx={{mt:{xs:3,md:3},fontSize:{xs:"24px",md:"32px"}}} textAlign="center">{"Leave a Rating for Today's menu"}</Typography>
+      <Rating
+        name="rating"
+        value={form.rating}
+        onChange={(event, newValue) => {
+          setForm({feedback:form.feedback,rating:newValue||0});
+        }}
+        sx={{
+          mt:{xs:2,md:3},
+          mb:3,
+          '& .MuiRating-icon': {
+            fontSize: { xs: '30px', md: '40px' },
+            color: 'var(--mui-palette-primary-main)',
+          },
+        }}
+      />
+
+<TextField
+  id="outlined-description"
+  label="Description"
+  variant="outlined"
+  placeholder="Description (Optional)"
+  name="description"
+  value={form.feedback}
+  onChange={(event) =>
+    { setForm({ rating: form.rating, feedback: event.target.value }); }
+  }
+  sx={{
+    width: "90%",
+    mb: {xs:1,md:3},
+    "& .MuiInputBase-input::placeholder": {
+      fontSize: { xs: '16px', md: '22px' }, 
+      fontWeight: 600, 
+    },
+  }}
+  rows={6}
+  multiline
+/>
+
+      {/* <Box sx={{ height: '43vh', overflowY: 'auto', pb: 1.5 }}>
         {Object.entries(currentMenuItems).map(([item, type]) => (
           <Paper
             key={`${timing}-${item}`}
@@ -66,7 +123,7 @@ export default function Feedback({ timing, day, menuItems }: FeedbackProps): Rea
               background: 'var(--mui-palette-secondary-light)',
               border: '1px dashed var(--mui-palette-secondary-main)',
             }}
-            elevation={10}
+            elevation={1}
           >
             <Stack direction="row" alignItems="center" justifyContent="space-between" gap={1}>
               <Stack direction="row" alignItems="center" sx={{ ml: { xs: 0, md: 2 }, gap: { xs: 3, md: 6 } }}>
@@ -96,19 +153,20 @@ export default function Feedback({ timing, day, menuItems }: FeedbackProps): Rea
               <Rating
                 name={`rating-${item}`}
                 value={ratings[item]}
-                onChange={(event, newValue) => { handleRatingChange(item, newValue); }}
+                onChange={(event, newValue) => {
+                  handleRatingChange(item, newValue);
+                }}
                 sx={{
                   '& .MuiRating-icon': {
-                    
                     fontSize: { xs: '18px', sm: '27px' },
-                    color:'var(--mui-palette-primary-main)'
+                    color: 'var(--mui-palette-primary-main)',
                   },
                 }}
               />
             </Stack>
           </Paper>
         ))}
-      </Box>
+      </Box> */}
 
       <Divider sx={{ mt: 1 }} />
       <Stack direction="row" gap={2} sx={{ mt: 2, justifyContent: { xs: 'center', md: 'flex-end' } }}>

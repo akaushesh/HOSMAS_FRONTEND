@@ -3,7 +3,6 @@
 import * as React from 'react';
 import { Box, Button, CircularProgress, Divider, Typography } from '@mui/material';
 import { Stack } from '@mui/system';
-import dayjs from 'dayjs';
 import { useProfile } from '@/hooks/query/use-profile';
 import { type AxiosError, type AxiosResponse } from 'axios';
 import { type SupervisorProfileResponse } from '@/services/profile';
@@ -27,7 +26,6 @@ export default function HomeLaundry({setPageState}:HomeProps): React.JSX.Element
   const user = profile as AxiosResponse<SupervisorProfileResponse>;
   const hostelID=user?.data?.supervisor?.hostel?.id;
 
-  const hostel=user?.data?.supervisor?.hostel?.name;
   
   const onSuccess = async (res: AxiosResponse<LaundryDetailsResponse>): Promise<void> => {
     setLaundryDetails(res.data);
@@ -49,18 +47,6 @@ export default function HomeLaundry({setPageState}:HomeProps): React.JSX.Element
 
   return (
     <Stack alignItems='center'>
-
-      <Typography variant="h6" textAlign='left' width={1} color='var(--mui-palette-text-primary)' sx={{ mt:1,fontSize:"18px"}}>
-          <span>
-           {hostel} | {' '}
-          </span>  
-          <span>
-           {dayjs().format('D MMMM, dddd')}
-          </span>  
-      </Typography>
-      
-
-
       <Stack alignItems='center' sx={{width:{xs:1,sm:0.8,md:0.6,lg:0.4}}}>
       <Stack
         direction="row"

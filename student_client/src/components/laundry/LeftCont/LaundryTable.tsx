@@ -45,7 +45,7 @@ function separateIntegerAndDecimal(number: number): { integer: number; decimal: 
 export default function LaundryTable({ laundrySlips }: EleProps): React.JSX.Element {
   return (
     <Paper sx={{ borderRadius: '8px', overflowY: 'auto', overflowX: 'hidden', height: '35.5 vh' }} elevation={10}>
-      <Table stickyHeader>
+      <Table stickyHeader >
         <TableHead>
           <TableRow sx={{ borderRadius: '8px', backgroundColor: 'red' }}>
             <StyledTableCell align="center">Drop-off</StyledTableCell>
