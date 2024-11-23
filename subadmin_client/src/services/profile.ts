@@ -33,6 +33,25 @@ interface Hostel {
   fee: number;
 }
 
+export interface ProfileResponse {
+  rollno: string;
+  name: string;
+  phoneno: string;
+  token: string;
+  gender: string;
+  cg: number;
+  batch: null | Batch;
+  alloted_room: Room;
+  user: User;
+  group: Group;
+  is_preference_filled: boolean;
+  academic_session: string;
+  fee_structure_url: string;
+  current_hostel: null | Hostel;
+  preview_hostel: null | Hostel;
+  alloted_hostel: null | Hostel;
+  group_size_limit: number;
+}
 export interface SuperVisorHostel {
   id: number;
   name: string;

@@ -6,6 +6,7 @@ import HomeLaundry from './HomeLaundry';
 import Scanner from './Scanner';
 import LaundryData from './LaundryData';
 import CollectData from './CollectData';
+import History from './History';
 
 export interface QRDataProps {
   details: Record<string, number>; 
@@ -28,6 +29,8 @@ export default function Laundry(): React.JSX.Element {
       {pageState === 3 && (<LaundryData data={QRData} setPageState={setPageState} />)}
       
       {pageState === 4 && (<CollectData data={QRData} setPageState={setPageState} />)}
+      
+      {pageState === 5 && (<History setPageState={setPageState} />)}
     </Box>
   );
 }

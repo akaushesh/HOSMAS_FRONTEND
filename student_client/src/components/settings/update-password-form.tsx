@@ -131,7 +131,7 @@ export function UpdatePasswordForm(): React.JSX.Element {
       <Snackbar open={error!==""|| success!==""} autoHideDuration={2500} onClose={ResetSnackBar}
       anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       >
-        <Alert onClose={ResetSnackBar} variant="filled" severity={success!=="" ? 'success' : 'error'} sx={{ width: '100%' }}>
+        <Alert onClose={ResetSnackBar} variant="filled" severity={success!=="" ? 'success' : 'error'} sx={{ width: '100%', mb:{xs:8,md:0} }}>
           {success!=="" ? success : error}
         </Alert>
       </Snackbar>

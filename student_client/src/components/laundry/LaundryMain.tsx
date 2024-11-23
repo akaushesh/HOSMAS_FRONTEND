@@ -8,6 +8,7 @@ import LaundryMobile from './Mobile/LaundryMobile';
 import {type LaundryInitResponse } from '@/services/laundry';
 import { useLaundryData } from '@/hooks/query/use-laundry';
 import { type AxiosResponse } from 'axios';
+import dayjs from 'dayjs';
 
 
 
@@ -16,8 +17,21 @@ export default function LaundryMain(): React.JSX.Element {
 
   const { data, isLoading:_isLoading } = useLaundryData();
   let initData = data as AxiosResponse<LaundryInitResponse|null>;
-  const laundryHistory = initData?.data?.laundry_slips.filter((item) => item. is_checked_out)||null;
 
+  
+  const laundryHistory = initData?.data?.laundry_slips
+  .filter((item) => item.is_checked_out)
+  .sort((a, b) => {
+    if (a.is_delivered !== b.is_delivered) {
+      return a.is_delivered ? 1 : -1; 
+    }
+
+    if (a.is_delivered) {
+      return dayjs(b.delievery_time).diff(dayjs(a.delievery_time));
+    }
+
+    return dayjs(b.dropoff_time).diff(dayjs(a.dropoff_time));
+  }) || null;
 
   if (initData?.data) {
     initData.data.is_active = true;

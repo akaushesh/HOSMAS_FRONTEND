@@ -133,6 +133,12 @@ export default function HomeLaundry({setPageState}:HomeProps): React.JSX.Element
           Return Laundry
         </Typography>
       </Button>
+      
+      {/* <Button   sx={{ mt: 2,width:"80%",py:1.6 }} variant="outlined"  onClick={()=>{setPageState(5)}}>
+        <Typography variant="body1" color='var(-mui-palette-common-white)' fontWeight={600}>
+          Search Transaction
+        </Typography>
+      </Button> */}
 
      </Stack>
     </Stack>

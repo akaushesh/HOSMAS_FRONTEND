@@ -40,13 +40,13 @@ export const login = async (data: LoginData): Promise<AxiosResponse<LoginRespons
 // below functions not there yet
 
 export const initiatePasswordReset = async (data: InitiatePasswordResetData): Promise<AxiosResponse<OkResponse>> => {
-  const res = await authApi.post('auth/initiate-reset-password/', data);
+  const res = await authApi.post('user/initiate-reset-password/', data);
   logger.debug('initiate password reset', res.data);
   return res;
 };
 
 export const resetPassword = async (data: ResetPasswordData): Promise<AxiosResponse<OkResponse>> => {
-  const res = await authApi.post('auth/reset-password/', data);
+  const res = await authApi.post('user/reset-password/', data);
   logger.debug('initiate password reset', res.data);
   return res;
 };

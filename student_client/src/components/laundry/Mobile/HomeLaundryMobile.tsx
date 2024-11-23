@@ -95,25 +95,32 @@ export default function HomeLaundryMobile({
         <Typography variant="h6" fontWeight={700} sx={{ fontSize: '22px', color: 'var(--mui-palette-text-primary)' }}>
           Notice Board
         </Typography>
-        <Stack direction="row" gap={1} alignItems="flex-end" justifyContent="flex-start">
-          <Typography fontSize="16px" sx={{ color: 'var(--mui-palette-text-secondaryChannel)' }} fontWeight={500}>
-            Laundry No :{' '}
-          </Typography>
-          <Typography
-            fontSize="16px"
-            fontWeight={500}
-            sx={{ color: 'var(--mui-palette-text-primaryChannel)' }}
-            display="block"
-          >
-            {laundryNumber || 'ABC-123'}
-          </Typography>
-        </Stack>
+        {laundryNumber === '' ? null : (
+          <Stack direction="row" gap={1} alignItems="flex-end" justifyContent="flex-start">
+            <Typography fontSize="16px" sx={{ color: 'var(--mui-palette-text-secondaryChannel)' }} fontWeight={500}>
+              Laundry No :{' '}
+            </Typography>
+            <Typography
+              fontSize="16px"
+              fontWeight={500}
+              sx={{ color: 'var(--mui-palette-text-primaryChannel)' }}
+              display="block"
+            >
+              {laundryNumber}
+            </Typography>
+          </Stack>
+        )}
 
-        <Box sx={{ height: '20vh', overflowY: 'auto',mt:2 }}>
-          <Typography sx={{color:'var(--mui-palette-text-primary)'}} variant="body1" fontSize="14px" textAlign="center">
-            <List sx={{ listStyleType: 'disc',p:0, pl: 2.5 }}>
+        <Box sx={{ height: '20vh', overflowY: 'auto', mt: 2 }}>
+          <Typography
+            sx={{ color: 'var(--mui-palette-text-primary)' }}
+            variant="body1"
+            fontSize="14px"
+            textAlign="center"
+          >
+            <List sx={{ listStyleType: 'disc', p: 0, pl: 2.5 }}>
               {notice.split(/<br\s*\/?>/).map((line, index) => (
-                <ListItem key={`${String(index)}-${line}`} sx={{ display: 'list-item', p:0,mb:0.5  }}>
+                <ListItem key={`${String(index)}-${line}`} sx={{ display: 'list-item', p: 0, mb: 0.5 }}>
                   <span dangerouslySetInnerHTML={{ __html: line }} />
                 </ListItem>
               ))}
