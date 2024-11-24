@@ -8,7 +8,7 @@ import { useLeaves } from '@/hooks/query/use-leave';
 
 import LeaveForm from './LeaveForm';
 import LeaveHistory from './LeaveHistory';
-import LeaveStatus from './LeaveStatus';
+import LeaveInfo from './LeaveInfo';
 
 const leaveRecords = [
   { title: 'Visiting Parents', location: 'Kapurthala', from: '27/07', to: '30/07' },
@@ -32,22 +32,28 @@ export default function LeaveApplication(): React.JSX.Element {
     phase = 1;
   }
 
+  phase = 1;
+
   return (
     <Grid container spacing={2}>
       <Grid item xs={12} md={7}>
-        <Paper elevation={10} sx={{ p: 3 }}>
-          <Paper elevation={0} sx={{ p: 3, backgroundColor: '#f9f9f9', maxHeight: '58vh', overflowY: 'scroll' }}>
-            {isLoading ? (
+        {isLoading ? (
+          <Paper elevation={10} sx={{ p: 3 }}>
+            <Paper elevation={0} sx={{ p: 3, backgroundColor: '#f9f9f9' }}>
               <Grid container justifyContent="center">
                 <CircularProgress />
               </Grid>
-            ) : phase === 0 ? (
-              <LeaveForm />
-            ) : (
-              <LeaveStatus />
-            )}
+            </Paper>
           </Paper>
-        </Paper>
+        ) : phase === 0 ? (
+          <Paper elevation={10} sx={{ p: 3 }}>
+            <Paper elevation={0} sx={{ p: 3, backgroundColor: '#f9f9f9' }}>
+              <LeaveForm />
+            </Paper>
+          </Paper>
+        ) : (
+          <LeaveInfo phase={phase} />
+        )}
       </Grid>
       <Grid item xs={12} md={5}>
         <Paper elevation={10} sx={{ p: 3 }}>
