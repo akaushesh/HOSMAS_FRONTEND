@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { CalendarToday } from '@mui/icons-material';
+// import CancelIcon from '@mui/icons-material/Cancel';
 import FormatIndentIncreaseIcon from '@mui/icons-material/FormatIndentIncrease';
 import { Box, Button, Grid, InputAdornment, Paper, TextField, Typography } from '@mui/material';
 
@@ -67,11 +68,10 @@ export default function LeaveDetails(): React.JSX.Element {
       </Paper>
 
       <Grid container spacing={2}>
-        <Grid item xs={8}>
+        <Grid item xs={12} sm={7}>
           <TextField
             fullWidth
             type="date"
-            sx={{ height: '100%' }}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -80,7 +80,7 @@ export default function LeaveDetails(): React.JSX.Element {
                     sx={{
                       borderTopRightRadius: 0,
                       borderBottomRightRadius: 0,
-                      height: '3rem',
+                      height: '3.8rem',
                       ml: '-1rem',
                     }}
                   >
@@ -88,12 +88,15 @@ export default function LeaveDetails(): React.JSX.Element {
                   </Button>
                 </InputAdornment>
               ),
-              sx: { height: '3rem' },
+              sx: {
+                height: '3.8rem',
+                backgroundColor: '#fff',
+              },
             }}
           />
         </Grid>
-        <Grid item xs={4}>
-          <Button variant="contained" fullWidth sx={{ height: '3rem' }}>
+        <Grid item xs={12} sm={5}>
+          <Button variant="contained" fullWidth sx={{ height: '3.8rem' }}>
             {/* <CancelIcon /> */}
             <Typography fontSize="1.2rem" fontWeight="bold" ml={1}>
               Cancel
