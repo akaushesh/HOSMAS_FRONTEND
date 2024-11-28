@@ -10,6 +10,8 @@ import {
   Typography,
 } from "@mui/material";
 import { useRouter } from "next/navigation";
+import { jsPDF } from "jspdf";
+import "jspdf-autotable";
 
 interface cleanerData {
   id: number;
@@ -32,8 +34,12 @@ export default function Page({
   const workerId = id;
 
   const [data, setData] = React.useState<cleanerData[]>([]);
+  const [workerName, setWorkerName] = React.useState<string>("");
 
   React.useEffect(() => {
+    // Fetch worker name (mocked here; replace with actual API call)
+    setWorkerName(`Worker ${workerId}`);
+
     const ws = new WebSocket(
       `wss://cleaning.hosmas.ccstiet.com/ws/workers/${workerId}/pending-requests/`
     );
@@ -67,6 +73,27 @@ export default function Page({
     };
   }, [workerId]);
 
+  const handleDownloadPDF = () => {
+    const doc = new jsPDF();
+    const tableColumnHeaders = ["Room No", "Slot", "Completed"];
+    const tableRows = data.map((el) => [
+      // workerName,
+      `Room ${el.room}, Level ${el.level}${
+        el.block ? `, Block ${el.block}` : ""
+      }`,
+      `${el.slot.start_time} - ${el.slot.end_time}`,
+      "", // Empty "Completed" column
+    ]);
+
+    doc.text("Cleaning Requests", 14, 10);
+    doc.autoTable({
+      head: [tableColumnHeaders],
+      body: tableRows,
+      startY: 20,
+    });
+    doc.save("cleaning_requests.pdf");
+  };
+
   return (
     <Stack>
       <Box sx={{ position: "relative", height: "fit-content", mb: 3 }}>
@@ -99,6 +126,19 @@ export default function Page({
           </Typography>
         </Button>
       </Box>
+
+      <Button
+        variant="contained"
+        sx={{
+          mb: 2,
+          alignSelf: "flex-start",
+          backgroundColor: "var(--Page-HeadColor)",
+          color: "white",
+        }}
+        onClick={handleDownloadPDF}
+      >
+        Download PDF
+      </Button>
 
       {loading ? (
         <Stack

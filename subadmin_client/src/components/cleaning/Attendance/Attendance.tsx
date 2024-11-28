@@ -1,5 +1,4 @@
 'use client';
-'use client';
 
 import * as React from 'react';
 import {
@@ -9,12 +8,15 @@ import {
   markWorkerAttendance,
   Worker,
 } from '@/services/cleaning';
+import { LoadingButton } from '@mui/lab';
 import { Box, Button, Checkbox, Divider, Paper, Stack, Typography } from '@mui/material';
 
 import { useProfile } from '@/hooks/query/use-profile';
 
 export default function Attendance(): React.JSX.Element {
   const [cleaners, setCleaners] = React.useState<Worker[]>([]);
+  const [attendanceMarked, setAttendanceMarked] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
   const { data } = useProfile();
 
   React.useEffect(() => {
@@ -22,7 +24,11 @@ export default function Attendance(): React.JSX.Element {
       try {
         if (data?.data?.supervisor?.hostel?.id) {
           const response = await getWorkersOfHostel(data.data.supervisor.hostel.id);
-          setCleaners(response.data); // Update state with fetched data
+          setCleaners(response.data);
+
+          const anyAttendanceMarked = response.data.some((cleaner: Worker) => cleaner.attendance !== null);
+          setAttendanceMarked(anyAttendanceMarked);
+
           console.log('cleaners', response.data);
         } else {
           console.log('Hostel ID is not available');
@@ -56,16 +62,24 @@ export default function Attendance(): React.JSX.Element {
 
   const markAttendance = async () => {
     try {
+      setLoading(true);
       const updatedWorkers = cleaners.map((cleaner) => ({
         id: cleaner.id,
         is_present: cleaner.attendance?.is_present || false,
       }));
 
       await markWorkerAttendance(updatedWorkers);
+      await assignFloorToWorkers();
+      await assignRequestsToWorkers();
     } catch (error) {
       console.error(error);
+    } finally {
+      setAttendanceMarked(true);
+      setLoading(false);
     }
   };
+
+  console.log('attendanceMarked', attendanceMarked);
 
   return (
     <Paper elevation={10} sx={{ p: 3, mt: 3 }}>
@@ -116,7 +130,7 @@ export default function Attendance(): React.JSX.Element {
               <Checkbox
                 sx={{ background: 'white', borderRadius: 0.6, p: 0, touchAction: 'none', pointerEvents: 'none' }}
                 checked={el.attendance?.is_present || false}
-                disabled={el.attendance ? true : false}
+                disabled={attendanceMarked}
               />
 
               <Typography
@@ -141,18 +155,16 @@ export default function Attendance(): React.JSX.Element {
       </Box>
       <Divider sx={{ my: 2 }} />
       <Stack direction="row" justifyContent="flex-end" mt={2} width={1}>
-        <Button
+        <LoadingButton
           variant="contained"
           sx={{ px: 6 }}
           color="primary"
-          onClick={async () => {
-            await markAttendance();
-            await assignFloorToWorkers();
-            await assignRequestsToWorkers();
-          }}
+          onClick={markAttendance}
+          loading={loading}
+          disabled={attendanceMarked || loading}
         >
           Save
-        </Button>
+        </LoadingButton>
       </Stack>
     </Paper>
   );
