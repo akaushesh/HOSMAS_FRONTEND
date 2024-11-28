@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 export const url = 'https://central.hosmas.ccstiet.com/';
+export const allocationUrl = 'https://api.hosmas.ccstiet.com/';
 export const centralUrl = 'https://central.hosmas.ccstiet.com/';
 export const cleaningUrl = 'https://cleaning.hosmas.ccstiet.com/';
 export const laundryUrl = 'https://hosmas-laundry.ccstiet.com/';
@@ -11,7 +12,7 @@ export const authApi = axios.create({
 });
 
 export const dashboardApi = axios.create({
-  baseURL: `${url}dashboard/`,
+  baseURL: `${allocationUrl}dashboard/`,
 });
 
 export const studentApi = axios.create({
@@ -19,19 +20,19 @@ export const studentApi = axios.create({
 });
 
 export const invitationApi = axios.create({
-  baseURL: `${url}student/invitation/`,
+  baseURL: `${allocationUrl}student/invitation/`,
 });
 
 export const groupApi = axios.create({
-  baseURL: `${url}student/group/`,
+  baseURL: `${allocationUrl}student/group/`,
 });
 
 export const preferenceApi = axios.create({
-  baseURL: `${url}preferences/`,
+  baseURL: `${allocationUrl}preferences/`,
 });
 
 export const roomApi = axios.create({
-  baseURL: `${url}preferences/alloted-hostel-levels/`,
+  baseURL: `${allocationUrl}preferences/alloted-hostel-levels/`,
 });
 
 export const centralApi = axios.create({

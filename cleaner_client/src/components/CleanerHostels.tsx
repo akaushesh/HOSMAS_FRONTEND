@@ -2,11 +2,12 @@
 
 import * as React from "react";
 import { Stack } from "@mui/system";
+import DownloadIcon from "@mui/icons-material/Download";
 
 // import hostels from "./assets/HostelData";
 import CleanerCards from "./cleaner-cards";
 // import { tempCleaners } from "./assets/CleanersData";
-import { Box, Typography } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import {
   getCleanersFromHostel,
   type CleanersResponse,
@@ -36,10 +37,10 @@ export default function CleanerHostels(): React.JSX.Element {
       console.log(cleaners.data);
       setCleaners(cleaners.data);
     };
-    if (pageState === 1&&hostel!=-1){
+    if (pageState === 1 && hostel != -1) {
       fetchCleaners();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pageState]);
 
   // const cleaners = tempCleaners;
@@ -94,6 +95,23 @@ export default function CleanerHostels(): React.JSX.Element {
           >
             Choose Cleaner
           </Typography>
+
+          <Button
+            variant="contained"
+            startIcon={<DownloadIcon />}
+            sx={{
+              position: "absolute",
+              top: "8px",
+              right: "8px",
+              padding: "1rem",
+              backgroundColor: "rgb(145,3,3)",
+            }}
+            onClick={() => {
+              // Add download functionality here
+            }}
+          >
+            Download
+          </Button>
 
           <CleanerCards
             data={cleaners}

@@ -32,7 +32,7 @@ export default function LeaveApplication(): React.JSX.Element {
     phase = 1;
   }
 
-  phase = 1;
+  phase = 2;
 
   return (
     <Grid container spacing={2}>

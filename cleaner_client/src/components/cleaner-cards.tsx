@@ -5,7 +5,13 @@ import { Box, Button, Paper, Typography } from "@mui/material";
 import { Stack } from "@mui/system";
 
 interface CleanerCardsProps {
-  data: { id: number; image?: string; name: string,image_url?:string;photo?:string; }[];
+  data: {
+    id: number;
+    image?: string;
+    name: string;
+    image_url?: string;
+    photo?: string;
+  }[];
   setHostel?: (hostel: number) => void;
   setPageState?: (val: number) => void;
   pageState?: number;
@@ -26,7 +32,6 @@ export default function CleanerCards({
       router.push(`/${path}`);
     }
   };
-
 
   return (
     <Stack
@@ -89,7 +94,9 @@ export default function CleanerCards({
                     width: "100%",
                     height: pageState === 0 ? "23vh" : "30vh",
                     p: 1,
-                    background: `url(${pageState==0?el.image_url:el.photo})`,
+                    background: `url(${
+                      pageState == 0 ? el.image_url : el.photo
+                    })`,
                     backgroundRepeat: "no-repeat",
                     backgroundSize: "cover",
                     backgroundPosition: "center center",
@@ -97,7 +104,7 @@ export default function CleanerCards({
                     borderRadius: 2,
                     cursor: "pointer",
                     transition: "all 0.3s",
-                    backgroundColor:"#f0f0f0"
+                    backgroundColor: "#f0f0f0",
                   }}
                   onClick={() => {
                     handleClick(el.id);
@@ -107,13 +114,13 @@ export default function CleanerCards({
                     sx={{
                       bottom: 9,
                       right: 15,
-                      width:"fit-content",
+                      width: "fit-content",
                       textAlign: "right",
                       position: "absolute",
                       background: "white",
                       px: 1,
                       py: 0.2,
-                      ml:2,
+                      ml: 2,
                       borderRadius: 1,
                     }}
                     fontWeight={700}
