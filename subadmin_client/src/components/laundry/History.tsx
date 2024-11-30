@@ -20,11 +20,11 @@ export default function History({ setPageState }: HistoryProps): React.JSX.Eleme
         startIcon={<ArrowBackIosIcon />}
         sx={{ mt: 1, alignSelf: 'flex-start' }}
         onClick={() => {
-          setPageState(0);
+          setPageState(-2);
         }}
       >
         <Typography variant="body1" color="var(--mui-palette-text-primary)">
-          back to main page
+          Main Menu
         </Typography>
       </Button>
 

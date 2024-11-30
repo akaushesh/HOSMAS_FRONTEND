@@ -10,8 +10,8 @@ import type { NavItemConfig } from '@/types/nav';
 import { isNavItemActive } from '@/lib/is-nav-item-active';
 
 import { navItems } from './config';
-import { navIcons } from './nav-icons';
 import { HamBurger } from './hamburger-nav';
+import { navIcons } from './nav-icons';
 
 export function BottomNav(): React.JSX.Element {
   const pathname = usePathname();
@@ -46,34 +46,37 @@ export function BottomNav(): React.JSX.Element {
         transition: 'ease-in-out 200ms',
       }}
     >
-        {renderNavItems({ pathname, items: navItems })}
+      {renderNavItems({ pathname, items: navItems })}
     </Box>
   );
 }
 
 function renderNavItems({ items, pathname }: { items?: NavItemConfig[]; pathname: string }): React.JSX.Element {
   return (
-    <Box 
-        sx={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'space-evenly',
-            alignItems: 'center',
-            p: 0,
-            m: 0,
-            listStyle: 'none',
-            width: 1,
-            transition: 'ease-in-out 200ms',
-        }}
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-evenly',
+        alignItems: 'center',
+        p: 0,
+        m: 0,
+        listStyle: 'none',
+        width: 1,
+        transition: 'ease-in-out 200ms',
+      }}
     >
       {items?.map((item) => {
         return (
-          <Box key={item.key} sx={{
-            ...(item.invisible ? {
-              display: 'none',
-            }:{})
-          }}>
-              <NavItem items={item.items} isNested={item.isNested} pathname={pathname} {...item} />
+          <Box
+            key={item.key}
+            sx={{
+              ...(item.invisible && {
+                display: 'none',
+              }),
+            }}
+          >
+            <NavItem items={item.items} isNested={item.isNested} pathname={pathname} {...item} />
           </Box>
         );
       })}
@@ -81,38 +84,47 @@ function renderNavItems({ items, pathname }: { items?: NavItemConfig[]; pathname
   );
 }
 
-
 interface NavItemProps extends Omit<NavItemConfig, 'items'> {
   pathname: string;
   items?: NavItemConfig[];
 }
 
-function NavItem({invisible, disabled, external, href, icon, matcher, pathname, title ,isNested,items }: NavItemProps): React.JSX.Element {
+function NavItem({
+  invisible,
+  disabled,
+  external,
+  href,
+  icon,
+  matcher,
+  pathname,
+  title,
+  isNested,
+  items,
+}: NavItemProps): React.JSX.Element {
   const active = isNavItemActive({ disabled, external, href, matcher, pathname });
   const Icon = icon ? navIcons[icon] : null;
   const router = useRouter();
 
   const [openNav, setOpenNav] = React.useState(false);
 
-  const handleClick = ():void => {
-    if(isNested){
-        if(!openNav) setOpenNav(true);
+  const handleClick = (): void => {
+    if (isNested) {
+      if (!openNav) setOpenNav(true);
+    } else {
+      const link = href!;
+      if (link) {
+        router.push(link);
+      }
     }
-    else{
-        const link = href!;
-        if (link) {
-            router.push(link);
-        }
-    }
-  }
+  };
 
   return (
     <li
-    style={{
-      ...(invisible ? {
-        display: 'none',
-      }:{}),
-    }}
+      style={{
+        ...(invisible && {
+          display: 'none',
+        }),
+      }}
     >
       <Box
         onClick={handleClick}
@@ -122,58 +134,58 @@ function NavItem({invisible, disabled, external, href, icon, matcher, pathname, 
           color: 'var(--NavSubItem-color)',
           cursor: 'pointer',
           display: 'flex',
-          gap: 1,
-          p:'6px ',
+          gap: '2px',
+          p: '6px ',
           position: 'relative',
           textDecoration: 'none',
-          whiteSpace: 'nowrap',
           ...(disabled && {
-              pointerEvents: 'none',
-              opacity: 0.45,
-            }),
-            ...(active && { bgcolor: 'var(--NavItem-active-background)', color: 'var(--NavItem-active-color)' }),
-            transition: 'ease-in-out 200ms',
+            pointerEvents: 'none',
+            opacity: 0.45,
+          }),
+          ...(active && { bgcolor: 'var(--NavItem-active-background)', color: 'var(--NavItem-active-color)' }),
+          transition: 'ease-in-out 200ms',
         }}
       >
-        <Box sx={{ alignItems: 'center', display: 'flex', justifyContent: 'center'}}>
+        <Box>
           {Icon ? (
             <SvgIcon
               sx={{
-                display:"flex",
+                position: 'relative',
+                display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize:'1.5rem',
-                color:active?'var(--NavItem-icon-active-color)':'var(--NavItem-icon-color)',
+                p:active?'3px':'1px',
+                color: active ? 'var(--NavItem-icon-active-color)' : 'var(--NavItem-icon-color)',
                 transition: 'ease-in-out 200ms',
               }}
             >
-              <Icon />
+              <Icon weight={active ? 'fill' : 'regular'} />
             </SvgIcon>
           ) : null}
         </Box>
-       
-        {(active||openNav) ? <Box 
-              sx={{transition: 'ease-in-out 200ms',}}
-          >
+
+        {active || openNav ? (
+          <Box sx={{ transition: 'ease-in-out 200ms' }}>
             <Typography
-              sx={{ 
-                color:active?'var(--NavItem-icon-active-color)':'var(--NavItem-icon-color)',
+              sx={{
+                color: active ? 'var(--NavItem-icon-active-color)' : 'var(--NavItem-icon-color)',
                 transition: 'ease-in-out 200ms',
-               }}
+                fontSize: '14px',
+              }}
             >
               {title}
             </Typography>
-          </Box> : null}
+          </Box>
+        ) : null}
 
-            <HamBurger
-              onClose={() => {
-                setOpenNav(false);
-              }}
-              open={openNav}
-              items={items}
-              title={title}
-            />
-
+        <HamBurger
+          onClose={() => {
+            setOpenNav(false);
+          }}
+          open={openNav}
+          items={items}
+          title={title}
+        />
       </Box>
     </li>
   );

@@ -94,7 +94,7 @@ export default function CollectData({ data, setPageState }: LaundryFormProps): R
         }}
       >
         <Typography variant="body1" color="var(--mui-palette-text-primary)">
-          back to main page
+          Home
         </Typography>
       </Button>
 

@@ -2,9 +2,7 @@
 
 import * as React from 'react';
 import type { ProfileResponse } from '@/services/profile';
-import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import CardHeader from '@mui/material/CardHeader';
 import Divider from '@mui/material/Divider';
@@ -58,10 +56,7 @@ export function AccountDetailsForm(): React.JSX.Element {
             </Grid>
           </Grid>
         </CardContent>
-        <Divider />
-        <CardActions sx={{ justifyContent: 'flex-end' }}>
-          <Button variant="contained">Confirm</Button>
-        </CardActions>
+        <Divider sx={{ mb: 8 }} />
       </Card>
     </form>
   );
