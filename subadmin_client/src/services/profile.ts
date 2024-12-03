@@ -1,6 +1,5 @@
 import type { AxiosResponse } from 'axios';
 
-import { authClient } from '@/lib/auth/client';
 import { logger } from '@/lib/default-logger';
 
 import { authApi } from './api';
@@ -77,8 +76,14 @@ interface ResetPasswordData {
 //eslint-disable-next-line @typescript-eslint/no-empty-interface -- Empty 200 Ok reponses are causing ESlint errors
 export interface OkResponse {}
 
+export const getToken = async (): Promise<{ data?: string | null }> => {
+  const token = localStorage.getItem('custom-auth-token');
+
+  return { data: token };
+};
+
 export const getProfile = async (): Promise<AxiosResponse<SupervisorProfileResponse>> => {
-  const token = (await authClient.getToken()).data;
+  const token = (await getToken()).data;
 
   if (token === null || token === undefined) {
     throw new Error('You must be logged in to perform this action');
@@ -95,7 +100,7 @@ export const getProfile = async (): Promise<AxiosResponse<SupervisorProfileRespo
 };
 
 export const changePassword = async (values: ResetPasswordData): Promise<AxiosResponse<OkResponse>> => {
-  const token = (await authClient.getToken()).data;
+  const token = (await getToken()).data;
 
   if (token === null || token === undefined) {
     throw new Error('You must be logged in to perform this action');

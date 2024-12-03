@@ -103,8 +103,14 @@ export interface CentralHostel {
 //eslint-disable-next-line @typescript-eslint/no-empty-interface -- Empty 200 Ok reponses are causing ESlint errors
 export interface OkResponse {}
 
-export const getProfile = async (): Promise<AxiosResponse<CentralProfileResponse>> => {
+export const getToken = async (): Promise<{ data?: string | null }> => {
   const token = localStorage.getItem('custom-auth-token');
+
+  return { data: token };
+};
+
+export const getProfile = async (): Promise<AxiosResponse<CentralProfileResponse>> => {
+  const token = (await getToken()).data;
 
   if (token === null || token === undefined) {
     throw new Error('You must be logged in to perform this action');

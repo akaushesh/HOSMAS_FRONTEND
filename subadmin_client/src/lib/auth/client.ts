@@ -2,6 +2,7 @@
 
 import { initiatePasswordReset, login, resetPassword } from '@/services/auth';
 import type { TokenResponse } from '@/services/auth';
+import { getProfile } from '@/services/profile';
 import type { AxiosError, AxiosResponse } from 'axios';
 
 import type { User } from '@/types/user';
@@ -125,12 +126,12 @@ class AuthClient {
 
   async getUser(): Promise<{ data?: User | null; error?: string }> {
     // Make API request
-
-    // We do not handle the API, so just check if we have a token in localStorage.
-    const token = localStorage.getItem('custom-auth-token');
-
-    if (!token) {
-      return { data: null };
+    try {
+      await getProfile();
+    } catch (err) {
+      return {
+        data: null,
+      };
     }
 
     return { data: user };

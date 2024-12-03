@@ -2,12 +2,11 @@
 
 import * as React from "react";
 import { Stack } from "@mui/system";
-import DownloadIcon from "@mui/icons-material/Download";
 
 // import hostels from "./assets/HostelData";
 import CleanerCards from "./cleaner-cards";
 // import { tempCleaners } from "./assets/CleanersData";
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import {
   getCleanersFromHostel,
   type CleanersResponse,
@@ -96,7 +95,7 @@ export default function CleanerHostels(): React.JSX.Element {
             Choose Cleaner
           </Typography>
 
-          <Button
+          {/* <Button
             variant="contained"
             startIcon={<DownloadIcon />}
             sx={{
@@ -111,7 +110,7 @@ export default function CleanerHostels(): React.JSX.Element {
             }}
           >
             Download
-          </Button>
+          </Button> */}
 
           <CleanerCards
             data={cleaners}
