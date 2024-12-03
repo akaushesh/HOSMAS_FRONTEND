@@ -9,14 +9,18 @@ import { type SupervisorProfileResponse } from '@/services/profile';
 import { useLaundryDetails } from '@/hooks/mutation/use-laundry';
 import {type  LaundryDetailsResponse } from '@/services/laundry';
 import { type ErrorResponse } from '@/services/auth';
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import { logger } from '@/lib/default-logger';
 
 interface HomeProps{
+  hostelId: number;
   setPageState: (val:number)=>void;
 }
 
 
-export default function HomeLaundry({setPageState}:HomeProps): React.JSX.Element {
+export default function HomeLaundry({setPageState,
+  // hostelId
+}:HomeProps): React.JSX.Element {
 
   
 
@@ -47,6 +51,17 @@ export default function HomeLaundry({setPageState}:HomeProps): React.JSX.Element
 
   return (
     <Stack alignItems='center'>
+       <Button
+        startIcon={<ArrowBackIosIcon />}
+        sx={{ mt: 2, py: 0, alignSelf: 'flex-start' }}
+        onClick={() => {
+          setPageState(-2);
+        }}
+      >
+        <Typography variant="body1" color="var(--mui-palette-text-primary)">
+          Main Menu
+        </Typography>
+      </Button>
       <Stack alignItems='center' sx={{width:{xs:1,sm:0.8,md:0.6,lg:0.4}}}>
       <Stack
         direction="row"
@@ -58,9 +73,8 @@ export default function HomeLaundry({setPageState}:HomeProps): React.JSX.Element
           boxShadow:10,
           border:'1px dashed var(--mui-palette-secondary-main)',
           borderRadius:1,
-          width:'1',
+          width:'90%',
         }}
-        mx={3}
       >
 
         <Stack 
@@ -122,13 +136,13 @@ export default function HomeLaundry({setPageState}:HomeProps): React.JSX.Element
 
 
 
-      <Button   sx={{ mt: 6,width:"80%",py:2 }} variant="contained"  onClick={()=>{setPageState(1)}}>
+      <Button   sx={{ mt: 6,width:"75%",py:2 }} variant="contained"  onClick={()=>{setPageState(1)}}>
         <Typography variant="body1" color='var(-mui-palette-common-white)' fontWeight={600}>
           Register Laundry
         </Typography>
       </Button>
       
-      <Button   sx={{ mt: 2,width:"80%",py:2 }} variant="contained"  onClick={()=>{setPageState(2)}}>
+      <Button   sx={{ mt: 2,width:"75%",py:2 }} variant="contained"  onClick={()=>{setPageState(2)}}>
         <Typography variant="body1" color='var(-mui-palette-common-white)' fontWeight={600}>
           Return Laundry
         </Typography>

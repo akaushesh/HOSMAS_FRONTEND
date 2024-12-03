@@ -7,6 +7,8 @@ import Scanner from './Scanner';
 import LaundryData from './LaundryData';
 import CollectData from './CollectData';
 import History from './History';
+import ChooseHostels from './ChooseHostels';
+import SelectPage from './Select';
 
 export interface QRDataProps {
   details: Record<string, number>; 
@@ -14,17 +16,30 @@ export interface QRDataProps {
   transactionId: string; 
 }
 
+export interface HostelProps {
+  hostelId: number;
+  hostelName: string;
+  hostelImg: string;
+  hostelOtherName: string;
+}
+
 export default function Laundry(): React.JSX.Element {
-  const [pageState, setPageState] = React.useState(0);
+  const [hostel, setHostel] = React.useState<HostelProps>({
+    hostelId: -2,
+    hostelName: '',
+    hostelImg: '',
+    hostelOtherName: '',
+  });
+  const [pageState, setPageState] = React.useState(-2);
   const [QRData, setQRData] = React.useState<QRDataProps|null>(null);
 
   return (
     <Box>
-      {pageState === 0 && <HomeLaundry setPageState={setPageState} />}
+      {pageState === -2 && <SelectPage setPageState={setPageState} />}
+      {pageState === -1 && <ChooseHostels setHostel={setHostel} setPageState={setPageState} />}
+      {pageState === 0 && <HomeLaundry hostelId={hostel.hostelId} setPageState={setPageState} />}
 
-      {pageState === 1 && <Scanner setPageState={setPageState} setQRData={setQRData} mode='drop' />}
-
-      {pageState === 2 && <Scanner setPageState={setPageState} setQRData={setQRData} mode='pick' />}
+      {(pageState === 1||pageState === 2) && <Scanner setPageState={setPageState} setQRData={setQRData} mode={pageState===1?'drop':'pick'} />}
 
       {pageState === 3 && (<LaundryData data={QRData} setPageState={setPageState} />)}
       
