@@ -8,7 +8,7 @@ import type { AxiosResponse } from 'axios';
 
 import { useCreatePreference, useRetain } from '@/hooks/mutation/use-preference';
 import { useChoices, usePreference, usePreferenceStatus } from '@/hooks/query/use-preference';
-import { useProfile } from '@/hooks/query/use-profile';
+import { useProfile2 } from '@/hooks/query/use-profile';
 import CheckboxSelect from '@/components/allocation/preference/checkbox-select';
 import DnDLarge from '@/components/allocation/preference/DnDLarge';
 import DnDMobile from '@/components/allocation/preference/DnDMobile';
@@ -55,7 +55,7 @@ export default function Page(): React.JSX.Element {
   const { data: PrefStatusRes, isLoading: isLoadPrefStatus } = usePreferenceStatus();
   const PrefStatus = PrefStatusRes as AxiosResponse<PrefStatusResponse>;
 
-  const { data: profile } = useProfile();
+  const { data: profile } = useProfile2();
   const user = profile as AxiosResponse<ProfileResponse>;
 
   // ADMIN RESTRICTIONS

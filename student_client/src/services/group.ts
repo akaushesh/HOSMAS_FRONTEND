@@ -36,7 +36,7 @@ export interface StudentData {
 }
 
 export const getGroup = async (): Promise<AxiosResponse<GroupResponse>> => {
-  const token = (await authClient.getToken()).data;
+  const token = (await authClient.getToken2()).data;
 
   if (token === null || token === undefined) {
     throw new Error('You must be logged in to perform this action');
@@ -53,7 +53,7 @@ export const getGroup = async (): Promise<AxiosResponse<GroupResponse>> => {
 };
 
 export const searchStudent = async (values: StudentData): Promise<AxiosResponse<Student>> => {
-  const token = (await authClient.getToken()).data;
+  const token = (await authClient.getToken2()).data;
 
   if (token === null || token === undefined) {
     throw new Error('You must be logged in to perform this action');
@@ -74,7 +74,7 @@ export const searchStudent = async (values: StudentData): Promise<AxiosResponse<
 };
 
 export const transferOwnersip = async (values: StudentData): Promise<AxiosResponse<OkResponse>> => {
-  const token = (await authClient.getToken()).data;
+  const token = (await authClient.getToken2()).data;
 
   if (token === null || token === undefined) {
     throw new Error('You must be logged in to perform this action');
@@ -96,7 +96,7 @@ export const transferOwnersip = async (values: StudentData): Promise<AxiosRespon
 
 // Some issue is causing 500 server error to appear but the route is working and producing effect
 export const leaveGroup = async (): Promise<AxiosResponse<OkResponse>> => {
-  const token = (await authClient.getToken()).data;
+  const token = (await authClient.getToken2()).data;
 
   if (token === null || token === undefined) {
     throw new Error('You must be logged in to perform this action');

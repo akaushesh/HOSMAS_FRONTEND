@@ -2,10 +2,10 @@ import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import { Box, Button } from '@mui/material';
 
-import type { hostel } from '@/types/hostels';
+import type { Hostel } from '@/types/hostels';
 
 interface PropsType {
-  hostels: hostel[];
+  hostels: Hostel[];
   current: number;
   handleMouseEnter: (index: number) => void;
   handleMouseLeave: () => void;

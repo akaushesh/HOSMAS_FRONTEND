@@ -37,7 +37,7 @@ export interface SuccessResponse {
 }
 
 export const getSentInvitationStatus = async (): Promise<InvitationStatusResponse> => {
-  const token = (await authClient.getToken()).data;
+  const token = (await authClient.getToken2()).data;
 
   if (token === null || token === undefined) {
     throw new Error('You must be logged in to perform this action');
@@ -54,7 +54,7 @@ export const getSentInvitationStatus = async (): Promise<InvitationStatusRespons
 };
 
 export const getReceivedInvitations = async (): Promise<ReceivedInvitationResponse> => {
-  const token = (await authClient.getToken()).data;
+  const token = (await authClient.getToken2()).data;
 
   if (token === null || token === undefined) {
     throw new Error('You must be logged in to perform this action');
@@ -71,7 +71,7 @@ export const getReceivedInvitations = async (): Promise<ReceivedInvitationRespon
 };
 
 export const sendInvitation = async (values: TokenData): Promise<AxiosResponse<SuccessResponse>> => {
-  const token = (await authClient.getToken()).data;
+  const token = (await authClient.getToken2()).data;
 
   if (token === null || token === undefined) {
     throw new Error('You must be logged in to perform this action');
@@ -93,7 +93,7 @@ export const sendInvitation = async (values: TokenData): Promise<AxiosResponse<S
 
 // Route is not tested
 export const withdrawInvitation = async (values: InvitationData): Promise<AxiosResponse<SuccessResponse>> => {
-  const token = (await authClient.getToken()).data;
+  const token = (await authClient.getToken2()).data;
 
   if (token === null || token === undefined) {
     throw new Error('You must be logged in to perform this action');
@@ -114,7 +114,7 @@ export const withdrawInvitation = async (values: InvitationData): Promise<AxiosR
 };
 
 export const acceptInvitation = async (values: InvitationData): Promise<AxiosResponse<OkResponse>> => {
-  const token = (await authClient.getToken()).data;
+  const token = (await authClient.getToken2()).data;
 
   if (token === null || token === undefined) {
     throw new Error('You must be logged in to perform this action');
@@ -135,7 +135,7 @@ export const acceptInvitation = async (values: InvitationData): Promise<AxiosRes
 };
 
 export const deleteInvitation = async (values: InvitationData): Promise<AxiosResponse<OkResponse>> => {
-  const token = (await authClient.getToken()).data;
+  const token = (await authClient.getToken2()).data;
 
   if (token === null || token === undefined) {
     throw new Error('You must be logged in to perform this action');

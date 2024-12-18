@@ -2,7 +2,7 @@ import type { AxiosResponse } from 'axios';
 
 import { logger } from '@/lib/default-logger';
 
-import { authApi, centralApi } from './api';
+import { authApi, centralApi, tempApi } from './api';
 
 interface Batch {
   id: number;
@@ -127,6 +127,28 @@ export const getProfile = async (): Promise<AxiosResponse<CentralProfileResponse
     },
   });
   logger.debug('getProfile', res.data);
+
+  return res;
+};
+
+export const getProfile2 = async (): Promise<AxiosResponse<ProfileResponse>> => {
+  const token = localStorage.getItem('custom-auth-token-2');
+
+  if (token === null || token === undefined) {
+    throw new Error('You must be logged in to perform this action');
+  }
+
+  const res = await tempApi.get('student/profile/', {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  // const res = await centralApi.get('user/', {
+  //   headers: {
+  //     Authorization: `Bearer ${token}`,
+  //   },
+  // });
+  logger.debug('getProfile2', res.data);
 
   return res;
 };

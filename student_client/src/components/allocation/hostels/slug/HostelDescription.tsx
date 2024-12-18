@@ -1,98 +1,149 @@
-import React, { useState } from 'react';
-import { Box, Collapse, Divider, Link, Paper, Typography } from '@mui/material';
+import * as React from 'react';
+import { Box, Collapse, Divider, Paper, Typography, Dialog, DialogContent, DialogTitle, IconButton, Stack, Button } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 
-import type { hostel } from '@/types/hostels';
+import type { Hostel } from '@/types/hostels';
+import Model from '../../models/Model';
+import LocationCityIcon from '@mui/icons-material/LocationCity';
 
 interface PropsType {
-  hostel?: hostel | null;
+  hostel?: Hostel | null;
 }
 
 export default function HostelDescription({ hostel }: PropsType): React.JSX.Element {
-  const [open, setOpen] = useState(false);
+  const [dialogOpen, setDialogOpen] = React.useState(false);
+  const [modelOpen, setModelOpen] = React.useState(false);
+
+  const handleDialogOpen = ():void => { setDialogOpen(true); };
+  const handleDialogClose = ():void => { setDialogOpen(false); };
 
   return (
-    <Paper
-      sx={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        width: 1,
-        gap: 4,
-        px: 3,
-        py: 1,
-        borderRadius: 1,
-        mb: 2,
-      }}
-      elevation={3}
-    >
-      <Box mb={0.5}>
-        <Typography variant="h2">{hostel?.name}</Typography>
+    <>
+      <Paper
+        sx={{
+          display: 'flex',
+          flexDirection: { xs: 'column', sm: 'row' },
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          width: 1,
+          gap: { xs: 2, sm: 4 },
+          p: { xs: 2, md: 3 },
+          borderRadius: 1,
+          mb: 2,
+          position: 'relative',
+        }}
+        elevation={3}
+      >
 
-        <Collapse in={open} collapsedSize={60}>
-          {hostel?.description.split('<br/>').map((desc, _) => {
-            return (
-              <Typography key={hostel?.emailW} variant="subtitle2">
+
+        <Box sx={{ flex: 3, width: 1 }}>
+
+          <Stack sx={{flexDirection:"row",alignItems:"center" ,gap:1}}  justifyContent="space-between" pr={2} mb={2}>
+
+          <Typography variant="h2" sx={{ fontSize: { xs: '33px', md: '39px', lg: '49px' } }}>
+            {hostel?.name}
+          </Typography>
+        
+          <Button variant="contained" sx={{borderRadius:1,width:"fit-content",minWidth:"0px"}} onClick={()=>{setModelOpen(true)}}  size='small'>
+
+            <LocationCityIcon sx={{fontSize:20, mr:{xs:0,md:1}}} />
+            <Typography  sx={{display:{xs:"none",md:"block"}}}>View 3D Model</Typography>
+            </Button>
+          </Stack>
+          <Collapse  collapsedSize={100}>
+            {hostel?.description.split('<br/>').map((desc, idx) => (
+              <Typography key={idx} variant="subtitle2" sx={{ fontSize: { xs: '12px', md: '14px', lg: '16px' } }}>
                 {desc}
               </Typography>
-            );
-          })}
-        </Collapse>
+            ))}
+          </Collapse>
 
-        <Typography
-          sx={{ cursor: 'pointer' }}
-          variant="body2"
-          mt={1}
-          color="var(--mui-palette-text-secondaryChannel)"
-          onClick={() => {
-            setOpen(!open);
+          <Typography
+            sx={{ cursor: 'pointer', mt: 1, fontSize: { xs: '12px', md: '14px' }, color: 'text.secondary' }}
+            onClick={handleDialogOpen}
+          >
+            ...view more
+          </Typography>
+        </Box>
+
+
+        <Divider
+          orientation="vertical"
+          variant="middle"
+          flexItem
+          sx={{
+            display: { xs: 'none', sm: 'block' },
           }}
-        >
-          ...view {open ? 'less' : 'more'}
-        </Typography>
-      </Box>
+        />
 
-      <Divider orientation="vertical" variant="middle" flexItem />
-
-      <Box>
-        <Box>
+        <Box sx={{  textAlign: 'center', display: { xs: 'none', sm: 'block' } }} >
           <img
-            src={hostel?.warden_image}
+            alt="hostelImg"
             height="150px"
+            src={hostel?.warden_image}
             style={{ margin: '10px auto', display: 'block', borderRadius: '8px' }}
           />
 
-          <Typography variant="body2" textAlign="center" fontSize="14px" lineHeight="1.1rem">
+          <Typography variant="body2" fontSize="14px" lineHeight="1.1rem">
             {hostel?.warden}
           </Typography>
-
-          {/* <Typography variant="body2">Warden</Typography> */}
-
-          {/* <Typography textAlign="center" mb={2} variant="h6" fontSize="17px">
-            <Link color="inherit" href={`mailto:${hostel?.emailW ?? ''}`} target="_blank">
-              {hostel?.emailW ?? ''}
-            </Link>
-          </Typography> */}
         </Box>
-        {open ? (
-          <>
-            <Typography textAlign="center" mb={2} variant="h6" fontSize="17px">
-              <Link color="inherit" href={`mailto:${hostel?.emailC ?? ''}`} target="_blank">
-                {hostel?.emailC ?? ''}
-              </Link>
-            </Typography>
+      </Paper>
 
-            {hostel?.contact.split(',').map((contact, _) => {
-              return contact.trim() !== '' ? (
-                <Typography key={hostel.emailW} textAlign="center" mb={2} variant="h6" fontSize="17px">
-                  {`+91 ${contact.trim()}`}
-                </Typography>
-              ) : (
-                ''
-              );
-            })}
-          </>
-        ) : null}
-      </Box>
-    </Paper>
+      {/* Dialog for Full Description */}
+      <Dialog open={dialogOpen} onClose={handleDialogClose} maxWidth="md" fullWidth>
+        <DialogTitle>
+          <Box display="flex" justifyContent="space-between" alignItems="center">
+            <Typography variant="h2">{hostel?.name}</Typography>
+            <IconButton onClick={handleDialogClose}>
+              <CloseIcon />
+            </IconButton>
+          </Box>
+        </DialogTitle>
+
+        <DialogContent
+          sx={{
+            p: 4,
+          }}
+        >
+          <Box
+          sx={{
+            height: '55vh',
+            pr:1,
+            overflowY: 'auto',
+          }}>
+
+          {hostel?.description.split('<br/>').map((desc, idx) => (
+            <Typography key={idx} variant="subtitle2" sx={{ fontSize: { xs: '12px', md: '14px', lg: '16px' }, mb: 1 }}>
+              {desc}
+            </Typography>
+          ))}
+
+          </Box>
+        </DialogContent>
+      </Dialog>
+
+
+      <Dialog open={modelOpen} onClose={()=>{setModelOpen(false)}} maxWidth="md" fullWidth>
+        <DialogTitle>
+          <Box display="flex" justifyContent="space-between" alignItems="center">
+            <Typography variant="h2">{hostel?.name}</Typography>
+            <IconButton onClick={()=>{setModelOpen(false)}}>
+              <CloseIcon />
+            </IconButton>
+          </Box>
+        </DialogTitle>
+
+        <DialogContent
+          sx={{
+            p: 4,
+            overflow:"hidden"
+          }}
+        >
+          <Model hostel={hostel?.path||""} />
+        </DialogContent>
+      </Dialog>
+
+    </>
   );
 }

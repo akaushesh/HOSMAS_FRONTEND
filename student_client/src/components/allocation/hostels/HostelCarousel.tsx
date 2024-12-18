@@ -3,10 +3,11 @@ import { useRouter } from 'next/navigation';
 import { Box, Typography } from '@mui/material';
 import Carousel from 'react-material-ui-carousel';
 
-import type { hostel } from '@/types/hostels';
+import type { Hostel } from '@/types/hostels';
+import ImageSkeleton from '@/components/core/skeleton-image';
 
 interface PropsType {
-  hostels: hostel[];
+  hostels: Hostel[];
   pause: boolean;
   current: number;
 }
@@ -34,7 +35,7 @@ export default function HostelCarousel({ hostels, pause, current }: PropsType): 
               handleHostelClick(currentHostel.path);
             }}
           >
-            <img
+            <ImageSkeleton
               src={currentHostel.image[0]}
               alt={currentHostel.name}
               style={{

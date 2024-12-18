@@ -1,4 +1,4 @@
-export interface hostel {
+export interface Hostel {
   name: string;
   path: string;
   floors: number;

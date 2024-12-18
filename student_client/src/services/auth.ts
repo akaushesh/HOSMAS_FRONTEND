@@ -2,7 +2,7 @@ import type { AxiosResponse } from 'axios';
 
 import { logger } from '@/lib/default-logger';
 
-import { authApi, centralApi } from './api';
+import {  centralApi, tempApi } from './api';
 import type { OkResponse } from './profile';
 
 export interface LoginData {
@@ -28,7 +28,7 @@ export interface ResetPasswordData {
 }
 
 export const login = async (data: LoginData): Promise<AxiosResponse<TokenResponse>> => {
-  const res = await authApi.post('auth/token/', data);
+  const res = await tempApi.post('auth/token/', data);
   logger.debug('login', res.data);
   return res;
 };

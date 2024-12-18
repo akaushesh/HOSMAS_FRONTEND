@@ -24,7 +24,7 @@ interface ClickProps {
 export default function RoomSelector({ selectedRooms, floor,user, setSelectedRooms }: RoomSelectorProps): React.JSX.Element {
   const handleSelect = ({ attached, room, capacity, str }: ClickProps): void => {
 
-    if(selectedRooms.length >= user?.data.group.size&& str !== 'gr'){
+    if(selectedRooms.length >= user?.data?.group?.size && str !== 'gr'){
       return;
     }
 
@@ -132,7 +132,7 @@ export default function RoomSelector({ selectedRooms, floor,user, setSelectedRoo
                     >
                       {roomCapacity.map((str, x) => {
 
-                        const disableCondition= str === 'dis' || (selectedRooms.length >= user?.data.group.size && str !== 'gr');
+                        const disableCondition= str === 'dis' || (selectedRooms.length >= user?.data?.group?.size && str !== 'gr');
 
                         return (
                           // eslint-disable-next-line react/button-has-type -- button type is not necessary.

@@ -7,6 +7,11 @@ export const cleaningUrl = 'https://cleaning.hosmas.ccstiet.com/';
 export const laundryUrl = 'https://hosmas-laundry.ccstiet.com/';
 export const leaveUrl = 'https://hosmas-mess-leave.ccstiet.com/';
 
+
+export const tempApi = axios.create({
+  baseURL: allocationUrl,
+});
+
 export const authApi = axios.create({
   baseURL: url,
 });

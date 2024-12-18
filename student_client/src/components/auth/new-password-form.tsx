@@ -8,6 +8,7 @@ import { z as zod } from 'zod';
 
 import { authClient } from '@/lib/auth/client';
 import { logger } from '@/lib/default-logger';
+import { useRouter } from 'next/navigation';
 
 interface NewPasswordProps {
   slug: string;
@@ -31,8 +32,8 @@ const defaultValues: FormValues = {
 };
 
 export function NewPasswordForm({ slug }: NewPasswordProps): React.JSX.Element {
+  const router=useRouter();
   const [isPending, setIsPending] = React.useState<boolean>(false);
-
   const {
     control,
     handleSubmit,
@@ -57,6 +58,7 @@ export function NewPasswordForm({ slug }: NewPasswordProps): React.JSX.Element {
       } else {
         // Clear form inputs
         reset(defaultValues);
+        void router.push('/auth/sign-in');
         // Redirect to confirm password reset
         logger.debug('Password reset successfully');
       }

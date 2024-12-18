@@ -6,13 +6,13 @@ import { Box, Button, Stack, Typography } from '@mui/material';
 import type { AxiosResponse } from 'axios';
 
 import type { SelectedRoomProps } from '@/hooks/mutation/use-room';
-import { useProfile } from '@/hooks/query/use-profile';
+import { useProfile2 } from '@/hooks/query/use-profile';
 import { selectedRooms1 } from '@/components/allocation/rooms/LowerCont1/LeftCont/roomstemp';
 import LowerCont1 from '@/components/allocation/rooms/LowerCont1/lower-cont1';
 import LowerCont2 from '@/components/allocation/rooms/LowerCont2/lower-cont2';
 
 export default function Rooms(): React.JSX.Element {
-  const { data: profile } = useProfile();
+  const { data: profile } = useProfile2();
   const user = profile as AxiosResponse<ProfileResponse>;
 
   const [selectedRooms, setSelectedRooms] = React.useState<SelectedRoomProps[]>(selectedRooms1);

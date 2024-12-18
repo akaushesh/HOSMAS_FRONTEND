@@ -1,4 +1,4 @@
-import type { hostel } from '@/types/hostels';
+import type { Hostel } from '@/types/hostels';
 
 import { hostelB, hostelM, hostelN, hostelO } from './HostelImages';
 
@@ -95,4 +95,4 @@ const hostels = [
   },
 ];
 
-export default hostels as hostel[];
+export default hostels as Hostel[];

@@ -63,7 +63,7 @@ export interface CreatePreferenceResponse {
 }
 
 export const getChoices = async (): Promise<AxiosResponse<Choice[]>> => {
-  const token = (await authClient.getToken()).data;
+  const token = (await authClient.getToken2()).data;
 
   if (token === null || token === undefined) {
     throw new Error('You must be logged in to perform this action');
@@ -80,7 +80,7 @@ export const getChoices = async (): Promise<AxiosResponse<Choice[]>> => {
 };
 
 export const getPreference = async (): Promise<AxiosResponse<PreferenceResponse>> => {
-  const token = (await authClient.getToken()).data;
+  const token = (await authClient.getToken2()).data;
 
   if (token === null || token === undefined) {
     throw new Error('You must be logged in to perform this action');
@@ -97,7 +97,7 @@ export const getPreference = async (): Promise<AxiosResponse<PreferenceResponse>
 };
 
 export const getPreferenceStatus = async (): Promise<AxiosResponse<PreferenceStatusResponse>> => {
-  const token = (await authClient.getToken()).data;
+  const token = (await authClient.getToken2()).data;
 
   if (token === null || token === undefined) {
     throw new Error('You must be logged in to perform this action');
@@ -114,11 +114,13 @@ export const getPreferenceStatus = async (): Promise<AxiosResponse<PreferenceSta
 };
 
 export const setRetain = async (): Promise<AxiosResponse<SuccessResponse>> => {
-  const token = (await authClient.getToken()).data;
+  const token = (await authClient.getToken2()).data;
 
   if (token === null || token === undefined) {
     throw new Error('You must be logged in to perform this action');
   }
+
+
 
   const res = await preferenceApi.post(
     'retain/',
@@ -135,7 +137,7 @@ export const setRetain = async (): Promise<AxiosResponse<SuccessResponse>> => {
 };
 
 export const createPreference = async (data: PreferenceOrder): Promise<AxiosResponse<CreatePreferenceResponse>> => {
-  const token = (await authClient.getToken()).data;
+  const token = (await authClient.getToken2()).data;
 
   if (token === null || token === undefined) {
     throw new Error('You must be logged in to perform this action');
@@ -152,7 +154,7 @@ export const createPreference = async (data: PreferenceOrder): Promise<AxiosResp
 };
 
 export const getAllLevel = async (): Promise<AxiosResponse<LevelsResponse>> => {
-  const token = (await authClient.getToken()).data;
+  const token = (await authClient.getToken2()).data;
 
   if (token === null || token === undefined) {
     throw new Error('You must be logged in to perform this action');

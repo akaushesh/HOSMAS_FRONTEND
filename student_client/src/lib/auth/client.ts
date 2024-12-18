@@ -1,6 +1,6 @@
 'use client';
 
-import { initiatePasswordReset, newLogin, resetPassword } from '@/services/auth';
+import { initiatePasswordReset, login, newLogin, resetPassword } from '@/services/auth';
 import { getProfile } from '@/services/profile';
 import type { AxiosError } from 'axios';
 
@@ -69,12 +69,16 @@ class AuthClient {
   async signInWithPassword(params: SignInWithPasswordParams): Promise<{ error?: string }> {
     const { email, password } = params;
     let token: string | null;
+    let token2: string | null;
 
     try {
       const loginResponse = await newLogin({ email, password });
+      const loginResponse2 = await login({ email, password });
       const successLoginResponse = loginResponse;
+      const successLoginResponse2 = loginResponse2;
 
       token = successLoginResponse?.data?.access;
+      token2 = successLoginResponse2?.data?.access;
       logger.debug('signInWithPassword', successLoginResponse);
     } catch (err) {
       const axiosError = err as AxiosError<CustomErrorResponse>;
@@ -87,6 +91,7 @@ class AuthClient {
     }
 
     localStorage.setItem('custom-auth-token', token);
+    localStorage.setItem('custom-auth-token-2', token2);
     return {};
   }
 
@@ -136,6 +141,11 @@ class AuthClient {
 
   async getToken(): Promise<{ data?: string | null }> {
     const token = localStorage.getItem('custom-auth-token');
+
+    return { data: token };
+  }
+  async getToken2(): Promise<{ data?: string | null }> {
+    const token = localStorage.getItem('custom-auth-token-2');
 
     return { data: token };
   }
