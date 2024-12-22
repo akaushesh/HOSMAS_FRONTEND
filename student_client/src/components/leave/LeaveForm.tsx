@@ -8,11 +8,12 @@ import { Controller, useForm } from 'react-hook-form';
 
 import { logger } from '@/lib/default-logger';
 import { useCreateLeaveSlip } from '@/hooks/mutation/use-leave';
+import { DatePicker } from '@mui/x-date-pickers';
 
 interface LeaveFormInputs {
   reason: string;
-  startDate: string;
-  endDate: string;
+  startDate: string|null;
+  endDate: string|null;
   place: string;
   parentEmail: string;
 }
@@ -45,12 +46,9 @@ export default function LeaveForm(): React.JSX.Element {
   };
 
   return (
-    <>
-      <Typography variant="h5" sx={{ mb: 3 }}>
-        Submit New Leave
-      </Typography>
+
       <Box component="form" noValidate autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
-        <Grid container spacing={2} sx={{ mb: 2 }}>
+        <Grid container spacing={3} sx={{ mb: 3 }}>
           <Grid item xs={12} sm={6}>
             <Controller
               name="reason"
@@ -92,26 +90,29 @@ export default function LeaveForm(): React.JSX.Element {
           </Grid>
         </Grid>
 
-        <Grid container spacing={2} sx={{ mb: 2 }}>
-          <Grid item xs={12} sm={6}>
+        <Grid container spacing={3} sx={{ mb: 3 }}>
+        <Grid item xs={12} sm={6}>
             <Controller
               name="startDate"
               control={control}
-              defaultValue=""
+              defaultValue={null}
               rules={{ required: 'Start date is required' }}
               render={({ field }) => (
-                <TextField
+                <DatePicker
                   {...field}
                   label="From"
-                  type="date"
-                  fullWidth
-                  InputLabelProps={{ shrink: true }}
-                  error={Boolean(errors.startDate)}
-                  helperText={errors.startDate?.message}
+                  slotProps={{
+                    textField: {
+                      fullWidth: true,
+                      error: Boolean(errors.startDate),
+                      helperText: errors.startDate?.message
+                    }
+                  }}
                 />
               )}
             />
           </Grid>
+
           <Grid item xs={12} sm={6}>
             <Controller
               name="endDate"
@@ -119,14 +120,16 @@ export default function LeaveForm(): React.JSX.Element {
               defaultValue=""
               rules={{ required: 'End date is required' }}
               render={({ field }) => (
-                <TextField
+                <DatePicker
                   {...field}
                   label="To"
-                  type="date"
-                  fullWidth
-                  InputLabelProps={{ shrink: true }}
-                  error={Boolean(errors.endDate)}
-                  helperText={errors.endDate?.message}
+                  slotProps={{
+                    textField: {
+                      fullWidth: true,
+                      error: Boolean(errors.endDate),
+                      helperText: errors.endDate?.message
+                    }
+                  }}
                 />
               )}
             />
@@ -160,6 +163,5 @@ export default function LeaveForm(): React.JSX.Element {
           </Grid>
         </Grid>
       </Box>
-    </>
   );
 }
