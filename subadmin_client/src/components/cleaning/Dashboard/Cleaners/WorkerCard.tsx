@@ -15,7 +15,7 @@ export default function WorkerCard({ worker }: { worker: Worker }): React.JSX.El
   const efficiency = Math.round((worker.completedDuties / worker.totalDuties) * 100);
 
   return (
-    <Card sx={{ display: 'flex', alignItems: 'center', p: 2, backgroundColor: '#f9f9f9' }}>
+    <Card sx={{ display: 'flex', alignItems: 'center', p: 2, backgroundColor: 'var(--mui-palette-background-level3)' }}>
       <Avatar variant="square" sx={{ width: 100, height: 120, borderRadius: '8px', bgcolor: '#ddd', mr: 3 }} />
       <Box sx={{ flexGrow: 1 }}>
         <Grid container justifyContent="space-between" alignItems="center">

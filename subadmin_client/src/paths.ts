@@ -16,6 +16,11 @@ export const paths = {
     menu:'/mess/menu',
     feedback:'/mess/feedback',
   },
+  leave:{
+    default:'/leave',
+    dashboard:'/leave/dashboard',
+    records:'/leave/records',
+  },
   errors: { notFound: '/errors/not-found' },
 
 

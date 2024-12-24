@@ -15,11 +15,17 @@ export const messSubItems = [
   { key: 'feedback', title: 'Feedback', href: paths.mess.feedback, icon: 'users'},
 ] satisfies NavItemConfig[];
   
+export const leaveSubItems = [
+  { key: 'dashboard', title: 'Dashboard', href: paths.leave.dashboard, icon: 'chart-pie' },
+  { key: 'records', title: 'Records', href: paths.leave.records, icon: 'ListChecks' },
+] satisfies NavItemConfig[];
+
 export const navItems = [
-    { key: 'overview', title: 'Overview', href: paths.overview, icon: 'house',isNested:false },
+    { key: 'overview', title: 'Overview', href: paths.overview, icon: 'chart-pie',isNested:false },
     { key: 'cleaning', title: 'Cleaning', href: paths.cleaning.default, icon: 'broom',isNested:true,items:cleaningSubItems},
     { key: 'laundry', title: 'Laundry', href: paths.laundry, icon: 'shirt',isNested:false},
     { key: 'mess', title: 'Mess', href: paths.mess.default, icon: 'cookingPot', isNested: true,items:messSubItems,invisible:false  },
+    { key: 'leave', title: 'Leave', href: paths.leave.default, icon: 'house', isNested: true,items:leaveSubItems,invisible:false  },
     { key: 'settings', title: 'Settings', href: paths.settings, icon: 'gear-six' },
 ] satisfies NavItemConfig[];
   

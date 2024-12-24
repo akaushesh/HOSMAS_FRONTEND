@@ -79,7 +79,7 @@ export const colorSchemes = {
         paper: 'var(--mui-palette-common-white)',
         level1: 'var(--mui-palette-neutral-50)',
         level2: 'var(--mui-palette-neutral-100)',
-        level3: 'var(--mui-palette-neutral-200)',
+        level3: '#f9f9f9',
       },
       common: { black: '#000000', white: '#ffffff' },
       divider: 'var(--mui-palette-neutral-200)',

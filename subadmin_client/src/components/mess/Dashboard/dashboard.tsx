@@ -20,7 +20,7 @@ export default function Dashboard(): React.JSX.Element {
           direction="row"
           alignItems="center"
           justifyContent="center"
-          gap={8}
+          gap={12}
           p={2}
           sx={{ background: 'var(--mui-palette-secondary-light)' }}
         >
@@ -42,6 +42,7 @@ export default function Dashboard(): React.JSX.Element {
                 borderRadius: 0.7,
                 mt: 1,
                 mb: 3,
+                px:2,
               }}
               inputProps={{ 'aria-label': 'Without label' }}
               size="small"
