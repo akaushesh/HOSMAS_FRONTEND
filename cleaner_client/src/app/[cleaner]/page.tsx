@@ -217,7 +217,7 @@ export default function Page({
                   <Box
                     sx={{
                       border: "1px dashed #D6D6D6",
-                      background: "#f9f9f9",
+                      background: "var(--mui-palette-background-level3)",
                       px: 2,
                       py: 0.5,
                       borderRadius: 1,
@@ -242,7 +242,7 @@ export default function Page({
                   <Box
                     sx={{
                       border: "1px dashed #D6D6D6",
-                      background: "#f9f9f9",
+                      background: "var(--mui-palette-background-level3)",
                       px: 2,
                       py: 0.5,
                       borderRadius: 1,

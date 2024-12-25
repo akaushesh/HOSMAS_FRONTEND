@@ -31,7 +31,7 @@ export default function ActiveLeaves({ arr }: ActiveCardProps): React.JSX.Elemen
           key={approval.id}
           sx={{ p: 2, background: 'white', borderRadius: 1 }}
         >
-          <Stack minWidth="18%" maxWidth="25%" justifyContent="space-between">
+          <Stack minWidth="20%" maxWidth="28%" justifyContent="space-between">
             <Box>
               <Typography variant="h6" fontWeight={600} fontSize="20px" lineHeight={1} color="text.primary">
                 {approval.name}
@@ -42,14 +42,14 @@ export default function ActiveLeaves({ arr }: ActiveCardProps): React.JSX.Elemen
             </Box>
           </Stack>
 
-          <Stack alignSelf="flex-start" width="20%" direction="row" justifyContent="space-evenly" alignItems="center">
+          <Stack alignSelf="flex-start" width="24%" direction="row" justifyContent="space-evenly" alignItems="center">
             <Box textAlign="center">
               <Typography
                 variant="body1"
                 sx={{ fontSize: { xs: '14px', sm: '15px' }, lineHeight: 1, mb: '1px' }}
                 fontWeight={500}
               >
-                {dayjs(approval.leaveDateFrom).format('DD/MM/YY')}
+                {dayjs(approval.leaveDateFrom).format('DD MMM YY')}
               </Typography>
               <Typography variant="body2" sx={{ fontSize: { xs: '13px', sm: '14px' } }} fontWeight={400}>
                 Dept
@@ -73,7 +73,7 @@ export default function ActiveLeaves({ arr }: ActiveCardProps): React.JSX.Elemen
                 sx={{ fontSize: { xs: '14px', sm: '15px' }, lineHeight: 1, mb: '1px' }}
                 fontWeight={500}
               >
-                {dayjs(approval.leaveDateTo).format('DD/MM/YY')}
+                {dayjs(approval.leaveDateTo).format('DD MMM YY')}
               </Typography>
               <Typography variant="body2" sx={{ fontSize: { xs: '13px', sm: '14px' } }} fontWeight={400}>
                 Arrival
@@ -81,7 +81,7 @@ export default function ActiveLeaves({ arr }: ActiveCardProps): React.JSX.Elemen
             </Box>
           </Stack>
 
-          <Stack width="25%" justifyContent="space-between" alignItems="flex-start" ml={8}>
+          <Stack width="25%" justifyContent="space-between" alignItems="flex-start" ml={6}>
             <Typography variant="body1"  fontWeight={600} fontSize="16px" color="text.primary">
               Place :<b style={{fontWeight:"400"}}> {approval.location}</b>
             </Typography>

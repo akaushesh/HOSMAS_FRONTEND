@@ -16,8 +16,8 @@ interface MenuItems {
 }
 
 interface FormProps {
-  rating:number;
-  feedback:string;
+  rating: number;
+  feedback: string;
 }
 
 interface FeedbackProps {
@@ -26,14 +26,12 @@ interface FeedbackProps {
   menuItems: MenuItems;
 }
 
-export default function Feedback(
-  { timing, day, menuItems }: FeedbackProps
-): React.JSX.Element {
+export default function Feedback({ timing, day, menuItems }: FeedbackProps): React.JSX.Element {
   // const currentMenuItems = menuItems[timing][day] || {};
 
   const [form, setForm] = React.useState<FormProps>({
-    rating:0,
-    feedback:""
+    rating: 0,
+    feedback: '',
   });
 
   // const [ratings, setRatings] = React.useState<Record<string, number>>(
@@ -64,24 +62,25 @@ export default function Feedback(
   // const isDisabled = Object.values(ratings).every((r) => r === 0);
 
   const handleReset = (): void => {
-    setForm({rating:0,feedback:""});
+    setForm({ rating: 0, feedback: '' });
   };
 
-  const isDisabled = form.rating===0;
+  const isDisabled = form.rating === 0;
 
   return (
     <Stack alignItems="center">
-
-      <Typography variant="h4" sx={{mt:{xs:3,md:3},fontSize:{xs:"24px",md:"32px"}}} textAlign="center">{"Leave a Rating for Today's menu"}</Typography>
+      <Typography variant="h4" sx={{ mt: { xs: 3, md: 3 }, fontSize: { xs: '24px', md: '32px' } }} textAlign="center">
+        Leave a Rating for Today&apos;s menu
+      </Typography>
       <Rating
         name="rating"
         value={form.rating}
         onChange={(event, newValue) => {
-          setForm({feedback:form.feedback,rating:newValue||0});
+          setForm({ feedback: form.feedback, rating: newValue || 0 });
         }}
         sx={{
-          mt:{xs:2,md:3},
-          mb:3,
+          mt: { xs: 2, md: 3 },
+          mb: 3,
           '& .MuiRating-icon': {
             fontSize: { xs: '30px', md: '40px' },
             color: 'var(--mui-palette-primary-main)',
@@ -89,27 +88,27 @@ export default function Feedback(
         }}
       />
 
-<TextField
-  id="outlined-description"
-  label="Description"
-  variant="outlined"
-  placeholder="Description (Optional)"
-  name="description"
-  value={form.feedback}
-  onChange={(event) =>
-    { setForm({ rating: form.rating, feedback: event.target.value }); }
-  }
-  sx={{
-    width: "90%",
-    mb: {xs:1,md:3},
-    "& .MuiInputBase-input::placeholder": {
-      fontSize: { xs: '16px', md: '22px' }, 
-      fontWeight: 600, 
-    },
-  }}
-  rows={6}
-  multiline
-/>
+      <TextField
+        id="outlined-description"
+        label="Description"
+        variant="outlined"
+        placeholder="Description (Optional)"
+        name="description"
+        value={form.feedback}
+        onChange={(event) => {
+          setForm({ rating: form.rating, feedback: event.target.value });
+        }}
+        sx={{
+          width: '90%',
+          mb: { xs: 1, md: 3 },
+          '& .MuiInputBase-input::placeholder': {
+            fontSize: { xs: '16px', md: '22px' },
+            fontWeight: 600,
+          },
+        }}
+        rows={6}
+        multiline
+      />
 
       {/* <Box sx={{ height: '43vh', overflowY: 'auto', pb: 1.5 }}>
         {Object.entries(currentMenuItems).map(([item, type]) => (

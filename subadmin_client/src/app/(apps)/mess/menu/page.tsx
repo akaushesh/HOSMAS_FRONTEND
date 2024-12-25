@@ -5,7 +5,7 @@ import { Stack } from '@mui/system';
 
 import { config } from '@/config';
 import Profile from '@/components/core/profile';
-import Dashboard from '@/components/mess/Dashboard/dashboard';
+import Menu from '@/components/mess/menu';
 
 export const metadata = { title: `Dashboard | Mess | ${config.site.name}` } satisfies Metadata;
 
@@ -33,7 +33,7 @@ export default function Page(): React.JSX.Element {
           <Profile/>
         </Box>
       </Stack>
-        <Dashboard/>
+        <Menu/>
     </Stack>
   );
 }

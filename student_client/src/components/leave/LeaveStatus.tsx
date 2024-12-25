@@ -44,7 +44,7 @@ export default function LeaveStatus({ phase,id }: { phase: number;id:string; }):
           Gate Pass
         </Typography>
         <Typography variant="body1" textAlign="center" >
-          Valid Till : {dayjs(validDate).format('DD/MM/YY')}
+          <b style={{fontWeight:"600"}}>Valid Till</b> : {dayjs(validDate).format('DD MMM, YY')}
         </Typography>
 
 

@@ -5,7 +5,7 @@ import { Stack } from '@mui/system';
 
 import { config } from '@/config';
 import Profile from '@/components/core/profile';
-import Dashboard from '@/components/mess/Dashboard/dashboard';
+import Dashboard from '@/components/mess/dashboard';
 
 export const metadata = { title: `Dashboard | Mess | ${config.site.name}` } satisfies Metadata;
 

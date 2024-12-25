@@ -2,12 +2,12 @@ import * as React from 'react';
 import type { Metadata } from 'next';
 import { Box, Typography } from '@mui/material';
 import { Stack } from '@mui/system';
-import dayjs from 'dayjs';
 
 import { config } from '@/config';
-import Statistics from '@/components/cleaning/Dashboard/Statistics';
+import Profile from '@/components/core/profile';
+import Feedback from '@/components/mess/feedback';
 
-export const metadata = { title: `Menu | Mess | ${config.site.name}` } satisfies Metadata;
+export const metadata = { title: `Feedback | Mess | ${config.site.name}` } satisfies Metadata;
 
 export default function Page(): React.JSX.Element {
   return (
@@ -28,15 +28,13 @@ export default function Page(): React.JSX.Element {
       <Stack direction="row" alignItems="center" justifyContent="space-between">
         <Box width={1}>
           <Typography variant="h4" sx={{ fontSize: '35px', color: 'var(--Page-HeadColor)' }} display="inline">
-            Dashboard
+            Mess Feedback
           </Typography>
+          <Profile/>
         </Box>
-
-        <Typography variant="h4" sx={{ fontSize: '30px', color: 'var(--TextMain-Color)' }} width={1} textAlign="right">
-          {dayjs().format('DD MMMM YYYY')}
-        </Typography>
       </Stack>
-      <Statistics />
+      <Feedback/>
+
     </Stack>
   );
 }

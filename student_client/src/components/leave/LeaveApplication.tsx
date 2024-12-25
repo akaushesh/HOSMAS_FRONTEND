@@ -170,18 +170,18 @@ export default function LeaveApplication(): React.JSX.Element {
             <Typography variant="subtitle1" sx={{ fontSize: '12px', mb: 2 }} color="text.secondary">
               You can view your current and past 10 leaves only.
             </Typography>
-            <Paper
-              elevation={0}
-              sx={{ p: 3, backgroundColor: 'var(--mui-palette-background-level3)', minHeight: '53vh' }}
-            >
               {isLoading ? (
+                  <Paper
+                    elevation={0}
+                    sx={{ p: 3, backgroundColor: 'var(--mui-palette-background-level3)', minHeight: '53vh' }}
+                  >
                 <Grid container height={1} alignItems="center" justifyContent="center">
                   <CircularProgress />
                 </Grid>
+                </Paper>
               ) : (
                 <LeaveHistory leaveRecords={leaveRecords} />
               )}
-            </Paper>
           </Paper>
         </Grid>
       )}

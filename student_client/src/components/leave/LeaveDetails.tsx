@@ -100,7 +100,7 @@ export default function LeaveDetails({ details, phase }: LeaveDetailsProps): Rea
               sx={{ fontSize: { xs: '14px', sm: '15px' }, lineHeight: 1, mb: '1px' }}
               fontWeight={500}
             >
-              {dayjs(details.leaveDateFrom).format('DD/MM/YY')}
+              {dayjs(details.leaveDateFrom).format('DD MMM YY')}
             </Typography>
             <Typography variant="body2" sx={{ fontSize: { xs: '13px', sm: '14px' } }} fontWeight={400}>
               Dept
@@ -124,7 +124,7 @@ export default function LeaveDetails({ details, phase }: LeaveDetailsProps): Rea
               sx={{ fontSize: { xs: '14px', sm: '15px' }, lineHeight: 1, mb: '1px' }}
               fontWeight={500}
             >
-              {dayjs(details.leaveDateTo).format('DD/MM/YY')}
+              {dayjs(details.leaveDateTo).format('DD MMM YY')}
             </Typography>
             <Typography variant="body2" sx={{ fontSize: { xs: '13px', sm: '14px' } }} fontWeight={400}>
               Arrival
@@ -147,7 +147,7 @@ export default function LeaveDetails({ details, phase }: LeaveDetailsProps): Rea
       >
         {actionState === 'default' ? (
           <>
-            <Grid container mb={1.3} alignItems="center" justifyContent="space-between">
+            <Grid container mb={1.3} alignItems="center" justifyContent={{xs:'center',sm:"space-between"}}>
               <Grid item sx={{ display: { xs: 'none', sm: 'block' } }}>
                 <Typography variant="h6" fontWeight={600}>
                   Reason :
@@ -162,7 +162,7 @@ export default function LeaveDetails({ details, phase }: LeaveDetailsProps): Rea
                 </Typography>
               </Grid>
             </Grid>
-            <Grid container alignItems="center" justifyContent="space-between">
+            <Grid container alignItems="center" justifyContent={{xs:'center',sm:"space-between"}}>
               <Grid item sx={{ display: { xs: 'none', sm: 'block' } }}>
                 <Typography variant="h6" fontWeight={600}>
                   Place of Visit :

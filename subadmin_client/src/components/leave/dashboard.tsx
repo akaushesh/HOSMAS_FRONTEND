@@ -57,21 +57,21 @@ export default function Dashboard(): React.JSX.Element {
     <Stack direction="row" alignItems="stretch" gap={4} justifyContent="space-between">
       <Paper sx={{ minHeight: '65vh', width: '100%', mt: 4, p: 3 }} elevation={10}>
         <Stack
-          direction="row"
+          direction={{xs:"column",sm:"row"}}
           width={1}
           justifyContent="space-between"
           alignItems="center"
           sx={{ py: 2, px: 3, backgroundColor: 'var(--mui-palette-background-level3)', borderRadius: 1 }}
-          gap={4}
+          gap={{xs:1.8,sm:4}}
         >
-          <Box>
-            <Typography variant="h5" sx={{ color: 'var(--mui-palette-text-primary)' }}>
+          <Box textAlign={{xs:"center",sm:"left"}} width={1}>
+            <Typography variant="h5" fontSize="23px" sx={{ color: 'var(--mui-palette-text-primary)' }}>
               Automatic Leave Approval
               <Tooltip title="This feature is enabled by default" arrow>
                 <InfoOutlinedIcon sx={{ color: 'var(--mui-palette-text-secondaryChannel)', ml: 2 }} />
               </Tooltip>
             </Typography>
-            <Typography variant="body1" sx={{ fontSize: '13px', color: 'var(--mui-palette-text-secondary)' }}>
+            <Typography variant="body1" sx={{ fontSize: '13px', color: 'var(--mui-palette-text-secondary)',mt:{xs:1,sm:0} }}>
               To be utilized when necessarys
             </Typography>
           </Box>
@@ -82,12 +82,13 @@ export default function Dashboard(): React.JSX.Element {
         <Stack direction="row" width={1} justifyContent="space-between" alignItems="center" gap={2} mt={1.4}>
           <Stack
             direction="row"
-            width="60%"
+            width={{xs:1,sm:"60%"}}
             justifyContent="space-between"
             alignItems="center"
+            gap={2}
             sx={{ py: 2, px: 3, backgroundColor: 'var(--mui-palette-background-level3)', borderRadius: 1 }}
           >
-            <Typography variant="h5" sx={{ color: 'var(--mui-palette-text-primary)' }}>
+            <Typography variant="h5" fontSize="23px" sx={{ color: 'var(--mui-palette-text-primary)' }}>
               Active Leaves
             </Typography>
             <Typography variant="h4" sx={{ color: 'var(--mui-palette-text-primary)' }}>
@@ -95,7 +96,7 @@ export default function Dashboard(): React.JSX.Element {
             </Typography>
           </Stack>
 
-          <Button variant="contained" sx={{ width: '35%' }} color="primary" onClick={() => {router.push('/leave/records?state=1')}}>
+          <Button variant="contained" sx={{ width: '35%', display:{xs:"none",sm:"block"} }} color="primary" onClick={() => {router.push('/leave/records?state=1')}}>
             View Active Leaves
           </Button>
         </Stack>
@@ -103,12 +104,13 @@ export default function Dashboard(): React.JSX.Element {
         <Stack
           width={1}
           alignItems="center"
+          display={{xs:"none",sm:"flex"}}
           gap={2}
           mt={1.4}
           sx={{ py: 2, px: 3, backgroundColor: 'var(--mui-palette-background-level3)', borderRadius: 1 }}
         >
           <Stack direction="row" width={1} justifyContent="space-between" alignItems="center">
-            <Typography variant="h5" sx={{ color: 'var(--mui-palette-text-primary)' }}>
+            <Typography variant="h5" fontSize="23px" sx={{ color: 'var(--mui-palette-text-primary)' }}>
               Pending Approvals
             </Typography>
             <Button variant="text" sx={{ py: 0.7, borderRadius: 1 }} color="primary" onClick={() => {router.push('/leave/records?state=0')}}>
@@ -116,7 +118,7 @@ export default function Dashboard(): React.JSX.Element {
             </Button>
           </Stack>
 
-          <Stack mt={1} width={1} p={1}>
+          <Stack mt={1} width={1}  p={1}>
             <ApprovalLeave arr={pendingApprovals} />
           </Stack>
         </Stack>
@@ -133,7 +135,7 @@ export default function Dashboard(): React.JSX.Element {
           sx={{ py: 2, px: 3, backgroundColor: 'var(--mui-palette-background-level3)', borderRadius: 1 }}
         >
           <Stack direction="row" width={1} justifyContent="space-between" alignItems="center">
-            <Typography variant="h5" sx={{ color: 'var(--mui-palette-text-primary)' }}>
+            <Typography variant="h5" fontSize="23px" sx={{ color: 'var(--mui-palette-text-primary)' }}>
               Recent Approvals
             </Typography>
             <Button variant="text" sx={{ py: 0.7, borderRadius: 1 }} color="primary" onClick={() => {router.push('/leave/records?state=2')}}>

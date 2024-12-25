@@ -43,14 +43,14 @@ export default function AllLeaves({ arr }: AllLeaveProps ): React.JSX.Element {
             </Box>
           </Stack>
 
-          <Stack alignSelf="flex-start" width="20%" direction="row" justifyContent="space-evenly" alignItems="center">
+          <Stack alignSelf="flex-start" width="30%" direction="row" justifyContent="space-evenly" alignItems="center">
             <Box textAlign="center">
               <Typography
                 variant="body1"
                 sx={{ fontSize: { xs: '14px', sm: '15px' }, lineHeight: 1, mb: '1px' }}
                 fontWeight={500}
               >
-                {dayjs(approval.leaveDateFrom).format('DD/MM/YY')}
+                {dayjs(approval.leaveDateFrom).format('DD MMM YY')}
               </Typography>
               <Typography variant="body2" sx={{ fontSize: { xs: '13px', sm: '14px' } }} fontWeight={400}>
                 Dept
@@ -74,7 +74,7 @@ export default function AllLeaves({ arr }: AllLeaveProps ): React.JSX.Element {
                 sx={{ fontSize: { xs: '14px', sm: '15px' }, lineHeight: 1, mb: '1px' }}
                 fontWeight={500}
               >
-                {dayjs(approval.leaveDateTo).format('DD/MM/YY')}
+                {dayjs(approval.leaveDateTo).format('DD MMM YY')}
               </Typography>
               <Typography variant="body2" sx={{ fontSize: { xs: '13px', sm: '14px' } }} fontWeight={400}>
                 Arrival

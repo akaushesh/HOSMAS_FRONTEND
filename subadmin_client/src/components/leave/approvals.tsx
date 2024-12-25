@@ -48,7 +48,7 @@ export default function ApprovalLeave({ arr }: ApprovalCardProps): React.JSX.Ele
                   sx={{ fontSize: { xs: '14px', sm: '15px' }, lineHeight: 1, mb: '1px' }}
                   fontWeight={500}
                 >
-                  {dayjs(approval.leaveDateFrom).format('DD/MM/YY')}
+                  {dayjs(approval.leaveDateFrom).format('DD MMM YY')}
                 </Typography>
                 <Typography variant="body2" sx={{ fontSize: { xs: '13px', sm: '14px' } }} fontWeight={400}>
                   Dept
@@ -72,7 +72,7 @@ export default function ApprovalLeave({ arr }: ApprovalCardProps): React.JSX.Ele
                   sx={{ fontSize: { xs: '14px', sm: '15px' }, lineHeight: 1, mb: '1px' }}
                   fontWeight={500}
                 >
-                  {dayjs(approval.leaveDateTo).format('DD/MM/YY')}
+                  {dayjs(approval.leaveDateTo).format('DD MMM YY')}
                 </Typography>
                 <Typography variant="body2" sx={{ fontSize: { xs: '13px', sm: '14px' } }} fontWeight={400}>
                   Arrival
