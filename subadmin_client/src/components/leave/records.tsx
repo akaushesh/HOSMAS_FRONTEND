@@ -2,14 +2,12 @@
 
 import * as React from 'react';
 import { useSearchParams } from 'next/navigation';
-import ClearIcon from '@mui/icons-material/Clear';
 import CloseIcon from '@mui/icons-material/Close';
 import SearchIcon from '@mui/icons-material/Search';
 import {
   Box,
   Button,
   IconButton,
-  InputAdornment,
   Pagination,
   Paper,
   Stack,
@@ -50,7 +48,7 @@ export default function Records(): React.JSX.Element {
   };
 
   const handleSearch = (): void => {
-    console.log(searchFilters);
+    // console.log(searchFilters);
   };
 
   return (
