@@ -13,6 +13,7 @@ export const messSubItems = [
   { key: 'dashboard', title: 'Dashboard', href: paths.mess.dashboard, icon: 'chart-pie' },
   { key: 'menu', title: 'Menu', href: paths.mess.menu, icon: 'hamburger'},
   { key: 'feedback', title: 'Feedback', href: paths.mess.feedback, icon: 'users'},
+  { key: 'menu-items', title: 'Menu Items', href: paths.mess.items, icon: 'list-dashes'},
 ] satisfies NavItemConfig[];
   
 export const leaveSubItems = [

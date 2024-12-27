@@ -172,7 +172,7 @@ function Menu(): React.JSX.Element {
         </Stack>
       </Stack>
 
-      <Stack direction={{ xs: 'column', md: 'row' }} spacing={3}>
+      <Stack direction={{ xs: 'column', md: 'row' }} mt={5} spacing={4}>
         {mealTypes.map((mealType) => (
           <Box
             key={mealType}
@@ -318,6 +318,9 @@ function Menu(): React.JSX.Element {
                 <>
                   {filteredUncategorizedItems.length > 0 && (
                     <>
+                    <Typography variant="subtitle1" sx={{ mb: 1 }}>
+                        Others
+                      </Typography>
                       <Stack direction="row" flexWrap="wrap" gap={1} sx={{ mb: 2 }}>
                         {filteredUncategorizedItems.map((item) => (
                           <Chip
@@ -329,6 +332,7 @@ function Menu(): React.JSX.Element {
                             }}
                             sx={{
                               cursor: 'pointer',
+                              fontSize: '14px',
                               borderRadius: 1,
                               ...(selectedItems.includes(item) && {
                                 backgroundColor: 'var(--mui-palette-primary-main)',
@@ -363,6 +367,7 @@ function Menu(): React.JSX.Element {
                             }}
                             sx={{
                               cursor: 'pointer',
+                              fontSize: '14px',
                               borderRadius: 1,
                               ...(selectedItems.includes(item) && {
                                 backgroundColor: 'var(--mui-palette-primary-main)',
@@ -377,6 +382,7 @@ function Menu(): React.JSX.Element {
                           />
                         ))}
                       </Stack>
+                      <Divider sx={{ mb: 2,mt:2.4 }} />
                     </Box>
                   ))}
                 </>

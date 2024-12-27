@@ -5,9 +5,9 @@ import { Stack } from '@mui/system';
 
 import { config } from '@/config';
 import Profile from '@/components/core/profile';
-import Menu from '@/components/mess/menu';
+import MenuItem from '@/components/mess/all-menu';
 
-export const metadata = { title: `Menu | Mess | ${config.site.name}` } satisfies Metadata;
+export const metadata = { title: `Items | Mess | ${config.site.name}` } satisfies Metadata;
 
 export default function Page(): React.JSX.Element {
   return (
@@ -28,12 +28,12 @@ export default function Page(): React.JSX.Element {
       <Stack direction="row" alignItems="center" justifyContent="space-between">
         <Box width={1}>
           <Typography variant="h4" sx={{ fontSize: '35px', color: 'var(--Page-HeadColor)' }} display="inline">
-            Mess Management
+            Menu Items Management
           </Typography>
           <Profile/>
         </Box>
       </Stack>
-        <Menu/>
+        <MenuItem/>
     </Stack>
   );
 }

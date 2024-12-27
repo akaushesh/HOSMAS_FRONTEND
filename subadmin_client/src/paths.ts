@@ -15,6 +15,7 @@ export const paths = {
     dashboard:'/mess/dashboard',
     menu:'/mess/menu',
     feedback:'/mess/feedback',
+    items:'/mess/menu-items',
   },
   leave:{
     default:'/leave',
