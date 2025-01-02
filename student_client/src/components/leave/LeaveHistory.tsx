@@ -11,6 +11,7 @@ interface LeaveRecord {
   location: string;
   leaveDateFrom: string;
   leaveDateTo: string;
+  leaveStatus: string;
 }
 
 export default function LeaveHistory({ leaveRecords }: LeaveRecordProps): React.JSX.Element {
@@ -68,7 +69,7 @@ export default function LeaveHistory({ leaveRecords }: LeaveRecordProps): React.
                   <Typography variant="body1" fontSize={{ xs: '13px', lg: '14px' }}>
                     {dayjs(record.leaveDateFrom).format('DD MMM YY')}
                   </Typography>
-                <Divider sx={{borderColor:"var(--mui-palette-primary-main)",display:{xs:"none",sm:"block",md:"none",lg:"block"}}} orientation="vertical" flexItem />
+                <Divider sx={{borderColor:record.leaveStatus==='d'?'var(--mui-palette-primary-main)':record.leaveStatus==='a'?'var(--mui-palette-success-main)':'var(--mui-palette-secondary-main)',display:{xs:"none",sm:"block",md:"none",lg:"block"}}} orientation="vertical" flexItem />
 
                   <Box position="relative" display={{xs:"block",sm:"none",md:"block",lg:"none"}} width="15%" height="2px">
                     <Box
@@ -76,7 +77,7 @@ export default function LeaveHistory({ leaveRecords }: LeaveRecordProps): React.
                         width:'80%',
                         ml: "10%",
                         height: '2px',
-                        backgroundColor: 'var(--mui-palette-primary-main)',
+                        backgroundColor: record.leaveStatus==='d'?'var(--mui-palette-primary-main)':record.leaveStatus==='a'?'var(--mui-palette-success-main)':'var(--mui-palette-secondary-main)',
                         position: 'absolute',
                         top: '50%',
                       }}
@@ -87,18 +88,13 @@ export default function LeaveHistory({ leaveRecords }: LeaveRecordProps): React.
                   </Typography>
                 </Box>
 
-                {/* <Box sx={{ display: 'flex',flexDirection:{xs:"column",lg:"row"}, alignItems: 'center', gap: {xs:0,lg:1.5} }}>
-                <Typography variant="body1" fontSize={{xs:"13px",lg:"16px"}}>{dayjs(record.leaveDateFrom).format('DD MMM YY')}</Typography>
-                <Divider sx={{display:{xs:"none",lg:"block"}}} orientation="vertical" flexItem />
-                <Typography variant="body1" fontSize={{xs:"13px",lg:"16px"}}>{dayjs(record.leaveDateTo).format('DD MMM YY')}</Typography>
-              </Box> */}
               </Box>
             ))}
           </Box>
         </Box>
       </Paper>
       <Box sx={{ mt: 3, display: 'flex', alignItems: 'center', justifyContent: 'center', bottom: 0 }}>
-        <Pagination count={2} onChange={handleChangePage} variant="outlined" color="primary" />
+        <Pagination count={leaveRecords.length>5?2:1} onChange={handleChangePage} variant="outlined" color="primary" disabled={leaveRecords.length<=5} />
       </Box>
     </Stack>
   );

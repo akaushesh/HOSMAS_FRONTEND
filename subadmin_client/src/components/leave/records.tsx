@@ -142,7 +142,7 @@ export default function Records(): React.JSX.Element {
           </Stack>
         ) : (
           <>
-            <Typography variant="h5">Seacrh</Typography>
+            <Typography variant="h5">Search</Typography>
             <Stack direction="row" width="70%"  gap={2} justifyContent="space-between" alignItems="stretch">
               <TextField
                 variant="standard"

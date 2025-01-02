@@ -119,7 +119,6 @@ function Menu(): React.JSX.Element {
   return (
     <Paper
       sx={{
-        minHeight: '65vh',
         width: '100%',
         mt: 4,
         p: { xs: 2, md: 4 },
@@ -200,24 +199,23 @@ function Menu(): React.JSX.Element {
                 </IconButton>
 
                 <Button
-                size="small"
-                onClick={() => {
-                  handleAddClick(mealType);
-                }}
-                variant="outlined"
-                sx={{
-                  borderRadius: 1,
-                  py: 0.5,
-                  px: 3,
-                  borderWidth: '2px',
-                  '&:hover': {
+                  size="small"
+                  onClick={() => {
+                    handleAddClick(mealType);
+                  }}
+                  variant="outlined"
+                  sx={{
+                    borderRadius: 1,
+                    py: 0.5,
+                    px: 3,
                     borderWidth: '2px',
-                  },
-                }}
+                    '&:hover': {
+                      borderWidth: '2px',
+                    },
+                  }}
                 >
-                Add
-              </Button>
-
+                  Add
+                </Button>
               </Stack>
             </Stack>
             <Box
@@ -318,7 +316,7 @@ function Menu(): React.JSX.Element {
                 <>
                   {filteredUncategorizedItems.length > 0 && (
                     <>
-                    <Typography variant="subtitle1" sx={{ mb: 1 }}>
+                      <Typography variant="subtitle1" sx={{ mb: 1 }}>
                         Others
                       </Typography>
                       <Stack direction="row" flexWrap="wrap" gap={1} sx={{ mb: 2 }}>
@@ -382,7 +380,7 @@ function Menu(): React.JSX.Element {
                           />
                         ))}
                       </Stack>
-                      <Divider sx={{ mb: 2,mt:2.4 }} />
+                      <Divider sx={{ mb: 2, mt: 2.4 }} />
                     </Box>
                   ))}
                 </>

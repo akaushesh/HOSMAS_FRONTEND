@@ -6,7 +6,7 @@ import { Stack } from '@mui/system';
 import { config } from '@/config';
 import LeaveApplication from '@/components/leave/LeaveApplication';
 
-export const metadata = { title: `Cleaning | ${config.site.name}` } satisfies Metadata;
+export const metadata = { title: `Leave | ${config.site.name}` } satisfies Metadata;
 
 export default function Page(): React.JSX.Element {
   return (

@@ -11,7 +11,7 @@ export const cleaningSubItems = [
 
 export const messSubItems = [
   { key: 'dashboard', title: 'Dashboard', href: paths.mess.dashboard, icon: 'chart-pie' },
-  { key: 'menu', title: 'Menu', href: paths.mess.menu, icon: 'hamburger'},
+  { key: 'menu', title: 'Menu', href: paths.mess.menu, icon: 'hamburger' },
   { key: 'feedback', title: 'Feedback', href: paths.mess.feedback, icon: 'users'},
   { key: 'menu-items', title: 'Menu Items', href: paths.mess.items, icon: 'list-dashes'},
 ] satisfies NavItemConfig[];
@@ -23,10 +23,11 @@ export const leaveSubItems = [
 
 export const navItems = [
     { key: 'overview', title: 'Overview', href: paths.overview, icon: 'chart-pie',isNested:false },
-    { key: 'cleaning', title: 'Cleaning', href: paths.cleaning.default, icon: 'broom',isNested:true,items:cleaningSubItems},
+    { key: 'cleaning', title: 'Cleaning', href: paths.cleaning.default, icon: 'broom',isNested:true,items:cleaningSubItems,},
     { key: 'laundry', title: 'Laundry', href: paths.laundry, icon: 'shirt',isNested:false},
-    { key: 'mess', title: 'Mess', href: paths.mess.default, icon: 'cookingPot', isNested: true,items:messSubItems,invisible:false  },
+    { key: 'mess', title: 'Mess', href: paths.mess.default, icon: 'cookingPot', isNested: true,items:messSubItems,  },
     { key: 'leave', title: 'Leave', href: paths.leave.default, icon: 'house', isNested: true,items:leaveSubItems,invisible:false  },
     { key: 'settings', title: 'Settings', href: paths.settings, icon: 'gear-six' },
 ] satisfies NavItemConfig[];
   
+

@@ -8,7 +8,7 @@ import { useTheme, type Theme } from '@mui/material/styles';
 
 
 
-export default function LeaveStatus({ phase,id }: { phase: number;id:string; }): React.JSX.Element {
+export default function LeaveStatus({ phase,id,status }: { phase: number;id:string;status:string|undefined; }): React.JSX.Element {
   
   const theme: Theme = useTheme();
   
@@ -22,7 +22,10 @@ export default function LeaveStatus({ phase,id }: { phase: number;id:string; }):
 
   return (
     <Paper elevation={0} sx={{ p: 3,mt:{xs:2,lg:0}, backgroundColor: 'var(--mui-palette-background-level3)', height: '100%' }}>
-      {phase === 2 ? (
+     
+     
+     
+      {(status!=='rc'&&phase === 2) ? (
         <Stack alignItems="center" justifyContent="center" height={1} >
         <QrCode
           value={id}
@@ -55,10 +58,12 @@ export default function LeaveStatus({ phase,id }: { phase: number;id:string; }):
           <Typography variant="h3" fontWeight={600} mb={4} >
             Status
           </Typography>
+         
+         
           <Box display="flex" alignItems="center" justifyContent="center" mb={2} >
             <CheckCircleIcon sx={{ color: 'success.main', mr: 1 }} />
             <Typography variant="h6" fontWeight={500} color="success.main">
-              Application Submitted
+              {status==="rc"?"Cancellation Requested":"Application Submitted"} 
             </Typography>
           </Box>
           <Box display="flex" alignItems="center" justifyContent="center" mb="2rem">

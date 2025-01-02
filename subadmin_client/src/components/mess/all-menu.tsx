@@ -53,8 +53,8 @@ export default function MenuItem(): React.JSX.Element {
   };
 
   const checkCategoryExists = (category: string): boolean => {
-	const lowerCaseCategory = category.toLowerCase();
-	return Object.keys(menu).some((existingCategory) => existingCategory.toLowerCase() === lowerCaseCategory);
+    const lowerCaseCategory = category.toLowerCase();
+    return Object.keys(menu).some((existingCategory) => existingCategory.toLowerCase() === lowerCaseCategory);
   };
 
   const handleOpenDialog = (type: string, category = ''): void => {
@@ -72,7 +72,7 @@ export default function MenuItem(): React.JSX.Element {
     setNewItem('');
     setItemsBuffer([]);
     setItemAlreadyExists(false);
-	setCategoryAlreadyExists(false);
+    setCategoryAlreadyExists(false);
   };
 
   const handleAddItem = (): void => {
@@ -168,7 +168,11 @@ export default function MenuItem(): React.JSX.Element {
         gap={{ xs: 1.9, sm: 3 }}
         mb={3}
       >
-        <Typography variant="h4"  fontSize={{xs:"1.7rem",sm:"2rem"}} sx={{ textAlign: { xs: 'center', sm: 'left' } }}>
+        <Typography
+          variant="h4"
+          fontSize={{ xs: '1.7rem', sm: '2rem' }}
+          sx={{ textAlign: { xs: 'center', sm: 'left' } }}
+        >
           Menu Items Management
         </Typography>
         <Button
@@ -183,9 +187,9 @@ export default function MenuItem(): React.JSX.Element {
       </Stack>
 
       <Box p={2} mt={1} mb={1} sx={{ backgroundColor: 'var(--mui-palette-background-level3)', borderRadius: 1 }}>
-        <Box sx={{ flex: 1, overflowY: 'auto', height: '44vh', pr: 1 }}>
-          {sortedCategories.map((category) => (
-            <Box key={category} mb={6}>
+        <Box sx={{ flex: 1, overflowY: 'auto', height: '48vh', pr: 1 }}>
+          {sortedCategories.map((category, idx) => (
+            <Box key={category} mb={sortedCategories.length - 1 !== idx ? 6 : 2}>
               <Stack direction="row" alignItems="flex-end" gap={2}>
                 <Typography variant="h6" fontSize="19px" color="text.secondary">
                   {category}
@@ -260,21 +264,28 @@ export default function MenuItem(): React.JSX.Element {
 
       <Dialog open={openDialog} onClose={handleCloseDialog} fullWidth maxWidth="sm">
         <DialogTitle>
-          <Typography variant="h4" fontSize={{xs:"1.7rem",sm:"2rem"}} color="primary">
-            {dialogType === 'addCategory'
-              ? 'Add Category'
-              : dialogType === 'addItem'
-                ? `Add Items to ${currentCategory}`
-                : dialogType === 'deleteCategory'
-                  ? `Delete Category ${currentCategory}`
-                  : (<Stack direction={{xs:"column",md:"row"}} gap={{xs:0,md:1}} alignItems={{xs:"flex-start",md:"flex-end"}} >Rename Category <span style={{marginLeft:1,fontSize:"21px", color:"var(--mui-palette-secondary-main)"}}>{currentCategory}</span></Stack>)}
+          <Typography variant="h4" fontSize={{ xs: '1.7rem', sm: '2rem' }} color="primary">
+            {dialogType === 'addCategory' ? (
+              'Add Category'
+            ) : dialogType === 'addItem' ? (
+              `Add Items to ${currentCategory}`
+            ) : dialogType === 'deleteCategory' ? (
+              `Delete Category ${currentCategory}`
+            ) : (
+              <Stack
+                direction={{ xs: 'column', md: 'row' }}
+                gap={{ xs: 0, md: 1 }}
+                alignItems={{ xs: 'flex-start', md: 'flex-end' }}
+              >
+                Rename Category{' '}
+                <span style={{ marginLeft: 1, fontSize: '21px', color: 'var(--mui-palette-secondary-main)' }}>
+                  {currentCategory}
+                </span>
+              </Stack>
+            )}
           </Typography>
-		  
         </DialogTitle>
         <DialogContent>
-
-		
-
           {(dialogType === 'addCategory' || dialogType === 'renameCategory') && (
             <TextField
               fullWidth
@@ -282,38 +293,42 @@ export default function MenuItem(): React.JSX.Element {
               value={newCategoryName}
               onChange={(e) => {
                 setNewCategoryName(e.target.value);
-				setCategoryAlreadyExists(checkCategoryExists(e.target.value));
+                setCategoryAlreadyExists(checkCategoryExists(e.target.value));
               }}
-			  error={categoryAlreadyExists}
-			  helperText={categoryAlreadyExists ? isSmallScreen? 'Category already exists':null : null}
-			  InputProps={{
-				endAdornment: (categoryAlreadyExists) && (
-				  <InputAdornment position="end" sx={{ gap: 0.3, pb: 1 }}>
-					  <Chip
-					  size='small'
-
-					  label="Category already exists"
-					  sx={{display:{xs:"none",sm:"block"},background:"#fbe8e8",color:"var(--mui-palette-primary-main)",borderRadius:10,px:1}}
-					/>
-					</InputAdornment>
-				),
-			  }}
+              error={categoryAlreadyExists}
+              helperText={categoryAlreadyExists ? (isSmallScreen ? 'Category already exists' : null) : null}
+              InputProps={{
+                endAdornment: categoryAlreadyExists && (
+                  <InputAdornment position="end" sx={{ gap: 0.3, pb: 1 }}>
+                    <Chip
+                      size="small"
+                      label="Category already exists"
+                      sx={{
+                        display: { xs: 'none', sm: 'block' },
+                        background: '#fbe8e8',
+                        color: 'var(--mui-palette-primary-main)',
+                        borderRadius: 10,
+                        px: 1,
+                      }}
+                    />
+                  </InputAdornment>
+                ),
+              }}
               margin="dense"
             />
           )}
           {(dialogType === 'addCategory' || dialogType === 'addItem') && (
             <Box
               p={1.5}
-			  mt={dialogType === 'addCategory' ? 1.6 : 0}
+              mt={dialogType === 'addCategory' ? 1.6 : 0}
               sx={{
-                ...(((dialogType === 'addCategory' &&
-                  newCategoryName === '' )|| categoryAlreadyExists) && {
-                    opacity: 0.5,
-                    pointerEvents: 'none',
-                  }),
-                
-                  background: 'var(--mui-palette-background-level3)',
-                  borderRadius: 1,
+                ...(((dialogType === 'addCategory' && newCategoryName === '') || categoryAlreadyExists) && {
+                  opacity: 0.5,
+                  pointerEvents: 'none',
+                }),
+
+                background: 'var(--mui-palette-background-level3)',
+                borderRadius: 1,
               }}
             >
               <TextField
@@ -338,17 +353,23 @@ export default function MenuItem(): React.JSX.Element {
                     background: 'var(--mui-palette-background-level3)',
                   },
                 }}
-				error={itemAlreadyExists}
-				helperText={itemAlreadyExists ? isSmallScreen? 'Item already exists':null : null}
+                error={itemAlreadyExists}
+                helperText={itemAlreadyExists ? (isSmallScreen ? 'Item already exists' : null) : null}
                 InputProps={{
                   endAdornment: newItem && (
                     <InputAdornment position="end" sx={{ gap: 0.3, pb: 1 }}>
                       {itemAlreadyExists ? (
-						<Chip
-						size='small'
-                        label="Item already exists"
-						sx={{display:{xs:"none",sm:"block"},background:"#fbe8e8",color:"var(--mui-palette-primary-main)",borderRadius:10,px:1}}
-                      />
+                        <Chip
+                          size="small"
+                          label="Item already exists"
+                          sx={{
+                            display: { xs: 'none', sm: 'block' },
+                            background: '#fbe8e8',
+                            color: 'var(--mui-palette-primary-main)',
+                            borderRadius: 10,
+                            px: 1,
+                          }}
+                        />
                       ) : null}
                       <IconButton
                         color="primary"
@@ -389,57 +410,51 @@ export default function MenuItem(): React.JSX.Element {
                   background: 'white',
                 }}
               >
-				<Box height="14vh" sx={{ overflowY: 'auto', overflowX: 'hidden'}} width={1}>
-
-                {itemsBuffer.length === 0 ? (
-                  <Stack  justifyContent="center" height={1} alignItems="center">
-                    <Typography variant="body1" color="text.primary">
-                      No items added
-                    </Typography>
-                  </Stack>
-                ) : (
-                  <Stack
-                    direction="row"
-                    alignItems="flex-start"
-                  
-				  sx={{ pr: 1,}}
-                    flexWrap="wrap"
-                    gap={1}
-                  >
-                    {itemsBuffer.map((item) => (
-                      <Chip
-                        key={item}
-                        label={item}
-						sx={{  backgroundColor: 'var(--mui-palette-grey-300)',
-							'&:hover': {
-							  backgroundColor: 'var(--mui-palette-grey-400)',
-							},}}
-                        color="secondary"
-                        onDelete={() => {
-                          handleRemoveBufferedItem(item);
-                        }}
-                      />
-                    ))}
-                  </Stack>
-                )}
-              </Box>
+                <Box height="14vh" sx={{ overflowY: 'auto', overflowX: 'hidden' }} width={1}>
+                  {itemsBuffer.length === 0 ? (
+                    <Stack justifyContent="center" height={1} alignItems="center">
+                      <Typography variant="body1" color="text.primary">
+                        No items added
+                      </Typography>
+                    </Stack>
+                  ) : (
+                    <Stack direction="row" alignItems="flex-start" sx={{ pr: 1 }} flexWrap="wrap" gap={1}>
+                      {itemsBuffer.map((item) => (
+                        <Chip
+                          key={item}
+                          label={item}
+                          sx={{
+                            backgroundColor: 'var(--mui-palette-grey-300)',
+                            '&:hover': {
+                              backgroundColor: 'var(--mui-palette-grey-400)',
+                            },
+                          }}
+                          color="secondary"
+                          onDelete={() => {
+                            handleRemoveBufferedItem(item);
+                          }}
+                        />
+                      ))}
+                    </Stack>
+                  )}
+                </Box>
               </Box>
             </Box>
           )}
 
-		  {dialogType === 'deleteCategory' && (
-			<Box mb={1}>
-		<Typography variant="h6" fontSize="20px" color="text.primary">
-			Are you sure you want to delete this category ?		
-			</Typography>
-		<Typography variant="body2" color="text.secondary" lineHeight={1.2} fontSize="13px" mt="2px">
-				Either you can delete all the items in the category with it or transfer the items to Uncategorized and delete the category.
-			</Typography>
-			</Box>
-		  )}
-
+          {dialogType === 'deleteCategory' && (
+            <Box mb={1}>
+              <Typography variant="h6" fontSize="20px" color="text.primary">
+                Are you sure you want to delete this category ?
+              </Typography>
+              <Typography variant="body2" color="text.secondary" lineHeight={1.2} fontSize="13px" mt="2px">
+                Either you can delete all the items in the category with it or transfer the items to Uncategorized and
+                delete the category.
+              </Typography>
+            </Box>
+          )}
         </DialogContent>
-        <DialogActions sx={{mb:0.2}}>
+        <DialogActions sx={{ mb: 0.2 }}>
           {dialogType === 'addCategory' && (
             <Button
               onClick={handleCreateCategory}
@@ -465,7 +480,7 @@ export default function MenuItem(): React.JSX.Element {
           {dialogType === 'renameCategory' && (
             <Button
               onClick={handleRenameCategory}
-              disabled={(!newCategoryName) || categoryAlreadyExists}
+              disabled={!newCategoryName || categoryAlreadyExists}
               variant="contained"
               sx={{ borderRadius: 1, py: 0.5 }}
               color="primary"
@@ -474,9 +489,9 @@ export default function MenuItem(): React.JSX.Element {
             </Button>
           )}
           {dialogType === 'deleteCategory' && (
-            <Box >
+            <Box>
               <Button
-                sx={{ borderRadius: 1, py: 0.5,ml:1,mt:1 }}
+                sx={{ borderRadius: 1, py: 0.5, ml: 1, mt: 1 }}
                 color="primary"
                 onClick={handleDeleteCategory}
                 variant="contained"
@@ -484,7 +499,7 @@ export default function MenuItem(): React.JSX.Element {
                 Delete
               </Button>
               <Button
-                sx={{ borderRadius: 1, py: 0.5, ml: 1,mt:1 }}
+                sx={{ borderRadius: 1, py: 0.5, ml: 1, mt: 1 }}
                 color="primary"
                 onClick={handleDeleteTransferCategory}
                 variant="contained"
@@ -493,7 +508,12 @@ export default function MenuItem(): React.JSX.Element {
               </Button>
             </Box>
           )}
-          <Button sx={{ borderRadius: 1,mt:dialogType==="deleteCategory"?1:0, py: 0.5 }} color="primary" variant="outlined" onClick={handleCloseDialog} >
+          <Button
+            sx={{ borderRadius: 1, mt: dialogType === 'deleteCategory' ? 1 : 0, py: 0.5 }}
+            color="primary"
+            variant="outlined"
+            onClick={handleCloseDialog}
+          >
             Close
           </Button>
         </DialogActions>
