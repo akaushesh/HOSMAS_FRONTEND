@@ -52,7 +52,7 @@ export default function Records(): React.JSX.Element {
     isLoading,
     refetch,
   } = useGetRecords({
-    status: state === 0 ? 'c' : state === 1 ? 'a' : state === 2 ? 'a' : state === 3 ? 'rc' : 'a',
+    status: state === 0 ? 'c' : state === 1 ? 'act' : state === 2 ? '' : state === 3 ? 'rc' : 'a',
     page,
     limit: 5,
   });
