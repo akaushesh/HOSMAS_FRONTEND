@@ -10,6 +10,7 @@ interface ActiveCardProps {
 }
 
 export default function ActiveLeaves({ arr }: ActiveCardProps): React.JSX.Element {
+  
   return (
     <Stack width={1} gap={2}>
       {arr.map((record) => (

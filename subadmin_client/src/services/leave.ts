@@ -8,14 +8,11 @@ import { leaveApi } from './api';
 
 export interface UpdateLeaveRequest {
   transaction_id:string;
-  departure_date?:string;
-  arrival_date?:string;
+  status:string;
 }
 
 
 
-export type UpdateLeaveResponse=Leave; 
-export type DeleteLeaveResponse=Leave; 
 
 export interface GetLeavesResponse {
   leaves: Leave[];
@@ -51,9 +48,6 @@ export interface Leave {
   reason: string;
 }
 
-export interface DeleteLeaveParams {
-  transactionId:string;
-}
 
 
 export interface FetchRecordsParams{
@@ -66,9 +60,17 @@ export interface FetchRecordsResponse{
   total_pages:number;
   leaves:Leave[];
 }
+export interface SearchRecordsParams{
+  page:number;
+  limit:number;
+  status:string;
+  text_query:string;
+  arrival_date:string;
+  departure_date:string;
+}
 
 
-export const updateLeave = async (params: UpdateLeaveRequest): Promise<AxiosResponse<UpdateLeaveResponse>> => {
+export const updateLeave = async (params: UpdateLeaveRequest): Promise<AxiosResponse<string>> => {
   const token = (await authClient.getToken()).data;
 
   if (token === null || token === undefined) {
@@ -126,8 +128,6 @@ export const setAutoApprove = async (autoApprove:boolean): Promise<AxiosResponse
 
 
 
-
-
 export const getRecords = async ({page,limit,status}:FetchRecordsParams): Promise<AxiosResponse<FetchRecordsResponse>> => {
   const token = (await authClient.getToken()).data;
 
@@ -145,7 +145,34 @@ export const getRecords = async ({page,limit,status}:FetchRecordsParams): Promis
   return res;
 };
 
-export const deleteLeave = async ({transactionId}:DeleteLeaveParams): Promise<AxiosResponse<DeleteLeaveResponse>> => {
+export const searchRecords = async (params:SearchRecordsParams): Promise<AxiosResponse<FetchRecordsResponse>> => {
+  const token = (await authClient.getToken()).data;
+  if (token === null || token === undefined) {
+    throw new Error('You must be logged in to perform this action');
+  }
+
+  
+  
+  if(params.status==='all'){
+    params.status='';
+  }
+ 
+
+  
+
+  const res = await leaveApi.post(`leave/search/`, params,{
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  logger.debug('getSearchResponse', res.data);
+  return res;
+};
+
+
+
+export const deleteLeave = async (transactionId:string): Promise<AxiosResponse<string>> => {
   const token = (await authClient.getToken()).data;
 
   if (token === null || token === undefined) {

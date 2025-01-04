@@ -49,7 +49,7 @@ export default function Dashboard(): React.JSX.Element {
 
   const router = useRouter();
 
-  const { data: pendingRecordsData, isLoading:isLoadingPendingRecords } = useGetRecords({ status: 'c', page: 1, limit: 3 });
+  const { data: pendingRecordsData, isLoading:isLoadingPendingRecords,refetch:refetchPendingRecords } = useGetRecords({ status: 'c', page: 1, limit: 3 });
   const pendingApprovals = pendingRecordsData?.data.leaves ?? [];
 
   const { data: RecentRecordsData, isLoading:isLoadingRecentRecords } = useGetRecords({ status: 'a', page: 1, limit: 6 });
@@ -172,7 +172,7 @@ export default function Dashboard(): React.JSX.Element {
                 </Typography>
               </Stack>
             ) : (
-              <ApprovalLeave arr={pendingApprovals} />
+              <ApprovalLeave refetch={refetchPendingRecords} arr={pendingApprovals} />
             )}
           </Stack>
         </Stack>

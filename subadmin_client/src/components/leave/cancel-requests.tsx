@@ -1,17 +1,44 @@
 'use client';
 
 import * as React from 'react';
+import { type Leave } from '@/services/leave';
 import { Box, Button, Stack, Typography } from '@mui/material';
 import dayjs from 'dayjs';
-import { type Leave } from '@/services/leave';
 
+import { useDeleteLeaveSlip } from '@/hooks/mutation/use-leave';
 
+import SnackBarAlert, { type SnackBarMsg } from '../core/snackbar-msg';
 
 interface CancelCardProps {
   arr: Leave[];
+  refetch: () => void;
 }
 
-export default function CancelLeaves({ arr }: CancelCardProps): React.JSX.Element {
+export default function CancelLeaves({ arr, refetch }: CancelCardProps): React.JSX.Element {
+  const [res, setRes] = React.useState<SnackBarMsg>({
+    msg: '',
+    type: '',
+  });
+
+
+  const onSuccess = async (): Promise<void> => {
+    setRes({ msg: 'Leave Cancellation Successfull!', type: 'success' });
+    refetch();
+  };
+
+  const onError = async (): Promise<void> => {
+    setRes({ msg: 'Something went wrong', type: 'error' });
+  };
+
+  const { mutate: deleteLeave } = useDeleteLeaveSlip({
+    onSuccess,
+    onError,
+  });
+
+  const handleDeleteRecord = (transactionId: string): void => {
+    deleteLeave(transactionId );
+  };
+
   return (
     <Stack width={1} gap={2}>
       {arr.map((record) => (
@@ -28,13 +55,7 @@ export default function CancelLeaves({ arr }: CancelCardProps): React.JSX.Elemen
               </Box>
             </Stack>
 
-            <Stack
-              alignSelf="flex-start"
-              width="28%"
-              direction="row"
-              justifyContent="space-evenly"
-              alignItems="center"
-            >
+            <Stack alignSelf="flex-start" width="28%" direction="row" justifyContent="space-evenly" alignItems="center">
               <Box textAlign="center">
                 <Typography
                   variant="body1"
@@ -84,13 +105,14 @@ export default function CancelLeaves({ arr }: CancelCardProps): React.JSX.Elemen
               <b>Reason :</b> {record.reason}
             </Typography>
             <Stack direction="row" gap={1}>
-              <Button variant="contained" size="small" sx={{ py: 0.8, borderRadius: 1 }} color="primary">
+              <Button variant="contained" size="small" sx={{ py: 0.8, borderRadius: 1 }} color="primary" onClick={() =>{ handleDeleteRecord(record.transactionID)}}>
                 Approve Cancellation
               </Button>
             </Stack>
           </Stack>
         </Stack>
       ))}
+          <SnackBarAlert setMsg={setRes} msg={res} />
     </Stack>
   );
 }

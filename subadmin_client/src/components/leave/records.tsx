@@ -2,15 +2,20 @@
 
 import * as React from 'react';
 import { useSearchParams } from 'next/navigation';
+import { InfoOutlined } from '@mui/icons-material';
 import CloseIcon from '@mui/icons-material/Close';
 import SearchIcon from '@mui/icons-material/Search';
 import {
   Box,
   Button,
   CircularProgress,
+  FormControl,
   IconButton,
+  InputLabel,
+  MenuItem,
   Pagination,
   Paper,
+  Select,
   Stack,
   TextField,
   Tooltip,
@@ -18,12 +23,13 @@ import {
 } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
 
-import { useGetRecords } from '@/hooks/query/use-leave';
+import { useGetRecords, useSearchRecords, useTotalLeaves } from '@/hooks/query/use-leave';
 
 import ActiveLeaves from './active';
 import AllLeaves from './all-records';
 import ApprovalLeave from './approvals';
 import CancelLeaves from './cancel-requests';
+import SearchResult from './search-results';
 
 export default function Records(): React.JSX.Element {
   const searchParams = useSearchParams();
@@ -38,6 +44,7 @@ export default function Records(): React.JSX.Element {
     searchText: '',
     departureDate: null,
     arrivalDate: null,
+    status: '',
   });
 
   const {
@@ -66,8 +73,26 @@ export default function Records(): React.JSX.Element {
     setPage(value);
   };
 
+  const { data: totalLeaves } = useTotalLeaves();
+  const autoApproval = totalLeaves?.data.auto_approve ?? false;
+
+  const {
+    data: serachData,
+    isLoading: searchLoading,
+    refetch: searchRefetch,
+  } = useSearchRecords({
+    page,
+    limit: 5,
+    text_query: searchFilters.searchText,
+    arrival_date: searchFilters.arrivalDate || '',
+    departure_date: searchFilters.departureDate || '',
+    status: searchFilters.status,
+  },(showSearch&&searchFilters.searchText!==""));
+
+  const searchRecords = serachData?.data.leaves ?? [];
+
   const handleSearch = (): void => {
-    // console.log(searchFilters);
+    void searchRefetch();
   };
 
   return (
@@ -82,9 +107,21 @@ export default function Records(): React.JSX.Element {
       >
         {!showSearch ? (
           <Stack direction="row" width={1} alignItems="flex-end" justifyContent="space-between" gap={2}>
-            <Typography variant="h5">
-              {state === 0 ? 'Pending Leaves' : state === 1 ? 'Active Leaves' : 'All Records'}
-            </Typography>
+            <Box>
+              <Typography variant="h5">
+                {state === 0 ? 'Pending Leaves' : state === 1 ? 'Active Leaves' : 'All Records'}
+              </Typography>
+
+              {state === 0 && autoApproval ? (
+                <Stack mt="2px" direction="row" gap={1} alignItems="center">
+                  <InfoOutlined color="primary" sx={{ fontSize: '20px' }} />
+                  <Typography variant="body2" sx={{ color: 'var(--mui-palette-primary-main)', fontSize: '14px' }}>
+                    Auto Approval is Enabled
+                  </Typography>
+                </Stack>
+              ) : null}
+            </Box>
+
             <Stack direction="row" gap={1} sx={{ width: { xs: '85%', md: '45%' }, justifyContent: 'center' }}>
               <Tooltip title="Search">
                 <IconButton
@@ -180,17 +217,17 @@ export default function Records(): React.JSX.Element {
         ) : (
           <>
             <Typography variant="h5">Search</Typography>
-            <Stack direction="row" width="70%" gap={2} justifyContent="space-between" alignItems="stretch">
+            <Stack direction="row" width="74%" gap={2} justifyContent="space-between" alignItems="stretch">
               <TextField
                 variant="standard"
-                sx={{ width: '50%' }}
+                sx={{ width: '40%' }}
                 placeholder="Search Student"
                 value={searchFilters.searchText}
                 onChange={(e) => {
                   setSearchFilters({ ...searchFilters, searchText: e.target.value });
                 }}
               />
-              <Stack direction="row" gap={1} alignItems="stretch">
+              <Stack direction="row" gap={1}>
                 <DatePicker
                   label="Departure Date"
                   value={searchFilters.departureDate}
@@ -226,13 +263,34 @@ export default function Records(): React.JSX.Element {
                   }}
                 />
 
+                <FormControl
+                  sx={{ minWidth: { xs: 80, lg: 107 }, ml: 1 }}
+                  disabled={!searchFilters.searchText}
+                  size="small"
+                >
+                  <InputLabel>Type</InputLabel>
+                  <Select
+                    defaultValue="all"
+                    onChange={(e) => {
+                      setSearchFilters({ ...searchFilters, status: e.target.value });
+                    }}
+                    label="Day"
+                  >
+                    <MenuItem value="all">All</MenuItem>
+                    <MenuItem value="act">Active</MenuItem>
+                    <MenuItem value="c">Pending</MenuItem>
+                    <MenuItem value="d">declined</MenuItem>
+                    <MenuItem value="rc">Cancelled</MenuItem>
+                  </Select>
+                </FormControl>
+
                 <Button
                   variant="contained"
                   disabled={!searchFilters.searchText}
                   onClick={() => {
                     handleSearch();
                   }}
-                  sx={{ ml: 2, py: 0.5, borderRadius: 1, px: 3 }}
+                  sx={{ ml: 1, py: 0.5, borderRadius: 1, px: 3 }}
                 >
                   Search
                 </Button>
@@ -241,8 +299,9 @@ export default function Records(): React.JSX.Element {
                     transition: '0.3s ease-in-out',
                     mr: 1,
                     '&:hover': {
-                      color: 'var(--mui-palette-primary-main)',
-                      backgroundColor: '#efc5c5',
+                      color: 'var(--mui-palette-secondary-dark)',
+                      backgroundColor: 'var(--mui-palette-grey-200)',
+                      // backgroundColor: '#efc5c5',
                     },
                   }}
                   onClick={() => {
@@ -251,6 +310,7 @@ export default function Records(): React.JSX.Element {
                       searchText: '',
                       departureDate: null,
                       arrivalDate: null,
+                      status: '',
                     });
                   }}
                 >
@@ -263,23 +323,43 @@ export default function Records(): React.JSX.Element {
       </Stack>
       <Box sx={{ width: 1, mt: 2, backgroundColor: 'var(--mui-palette-background-level3)', p: 2 }}>
         <Box width={1} sx={{ height: '50vh', pr: 1, overflowY: 'auto' }}>
-          {isLoading ? (
-            <Stack alignItems="center" justifyContent="center" height={1}>
-              <CircularProgress size={27} />
-            </Stack>
-          ) : records.length === 0 ? (
-            <Stack alignItems="center" justifyContent="center" height={1}>
-              <Typography variant="body1" sx={{ color: 'var(--mui-palette-text-secondary)', textAlign: 'center' }}>
-                No pending approvals
-              </Typography>
-            </Stack>
+          {showSearch ? (
+            searchLoading ? (
+              <Stack alignItems="center" justifyContent="center" height={1}>
+                <CircularProgress size={27} />
+              </Stack>
+            ) : searchRecords.length === 0 ? (
+              <Stack alignItems="center" justifyContent="center" height={1}>
+                <Typography variant="body1" sx={{ color: 'var(--mui-palette-text-secondary)', textAlign: 'center' }}>
+                  No Records Exists
+                </Typography>
+              </Stack>
+            ) : (
+              <Box>
+                <SearchResult arr={searchRecords} refetch={searchRefetch} />
+              </Box>
+            )
           ) : (
-            <Box>
-              {state === 0 && <ApprovalLeave arr={records} />}
-              {state === 1 && <ActiveLeaves arr={records} />}
-              {state === 2 && <AllLeaves arr={records} />}
-              {state === 3 && <CancelLeaves arr={records} />}
-            </Box>
+            <>
+              {isLoading ? (
+                <Stack alignItems="center" justifyContent="center" height={1}>
+                  <CircularProgress size={27} />
+                </Stack>
+              ) : records.length === 0 ? (
+                <Stack alignItems="center" justifyContent="center" height={1}>
+                  <Typography variant="body1" sx={{ color: 'var(--mui-palette-text-secondary)', textAlign: 'center' }}>
+                    No Records Exists
+                  </Typography>
+                </Stack>
+              ) : (
+                <Box>
+                  {state === 0 && <ApprovalLeave arr={records} refetch={refetch} />}
+                  {state === 1 && <ActiveLeaves arr={records} />}
+                  {state === 2 && <AllLeaves arr={records} />}
+                  {state === 3 && <CancelLeaves arr={records} refetch={refetch} />}
+                </Box>
+              )}
+            </>
           )}
         </Box>
       </Box>

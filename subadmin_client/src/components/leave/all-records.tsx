@@ -1,17 +1,16 @@
 'use client';
 
 import * as React from 'react';
+import { type Leave } from '@/services/leave';
 import { Box, Stack, Typography } from '@mui/material';
 import dayjs from 'dayjs';
-import {type Leave } from '@/services/leave';
-
-
+import { DoNotDisturbOn } from '@mui/icons-material';
 
 interface AllLeaveProps {
   arr: Leave[];
 }
 
-export default function AllLeaves({ arr }: AllLeaveProps ): React.JSX.Element {
+export default function AllLeaves({ arr }: AllLeaveProps): React.JSX.Element {
   return (
     <Stack width={1} gap={2}>
       {arr.map((record) => (
@@ -24,7 +23,8 @@ export default function AllLeaves({ arr }: AllLeaveProps ): React.JSX.Element {
           key={record.transactionID}
           sx={{ p: 2, background: 'white', borderRadius: 1 }}
         >
-          <Stack minWidth="18%" maxWidth="25%" justifyContent="space-between">
+          <Stack minWidth="18%" maxWidth="25%" gap={2} direction="row" justifyContent="space-between">
+            {record.leaveStatus === 'd' ? <DoNotDisturbOn color="primary" sx={{ fontSize: '20px' }} /> : null}
             <Box>
               <Typography variant="h6" fontWeight={600} fontSize="20px" lineHeight={1} color="text.primary">
                 {record.studentName}
@@ -54,7 +54,8 @@ export default function AllLeaves({ arr }: AllLeaveProps ): React.JSX.Element {
                   width: { xs: '50%', sm: '80%' },
                   ml: { xs: '25%', sm: '10%' },
                   height: '2px',
-                  backgroundColor: record.leaveStatus==='a'?'var(--mui-palette-success-main)':'var(--mui-palette-error-main)',
+                  backgroundColor:
+                    record.leaveStatus === 'a' ? 'var(--mui-palette-success-main)' : 'var(--mui-palette-error-main)',
                   position: 'absolute',
                   top: '50%',
                 }}
@@ -74,19 +75,14 @@ export default function AllLeaves({ arr }: AllLeaveProps ): React.JSX.Element {
             </Box>
           </Stack>
 
-
-
           <Stack width="25%" justifyContent="space-between" alignItems="flex-start" ml={8}>
-            <Typography variant="body1"  fontWeight={600} fontSize="16px" color="text.primary">
-              Place :<b style={{fontWeight:"400"}}> {record.location}</b>
+            <Typography variant="body1" fontWeight={600} fontSize="16px" color="text.primary">
+              Place :<b style={{ fontWeight: '400' }}> {record.location}</b>
             </Typography>
-            <Typography variant="body1"  fontWeight={600} fontSize="16px" color="text.primary">
-              Reason :<b style={{fontWeight:"400"}}> {record.reason}</b>
+            <Typography variant="body1" fontWeight={600} fontSize="16px" color="text.primary">
+              Reason :<b style={{ fontWeight: '400' }}> {record.reason}</b>
             </Typography>
           </Stack>
-          
-          
-
         </Stack>
       ))}
     </Stack>
