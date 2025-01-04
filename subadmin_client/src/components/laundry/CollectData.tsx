@@ -55,7 +55,7 @@ export default function CollectData({ data, setPageState }: LaundryFormProps): R
   const {mutate:deliverSlip,isPending}=useDeliverLaundry({onSuccess,onError});
 
   const handleSubmit = (): void => {
-    deliverSlip(data?.transactionId);
+    deliverSlip(data?.transactionId||"");
   };
 
 

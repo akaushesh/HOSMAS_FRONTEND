@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Box, Divider, Pagination, Paper, Stack, Typography } from '@mui/material';
 import dayjs from 'dayjs';
+import {  DoNotDisturbOn } from '@mui/icons-material';
 
 export interface LeaveRecordProps {
   leaveRecords: LeaveRecord[];
@@ -56,6 +57,10 @@ export default function LeaveHistory({ leaveRecords }: LeaveRecordProps): React.
                   boxShadow: 1,
                 }}
               >
+                <Stack direction="row" alignItems="center" gap={{xs:1,sm:2,md:1,lg:2}} >
+                {record.leaveStatus === 'd' ? (
+                  <DoNotDisturbOn color='primary' sx={{fontSize:"20px"}} />
+                ):null}
                 <Box textAlign={{ xs: 'center', sm: 'left',md: 'center', lg: 'left' }}>
                   <Typography variant="body1" lineHeight={1} sx={{ fontWeight: 500 }}>
                     {record.reason}
@@ -64,12 +69,13 @@ export default function LeaveHistory({ leaveRecords }: LeaveRecordProps): React.
                     {record.location}
                   </Typography>
                 </Box>
+                </Stack>
 
                 <Box sx={{ display: 'flex', alignItems: 'center',justifyContent:{xs:"center",sm:"stretch",md:"center",lg:"stretch"},width:{xs:1,sm:'auto',md:1,lg:'auto'}, gap: 1 }}>
                   <Typography variant="body1" fontSize={{ xs: '13px', lg: '14px' }}>
                     {dayjs(record.leaveDateFrom).format('DD MMM YY')}
                   </Typography>
-                <Divider sx={{borderColor:record.leaveStatus==='d'?'var(--mui-palette-primary-main)':record.leaveStatus==='a'?'var(--mui-palette-success-main)':'var(--mui-palette-secondary-main)',display:{xs:"none",sm:"block",md:"none",lg:"block"}}} orientation="vertical" flexItem />
+                <Divider sx={{borderColor:(record.leaveStatus==='d'|| dayjs().isBefore(dayjs(record?.leaveDateTo)))?'var(--mui-palette-primary-main)':record.leaveStatus==='a'?'var(--mui-palette-success-main)':'var(--mui-palette-secondary-main)',display:{xs:"none",sm:"block",md:"none",lg:"block"}}} orientation="vertical" flexItem />
 
                   <Box position="relative" display={{xs:"block",sm:"none",md:"block",lg:"none"}} width="15%" height="2px">
                     <Box
@@ -77,7 +83,7 @@ export default function LeaveHistory({ leaveRecords }: LeaveRecordProps): React.
                         width:'80%',
                         ml: "10%",
                         height: '2px',
-                        backgroundColor: record.leaveStatus==='d'?'var(--mui-palette-primary-main)':record.leaveStatus==='a'?'var(--mui-palette-success-main)':'var(--mui-palette-secondary-main)',
+                        backgroundColor: (record.leaveStatus==='d'|| dayjs().isBefore(dayjs(record?.leaveDateTo)))?'var(--mui-palette-primary-main)':record.leaveStatus==='a'?'var(--mui-palette-success-main)':'var(--mui-palette-secondary-main)',
                         position: 'absolute',
                         top: '50%',
                       }}

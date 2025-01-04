@@ -30,6 +30,7 @@ export default function MenuItem(): React.JSX.Element {
     Uncategorized: ['Lassi', 'Chai', 'Roti'],
     Indian: ['Idli Sambar', 'Masala Dosa', 'Puri Bhaji', 'Paneer Butter Masala'],
     Continental: ['Bread Jam', 'Rice', 'Dal'],
+    NonVeg: ['Eggs', 'Omlette', 'Egg Curry', 'Half Fry'],
     Snacks: ['Coconut', 'Upma', 'Poha', 'Paratha'],
   });
 
@@ -149,7 +150,7 @@ export default function MenuItem(): React.JSX.Element {
     });
   };
 
-  const sortedCategories = ['Uncategorized', ...Object.keys(menu).filter((cat) => cat !== 'Uncategorized')];
+  const sortedCategories = ['Uncategorized', ...Object.keys(menu).filter((cat) => (cat !== 'Uncategorized'&& cat !=='NonVeg')),'NonVeg'];
 
   return (
     <Paper
@@ -192,7 +193,7 @@ export default function MenuItem(): React.JSX.Element {
             <Box key={category} mb={sortedCategories.length - 1 !== idx ? 6 : 2}>
               <Stack direction="row" alignItems="flex-end" gap={2}>
                 <Typography variant="h6" fontSize="19px" color="text.secondary">
-                  {category}
+                  {category==='Uncategorized' ? 'Others' : category}
                 </Typography>
                 <Stack direction="row" gap={1}>
                   <IconButton
@@ -213,7 +214,7 @@ export default function MenuItem(): React.JSX.Element {
                   <IconButton
                     size="small"
                     sx={{
-                      display: category === 'Uncategorized' ? 'none' : 'flex',
+                      display: (category === 'Uncategorized'|| category ==='NonVeg') ? 'none' : 'flex',
                       backgroundColor: 'var(--mui-palette-grey-300)',
                       '&:hover': {
                         backgroundColor: 'var(--mui-palette-grey-400)',
@@ -229,7 +230,7 @@ export default function MenuItem(): React.JSX.Element {
                   <IconButton
                     size="small"
                     sx={{
-                      display: category === 'Uncategorized' ? 'none' : 'flex',
+                      display: (category === 'Uncategorized'|| category ==='NonVeg') ? 'none' : 'flex',
                       backgroundColor: 'var(--mui-palette-grey-300)',
                       '&:hover': {
                         backgroundColor: 'var(--mui-palette-grey-400)',

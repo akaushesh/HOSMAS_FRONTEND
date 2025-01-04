@@ -53,6 +53,7 @@ export interface CheckoutLaundryItems {
   };
 }
 
+
 export interface GetSlipTransID {
   transaction_id: string;
   action: string;
@@ -124,14 +125,14 @@ export const getSlipTransID = async (params: GetSlipTransID): Promise<AxiosRespo
 };
 
 
-export const getLaundryDetails = async (params:{hostelID:number}): Promise<AxiosResponse<LaundryDetailsResponse>> => {
+export const getLaundryDetails = async (hostelID:number): Promise<AxiosResponse<LaundryDetailsResponse>> => {
   const token = (await authClient.getToken()).data;
 
   if (token === null || token === undefined) {
     throw new Error('You must be logged in to perform this action');
   }
 
-  const res = await laundryApi.get(`collected/${String(params.hostelID)}`, {
+  const res = await laundryApi.get(`collected/${String(hostelID)}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },  

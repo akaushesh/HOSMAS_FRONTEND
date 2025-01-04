@@ -8,6 +8,12 @@ const CustomSwitch = styled((props: SwitchProps) => (
   width: 48,
   height: 32,
   padding: 0,
+  opacity: 1, // Default opacity
+  pointerEvents: 'auto', // Default pointer-events
+  '&.Mui-disabled': {
+    opacity: 0.5, // Reduced opacity when disabled
+    pointerEvents: 'none', // Disable pointer events
+  },
   '& .MuiSwitch-switchBase': {
     padding: 3,
     display: 'flex',
@@ -48,16 +54,13 @@ const CustomSwitch = styled((props: SwitchProps) => (
   },
   '& .MuiSwitch-thumb': {
     boxSizing: 'border-box',
-    backgroundColor: 'red', // Default thumb color
+    backgroundColor: 'red',
     width: 22,
     height: 22,
     borderRadius: 6,
     transition: theme.transitions.create(['background-color'], {
       duration: 300,
     }),
-  },
-  '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-thumb': {
-    backgroundColor: 'white', // Thumb color when checked
   },
   '& .MuiSwitch-track': {
     backgroundColor: '#E9E9EA',

@@ -65,7 +65,7 @@ export default function LaundryData({ data, setPageState }: LaundryFormProps): R
 
   const handleSubmit = (): void => {
     const obj = {
-      transaction_id: data?.transactionId,
+      transaction_id: data?.transactionId||"",
       items: laundryData,
     };
     checkoutSlip(obj);

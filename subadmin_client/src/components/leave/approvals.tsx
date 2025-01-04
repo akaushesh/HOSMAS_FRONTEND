@@ -3,34 +3,27 @@
 import * as React from 'react';
 import { Box, Button, Stack, Typography } from '@mui/material';
 import dayjs from 'dayjs';
+import { type Leave } from '@/services/leave';
 
-interface CardProps {
-  id: string;
-  name: string;
-  roll_num: number;
-  reason: string;
-  location: string;
-  leaveDateFrom: string;
-  leaveDateTo: string;
-}
+
 
 interface ApprovalCardProps {
-  arr: CardProps[];
+  arr: Leave[];
 }
 
 export default function ApprovalLeave({ arr }: ApprovalCardProps): React.JSX.Element {
   return (
     <Stack width={1} gap={2}>
       {arr.map((approval) => (
-        <Stack width={1} key={approval.id} gap={1} sx={{ p: 2, background: 'white', borderRadius: 1 }}>
+        <Stack width={1} key={approval.transactionID} gap={1} sx={{ p: 2, background: 'white', borderRadius: 1 }}>
           <Stack width={1} direction="row" justifyContent="space-between" gap={1} alignItems="stretch">
             <Stack width="34%" justifyContent="space-between">
               <Box>
                 <Typography variant="h6" fontWeight={600} fontSize="20px" lineHeight={1} color="text.primary">
-                  {approval.name}
+                  {approval.studentName}
                 </Typography>
                 <Typography variant="subtitle1" lineHeight={1} mt="4px" fontSize="14px" color="text.secondary">
-                  {approval.roll_num}
+                  {approval.rollNumber}
                 </Typography>
               </Box>
             </Stack>

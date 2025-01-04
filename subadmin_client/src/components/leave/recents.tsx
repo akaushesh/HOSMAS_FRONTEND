@@ -3,42 +3,33 @@
 import * as React from 'react';
 import { Box, Stack, Typography } from '@mui/material';
 import dayjs from 'dayjs';
+import {type  Leave } from '@/services/leave';
 
-interface CardProps {
-  id: string;
-  name: string;
-  roll_num: number;
-  reason: string;
-  location: string;
-  leaveDateFrom: string;
-  leaveDateTo: string;
-  status: string;
-}
 
 interface RecentProps {
-  arr: CardProps[];
+  arr: Leave[];
 }
 
 export default function RecentLeaves({ arr }: RecentProps): React.JSX.Element {
   return (
     <Stack width={1} gap={2}>
-      {arr.map((approval) => (
+      {arr.map((record) => (
         <Stack
           width={1}
           direction="row"
           justifyContent="space-between"
           gap={1}
           alignItems="center"
-          key={approval.id}
+          key={record.transactionID}
           sx={{ p: 2, background: 'white', borderRadius: 1 }}
         >
           <Stack width="45%" justifyContent="space-between">
             <Box>
               <Typography variant="h6" fontWeight={600} fontSize="19px" lineHeight={1} color="text.primary">
-                {approval.name}
+                {record.studentName}
               </Typography>
               <Typography variant="subtitle1" lineHeight={1} mt="4px" fontSize="14px" color="text.secondary">
-                {approval.roll_num}
+                {record.rollNumber}
               </Typography>
             </Box>
           </Stack>
@@ -50,7 +41,7 @@ export default function RecentLeaves({ arr }: RecentProps): React.JSX.Element {
                 sx={{ fontSize: '14px' , lineHeight: 1, mb: '1px' }}
                 fontWeight={500}
               >
-                {dayjs(approval.leaveDateFrom).format('DD/MM/YY')}
+                {dayjs(record.leaveDateFrom).format('DD/MM/YY')}
               </Typography>
               <Typography variant="body2" sx={{ fontSize:'13px'  }} fontWeight={400}>
                 Dept
@@ -62,7 +53,7 @@ export default function RecentLeaves({ arr }: RecentProps): React.JSX.Element {
                   width:  '70%',
                   ml: '15%',
                   height: '2px',
-                  backgroundColor: approval.status==='a'?'var(--mui-palette-success-main)':'var(--mui-palette-error-main)',
+                  backgroundColor: dayjs().isBefore(dayjs(record.leaveDateTo))?'var(--mui-palette-success-main)':'var(--mui-palette-error-main)',
                   position: 'absolute',
                   top: '50%',
                 }}
@@ -74,7 +65,7 @@ export default function RecentLeaves({ arr }: RecentProps): React.JSX.Element {
                 sx={{ fontSize: '14px' , lineHeight: 1, mb: '1px' }}
                 fontWeight={500}
               >
-                {dayjs(approval.leaveDateTo).format('DD/MM/YY')}
+                {dayjs(record.leaveDateTo).format('DD/MM/YY')}
               </Typography>
               <Typography variant="body2" sx={{ fontSize:'13px'  }} fontWeight={400}>
                 Arrival

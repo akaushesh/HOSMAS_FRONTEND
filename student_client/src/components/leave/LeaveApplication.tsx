@@ -12,6 +12,7 @@ import { useLeaves } from '@/hooks/query/use-leave';
 import LeaveForm from './LeaveForm';
 import LeaveHistory from './LeaveHistory';
 import LeaveInfo from './LeaveInfo';
+import dayjs from 'dayjs';
 
 export default function LeaveApplication(): React.JSX.Element {
   const theme: Theme = useTheme();
@@ -24,21 +25,26 @@ export default function LeaveApplication(): React.JSX.Element {
   let phase = 0;
   if (latestLeave?.leaveStatus === 'c' || latestLeave?.leaveStatus === 'rc') {
     phase = 1;
-  } else if (latestLeave?.leaveStatus === 'a') {
+  } else if (latestLeave?.leaveStatus === 'a'&& dayjs().isBefore(dayjs(latestLeave?.leaveDateTo))){
     phase = 2;
   }
+  else if(latestLeave?.leaveStatus === 'd' )phase=0;
 
   const [showRecords, setShowRecords] = React.useState(false);
+
+
+  const declinedCondition=latestLeave?.leaveStatus === 'd';
 
   return (
     <Grid sx={{ px: { xs: 2, md: 0 } }} container alignItems="stretch" spacing={4}>
       <Grid item xs={12} md={7}>
         <Paper elevation={10} sx={{ p: { xs: 1.6, sm: 3 } }}>
-          <Stack mb={3} direction="row" alignItems="center" gap={2} justifyContent="space-between">
+          <Stack mb={declinedCondition?0:3} direction="row" alignItems="center" gap={2} justifyContent="space-between">
             <Typography variant="h5">
               {showRecords ? 'Leave Records' : phase === 0 ? 'Submit New Leave' : 'Current Application'}
             </Typography>
 
+            
             {isSmallScreen && showRecords ? (
               <Button
                 variant="contained"
@@ -54,6 +60,14 @@ export default function LeaveApplication(): React.JSX.Element {
               </Button>
             ) : null}
           </Stack>
+
+          {declinedCondition ? <Stack mb={3} mt={showRecords?1:"1px"} direction="row" alignItems="center" gap={1}>
+              {/* <InfoOutlined sx={{ color: 'var(--mui-palette-primary-main)',fontSize:{xs:"21px",sn:"18px"} }} /> */}
+              <Typography variant="body2" color="text.secondaryChannel">
+                Your last leave request has been denied.
+              </Typography>
+            </Stack> : null}
+
 
           {isLoading ? (
             <Paper elevation={0} sx={{ p: 3, height: '32vh', backgroundColor: 'var(--mui-palette-background-level3)' }}>

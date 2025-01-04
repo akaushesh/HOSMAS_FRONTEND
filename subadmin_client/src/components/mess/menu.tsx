@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { Clear as ClearIcon } from '@mui/icons-material';
+import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import ResetIcon from '@mui/icons-material/Refresh';
 import {
   Box,
@@ -11,9 +12,13 @@ import {
   DialogContent,
   DialogTitle,
   Divider,
+  FormControl,
   IconButton,
   InputAdornment,
+  InputLabel,
+  MenuItem,
   Paper,
+  Select,
   Stack,
   TextField,
   Typography,
@@ -21,15 +26,23 @@ import {
 
 type MealType = 'breakfast' | 'lunch' | 'dinner';
 
+interface MenuItemType {
+  item: string;
+  type: 'veg' | 'non-veg';
+}
+
 const mealTypes: MealType[] = ['breakfast', 'lunch', 'dinner'];
+const days: string[] = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
 
 function Menu(): React.JSX.Element {
-  const [menu, setMenu] = React.useState<Record<MealType, string[]>>({
-    breakfast: [],
-    lunch: [],
-    dinner: [],
+  const [menu, setMenu] = React.useState<Record<MealType, Record<string, MenuItemType[]>>>({
+    breakfast: Object.fromEntries(days.map((day) => [day, []])),
+    lunch: Object.fromEntries(days.map((day) => [day, []])),
+    dinner: Object.fromEntries(days.map((day) => [day, []])),
   });
 
+
+  const [selectedDay, setSelectedDay] = React.useState<string>('monday');
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [currentMeal, setCurrentMeal] = React.useState<MealType>('breakfast');
   const [search, setSearch] = React.useState('');
@@ -40,10 +53,10 @@ function Menu(): React.JSX.Element {
     Continental: ['Bread Jam', 'Rice', 'Dal'],
     Snacks: ['Coconut', 'Upma', 'Poha', 'Paratha'],
     Snacks2: ['Coconut2', 'Upma2', 'Poha2', 'Paratha2'],
+    NonVeg: ['Eggs', 'Omlette', 'Egg Curry', 'Half Fry'],
     Uncategorized: ['Lassi', 'Chai', 'Roti'],
   };
 
-  // Extract categorized and uncategorized items
   const uncategorizedItems = newMenuItems.Uncategorized || [];
   const categorizedItems = Object.keys(newMenuItems).reduce<Record<string, string[]>>((acc, category: string) => {
     if (category !== 'Uncategorized') {
@@ -55,21 +68,24 @@ function Menu(): React.JSX.Element {
   const handleAddClick = (mealType: MealType): void => {
     setCurrentMeal(mealType);
     setDialogOpen(true);
-    setSelectedItems(menu[mealType]);
+    setSelectedItems(menu[mealType][selectedDay].map((item) => item.item));
   };
 
   const handleResetMealClick = (mealType: MealType): void => {
     setMenu((prevMenu) => ({
       ...prevMenu,
-      [mealType]: [],
+      [mealType]: {
+        ...prevMenu[mealType],
+        [selectedDay]: [],
+      },
     }));
   };
 
   const handleResetAll = (): void => {
     setMenu({
-      breakfast: [],
-      lunch: [],
-      dinner: [],
+      breakfast: Object.fromEntries(days.map((day) => [day, []])),
+      lunch: Object.fromEntries(days.map((day) => [day, []])),
+      dinner: Object.fromEntries(days.map((day) => [day, []])),
     });
   };
 
@@ -78,10 +94,13 @@ function Menu(): React.JSX.Element {
     setSearch('');
   };
 
-  const handleRemoveItem = (mealType: MealType, item: string): void => {
+  const handleRemoveItem = (mealType: MealType, itemToRemove: string): void => {
     setMenu((prevMenu) => ({
       ...prevMenu,
-      [mealType]: prevMenu[mealType].filter((menuItem) => menuItem !== item),
+      [mealType]: {
+        ...prevMenu[mealType],
+        [selectedDay]: prevMenu[mealType][selectedDay].filter(({ item }) => item !== itemToRemove),
+      },
     }));
   };
 
@@ -94,9 +113,17 @@ function Menu(): React.JSX.Element {
   };
 
   const handleAddToMenu = (): void => {
+    const menuItems: MenuItemType[] = selectedItems.map((item) => ({
+      item,
+      type: newMenuItems.NonVeg.includes(item) ? 'non-veg' : 'veg',
+    }));
+
     setMenu((prevMenu) => ({
       ...prevMenu,
-      [currentMeal]: selectedItems,
+      [currentMeal]: {
+        ...prevMenu[currentMeal],
+        [selectedDay]: menuItems,
+      },
     }));
     handleDialogClose();
   };
@@ -117,14 +144,7 @@ function Menu(): React.JSX.Element {
   );
 
   return (
-    <Paper
-      sx={{
-        width: '100%',
-        mt: 4,
-        p: { xs: 2, md: 4 },
-      }}
-      elevation={10}
-    >
+    <Paper sx={{ width: '100%', mt: 4, p: { xs: 2, md: 4 } }} elevation={10}>
       <Stack
         direction={{ xs: 'column', sm: 'row' }}
         alignItems="center"
@@ -136,36 +156,28 @@ function Menu(): React.JSX.Element {
           Update Menu
         </Typography>
 
-        <Stack direction="row" alignItems="center" gap={1}>
+        <Stack direction="row" alignItems="stretch" gap={1}>
+          <FormControl sx={{ minWidth: 120,mr:0.6 }} size='small'>
+            <InputLabel>Day</InputLabel>
+            <Select  value={selectedDay} sx={{py:"2px"}} onChange={(e) => { setSelectedDay(e.target.value); }} label="Day">
+              {days.map((day) => (
+                <MenuItem key={day} value={day}>
+                  {day.charAt(0).toUpperCase() + day.slice(1)}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
           <Button
             variant="outlined"
             onClick={handleResetAll}
-            sx={{
-              borderRadius: 1,
-              borderWidth: '2px',
-              '&:hover': {
-                borderWidth: '2px',
-              },
-              px: { xs: 4, sm: 6 },
-              py: { xs: 0.5, sm: 1 },
-            }}
             color="error"
+            sx={{ borderRadius: 1, borderWidth: '2px','&:hover':{
+              borderWidth: '2px',
+            } }}
           >
             Reset
           </Button>
-          <Button
-            variant="contained"
-            sx={{
-              borderRadius: 1,
-              borderWidth: '2px',
-              '&:hover': {
-                borderWidth: '2px',
-              },
-              px: { xs: 4, sm: 6 },
-              py: { xs: 0.5, sm: 1 },
-            }}
-            color="primary"
-          >
+          <Button variant="contained" color="primary" sx={{ borderRadius: 1, borderWidth: '2px' }}>
             Save
           </Button>
         </Stack>
@@ -188,31 +200,14 @@ function Menu(): React.JSX.Element {
               </Typography>
 
               <Stack direction="row" alignItems="center" justifyContent="flex-end" gap={1}>
-                <IconButton
-                  onClick={() => {
-                    handleResetMealClick(mealType);
-                  }}
-                  color="primary"
-                  size="medium"
-                >
+                <IconButton onClick={() => {handleResetMealClick(mealType)}} color="primary" size="medium">
                   <ResetIcon fontSize="inherit" />
                 </IconButton>
-
                 <Button
                   size="small"
-                  onClick={() => {
-                    handleAddClick(mealType);
-                  }}
+                  onClick={() => {handleAddClick(mealType)}}
                   variant="outlined"
-                  sx={{
-                    borderRadius: 1,
-                    py: 0.5,
-                    px: 3,
-                    borderWidth: '2px',
-                    '&:hover': {
-                      borderWidth: '2px',
-                    },
-                  }}
+                  sx={{ borderRadius: 1, borderWidth: '2px' }}
                 >
                   Add
                 </Button>
@@ -224,7 +219,7 @@ function Menu(): React.JSX.Element {
               mt={2}
               sx={{ backgroundColor: 'var(--mui-palette-background-level3)', borderRadius: 1, p: 2 }}
             >
-              {menu[mealType].length === 0 ? (
+              {menu[mealType][selectedDay].length === 0 ? (
                 <Stack height={1} justifyContent="center" alignItems="center">
                   <Typography variant="body1" color="text.primary">
                     No items added
@@ -238,14 +233,45 @@ function Menu(): React.JSX.Element {
                   flexWrap="wrap"
                   gap={1}
                 >
-                  {menu[mealType].map((item, index) => (
+                  {menu[mealType][selectedDay].map((menuItem, index) => (
                     <Chip
                       sx={{ borderRadius: 1 }}
-                      key={`${item}-${String(index)}`}
-                      label={item}
-                      onDelete={() => {
-                        handleRemoveItem(mealType, item);
-                      }}
+                      key={`${menuItem.item}-${String(index)}`}
+                      label={
+                        <Stack direction="row" alignItems="center" justifyContent="space-between" gap={1}>
+                          <Box sx={{backgroundColor: 'var(--mui-palette-background-level3)', borderRadius:"4px", p: "1px"}}>
+
+                          <Stack
+                            sx={{
+                              p: 0,
+                              border: menuItem.type === 'veg' ? '2px solid green' : '2px solid #8C0606',
+                              backgroundColor: 'var(--mui-palette-background-level3)',
+                              borderRadius: 0.4,
+                              borderWidth: '2px',
+                            }}
+                            alignItems="center"
+                            justifyContent="center"
+                          >
+                            <FiberManualRecordIcon
+                              sx={{ fontSize: '13px', color: menuItem.type === 'veg' ? 'green' : '#8C0606' }}
+                            />
+                          </Stack>
+                          </Box>
+
+
+                          <Stack
+                            sx={{
+                              flexGrow: 1,
+                              textAlign: 'center',
+                            }}
+                            alignItems="center"
+                            justifyContent="center"
+                          >
+                            {menuItem.item}
+                          </Stack>
+                        </Stack>
+                      }
+                      onDelete={() => { handleRemoveItem(mealType, menuItem.item); }}
                       color="primary"
                     />
                   ))}

@@ -18,8 +18,8 @@ export interface LogoProps {
   width?: number;
 }
 
-export function Logo({ color = 'dark', emblem, height = HEIGHT, width = WIDTH }: LogoProps): React.JSX.Element {
-  let url: string='/assets/hosmas-logo.svg'
+export function Logo({ height = HEIGHT, width = WIDTH }: LogoProps): React.JSX.Element {
+  const url='/assets/hosmas-logo.svg'
 
   return <Box alt="logo" component="img" height={height} src={url} width={width} mt={1} />;
 }
@@ -43,7 +43,7 @@ export function DynamicLogo({
   const color = colorScheme === 'dark' ? colorDark : colorLight;
 
   return (
-    <NoSsr fallback={<Box sx={{ height: `${height}px`, width: `${width}px` }} />}>
+    <NoSsr fallback={<Box sx={{ height: `${String(height)}px`, width: `${String(width)}px` }} />}>
       <Logo color={color} height={height} width={width} {...props} />
     </NoSsr>
   );
