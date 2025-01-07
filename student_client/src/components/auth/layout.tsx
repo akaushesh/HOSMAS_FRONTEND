@@ -1,6 +1,6 @@
 import * as React from 'react';
 import RouterLink from 'next/link';
-import { Box, Grid, Typography } from '@mui/material';
+import { Box, Stack, Typography } from '@mui/material';
 
 import { DynamicLogo } from '@/components/core/logo';
 
@@ -14,28 +14,23 @@ export function Layout({ children }: LayoutProps): React.JSX.Element {
       component="main"
       sx={{
         display: 'flex',
-        flex: '1 1 auto',
         minHeight: '100%',
       }}
     >
-      <Grid container sx={{ flex: '1 1 auto' }}>
-        <Grid
-          xs={12}
-          lg={6}
+      <Stack sx={{ alignItems: 'center',width:1 ,justifyContent: 'center', flexDirection:{xs:'column',lg:'row'} }}>
+        
+        <Stack
           sx={{
+            height:1,
             backgroundColor: 'background.paper',
-            display: 'flex',
-            flexDirection: 'column',
-            position: 'relative',
+            width:{xs:1,lg:"50%"}
           }}
+          alignItems="center"
         >
           <Box
             component="header"
             sx={{
-              left: 0,
-              p: 3,
-              position: 'fixed',
-              top: 0,
+              p:3,
               width: '100%',
             }}
           >
@@ -44,28 +39,31 @@ export function Layout({ children }: LayoutProps): React.JSX.Element {
               href="/"
               sx={{
                 display: 'inline-flex',
-                height: { xs: '50px', md: '70px' },
-                width: { xs: '140px', md: '220px' },
+                // mt:{xs:2,lg:0},
+                height: { xs: '11vh', lg: '70px' },
+                width: { xs: 1, lg: '220px' },
               }}
             >
-              {/* <Logo /> */}
               <DynamicLogo colorDark="light" colorLight="dark" height={1} width={1} />
             </Box>
           </Box>
 
-          <Box sx={{ alignItems: 'center', display: 'flex', flex: '1 1 auto', justifyContent: 'center', p: 3 }}>
-            <Box sx={{ maxWidth: '450px', width: '100%' }}>{children}</Box>
-          </Box>
-        </Grid>
-        <Grid
-          xs={12}
-          lg={6}
+          <Stack sx={{ alignItems: 'center', justifyContent: 'center', p:3,px:5,width:1,height:0.7,mt:{xs:2,sm:0} }}>
+            <Box sx={{ width: {xs:1,lg:"450px"},maxWidth:"450px" }}>{children}</Box>
+          </Stack>
+        </Stack>
+       
+       
+       
+        <Stack
           sx={{
+            height:1,
             alignItems: 'center',
+            width:{xs:1,lg:"50%"},
             // background: "radial-gradient(50% 50% at 50% 50%, #122647 0%, #090E23 100%)",
             backgroundImage: "url('/assets/hostelM.webp')",
             color: 'white',
-            display: 'flex',
+            display: {xs:'none',sm:'flex'},
             justifyContent: 'center',
             backgroundSize: 'cover',
             position: 'relative',
@@ -98,15 +96,40 @@ export function Layout({ children }: LayoutProps): React.JSX.Element {
             >
               Welcome to{' '}
               <Box component="a" sx={{ color: '#15B79E' }}>
-                Thapar Hostel Allocation System
+                Thapar Hostel Management System
               </Box>
             </Typography>
-            {/* <Typography align="center" sx={{ mb: 3 }} variant="subtitle1"></Typography> */}
-            {/* <img alt="" src="/assets/auth-illustration.svg" />
-            <img alt="hostel picture" src="/assets/hostels/hostelM.webp" /> */}
           </Box>
-        </Grid>
-      </Grid>
+        </Stack>
+
+
+        <Stack
+          sx={{
+            height:1,
+            width:1,
+            alignItems: 'center',
+            backgroundColor:"white",
+            display: {xs:'flex',sm:'none'},
+            justifyContent: 'center',
+            position: 'relative',
+          }}
+        >
+        <Stack
+          sx={{
+            height:1,
+            width:1,
+            backgroundPosition: 'center',            
+            backgroundRepeat: 'no-repeat',
+            backgroundImage: "url('/assets/hosmas-2.png')",
+            backgroundSize: 'contain',
+            position: 'relative',
+            '& img': {
+              maxWidth: '100%',
+            },
+          }}
+        />
+      </Stack>
+      </Stack>
     </Box>
   );
 }
