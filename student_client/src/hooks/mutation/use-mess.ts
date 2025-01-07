@@ -1,0 +1,29 @@
+import { type ErrorResponse } from '@/services/auth';
+import { submitFeedback, type CreateFeedbackRequest, type FeedbackResponse } from '@/services/mess';
+import { useQueryClient, type UseMutationResult } from '@tanstack/react-query';
+import type { AxiosError, AxiosResponse } from 'axios';
+
+import { useCustomMutation, type ResolutionFunctions } from './use-custom-mutation';
+
+export const useSubmitFeedback = ({
+  onSuccess,
+  onError,
+}: ResolutionFunctions<FeedbackResponse> = {}): UseMutationResult<
+  AxiosResponse<FeedbackResponse>,
+  AxiosError<ErrorResponse>,
+  CreateFeedbackRequest
+> => {
+  const queryClient = useQueryClient();
+
+  return useCustomMutation<CreateFeedbackRequest, FeedbackResponse>({
+    mutationFn: submitFeedback,
+    onSuccess: (data) => {
+      // No need to invalidate queries as feedback doesn't affect other data
+      onSuccess?.(data);
+    },
+    onError: (error) => {
+      console.error('Failed to submit feedback:', error);
+      onError?.(error);
+    },
+  });
+};
