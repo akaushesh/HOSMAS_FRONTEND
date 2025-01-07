@@ -36,3 +36,6 @@
 #vs code files
 *.vscode
 __pycache__
+
+/student_client/node_modules
+node_modules/
