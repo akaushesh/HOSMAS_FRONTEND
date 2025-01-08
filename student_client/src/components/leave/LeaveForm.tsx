@@ -24,13 +24,24 @@ interface LeaveFormProps {
   parentsEmail: string;
 }
 
-export default function LeaveForm({ refetch,caretakerEmail, parentsEmail }: LeaveFormProps): React.JSX.Element {
+export default function LeaveForm({ refetch, caretakerEmail, parentsEmail }: LeaveFormProps): React.JSX.Element {
   const queryClient = useQueryClient();
   const {
     control,
     handleSubmit,
+    watch,
+    setValue,
     formState: { errors },
-  } = useForm<LeaveFormInputs>();
+  } = useForm<LeaveFormInputs>({
+    defaultValues: {
+      reason: '',
+      startDate: null,
+      endDate: null,
+      place: '',
+    }
+  });
+
+  const startDate = watch('startDate');
 
   const [res, setRes] = React.useState<SnackBarMsg>({
     msg: '',
@@ -46,7 +57,7 @@ export default function LeaveForm({ refetch,caretakerEmail, parentsEmail }: Leav
     setRes({ msg: 'Leave Request Failed', type: 'error' });
   };
 
-  const { mutate: createLeaveSlip } = useCreateLeaveSlip({ onSuccess,onError });
+  const { mutate: createLeaveSlip } = useCreateLeaveSlip({ onSuccess, onError });
 
   const onSubmit = (data: LeaveFormInputs): void => {
     const formattedData = {
@@ -68,7 +79,6 @@ export default function LeaveForm({ refetch,caretakerEmail, parentsEmail }: Leav
           <Controller
             name="reason"
             control={control}
-            defaultValue=""
             rules={{ required: 'Reason is required' }}
             render={({ field }) => (
               <TextField
@@ -90,7 +100,6 @@ export default function LeaveForm({ refetch,caretakerEmail, parentsEmail }: Leav
           <Controller
             name="place"
             control={control}
-            defaultValue=""
             rules={{ required: 'Place is required' }}
             render={({ field }) => (
               <TextField
@@ -110,12 +119,16 @@ export default function LeaveForm({ refetch,caretakerEmail, parentsEmail }: Leav
           <Controller
             name="startDate"
             control={control}
-            defaultValue={null}
             rules={{ required: 'Start date is required' }}
             render={({ field }) => (
               <DatePicker
                 {...field}
                 label="From"
+                disablePast
+                onChange={(date) => {
+                  field.onChange(date);
+                  setValue('endDate', null);  // Reset end date when start date changes
+                }}
                 slotProps={{
                   textField: {
                     fullWidth: true,
@@ -132,12 +145,21 @@ export default function LeaveForm({ refetch,caretakerEmail, parentsEmail }: Leav
           <Controller
             name="endDate"
             control={control}
-            defaultValue=""
-            rules={{ required: 'End date is required' }}
+            rules={{ 
+              required: 'End date is required',
+              validate: (value) => {
+                if (startDate && value && dayjs(value).isBefore(dayjs(startDate))) {
+                  return 'End date must be after start date';
+                }
+                return true;
+              }
+            }}
             render={({ field }) => (
               <DatePicker
                 {...field}
                 label="To"
+                minDate={startDate ? dayjs(startDate) : undefined}
+                disabled={!startDate}
                 slotProps={{
                   textField: {
                     fullWidth: true,

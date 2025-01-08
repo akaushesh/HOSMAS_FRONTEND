@@ -38,7 +38,7 @@ export interface Leave {
   //  "c" --> created 
   //  "a" --> approved 
   //  "d" --> declined
-  //  "rc" --> request cancelled
+  //  "x" --> request cancelled
   phoneNumber: string;
   rollNumber: string;
   roomNumber: string;

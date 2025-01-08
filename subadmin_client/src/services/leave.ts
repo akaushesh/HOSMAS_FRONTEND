@@ -38,7 +38,7 @@ export interface Leave {
   //  "c" --> created 
   //  "a" --> approved 
   //  "d" --> declined
-  //  "rc" --> request cancelled
+  //  "x" --> request cancelled
   phoneNumber: string;
   rollNumber: string;
   roomNumber: string;
@@ -65,8 +65,8 @@ export interface SearchRecordsParams{
   limit:number;
   status:string;
   text_query:string;
-  arrival_date:string;
-  departure_date:string;
+  arrival_date?:string|null;
+  departure_date?:string|null;
 }
 
 
@@ -77,7 +77,7 @@ export const updateLeave = async (params: UpdateLeaveRequest): Promise<AxiosResp
     throw new Error('You must be logged in to perform this action');
   }
 
-  const res = await leaveApi.patch('leave/update-request/', params, {
+  const res = await leaveApi.patch('leave/set-status/', params, {
     headers: {
       Authorization: `Bearer ${token}`,
     },

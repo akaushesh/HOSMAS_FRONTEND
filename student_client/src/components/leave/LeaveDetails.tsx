@@ -139,7 +139,7 @@ export default function LeaveDetails({ refetch, details, phase }: LeaveDetailsPr
       sx={{
         p: 1,
         backgroundColor: 'var(--mui-palette-background-level3)',
-        ...details?.leaveStatus==='rc'&&({
+        ...details?.leaveStatus==='x'&&({
           opacity: 0.35,
           pointerEvents: 'none',
         }),
@@ -257,6 +257,7 @@ export default function LeaveDetails({ refetch, details, phase }: LeaveDetailsPr
             <DatePicker
               label="Arrival Date"
               defaultValue={null}
+              disablePast
               slotProps={{
                 textField: {
                   sx: { width: { xs: 0.9, sm: '50%' } },
@@ -278,6 +279,7 @@ export default function LeaveDetails({ refetch, details, phase }: LeaveDetailsPr
               <DatePicker
                 label="Departure "
                 defaultValue={null}
+                disablePast
                 slotProps={{
                   textField: {
                     error: false,
@@ -287,6 +289,7 @@ export default function LeaveDetails({ refetch, details, phase }: LeaveDetailsPr
                 value={patchData.revise.leaveDateFrom}
                 onChange={(date) => {
                   handleReviseDateChange(date, 'departure');
+                  setPatchData({...patchData,revise:{...patchData.revise,leaveDateTo:null}});
                 }}
               />
               <Typography
@@ -303,6 +306,8 @@ export default function LeaveDetails({ refetch, details, phase }: LeaveDetailsPr
               <DatePicker
                 label="Arrival"
                 defaultValue={null}
+                minDate={patchData.revise.leaveDateFrom ? dayjs(patchData.revise.leaveDateFrom).toDate() : null}
+                disabled={!patchData.revise.leaveDateFrom}
                 slotProps={{
                   textField: {
                     error: false,
@@ -328,7 +333,7 @@ export default function LeaveDetails({ refetch, details, phase }: LeaveDetailsPr
         )}
       </Paper>
 
-      {details?.leaveStatus === 'rc' ? (
+      {details?.leaveStatus === 'x' ? (
         <Stack
           direction="row"
           gap={2}

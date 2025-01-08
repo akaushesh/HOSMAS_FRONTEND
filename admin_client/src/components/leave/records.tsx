@@ -52,7 +52,7 @@ export default function Records(): React.JSX.Element {
     isLoading,
     refetch,
   } = useGetRecords({
-    status: state === 0 ? 'c' : state === 1 ? 'act' : state === 2 ? '' : state === 3 ? 'rc' : 'a',
+    status: state === 0 ? 'c' : state === 1 ? 'active' : state === 2 ? '' : state === 3 ? 'x' : 'a',
     page,
     limit: 5,
   });
@@ -277,10 +277,10 @@ export default function Records(): React.JSX.Element {
                     label="Day"
                   >
                     <MenuItem value="all">All</MenuItem>
-                    <MenuItem value="act">Active</MenuItem>
+                    <MenuItem value="active">Active</MenuItem>
                     <MenuItem value="c">Pending</MenuItem>
                     <MenuItem value="d">declined</MenuItem>
-                    <MenuItem value="rc">Cancelled</MenuItem>
+                    <MenuItem value="x">Cancelled</MenuItem>
                   </Select>
                 </FormControl>
 

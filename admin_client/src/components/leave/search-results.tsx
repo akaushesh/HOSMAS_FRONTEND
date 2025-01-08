@@ -70,7 +70,7 @@ export default function SearchResult({ arr, refetch }: RecordCardProps): React.J
   return (
     <Stack width={1} gap={2}>
       {arr.map((record) => {
-        if (record.leaveStatus === 'c' || record.leaveStatus === 'rc') {
+        if (record.leaveStatus === 'c' || record.leaveStatus === 'x') {
           return (
             <Stack width={1} key={record.transactionID} gap={1} sx={{ p: 2, background: 'white', borderRadius: 1 }}>
               <Stack width={1} direction="row" justifyContent="space-between" gap={1} alignItems="stretch">

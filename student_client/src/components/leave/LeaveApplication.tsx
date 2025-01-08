@@ -23,12 +23,11 @@ export default function LeaveApplication(): React.JSX.Element {
   const latestLeave = leavesData?.leaves[0];
 
   let phase = 0;
-  if (latestLeave?.leaveStatus === 'c' || latestLeave?.leaveStatus === 'rc') {
+  if (latestLeave?.leaveStatus === 'c' || latestLeave?.leaveStatus === 'x') {
     phase = 1;
   } else if (latestLeave?.leaveStatus === 'a' && dayjs().isBefore(dayjs(latestLeave?.leaveDateTo))) {
     phase = 2;
   } else if (latestLeave?.leaveStatus === 'd') phase = 0;
-
   const [showRecords, setShowRecords] = React.useState(false);
 
   const declinedCondition = latestLeave?.leaveStatus === 'd';

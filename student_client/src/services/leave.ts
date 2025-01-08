@@ -40,8 +40,9 @@ export interface Leave {
   leaveStatus: string; 
   //  "c" --> created 
   //  "a" --> approved 
+  //  "active" --> tenure declined 
   //  "d" --> declined
-  //  "rc" --> request cancelled
+  //  "x" --> request cancelled
   phoneNumber: string;
   rollNumber: string;
   roomNumber: string;

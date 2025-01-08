@@ -3,7 +3,6 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { Box, Paper, Stack, Typography, useMediaQuery } from '@mui/material';
 import { QrCode } from 'react-qrcode-pretty';
-import dayjs from 'dayjs';
 import { useTheme, type Theme } from '@mui/material/styles';
 
 
@@ -15,7 +14,6 @@ export default function LeaveStatus({ phase,id,status }: { phase: number;id:stri
   const islg = useMediaQuery(theme.breakpoints.up('lg'));
   const isxs = useMediaQuery(theme.breakpoints.between('xs','sm'));
   
-  const validDate="2022-12-31";
 
 
 
@@ -25,7 +23,7 @@ export default function LeaveStatus({ phase,id,status }: { phase: number;id:stri
      
      
      
-      {(status!=='rc'&&phase === 2) ? (
+      {(status!=='x'&&phase === 2) ? (
         <Stack alignItems="center" justifyContent="center" height={1} >
         <QrCode
           value={id}
@@ -46,9 +44,7 @@ export default function LeaveStatus({ phase,id,status }: { phase: number;id:stri
         <Typography variant="h3" textAlign="center" sx={{fontSize:{xs:"26px",sm:"2.25rem"}}} fontWeight={600} mt={3}>
           Gate Pass
         </Typography>
-        <Typography variant="body1" textAlign="center" >
-          <b style={{fontWeight:"600"}}>Valid Till</b> : {dayjs(validDate).format('DD MMM, YY')}
-        </Typography>
+      
 
 
 
@@ -63,7 +59,7 @@ export default function LeaveStatus({ phase,id,status }: { phase: number;id:stri
           <Box display="flex" alignItems="center" justifyContent="center" mb={2} >
             <CheckCircleIcon sx={{ color: 'success.main', mr: 1 }} />
             <Typography variant="h6" fontWeight={500} color="success.main">
-              {status==="rc"?"Cancellation Requested":"Application Submitted"} 
+              {status==="x"?"Cancellation Requested":"Application Submitted"} 
             </Typography>
           </Box>
           <Box display="flex" alignItems="center" justifyContent="center" mb="2rem">

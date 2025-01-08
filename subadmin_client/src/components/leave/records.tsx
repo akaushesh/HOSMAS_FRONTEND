@@ -22,23 +22,23 @@ import {
   Typography,
 } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
-
 import { useGetRecords, useSearchRecords, useTotalLeaves } from '@/hooks/query/use-leave';
-
 import ActiveLeaves from './active';
 import AllLeaves from './all-records';
 import ApprovalLeave from './approvals';
 import CancelLeaves from './cancel-requests';
 import SearchResult from './search-results';
+import { type Leave } from '@/services/leave';
 
 export default function Records(): React.JSX.Element {
   const searchParams = useSearchParams();
   const queryState = Number(searchParams.get('state')) || 0;
 
-  const [state, setstate] = React.useState(queryState);
+  const [state, setState] = React.useState(queryState);
   const [showSearch, setShowSearch] = React.useState(false);
-
   const [page, setPage] = React.useState(1);
+  const [records, setRecords] = React.useState<Leave[]>([]);
+  const [isLoading, setIsLoading] = React.useState(true);
 
   const [searchFilters, setSearchFilters] = React.useState({
     searchText: '',
@@ -49,25 +49,31 @@ export default function Records(): React.JSX.Element {
 
   const {
     data: recordsData,
-    isLoading,
-    refetch,
+    refetch
   } = useGetRecords({
-    status: state === 0 ? 'c' : state === 1 ? 'act' : state === 2 ? '' : state === 3 ? 'rc' : 'a',
+    status: state === 0 ? 'c' : state === 1 ? 'active' : state === 2 ? '' : state === 3 ? 'x' : 'a',
     page,
     limit: 5,
   });
 
-  const records = recordsData?.data.leaves ?? [];
+  React.useEffect(() => {
+    if (recordsData?.data.leaves) {
+      setRecords(recordsData.data.leaves);
+    }
+    setIsLoading(false);
+  }, [recordsData]);
+
   const totalPages = recordsData?.data.total_pages ?? 1;
 
   React.useEffect(() => {
-    setstate(queryState);
+    setState(queryState);
   }, [queryState]);
 
   React.useEffect(() => {
+    setRecords([]);
+    setIsLoading(true);
     void refetch();
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- refetch is a dependency
-  }, [page, state]);
+  }, [page, state, refetch]);
 
   const handleChangePage = (event: React.ChangeEvent<unknown>, value: number): void => {
     setPage(value);
@@ -77,22 +83,31 @@ export default function Records(): React.JSX.Element {
   const autoApproval = totalLeaves?.data.auto_approve ?? false;
 
   const {
-    data: serachData,
+    data: searchData,
     isLoading: searchLoading,
     refetch: searchRefetch,
   } = useSearchRecords({
     page,
     limit: 5,
     text_query: searchFilters.searchText,
-    arrival_date: searchFilters.arrivalDate || '',
-    departure_date: searchFilters.departureDate || '',
+    arrival_date: searchFilters.arrivalDate,
+    departure_date: searchFilters.departureDate,
     status: searchFilters.status,
-  },(showSearch&&searchFilters.searchText!==""));
+  }, (showSearch && searchFilters.searchText !== ""));
 
-  const searchRecords = serachData?.data.leaves ?? [];
+  const searchRecords = searchData?.data.leaves ?? [];
 
   const handleSearch = (): void => {
     void searchRefetch();
+  };
+
+  const handleStateChange = (newState: number) :void => {
+    if (state !== newState) {
+      setRecords([]);
+      setIsLoading(true);
+      setState(newState);
+      setPage(1);
+    }
   };
 
   return (
@@ -111,7 +126,6 @@ export default function Records(): React.JSX.Element {
               <Typography variant="h5">
                 {state === 0 ? 'Pending Leaves' : state === 1 ? 'Active Leaves' : 'All Records'}
               </Typography>
-
               {state === 0 && autoApproval ? (
                 <Stack mt="2px" direction="row" gap={1} alignItems="center">
                   <InfoOutlined color="primary" sx={{ fontSize: '20px' }} />
@@ -121,7 +135,6 @@ export default function Records(): React.JSX.Element {
                 </Stack>
               ) : null}
             </Box>
-
             <Stack direction="row" gap={1} sx={{ width: { xs: '85%', md: '45%' }, justifyContent: 'center' }}>
               <Tooltip title="Search">
                 <IconButton
@@ -152,9 +165,7 @@ export default function Records(): React.JSX.Element {
                 }}
                 variant={state === 0 ? 'contained' : 'outlined'}
                 color="primary"
-                onClick={() => {
-                  if (state !== 0) setstate(0);
-                }}
+                onClick={() => { handleStateChange(0); }}
               >
                 Pending
               </Button>
@@ -170,9 +181,7 @@ export default function Records(): React.JSX.Element {
                 }}
                 variant={state === 1 ? 'contained' : 'outlined'}
                 color="primary"
-                onClick={() => {
-                  if (state !== 1) setstate(1);
-                }}
+                onClick={() => { handleStateChange(1); }}
               >
                 Active
               </Button>
@@ -188,9 +197,7 @@ export default function Records(): React.JSX.Element {
                 }}
                 variant={state === 2 ? 'contained' : 'outlined'}
                 color="primary"
-                onClick={() => {
-                  if (state !== 2) setstate(2);
-                }}
+                onClick={() => { handleStateChange(2); }}
               >
                 All
               </Button>
@@ -206,9 +213,7 @@ export default function Records(): React.JSX.Element {
                 }}
                 variant={state === 3 ? 'contained' : 'outlined'}
                 color="primary"
-                onClick={() => {
-                  if (state !== 3) setstate(3);
-                }}
+                onClick={() => { handleStateChange(3); }}
               >
                 Cancelled
               </Button>
@@ -262,7 +267,6 @@ export default function Records(): React.JSX.Element {
                     },
                   }}
                 />
-
                 <FormControl
                   sx={{ minWidth: { xs: 80, lg: 107 }, ml: 1 }}
                   disabled={!searchFilters.searchText}
@@ -277,19 +281,16 @@ export default function Records(): React.JSX.Element {
                     label="Day"
                   >
                     <MenuItem value="all">All</MenuItem>
-                    <MenuItem value="act">Active</MenuItem>
+                    <MenuItem value="active">Active</MenuItem>
                     <MenuItem value="c">Pending</MenuItem>
                     <MenuItem value="d">declined</MenuItem>
-                    <MenuItem value="rc">Cancelled</MenuItem>
+                    <MenuItem value="x">Cancelled</MenuItem>
                   </Select>
                 </FormControl>
-
                 <Button
                   variant="contained"
                   disabled={!searchFilters.searchText}
-                  onClick={() => {
-                    handleSearch();
-                  }}
+                  onClick={handleSearch}
                   sx={{ ml: 1, py: 0.5, borderRadius: 1, px: 3 }}
                 >
                   Search
@@ -301,7 +302,6 @@ export default function Records(): React.JSX.Element {
                     '&:hover': {
                       color: 'var(--mui-palette-secondary-dark)',
                       backgroundColor: 'var(--mui-palette-grey-200)',
-                      // backgroundColor: '#efc5c5',
                     },
                   }}
                   onClick={() => {
