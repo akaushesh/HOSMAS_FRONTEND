@@ -13,13 +13,9 @@ export interface MenuItem {
   category: string;
 }
 
-export interface DayMenu {
-  [itemName: string]: 'veg' | 'non-veg';
-}
+export type DayMenu = Record<string, 'veg' | 'non-veg'>;
 
-export interface MealTypeMenu {
-  [day: string]: DayMenu;
-}
+export type MealTypeMenu = Record<string, DayMenu>;
 
 export interface MessMenu {
   Breakfast: MealTypeMenu;
@@ -49,7 +45,7 @@ export const getMessMenu = async (hostelId: number): Promise<AxiosResponse<MessM
     throw new Error('Only hostel IDs 5 and 6 are active');
   }
 
-  const res = await messApi.get(`mess/get-menu/${hostelId}/`);
+  const res = await messApi.get(`mess/get-menu/${String(hostelId)}/`);
   logger.debug('getMessMenu', res.data);
   return res;
 };
