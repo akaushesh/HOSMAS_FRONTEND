@@ -40,13 +40,33 @@ export interface FeedbackResponse {
   meal_type: 'Breakfast' | 'Lunch' | 'Dinner';
 }
 
-export const getMessMenu = async (hostelId: number): Promise<AxiosResponse<MessMenu>> => {
-  if (![5, 6].includes(hostelId)) {
-    throw new Error('Only hostel IDs 5 and 6 are active');
-  }
 
+export interface PreviousFeedbackResponse{
+  feedback_open:boolean;
+  feedbacks:FeedbackResponse[];
+}
+
+
+export const getMessMenu = async (hostelId: number): Promise<AxiosResponse<MessMenu>> => {
   const res = await messApi.get(`mess/get-menu/${String(hostelId)}/`);
   logger.debug('getMessMenu', res.data);
+  return res;
+};
+
+export const getPreviousFeedbacks = async (): Promise<AxiosResponse<MessMenu>> => {
+  const token = (await authClient.getToken()).data;
+
+  if (token === null || token === undefined) {
+    throw new Error('You must be logged in to perform this action');
+  }
+
+  const res = await messApi.get('mess/get-feedbacks/', {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  logger.debug('previousFeebacks', res.data);
   return res;
 };
 

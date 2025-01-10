@@ -5,6 +5,7 @@ import { Stack } from '@mui/system';
 
 import { config } from '@/config';
 import Home from '@/components/mess/home';
+import Profile from '../../../components/core/profile';
 
 export const metadata = { title: `Mess | ${config.site.name}` } satisfies Metadata;
 
@@ -27,6 +28,7 @@ export default function Page(): React.JSX.Element {
         <Typography variant="h3" sx={{ color: 'var(--Page-HeadColor)' }}>
           Mess Facilities
         </Typography>
+        <Profile/>
 
         <Box
           sx={{minHeight: '63vh', mt: 5 }}

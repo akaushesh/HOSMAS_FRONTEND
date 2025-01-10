@@ -1,76 +1,96 @@
 'use client';
 
 import * as React from 'react';
-import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import { LoadingButton } from '@mui/lab';
-import { Box, Button, Divider, Paper, Rating, Stack, TextField, Typography } from '@mui/material';
+import { Button, Divider, Rating, Stack, TextField, Typography } from '@mui/material';
+import dayjs from 'dayjs';
 
-type Items = Record<string, 'veg' | 'non-veg'>;
+import { useSubmitFeedback } from '@/hooks/mutation/use-mess';
+import { useGetFeedback } from '@/hooks/query/use-mess';
 
-type MealTimings = Record<string, Items>;
-
-interface MenuItems {
-  Breakfast: MealTimings;
-  Lunch: MealTimings;
-  Dinner: MealTimings;
-}
+import SnackBarAlert, { type SnackBarMsg } from '../core/snackbar-msg';
 
 interface FormProps {
   rating: number;
   feedback: string;
 }
 
-interface FeedbackProps {
-  timing: 'Breakfast' | 'Lunch' | 'Dinner';
-  day: string;
-  menuItems: MenuItems;
-}
+const getMealTiming = (): string => {
+  const currentHour = dayjs().hour();
+  const currentMinute = dayjs().minute();
 
-export default function Feedback({ timing, day, menuItems }: FeedbackProps): React.JSX.Element {
-  // const currentMenuItems = menuItems[timing][day] || {};
+  if (currentHour >= 7 && currentHour < 12) {
+    return 'Breakfast';
+  } else if (currentHour >= 12 && (currentHour < 19 || (currentHour === 18 && currentMinute <= 59))) {
+    return 'Lunch';
+  } else if ((currentHour >= 19 && currentHour <= 23) || (currentHour === 0 && currentMinute === 0)) {
+    return 'Dinner';
+  }
+  return 'No Meal Time';
+};
 
+export default function Feedback(): React.JSX.Element {
   const [form, setForm] = React.useState<FormProps>({
     rating: 0,
     feedback: '',
   });
 
-  // const [ratings, setRatings] = React.useState<Record<string, number>>(
-  //   Object.keys(currentMenuItems).reduce<Record<string, number>>((acc, item) => {
-  //     acc[item] = 0;
-  //     return acc;
-  //   }, {})
-  // );
+  const [res, setRes] = React.useState<SnackBarMsg>({
+    msg: '',
+    type: '',
+  });
 
-  // const handleRatingChange = (item: string, value: number | null): void => {
-  //   if (value !== null) {
-  //     setRatings((prevRatings) => ({
-  //       ...prevRatings,
-  //       [item]: value,
-  //     }));
-  //   }
-  // };
+  const onSuccess = async (): Promise<void> => {
+    setRes({ msg: 'Feedback Submitted', type: 'success' });
+    setForm({ rating: 0, feedback: '' });
+  };
+  const onError = async (): Promise<void> => {
+    setRes({ msg: 'Something went wrong', type: 'error' });
+  };
 
-  // const handleReset = (): void => {
-  //   setRatings(
-  //     Object.keys(currentMenuItems).reduce<Record<string, number>>((acc, item) => {
-  //       acc[item] = 0;
-  //       return acc;
-  //     }, {})
-  //   );
-  // };
+  const { mutate: submitFeedback } = useSubmitFeedback({ onSuccess, onError });
 
-  // const isDisabled = Object.values(ratings).every((r) => r === 0);
+  const onSubmit = (): void => {
+    const formattedData = {
+      rating: form.rating,
+      description: form.feedback,
+    };
+
+    submitFeedback(formattedData);
+  };
+
+  const { data: prevFeeback,isLoading } = useGetFeedback();
 
   const handleReset = (): void => {
     setForm({ rating: 0, feedback: '' });
   };
 
   const isDisabled = form.rating === 0;
+  const timing = getMealTiming();
+
+  const formDisableCondition = timing === 'No Meal Time' || (prevFeeback?.data.feedback_open === false);
 
   return (
-    <Stack alignItems="center">
-      <Typography variant="h4" sx={{ mt: { xs: 3, md: 3 }, fontSize: { xs: '24px', md: '32px' } }} textAlign="center">
-        Leave a Rating for Today&apos;s menu
+    <Stack
+      alignItems="center"
+      sx={{
+        ...((formDisableCondition||isLoading) && {
+          opacity: 0.46,
+          pointerEvents: 'none',
+        }),
+      }}
+    >
+      <Typography
+        variant="h4"
+        sx={{ mt: { xs: 3, md: 4 }, lineHeight: 1.2, fontSize: { xs: '20px', md: '26px' } }}
+        textAlign="center"
+      >
+        {isLoading?`Submit Feedback`:
+        timing === 'No Meal Time'
+          ? `Feedback cannot be submitted at this moment`
+          : prevFeeback?.data.feedback_open === false
+            ? `Already Submitted Feedback for Today's ${timing} menu`
+            : `Leave a Rating for Today's ${timing} menu`}
       </Typography>
       <Rating
         name="rating"
@@ -110,63 +130,6 @@ export default function Feedback({ timing, day, menuItems }: FeedbackProps): Rea
         multiline
       />
 
-      {/* <Box sx={{ height: '43vh', overflowY: 'auto', pb: 1.5 }}>
-        {Object.entries(currentMenuItems).map(([item, type]) => (
-          <Paper
-            key={`${timing}-${item}`}
-            sx={{
-              px: { xs: 1, md: 2 },
-              py: 1.5,
-              mx: { xs: 1, md: 2 },
-              my: 1,
-              background: 'var(--mui-palette-secondary-light)',
-              border: '1px dashed var(--mui-palette-secondary-main)',
-            }}
-            elevation={1}
-          >
-            <Stack direction="row" alignItems="center" justifyContent="space-between" gap={1}>
-              <Stack direction="row" alignItems="center" sx={{ ml: { xs: 0, md: 2 }, gap: { xs: 3, md: 6 } }}>
-                <Stack
-                  sx={{
-                    p: 0,
-                    border: type === 'veg' ? '4px solid green' : '4px solid #8C0606',
-                    borderRadius: 0.4,
-                    borderWidth: { xs: '2px', md: '3px' },
-                  }}
-                  alignItems="center"
-                  justifyContent="center"
-                >
-                  <FiberManualRecordIcon
-                    sx={{
-                      fontSize: { xs: '13px', md: '16px' },
-                      color: type === 'veg' ? 'green' : '#8C0606',
-                    }}
-                  />
-                </Stack>
-
-                <Typography variant="h6" sx={{ fontSize: { xs: '14px', md: '19px' } }}>
-                  {item}
-                </Typography>
-              </Stack>
-
-              <Rating
-                name={`rating-${item}`}
-                value={ratings[item]}
-                onChange={(event, newValue) => {
-                  handleRatingChange(item, newValue);
-                }}
-                sx={{
-                  '& .MuiRating-icon': {
-                    fontSize: { xs: '18px', sm: '27px' },
-                    color: 'var(--mui-palette-primary-main)',
-                  },
-                }}
-              />
-            </Stack>
-          </Paper>
-        ))}
-      </Box> */}
-
       <Divider sx={{ mt: 1 }} />
       <Stack direction="row" gap={2} sx={{ mt: 2, justifyContent: { xs: 'center', md: 'flex-end' } }}>
         <Button
@@ -191,10 +154,12 @@ export default function Feedback({ timing, day, menuItems }: FeedbackProps): Rea
             borderRadius: 1,
             px: 5,
           }}
+          onClick={onSubmit}
         >
           Submit
         </LoadingButton>
       </Stack>
+      <SnackBarAlert setMsg={setRes} msg={res} />
     </Stack>
   );
 }

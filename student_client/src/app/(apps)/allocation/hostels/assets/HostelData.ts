@@ -1,6 +1,6 @@
 import type { Hostel } from '@/types/hostels';
 
-import { hostelB, hostelM, hostelN, hostelO } from './HostelImages';
+import { hostelA, hostelB, hostelC, hostelD, hostelJ, hostelM, hostelN, hostelO, hostelQ } from './HostelImages';
 
 const hostels = [
   {
@@ -93,6 +93,116 @@ const hostels = [
         • Students can avail themselves of a laundry unit system for their convenience.<br/>
         • The entire hostel premises are enveloped by a continuous 24/7 Wi-Fi network, granting students access to high-speed internet at all times.<br/>`,
   },
+
+
+  {
+    name: 'Hostel C',
+    path: 'hostel-c',
+    floors: 3,
+    rooms: 387,
+    students: 387,
+    warden: 'Dr. Hari Shankar',
+    warden_image: 'https://www.thapar.edu/webroot/files/faculty/285/1508733465285.jpg',
+    emailW: 'wardenc@thapar.edu',
+    contact: '7977389955',
+    dayCaretaker: 'Mr. Gurmeet Singh, Mr. Manish Kumar',
+    nightCaretaker: 'Nishan Singh',
+    emailC: 'caretaker.c@thapar.edu',
+    gender: 'Boys',
+    image: hostelC,
+    description: `Prithvi Hall is one of the oldest hostels equipped with modern amenities. With a total capacity of 387, the hostel offers air-conditioned accommodation in two-seater and three-seater rooms, each featuring a shared washroom for students.<br/>
+        Every room is thoughtfully furnished, providing essential living conveniences such as a study table, chair, wardrobe, bookrack, mattress, curtains, cloth stands, and dustbins.<br/>
+        Hostel C has facilities such as a water cooler with an in-built RO system, a TV/common room, a reading room, hot water availability, and indoor games like table tennis, chess, and carom. The hostel's extensive and well-maintained lawns, adorned with water fountains, create a peaceful and serene atmosphere.<br/>
+        The presence of housekeeping staff ensures cleanliness, and a laundry system is provided for students' needs.<br/>
+        Hostel C fosters a vibrant student community with various events, committees, study groups, and recreational activities.<br/>
+        Additionally, Hostel C promotes an inclusive environment with cultural exchange programs and events celebrating student diversity.<br/>`
+},
+
+{
+    name: 'Hostel D',
+    path: 'hostel-d',
+    floors: 4,
+    rooms: 928,
+    students: 928,
+    warden: 'Dr. Rajendra Kumar Godara',
+    warden_image: 'https://www.thapar.edu/webroot/files/faculty/285/1508733465285.jpg',
+    emailW: 'wardend@thapar.edu',
+    contact: '9115600146, 9456338299',
+    dayCaretaker: 'Mr. Mandeep Daniel, Mr. Manish Kumar',
+    nightCaretaker: 'Mr. Arwinder Singh, Mr. Gurvinder Singh',
+    emailC: 'caretaker.d@thapar.edu',
+    gender: 'Boys',
+    image: hostelD,
+    description: `Neeram Hall is the latest addition to the exceptional range of hostel facilities. This 928-seater hostel provides double-seater rooms with shared washrooms for boys. Each room is fully furnished, with a study table, chair, wardrobe, bookrack, shoe rack, mattress, geyser, curtains, and dustbins.<br/>
+        Students benefit from amenities such as water coolers and RO systems. The hostel features four elevators, ensuring easy access to all floors, with power backup available in emergencies.<br/>
+        Hostel D offers round-the-clock Wi-Fi, a state-of-the-art gymnasium, an excellent mess facility, well-maintained lawns, and a night canteen.<br/>
+        The hostel ensures safety with guards, CCTV cameras, and fire alarms throughout the premises. A student executive committee manages the day-to-day affairs.<br/>
+        Hostel D focuses on student well-being and comfort, providing various recreational and academic facilities.<br/>`
+},
+
+{
+    name: 'Hostel J',
+    path: 'hostel-j',
+    floors: 2,
+    rooms: 1170,
+    students: 1170,
+    warden: 'Dr. Munish Kansal',
+    warden_image: 'https://www.thapar.edu/webroot/files/faculty/285/1508733465285.jpg',
+    emailW: 'wardenj@thapar.edu',
+    contact: '9115608845',
+    dayCaretaker: 'Mr. Raj Kumar, Mr. Jaspal Singh',
+    nightCaretaker: 'Mr. Ajay Kumar, Mr. Ram Naresh',
+    emailC: 'caretaker.j@thapar.edu',
+    gender: 'Boys',
+    image: hostelJ,
+    description: `Tejas Hall is a multistoried boys hostel offering single-seated accommodation for 858 residents in 78 clusters. Each cluster has geysers and three-seater chairs. The hostel offers 24/7 Wi-Fi, a well-equipped gym, and an air-conditioned reading room.<br/>
+        The twin towers of Hostel J have four elevators with power backups. The hostel features an open-air theatre for cultural functions, guest rooms, a night mess, and a complaint management system.<br/>
+        Security is a priority with guards, CCTV cameras, and fire alarms. The mess offers a variety of food, ensuring nutritional needs are met.<br/>
+        Hostel J provides excellent services, ensuring the residents' comfort and satisfaction.<br/>`
+},
+
+{
+    name: 'Hostel A',
+    path: 'hostel-a',
+    floors: 4,
+    rooms: 928,
+    students: 928,
+    warden: 'M. Vasundhara',
+    warden_image: 'https://www.thapar.edu/webroot/files/faculty/285/1508733465285.jpg',
+    emailW: 'wardena@thapar.edu',
+    contact: '8288008174, 9115600644',
+    dayCaretaker: 'Mr. Sandeep Singh, Mrs. Jasvir Kaur, Mr. Deepak Batish',
+    nightCaretaker: 'Mrs. Suman Kumari, Mrs. Gagandeep Kaur',
+    emailC: 'caretaker.a@thapar.edu',
+    gender: 'Girls',
+    image: hostelA,
+    description: `Agira Hall is the latest addition to the exceptional range of hostel facilities. This 928-seater hostel offers double-seater rooms with shared washrooms for girls. Each room is fully furnished with essential amenities.<br/>
+        The hostel features four elevators, ensuring easy access to all floors with power backup in emergencies. Students enjoy 24/7 Wi-Fi access, a state-of-the-art gymnasium, and a well-maintained lawn.<br/>
+        The hostel also has a night canteen, excellent mess facilities, and security with guards, CCTV cameras, and fire alarms.<br/>
+        Agira Hall offers a comfortable, safe, and student-centric environment with a focus on student well-being and satisfaction.<br/>`
+},
+
+{
+    name: 'Hostel Q',
+    path: 'hostel-q',
+    floors: 4,
+    rooms: 928,
+    students: 928,
+    warden: 'Dr. Anju Bala',
+    warden_image: 'https://www.thapar.edu/webroot/files/faculty/285/1508733465285.jpg',
+    emailW: 'wardenq@thapar.edu',
+    contact: '828808175',
+    dayCaretaker: 'Mr. Amarinder Singh, Mrs. Amandeep Rani',
+    nightCaretaker: 'Mrs. Dilpreet Kaur, Mrs. Pooja',
+    emailC: 'caretaker.q@thapar.edu',
+    gender: 'Girls',
+    image: hostelQ,
+    description: `Hostel Q is the newest addition to Thapar Institute's state-of-the-art housing facilities. The hostel offers 928 double-seater rooms with air conditioning and shared restrooms.<br/>
+        Each room is furnished with essential amenities such as a desk, chair, bookcase, mattress, geyser, curtains, and trash cans.<br/>
+        Hostel Q provides a TV room, gymnasium, study area, night café, and spacious grounds. Four elevators with power backup ensure easy access to all floors.<br/>
+        The hostel has a dedicated housekeeping team, a laundry system, 24/7 Wi-Fi, and excellent mess facilities.<br/>
+        The well-maintained lawn and beautiful water features add to the serene ambiance. Security is ensured with CCTV cameras and round-the-clock guards.<br/>`
+}
 ];
 
 export default hostels as Hostel[];

@@ -23,6 +23,7 @@ export default function Page(): React.JSX.Element {
       }}
     >
       <LaundryMain/>
+      
     </Stack>
   );
 }

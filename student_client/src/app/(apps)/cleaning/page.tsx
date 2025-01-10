@@ -6,6 +6,7 @@ import { Stack } from '@mui/system';
 import { config } from '@/config';
 import LeftCont from '@/components/cleaning/LeftCont/LeftCont';
 import RightCont from '@/components/cleaning/RightCont/RightCont';
+import Profile from '@/components/core/profile';
 
 export const metadata = { title: `Cleaning | ${config.site.name}` } satisfies Metadata;
 
@@ -28,6 +29,7 @@ export default function Page(): React.JSX.Element {
       <Typography variant="h3" sx={{ color: 'var(--Page-HeadColor)' }}>
         Room Cleaning
       </Typography>
+      <Profile />
 
       <Grid container gap={3} mb={4}>
         <Grid item lg={7.5} md={6} xs={12} sx={{ display: { xs: 'none', md: 'block' } }}>

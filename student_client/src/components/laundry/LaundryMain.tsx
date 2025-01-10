@@ -9,6 +9,7 @@ import {type LaundryInitResponse } from '@/services/laundry';
 import { useLaundryData } from '@/hooks/query/use-laundry';
 import { type AxiosResponse } from 'axios';
 import dayjs from 'dayjs';
+import Profile from '../core/profile';
 
 
 
@@ -16,7 +17,7 @@ export default function LaundryMain(): React.JSX.Element {
 
 
   const { data, isLoading:_isLoading } = useLaundryData();
-  let initData = data as AxiosResponse<LaundryInitResponse|null>;
+  const initData = data as AxiosResponse<LaundryInitResponse|null>;
 
   
   const laundryHistory = initData?.data?.laundry_slips
@@ -43,6 +44,7 @@ export default function LaundryMain(): React.JSX.Element {
         <Typography variant="h3" sx={{ color: 'var(--Page-HeadColor)' }}>
           Laundry Management
         </Typography>
+        <Profile/>
 
         <Box
           sx={{ display: 'flex', alignItems: 'stretch', justifyContent: 'center', minHeight: '60vh', mt: 5 }}

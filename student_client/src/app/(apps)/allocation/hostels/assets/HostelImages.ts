@@ -57,15 +57,59 @@ export const hostelO = [
   'https://res.cloudinary.com/dmwydl8zn/image/upload/v1714996244/hosmas/hostel_o/xzojqmij7oyhktq6blsj.jpg',
 ] as string[];
 
-export const hostelM=[
-  "https://res.cloudinary.com/dmwydl8zn/image/upload/v1715098045/hosmas/hostel_m/bezl4tqeguzu2foomzyz.jpg",
-  "https://res.cloudinary.com/dmwydl8zn/image/upload/v1715098049/hosmas/hostel_m/fm2s19hhq5mrg6xqz2fl.jpg",
-  "https://res.cloudinary.com/dmwydl8zn/image/upload/v1715098029/hosmas/hostel_m/lj58f9dg0qkdyzimontr.jpg",
-  "https://res.cloudinary.com/dmwydl8zn/image/upload/v1715098033/hosmas/hostel_m/bn6kb3s0oqhe4s1d1aea.jpg",
-  "https://res.cloudinary.com/dmwydl8zn/image/upload/v1715098038/hosmas/hostel_m/qcjky5idp24nkpmloqge.jpg",
-  "https://res.cloudinary.com/dmwydl8zn/image/upload/v1715098041/hosmas/hostel_m/ipgxntfhrfsyt20i8kvv.jpg",
-  "https://res.cloudinary.com/dmwydl8zn/image/upload/v1715098052/hosmas/hostel_m/jtut3h3ovonghvdhnind.jpg",
-  "https://res.cloudinary.com/dmwydl8zn/image/upload/v1715098056/hosmas/hostel_m/sz186pqux3us2ozqkvtz.jpg",
-  "https://res.cloudinary.com/dmwydl8zn/image/upload/v1715098061/hosmas/hostel_m/kdqgpks5qccvrmos1kkp.jpg",
-  "https://res.cloudinary.com/dmwydl8zn/image/upload/v1715098065/hosmas/hostel_m/vhosaqgipl4hpl4gxynt.jpg"
+export const hostelM = [
+  'https://res.cloudinary.com/dmwydl8zn/image/upload/v1715098045/hosmas/hostel_m/bezl4tqeguzu2foomzyz.jpg',
+  'https://res.cloudinary.com/dmwydl8zn/image/upload/v1715098049/hosmas/hostel_m/fm2s19hhq5mrg6xqz2fl.jpg',
+  'https://res.cloudinary.com/dmwydl8zn/image/upload/v1715098029/hosmas/hostel_m/lj58f9dg0qkdyzimontr.jpg',
+  'https://res.cloudinary.com/dmwydl8zn/image/upload/v1715098033/hosmas/hostel_m/bn6kb3s0oqhe4s1d1aea.jpg',
+  'https://res.cloudinary.com/dmwydl8zn/image/upload/v1715098038/hosmas/hostel_m/qcjky5idp24nkpmloqge.jpg',
+  'https://res.cloudinary.com/dmwydl8zn/image/upload/v1715098041/hosmas/hostel_m/ipgxntfhrfsyt20i8kvv.jpg',
+  'https://res.cloudinary.com/dmwydl8zn/image/upload/v1715098052/hosmas/hostel_m/jtut3h3ovonghvdhnind.jpg',
+  'https://res.cloudinary.com/dmwydl8zn/image/upload/v1715098056/hosmas/hostel_m/sz186pqux3us2ozqkvtz.jpg',
+  'https://res.cloudinary.com/dmwydl8zn/image/upload/v1715098061/hosmas/hostel_m/kdqgpks5qccvrmos1kkp.jpg',
+  'https://res.cloudinary.com/dmwydl8zn/image/upload/v1715098065/hosmas/hostel_m/vhosaqgipl4hpl4gxynt.jpg',
+] as string[];
+
+export const hostelA = [
+  'http://thapar.edu/images/hostel/outerview-a.jpg',
+  'http://thapar.edu/images/hostel/innerview-a.jpg',
+  'http://thapar.edu/images/hostel/reception-a.jpg',
+  'http://thapar.edu/images/hostel/roomview-a.jpg',
+  'http://thapar.edu/images/hostel/guest%20room-a.jpg',
+  'http://thapar.edu/images/hostel/gym-a',
+  'http://thapar.edu/images/hostel/mess1-a.jpg',
+  'http://thapar.edu/images/hostel/mess-a.jpg',
+] as string[];
+export const hostelC = [
+  'https://www.thapar.edu/upload/files/chostel.jpg',
+  'https://www.thapar.edu/upload/files/chostel2.jpg',
+  'https://www.thapar.edu/upload/files/chostel4.jpg',
+  'https://www.thapar.edu/upload/files/chostel6.jpg',
+  'https://www.thapar.edu/upload/files/chostel7.jpg',
+  'https://www.thapar.edu/upload/files/chostel8.jpg',
+  'https://www.thapar.edu/upload/files/chostel9.jpg',
+  'https://www.thapar.edu/upload/files/chostel10.jpg',
+] as string[];
+
+export const hostelD = [
+  'https://thapar.edu/images/hostel/1OUTERVIEWD.jpg',
+  'https://thapar.edu/images/hostel/2INSIDED.jpg',
+  'https://thapar.edu/images/hostel/3MESSD.jpg',
+  'https://thapar.edu/images/hostel/4ROOMD.jpg',
+  'https://thapar.edu/images/hostel/5gymd.jpg',
+  'https://thapar.edu/images/hostel/6INNER2D.jpg',
+] as string[];
+export const hostelJ = [
+  'https://thapar.edu/images/hostel/hostelJ_1.png',
+  'https://thapar.edu/images/hostel/hostelJ_2.png',
+  'https://thapar.edu/images/hostel/hostelJ_2.png',
+  'https://thapar.edu/images/hostel/hostelJ_4.png',
+  'https://thapar.edu/upload/files/Hostelj2.jpeg',
+] as string[];
+export const hostelQ = [
+  'http://thapar.edu/images/hostel/1OUTERVIEWQ.JPG',
+  'http://thapar.edu/images/hostel/2INNERVIEWQ.JPG',
+  'https://thapar.edu/images/hostel/3ROOMQ.JPG',
+  'https://thapar.edu/images/hostel/4BEDROOMQ.JPG',
+  'https://thapar.edu/images/hostel/5WASHROOMQ.JPG',
 ] as string[];

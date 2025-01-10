@@ -1,61 +1,33 @@
 'use client';
 
 import * as React from 'react';
-import { Box, Button, MenuItem, Paper, Select, type SelectChangeEvent } from '@mui/material';
+import { Box, Button, CircularProgress, MenuItem, Paper, Select, type SelectChangeEvent } from '@mui/material';
 import { Stack } from '@mui/system';
 
 // import Complaint from './complaint';
 import Feedback from './feedback';
 import MenuTable from './menu';
+import { useMessMenu } from '@/hooks/query/use-mess';
+import { useProfile } from '@/hooks/query/use-profile';
 
  const days: string[] = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 
-type Items = Record<string, "veg" | "non-veg">;
 
-type MealTimings = Record<string, Items>;
 
- interface MenuItems {
-  Breakfast: MealTimings;
-  Lunch: MealTimings;
-  Dinner: MealTimings;
-}
 
 export default function Home(): React.JSX.Element {
   // 0 -> Mess Menu
   // 1 -> Feedback Menu
   // 2 -> Complaint Menu
 
-  const menuItems: MenuItems = {
-    Breakfast: {
-      Monday: { "Pancakes": "veg", "Omelette": "non-veg", "Toast": "veg", "Fruit Salad": "veg", "Smoothie": "veg", "Chicken Sausage": "non-veg" },
-      Tuesday: { "Paratha": "veg", "Scrambled Eggs": "non-veg", "Porridge": "veg", "Boiled Eggs": "non-veg", "Chana Masala": "veg", "Bacon": "non-veg" },
-      Wednesday: { "Toast": "veg", "Sausage": "non-veg", "Uttapam": "veg", "Veg Sandwich": "veg", "Egg Curry": "non-veg", "Tea & Biscuits": "veg" },
-      Thursday: { "Idli": "veg", "Bacon": "non-veg", "Poha": "veg", "Vegetable Upma": "veg", "Omelette Roll": "non-veg", "Fried Eggs": "non-veg" },
-      Friday: { "Cereal": "veg", "Ham": "non-veg", "Sprouts": "veg", "Cheese Sandwich": "veg", "Chicken Nuggets": "non-veg", "Muffins": "veg" },
-      Saturday: { "Poha": "veg", "French Toast": "non-veg", "Dosa": "veg", "Fruit Bowl": "veg", "Egg Bhurji": "non-veg", "Hash Browns": "veg" },
-      Sunday: { "Aloo Paratha": "veg", "Veg Cutlets": "veg", "Chicken Patties": "non-veg", "Lassi": "veg", "Omelette": "non-veg", "Waffles": "veg" },
-    },
-    Lunch: {
-      Monday: { "Rajma Chawal": "veg", "Grilled Chicken": "non-veg", "Salad": "veg", "Paneer Tikka": "veg", "Fish Curry": "non-veg", "Dal Fry": "veg" },
-      Tuesday: { "Butter Chicken": "non-veg", "Jeera Rice": "veg", "Mix Veg": "veg", "Mutton Curry": "non-veg", "Chapati": "veg", "Veg Pulao": "veg" },
-      Wednesday: { "Egg Curry": "non-veg", "Aloo Gobhi": "veg", "Rice": "veg", "Chicken Biryani": "non-veg", "Roti": "veg", "Dal Makhani": "veg" },
-      Thursday: { "Fish Fry": "non-veg", "Chole Bhature": "veg", "Veg Salad": "veg", "Chicken Korma": "non-veg", "Veg Soup": "veg", "Paneer Butter Masala": "veg" },
-      Friday: { "Grilled Fish": "non-veg", "Pulao": "veg", "Mix Veg Curry": "veg", "Chicken Curry": "non-veg", "Dal Tadka": "veg", "Paratha": "veg" },
-      Saturday: { "Egg Fried Rice": "non-veg", "Aloo Paratha": "veg", "Paneer Bhurji": "veg", "Chicken Roast": "non-veg", "Cucumber Salad": "veg", "Roti": "veg" },
-      Sunday: { "Mutton Biryani": "non-veg", "Shahi Paneer": "veg", "Plain Rice": "veg", "Tandoori Chicken": "non-veg", "Veg Kofta": "veg", "Chapati": "veg" },
-    },
-    Dinner: {
-      Monday: { "Chicken Curry": "non-veg", "Dal Tadka": "veg", "Steamed Rice": "veg", "Vegetable Soup": "veg", "Fish Tikka": "non-veg", "Roti": "veg" },
-      Tuesday: { "Paneer Curry": "veg", "Grilled Chicken": "non-veg", "Mix Veg Curry": "veg", "Rice": "veg", "Mutton Rogan Josh": "non-veg", "Naan": "veg" },
-      Wednesday: { "Vegetable Biryani": "veg", "Fried Fish": "non-veg", "Dal": "veg", "Butter Naan": "veg", "Chicken Stew": "non-veg", "Salad": "veg" },
-      Thursday: { "Mutton Korma": "non-veg", "Veg Korma": "veg", "Rice": "veg", "Paneer Tikka Masala": "veg", "Fish Curry": "non-veg", "Roti": "veg" },
-      Friday: { "Chicken Handi": "non-veg", "Jeera Rice": "veg", "Aloo Matar": "veg", "Grilled Fish": "non-veg", "Dal Fry": "veg", "Paratha": "veg" },
-      Saturday: { "Egg Curry": "non-veg", "Veg Manchurian": "veg", "Noodles": "veg", "Chicken Fried Rice": "non-veg", "Spring Rolls": "veg", "Soup": "veg" },
-      Sunday: { "Tandoori Chicken": "non-veg", "Malai Kofta": "veg", "Steamed Rice": "veg", "Fish Curry": "non-veg", "Paneer Butter Masala": "veg", "Chapati": "veg" },
-    },
-  };
+
+
+  const {data:profile}=useProfile();
+  const hostelId=profile?.data.student.room.hostel.id;
   
+  const { data:messMenu, isLoading} = useMessMenu({hostelId:hostelId||0});
+  const menuItems=messMenu?.data||{Breakfast:{},Lunch:{},Dinner:{}};
 
   const [pageState, setPagesState] = React.useState<number>(0);
   const [day, setDay] = React.useState<string>('Monday');
@@ -208,9 +180,16 @@ export default function Home(): React.JSX.Element {
           <MenuItem value="Dinner">Dinner</MenuItem>
         </Select>
       </Stack>
-
-      {pageState === 0 && <MenuTable menuItems={menuItems} timing={messTiming} day={day} />}
-      {pageState === 1 && <Feedback menuItems={menuItems} day={day} timing={messTiming} />}
+       {isLoading ?(
+        <Box sx={{display:'flex',justifyContent:'center',alignItems:'center',height:'52vh'}}>
+          <CircularProgress/>
+          </Box>
+       ):(
+        <>
+        {pageState === 0 && <MenuTable menuItems={menuItems} timing={messTiming} day={day} />}
+        </>
+       )}   
+        {pageState === 1 && <Feedback/>}
       {/* {pageState === 2 && <Complaint />} */}
     </Paper>
   );

@@ -1,12 +1,17 @@
 'use client';
 
-import React, { useState } from 'react';
+import *  as React from 'react';
 import { Environment, OrbitControls, OrthographicCamera } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 
 import { Skeleton, Box } from '@mui/material';
 import OHostel from './base-models/OHostel';
 import BHostel from './base-models/BHostel';
+import AHostel from './base-models/AHostel';
+import CHostel from './base-models/CHostel';
+import DHostel from './base-models/DHostel';
+import JHostel from './base-models/JHostel';
+import QHostel from './base-models/QHostel';
 
 interface ModelProps {
   // eslint-disable-next-line react/require-default-props -- default props are provided in the component
@@ -15,9 +20,9 @@ interface ModelProps {
 }
 
 export default function Model({ hostel }: ModelProps): React.JSX.Element {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = React.useState(true);
 
-  const handleModelLoad = () => {
+  const handleModelLoad = ():void => {
     setLoading(false);
   };
 
@@ -64,6 +69,11 @@ export default function Model({ hostel }: ModelProps): React.JSX.Element {
 
         {hostel === 'hostel-o' && (<OHostel position={[10, -10, 0]} onLoad={handleModelLoad} />)}
         {hostel === 'hostel-b' && (<BHostel position={[0, -10, 0]} onLoad={handleModelLoad} />)}
+        {hostel === 'hostel-a' && (<AHostel position={[0, -10, 0]} onLoad={handleModelLoad} />)}
+        {hostel === 'hostel-c' && (<CHostel position={[0, -10, 0]} onLoad={handleModelLoad} />)}
+        {hostel === 'hostel-d' && (<DHostel position={[0, -10, 0]} onLoad={handleModelLoad} />)}
+        {hostel === 'hostel-j' && (<JHostel position={[0, -10, 0]} onLoad={handleModelLoad} />)}
+        {hostel === 'hostel-q' && (<QHostel position={[0, -10, 0]} onLoad={handleModelLoad} />)}
       </Canvas>
     </div>
   );

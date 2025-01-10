@@ -5,6 +5,7 @@ import { Stack } from '@mui/system';
 
 import { config } from '@/config';
 import LeaveApplication from '@/components/leave/LeaveApplication';
+import Profile from '@/components/core/profile';
 
 export const metadata = { title: `Leave | ${config.site.name}` } satisfies Metadata;
 
@@ -14,6 +15,7 @@ export default function Page(): React.JSX.Element {
       <Typography variant="h3" sx={{ color: 'var(--Page-HeadColor)' }}>
         Leave Application
       </Typography>
+      <Profile/>
       <LeaveApplication />
     </Stack>
   );

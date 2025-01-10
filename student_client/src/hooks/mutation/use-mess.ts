@@ -16,12 +16,7 @@ export const useSubmitFeedback = ({
 
   return useCustomMutation<CreateFeedbackRequest, FeedbackResponse>({
     mutationFn: submitFeedback,
-    onSuccess: (data) => {
-      // No need to invalidate queries as feedback doesn't affect other data
-      onSuccess?.(data);
-    },
-    onError: (error) => {
-      onError?.(error);
-    },
+    onSuccess,
+    onError,
   });
 };
