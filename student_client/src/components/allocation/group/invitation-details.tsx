@@ -38,11 +38,7 @@ export default function InvitationDetails(): React.JSX.Element {
         <Typography variant="h5">Invitations</Typography>
         <Button
           variant="contained"
-          sx={{
-            padding: '0.4rem',
-            minHeight: 0,
-            minWidth: 0,
-          }}
+          sx={{ padding: '0.4rem', minHeight: 0, minWidth: 0 }}
           onClick={handleOpenInvitationModal}
         >
           <AddIcon />

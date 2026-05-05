@@ -22,6 +22,6 @@ export interface Level {
 }
 
 export const getAllHostels = async (): Promise<AxiosResponse<Root>> => {
-  const res = await hostelApi.get("/all/");
+  const res = await hostelApi.get("all/");
   return res;
 };

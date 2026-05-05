@@ -132,22 +132,22 @@ export const getProfile = async (): Promise<AxiosResponse<CentralProfileResponse
 };
 
 export const getProfile2 = async (): Promise<AxiosResponse<ProfileResponse>> => {
-  const token = localStorage.getItem('custom-auth-token-2');
+  const token = (await getToken()).data;
 
   if (token === null || token === undefined) {
     throw new Error('You must be logged in to perform this action');
   }
 
-  const res = await tempApi.get('student/profile/', {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  // const res = await centralApi.get('user/', {
+  // const res = await tempApi.get('student/profile/', {
   //   headers: {
   //     Authorization: `Bearer ${token}`,
   //   },
   // });
+  const res = await centralApi.get('user/', {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
   logger.debug('getProfile2', res.data);
 
   return res;

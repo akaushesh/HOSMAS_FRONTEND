@@ -5,6 +5,7 @@ import type { ErrorResponse } from '@/services/auth';
 import type { GroupResponse } from '@/services/group';
 import type { SuccessResponse } from '@/services/invitation';
 import type { ProfileResponse } from '@/services/profile';
+import GroupsIcon from '@mui/icons-material/Groups';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { Button, CircularProgress, IconButton, Menu, MenuItem, TableFooter } from '@mui/material';
 import Paper from '@mui/material/Paper';
@@ -14,11 +15,13 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import Typography from '@mui/material/Typography';
+import { Box } from '@mui/system';
 import { useQueryClient } from '@tanstack/react-query';
 import type { AxiosError, AxiosResponse } from 'axios';
 
 import { logger } from '@/lib/default-logger';
-import { useTransferOwnership } from '@/hooks/mutation/use-group';
+import { useCreateGroup, useTransferOwnership } from '@/hooks/mutation/use-group';
 import { useGroup } from '@/hooks/query/use-group';
 import { useProfile } from '@/hooks/query/use-profile';
 import CustomModal from '@/components/core/custom-modal';
@@ -49,6 +52,7 @@ export default function GroupDetails(): React.JSX.Element {
   const [openLeaveModal, setOpenLeaveModal] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [newLeaderRollno, setNewLeaderRollno] = React.useState<null | number>(null);
+  const [createError, setCreateError] = React.useState<string>('');
 
   const queryClient = useQueryClient();
 
@@ -66,6 +70,17 @@ export default function GroupDetails(): React.JSX.Element {
     onError,
   });
 
+  const { mutate: createGroupFn, isPending: isCreatingGroup } = useCreateGroup({
+    onSuccess: async () => {
+      setCreateError('');
+      await queryClient.invalidateQueries({ queryKey: ['getGroup'] });
+      await queryClient.invalidateQueries({ queryKey: ['getMyToken'] });
+    },
+    onError: (error: AxiosError<ErrorResponse>) => {
+      setCreateError(error?.response?.data?.message ?? 'Failed to create group');
+    },
+  });
+
   const open = Boolean(anchorEl);
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>): void => {
     setAnchorEl(event.currentTarget);
@@ -80,6 +95,45 @@ export default function GroupDetails(): React.JSX.Element {
     logger.debug(newLeaderRollno);
   };
 
+  // ── Empty state: no group yet ──
+  if (!isLoading && !leader) {
+    return (
+      <TableContainer component={Paper}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '3rem 2rem',
+            gap: 2,
+          }}
+        >
+          <GroupsIcon sx={{ fontSize: '4rem', color: 'text.secondary' }} />
+          <Typography variant="h6" color="text.secondary">
+            You are not in a group yet
+          </Typography>
+          <Typography variant="body2" color="text.secondary" textAlign="center">
+            Create a group to become the leader and start inviting members, or wait for a leader to invite you.
+          </Typography>
+          {createError && (
+            <Typography variant="body2" color="error">
+              {createError}
+            </Typography>
+          )}
+          <Button
+            variant="contained"
+            onClick={() => { createGroupFn(); }}
+            disabled={isCreatingGroup}
+            startIcon={isCreatingGroup ? <CircularProgress size={16} /> : <GroupsIcon />}
+          >
+            {isCreatingGroup ? 'Creating…' : 'Create Group'}
+          </Button>
+        </Box>
+      </TableContainer>
+    );
+  }
+
   return (
     <TableContainer component={Paper}>
       <Table aria-label="group table">
@@ -93,7 +147,7 @@ export default function GroupDetails(): React.JSX.Element {
                 onClick={() => {
                   setOpenLeaveModal(true);
                 }}
-                disabled={isLoading||isIndividual}
+                disabled={isLoading}
               >
                 Leave
               </Button>

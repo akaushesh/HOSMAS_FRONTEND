@@ -9,6 +9,7 @@ export const paths = {
     dashboard:'/cleaning/dashboard',
     attendance:'/cleaning/attendance',
     assignment:'/cleaning/assignment',
+    addWorker:'/cleaning/add-worker',
   },
   mess:{
     default:'/mess',

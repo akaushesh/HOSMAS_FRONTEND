@@ -21,7 +21,7 @@ export default function LaundryMain(): React.JSX.Element {
 
   
   const laundryHistory = initData?.data?.laundry_slips
-  .filter((item) => item.is_checked_out)
+  ?.filter((item) => item.is_checked_out)
   .sort((a, b) => {
     if (a.is_delivered !== b.is_delivered) {
       return a.is_delivered ? 1 : -1; 
@@ -32,7 +32,7 @@ export default function LaundryMain(): React.JSX.Element {
     }
 
     return dayjs(b.dropoff_time).diff(dayjs(a.dropoff_time));
-  }) || null;
+  }) ?? null;
 
   if (initData?.data) {
     initData.data.is_active = true;

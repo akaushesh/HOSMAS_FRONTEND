@@ -57,8 +57,8 @@ export default function LowerRightCont(): React.JSX.Element {
   const today = format(now, 'yyyy-MM-dd');
   const nextDay = format(new Date(now.setDate(now.getDate() + 1)), 'yyyy-MM-dd');
 
-  const areAllSlotsSelected = (): boolean => {
-    return selectedSlots.every((slot) => slot.id !== 0 && slot.time !== '' && slot.date !== '');
+  const isAtLeastOneSlotSelected = (): boolean => {
+    return selectedSlots.some((slot) => slot.id !== 0 && slot.time !== '' && slot.date !== '');
   };
 
   const filteredSlots = slots
@@ -92,8 +92,9 @@ export default function LowerRightCont(): React.JSX.Element {
   };
 
   const onHandleConfirmSlots = async (): Promise<void> => {
-    const selectedSlotIds = selectedSlots.map((slot) => slot.id);
-    const selectedDates = selectedSlots.map((slot) => slot.date);
+    const validSlots = selectedSlots.filter((slot) => slot.id !== 0);
+    const selectedSlotIds = validSlots.map((slot) => slot.id);
+    const selectedDates = validSlots.map((slot) => slot.date);
 
     const createCleaningRequestData = {
       preferred_slots: selectedSlotIds,
@@ -111,7 +112,7 @@ export default function LowerRightCont(): React.JSX.Element {
     <Paper elevation={10} sx={{ width: 1, height: 1, p: 3 }}>
       <Typography variant="h5">Select Room cleaning slots</Typography>
       <Typography variant="caption" gutterBottom>
-        Choose your 3 preferred slots to request for room cleaning
+        Choose up to 3 preferred slots to request for room cleaning
       </Typography>
 
       <Grid container spacing={2} mt={3}>
@@ -152,7 +153,7 @@ export default function LowerRightCont(): React.JSX.Element {
           variant="contained"
           color="primary"
           onClick={onHandleConfirmSlots}
-          disabled={!areAllSlotsSelected()}
+          disabled={!isAtLeastOneSlotSelected()}
         >
           Confirm Slots
         </LoadingButton>

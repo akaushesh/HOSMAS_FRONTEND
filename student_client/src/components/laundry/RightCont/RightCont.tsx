@@ -18,8 +18,8 @@ interface RightContProps {
 }
 
 export default function RightCont({ data }: RightContProps): React.JSX.Element {
-  const submitQr = data?.laundry_slips.find((item) => !item.is_checked_out) || null;
-  const collectQrs = data?.laundry_slips.filter((item) => item.is_checked_out && !item.is_delivered) || null;
+  const submitQr = data?.laundry_slips?.find((item) => !item.is_checked_out) ?? null;
+  const collectQrs = data?.laundry_slips?.filter((item) => item.is_checked_out && !item.is_delivered) ?? null;
 
   const isAllowedSubmit = !data?.laundry_slips?.some(item => item.is_checked_out && dayjs(item.dropoff_time).format('DD MMM YYYY') === dayjs().format('DD MMM YYYY'));
 

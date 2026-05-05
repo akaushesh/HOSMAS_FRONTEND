@@ -34,7 +34,7 @@ function timeAgo(timestamp: Date): string {
   const days = Math.floor(hours / 24);
 
   if (seconds < 60) {
-    return `${seconds.toString()} seconds ago`;
+    return 'Just now';
   } else if (minutes < 60) {
     return `${minutes.toString()} minutes ago`;
   } else if (hours < 24) {
@@ -122,9 +122,8 @@ export function ReceivedInvitations(): React.JSX.Element {
               </TableRow>
             )}
             {receivedInvitations?.data.map((invitation) => {
-              if (invitation?.status === 'W') {
-                return (
-                  <TableRow hover key={invitation.group_leader_rollno}>
+              return (
+                <TableRow hover key={invitation.group_leader_rollno}>
                     <TableCell>{invitation.group_leader_name}</TableCell>
                     <TableCell align="center">{timeAgo(new Date(invitation.time))}</TableCell>
                     <TableCell align="right">
@@ -161,9 +160,6 @@ export function ReceivedInvitations(): React.JSX.Element {
                     </TableCell>
                   </TableRow>
                 );
-              } else {
-                return null;
-              }
             })}
           </TableBody>
         )}

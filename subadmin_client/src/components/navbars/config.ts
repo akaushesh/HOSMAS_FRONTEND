@@ -7,6 +7,7 @@ export const cleaningSubItems = [
   { key: 'dashboard', title: 'Dashboard', href: paths.cleaning.dashboard, icon: 'users' },
   { key: 'attendance', title: 'Attendance', href: paths.cleaning.attendance, icon: 'userList'},
   { key: 'assignment', title: 'Assignment', href: paths.cleaning.assignment, icon: 'ListChecks' },
+  { key: 'add-worker', title: 'Add Worker', href: paths.cleaning.addWorker, icon: 'plus' },
 ] satisfies NavItemConfig[];
 
 export const messSubItems = [

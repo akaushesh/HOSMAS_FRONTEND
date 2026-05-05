@@ -69,7 +69,7 @@ export const getChoices = async (): Promise<AxiosResponse<Choice[]>> => {
     throw new Error('You must be logged in to perform this action');
   }
 
-  const res = await preferenceApi.get('getChoices/', {
+  const res = await preferenceApi.get('choices/', {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -86,7 +86,7 @@ export const getPreference = async (): Promise<AxiosResponse<PreferenceResponse>
     throw new Error('You must be logged in to perform this action');
   }
 
-  const res = await preferenceApi.get('getPreference/', {
+  const res = await preferenceApi.get('get/', {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -143,7 +143,7 @@ export const createPreference = async (data: PreferenceOrder): Promise<AxiosResp
     throw new Error('You must be logged in to perform this action');
   }
 
-  const res = await preferenceApi.post('createPreference/', data, {
+  const res = await preferenceApi.post('create/', data, {
     headers: {
       Authorization: `Bearer ${token}`,
     },

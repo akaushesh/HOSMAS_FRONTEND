@@ -28,7 +28,8 @@ export interface ResetPasswordData {
 }
 
 export const login = async (data: LoginData): Promise<AxiosResponse<TokenResponse>> => {
-  const res = await tempApi.post('auth/token/', data);
+  // const res = await tempApi.post('/token/', data);
+  const res = await centralApi.post('/token/', data);
   logger.debug('login', res.data);
   return res;
 };

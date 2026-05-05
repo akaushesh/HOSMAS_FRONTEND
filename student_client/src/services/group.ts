@@ -6,6 +6,23 @@ import { logger } from '@/lib/default-logger';
 import { groupApi, studentApi } from './api';
 import type { OkResponse } from './profile';
 
+export const createGroup = async (): Promise<AxiosResponse<OkResponse>> => {
+  const token = (await authClient.getToken2()).data;
+
+  if (token === null || token === undefined) {
+    throw new Error('You must be logged in to perform this action');
+  }
+
+  const res = await groupApi.post('create/', null, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  logger.debug('createGroup', res.data);
+
+  return res;
+};
+
 interface Room {
   level: number;
   number: string;
@@ -63,7 +80,7 @@ export const searchStudent = async (values: StudentData): Promise<AxiosResponse<
     rollno: values.rollno,
   };
 
-  const res = await studentApi.post('search/', data, {
+  const res = await groupApi.post('search-student/', data, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -108,6 +125,29 @@ export const leaveGroup = async (): Promise<AxiosResponse<OkResponse>> => {
     },
   });
   logger.debug('leaveGroup', res.data);
+
+  return res;
+};
+
+export interface MyTokenResponse {
+  status: string;
+  token: string;
+  name: string;
+}
+
+export const getMyToken = async (): Promise<AxiosResponse<MyTokenResponse>> => {
+  const token = (await authClient.getToken2()).data;
+
+  if (token === null || token === undefined) {
+    throw new Error('You must be logged in to perform this action');
+  }
+
+  const res = await groupApi.get('token/', {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  logger.debug('getMyToken', res.data);
 
   return res;
 };

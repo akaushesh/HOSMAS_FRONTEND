@@ -67,16 +67,17 @@ function renderNavItems({ items, pathname }: { items?: NavItemConfig[]; pathname
       }}
     >
       {items?.map((item) => {
+        const { key, ...restItem } = item;
         return (
           <Box
-            key={item.key}
+            key={key}
             sx={{
-              ...(item.invisible && {
+              ...(restItem.invisible && {
                 display: 'none',
               }),
             }}
           >
-            <NavItem items={item.items} isNested={item.isNested} pathname={pathname} {...item} />
+            <NavItem items={restItem.items} isNested={restItem.isNested} pathname={pathname} {...restItem} />
           </Box>
         );
       })}

@@ -7,6 +7,7 @@ import type { AxiosError } from 'axios';
 import type { User } from '@/types/user';
 
 import { logger } from '../default-logger';
+import { log } from 'util';
 
 function generateToken(): string {
   const arr = new Uint8Array(12);
@@ -73,12 +74,12 @@ class AuthClient {
 
     try {
       const loginResponse = await newLogin({ email, password });
-      const loginResponse2 = await login({ email, password });
+      // const loginResponse2 = await login({ email, password });
       const successLoginResponse = loginResponse;
-      const successLoginResponse2 = loginResponse2;
+      // const successLoginResponse2 = loginResponse2; 
 
       token = successLoginResponse?.data?.access;
-      token2 = successLoginResponse2?.data?.access;
+      // token2 = successLoginResponse2?.data?.access;
       logger.debug('signInWithPassword', successLoginResponse);
     } catch (err) {
       const axiosError = err as AxiosError<CustomErrorResponse>;
@@ -91,7 +92,7 @@ class AuthClient {
     }
 
     localStorage.setItem('custom-auth-token', token);
-    localStorage.setItem('custom-auth-token-2', token2);
+    // localStorage.setItem('custom-auth-token-2', token2);
     return {};
   }
 
@@ -145,7 +146,7 @@ class AuthClient {
     return { data: token };
   }
   async getToken2(): Promise<{ data?: string | null }> {
-    const token = localStorage.getItem('custom-auth-token-2');
+    const token = localStorage.getItem('custom-auth-token');
 
     return { data: token };
   }

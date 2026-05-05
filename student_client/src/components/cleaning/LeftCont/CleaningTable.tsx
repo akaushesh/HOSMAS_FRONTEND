@@ -20,9 +20,7 @@ const StyledTableCell = styled(TableCell)(() => ({
 export default function CleaningTable(): React.JSX.Element {
   const { data: cleaningData, isLoading } = useCleaningRequests({ page: 1, page_size: 10 });
   const cleaningRequests = cleaningData!;
-  const assignedCleaningRequests = cleaningRequests?.data?.results.filter(
-    (cleaningRequest) => cleaningRequest.status !== 'Pending'
-  );
+  const allCleaningRequests = cleaningRequests?.data?.results;
 
   return (
     <Paper sx={{ borderRadius: '8px', overflowY: 'auto', overflowX: 'hidden', maxHeight: '47vh' }} elevation={10}>
@@ -43,7 +41,7 @@ export default function CleaningTable(): React.JSX.Element {
               </TableCell>
             </TableRow>
           ) : (
-            assignedCleaningRequests?.map((task) => <RowCleaning key={task?.id} task={task} />)
+            allCleaningRequests?.map((task) => <RowCleaning key={task?.id} task={task} />)
           )}
         </TableBody>
       </Table>
@@ -64,7 +62,7 @@ function RowCleaning({ task }: { task: CleaningRequest }): React.JSX.Element {
     >
       <TableCell align="center">{dayjs(task.date).format('DD MMM YYYY')}</TableCell>
       <TableCell align="center">{dayjs(task.date).format('hh:mm A')}</TableCell>
-      <TableCell align="center">{task.worker_details.name}</TableCell>
+      <TableCell align="center">{task.worker_details?.name ?? '—'}</TableCell>
       <TableCell align="center">{task.status}</TableCell>
     </TableRow>
   );

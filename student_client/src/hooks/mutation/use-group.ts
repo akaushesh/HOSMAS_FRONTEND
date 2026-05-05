@@ -1,4 +1,4 @@
-import { leaveGroup, searchStudent, transferOwnersip } from '@/services/group';
+import { createGroup, leaveGroup, searchStudent, transferOwnersip } from '@/services/group';
 import type { Student, StudentData } from '@/services/group';
 import type { OkResponse } from '@/services/profile';
 import type { UseMutationResult } from '@tanstack/react-query';
@@ -35,6 +35,18 @@ export const useLeaveGroup = ({
   // eslint-disable-next-line @typescript-eslint/no-invalid-void-type -- void is correct for no arguments
   return useCustomMutation<void, OkResponse>({
     mutationFn: leaveGroup,
+    onSuccess,
+    onError,
+  });
+};
+
+export const useCreateGroup = ({
+  onSuccess,
+  onError,
+}: ResolutionFunctions<OkResponse>): UseMutationResult<AxiosResponse<OkResponse>, AxiosError, void> => {
+  // eslint-disable-next-line @typescript-eslint/no-invalid-void-type -- void is correct for no arguments
+  return useCustomMutation<void, OkResponse>({
+    mutationFn: createGroup,
     onSuccess,
     onError,
   });

@@ -57,7 +57,7 @@ export default function LeaveForm({ refetch, caretakerEmail, parentsEmail }: Lea
     setRes({ msg: 'Leave Request Failed', type: 'error' });
   };
 
-  const { mutate: createLeaveSlip } = useCreateLeaveSlip({ onSuccess, onError });
+	const { mutate: createLeaveSlip, isPending } = useCreateLeaveSlip({ onSuccess, onError });
 
   const onSubmit = (data: LeaveFormInputs): void => {
     const formattedData = {
@@ -185,8 +185,8 @@ export default function LeaveForm({ refetch, caretakerEmail, parentsEmail }: Lea
         </Stack>
 
         <Stack justifyContent="center">
-          <Button variant="contained" type="submit" sx={{ pl: 6, pr: 6, mt: 2, fontSize: '1rem', fontWeight: 'bold' }}>
-            Submit
+          <Button disabled={isPending} variant="contained" type="submit" sx={{ pl: 6, pr: 6, mt: 2, fontSize: '1rem', fontWeight: 'bold' }}>
+            {isPending ? 'Submitting...' : 'Submit'}
           </Button>
         </Stack>
       </Stack>

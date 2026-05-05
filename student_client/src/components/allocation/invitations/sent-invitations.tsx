@@ -21,7 +21,7 @@ function timeAgo(timestamp: Date): string {
   const days = Math.floor(hours / 24);
 
   if (seconds < 60) {
-    return `${seconds.toString()} seconds ago`;
+    return 'Just now';
   } else if (minutes < 60) {
     return `${minutes.toString()} minutes ago`;
   } else if (hours < 24) {

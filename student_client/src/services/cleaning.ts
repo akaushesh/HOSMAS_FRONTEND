@@ -84,6 +84,12 @@ export const getCleaningRequests = async (
         Authorization: `Bearer ${token}`,
       },
     }
+    // `getCleaningRequests/?page_size=${String(params.page_size)}&page=${String(params.page)}`,
+    // {
+    //   headers: {
+    //     Authorization: `Bearer ${token}`,
+    //   },
+    // }
   );
   logger.debug('getCleaningRequests', res.data);
 

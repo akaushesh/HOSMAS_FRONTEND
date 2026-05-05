@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Divider, Paper, Stack, Typography } from '@mui/material';
+import { Divider, Paper, Stack, Typography, Skeleton } from '@mui/material';
 
 import { type CleanerProps } from './Assignment';
 
@@ -9,9 +9,10 @@ interface CleanerSelectorProps {
   selectedCleaner: CleanerProps;
   setSelectedCleaner: (val: CleanerProps) => void;
   cleaners: CleanerProps[];
+  isLoading?: boolean;
 }
 
-export function CleanerSelect({ cleaners,selectedCleaner, setSelectedCleaner }: CleanerSelectorProps): React.JSX.Element {
+export function CleanerSelect({ cleaners,selectedCleaner, setSelectedCleaner, isLoading }: CleanerSelectorProps): React.JSX.Element {
 
   const handleCleanerClick = (cleaner: CleanerProps): void => {
     if (cleaner.id === selectedCleaner.id) {
@@ -45,7 +46,11 @@ export function CleanerSelect({ cleaners,selectedCleaner, setSelectedCleaner }: 
       </Stack>
 
       <Stack spacing={1.5} mt={3} sx={{ overflowY: 'auto', height: '50vh', width: 1 }}>
-        {cleaners.map((cleaner) => {
+        {isLoading ? (
+          Array.from(new Array(4)).map((_, i) => (
+            <Skeleton key={i} variant="rounded" width="100%" height={60} sx={{ ml: 2.5, mr: 1 }} />
+          ))
+        ) : cleaners.map((cleaner) => {
           // console.log(selectedCleaner,cleaner);
           const isSelected = selectedCleaner.id === cleaner.id;
           return (
