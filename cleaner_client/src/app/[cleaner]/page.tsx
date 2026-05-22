@@ -41,7 +41,7 @@ export default function Page({
     setWorkerName(`Worker ${workerId}`);
 
     const ws = new WebSocket(
-      `wss://cleaning.hosmas.ccstiet.com/ws/workers/${workerId}/pending-requests/`
+      `ws://localhost:3378/ws/workers/${workerId}/pending-requests/`
     );
 
     ws.onopen = () => {
@@ -78,8 +78,7 @@ export default function Page({
     const tableColumnHeaders = ["Room No", "Slot", "Completed"];
     const tableRows = data.map((el) => [
       // workerName,
-      `Room ${el.room}, Level ${el.level}${
-        el.block ? `, Block ${el.block}` : ""
+      `Room ${el.room}, Level ${el.level}${el.block ? `, Block ${el.block}` : ""
       }`,
       `${el.slot.start_time} - ${el.slot.end_time}`,
       "", // Empty "Completed" column

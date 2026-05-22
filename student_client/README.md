@@ -1,90 +1,191 @@
-## [Devias Kit - React](https://material-kit-react.devias.io/)
+# HOSMAS — Student Client
 
-![license](https://img.shields.io/badge/license-MIT-blue.svg)
+Self-service web portal for hostel students to access all HOSMAS services.
 
-[![Devias Kit - React](https://github.com/devias-io/material-kit-react/blob/main/public/assets/thumbnail.png)](https://material-kit-react.devias.io/)
+- **Framework**: Next.js 14 (App Router) + TypeScript  
+- **UI**: Material-UI (MUI) v5  
+- **State**: TanStack Query v5  
+- **HTTP**: Axios  
+- **3D**: Three.js + React Three Fiber  
+- **Default port**: `3000`
 
-> Free React Admin Dashboard made with [MUI's](https://mui.com) components, [React](https://reactjs.org) and of course [Next.js](https://github.com/vercel/next.js) to boost your app development process!
+---
 
-## Pages 
+## Table of Contents
 
-- [Dashboard](https://material-kit-react.devias.io)
-- [Customers](https://material-kit-react.devias.io/dashboard/customers)
-- [Integrations](https://material-kit-react.devias.io/dashboard/integrations)
-- [Settings](https://material-kit-react.devias.io/dashboard/settings)
-- [Account](https://material-kit-react.devias.io/dashboard/account)
-- [Sign In](https://material-kit-react.devias.io/auth/sign-in)
-- [Sign Up](https://material-kit-react.devias.io/auth/sign-up)
-- [Reset Password](https://material-kit-react.devias.io/auth/reset-password)
+1. [Setup](#setup)
+2. [Environment Variables](#environment-variables)
+3. [Service Endpoints](#service-endpoints-api-map)
+4. [Feature Pages](#feature-pages)
+5. [Services Layer](#services-layer)
+6. [Architecture Notes](#architecture-notes)
 
-## Free Figma Community File
+---
 
-- [Duplicate File](https://www.figma.com/file/b3L1Np4RYiicZAOMopHNkm/Devias-Dashboard-Design-Library-Kit)
+## Setup
 
-## Upgrade to PRO Version
-
-We also have a pro version of this product which bundles even more pages and components if you want
-to save more time and design efforts :)
-
-| Free Version (this one)  | [Devias Kit Pro](https://mui.com/store/items/devias-kit-pro/)                |
-| ------------------------ | :--------------------------------------------------------------------------- |
-| **8** Pages              | **80+** Pages                                                                |
-| ✔ Custom Authentication  | ✔ Authentication with **Amplify**, **Auth0**, **Firebase** and **Supabase**  |
-| -                        | ✔ Vite Version                                                               |
-| -                        | ✔ Dark Mode Support                                                          |
-| -                        | ✔ Complete Users Flows                                                       |
-| -                        | ✔ Premium Technical Support                                                  |
-
-## Quick start
-
-- Clone the repo: `git clone https://github.com/devias-io/material-kit-react.git`
-- Make sure your Node.js and npm versions are up to date
-- Install dependencies: `npm install` or `yarn`
-- Start the server: `npm run dev` or `yarn dev`
-- Open browser: `http://localhost:3000`
-
-## File Structure
-
-Within the download you'll find the following directories and files:
-
-```
-┌── .editorconfig
-├── .eslintrc.js
-├── .gitignore
-├── CHANGELOG.md
-├── LICENSE.md
-├── next-env.d.ts
-├── next.config.js
-├── package.json
-├── README.md
-├── tsconfig.json
-├── public
-└── src
-	├── components
-	├── contexts
-	├── hooks
-	├── lib
-	├── styles
-	├── types
-	└── app
-		├── layout.tsx
-		├── page.tsx
-		├── auth
-		└── dashboard
+```bash
+cd Hosmas/student_client
+npm install
+npm run dev          # http://localhost:3000
 ```
 
-## Resources
+---
 
-- More freebies like this one: https://devias.io
+## Environment Variables
 
-## Reporting Issues:
+Create `.env.local`:
 
-- [Github Issues Page](https://github.com/devias-io/material-kit-react/issues)
+```env
+NEXT_PUBLIC_CENTRAL_URL=http://localhost:3376/
+NEXT_PUBLIC_ALLOCATION_URL=http://localhost:6543/
+NEXT_PUBLIC_CLEANING_URL=http://localhost:3378/
+NEXT_PUBLIC_LAUNDRY_URL=http://localhost:3388/
+NEXT_PUBLIC_LEAVE_URL=http://localhost:6699/
+NEXT_PUBLIC_MESS_URL=http://localhost:6555/
+```
 
-## License
+> **Production URLs** (commented out in `src/services/api.ts`):  
+> `https://central.hosmas.ccstiet.com/`, `https://api.hosmas.ccstiet.com/`, etc.
 
-- Licensed under [MIT](https://github.com/devias-io/material-kit-react/blob/main/LICENSE.md)
+---
 
-## Contact Us
+## Service Endpoints (API Map)
 
-- Email Us: support@deviasio.zendesk.com
+All API calls are made via Axios instances defined in `src/services/api.ts`.
+
+| Axios Instance | Base URL | Used for |
+|---|---|---|
+| `authApi` | `CENTRAL_URL` | Login, token refresh |
+| `centralApi` | `CENTRAL_URL` | User profile, hostel data |
+| `groupApi` | `ALLOCATION_URL/halloc/group/` | Group management |
+| `invitationApi` | `ALLOCATION_URL/halloc/group/invitation/` | Invitations |
+| `preferenceApi` | `ALLOCATION_URL/halloc/pref/` | Hostel preferences |
+| `roomApi` | `ALLOCATION_URL/halloc/pref/alloted-hostel-levels/` | Allotment result |
+| `dashboardApi` | `ALLOCATION_URL/dashboard/` | FAQ |
+| `cleaningApi` | `CLEANING_URL` | Cleaning requests |
+| `laundryApi` | `LAUNDRY_URL` | Laundry slips |
+| `leaveApi` | `LEAVE_URL` | Leave requests |
+| `messApi` | `MESS_URL` | Mess menu + feedback |
+
+---
+
+## Feature Pages
+
+| Route | Service(s) | Description |
+|---|---|---|
+| `/auth/login` | Central Repo | JWT login |
+| `/auth/reset-password` | Central Repo | Password reset |
+| `/dashboard` | — | Home dashboard |
+| `/cleaning` | Cleaning | View/create cleaning requests, rate completed work |
+| `/laundry` | Laundry | Create slip, track status |
+| `/leave` | Leave | Apply for leave, track status, cancel |
+| `/mess` | Mess | View weekly menu, submit feedback |
+| `/profile` | Central Repo | View/edit personal profile |
+| `/allocation` | Hostel Allocation | Group, invitation, preference, allotment |
+| `/allocation/hostel-3d` | — | 3D hostel viewer (Three.js) |
+
+---
+
+## Services Layer
+
+Each file in `src/services/` maps to one backend service:
+
+### `auth.ts`
+```typescript
+login(email, password)       // POST /user/login/
+logout()                     // clears localStorage
+getCurrentUser()             // GET /user/  (with JWT)
+refreshToken()               // POST /token/refresh/
+resetPassword(slug, pass)    // POST /user/reset-password/
+initiateReset(email)         // POST /user/initiate-reset-password/
+```
+
+### `cleaning.ts`
+```typescript
+getCleaningRequests(status?)         // GET /getCleaningRequests/
+getCleaningRequest(id)               // GET /getCleaningRequests/:id/
+createCleaningRequest(slots, dates)  // POST /createCleaningRequests/
+markRequestComplete(rating, comment) // POST /mark-request-complete/
+getSlots()                          // GET /getSlots/
+```
+
+### `laundry.ts`
+```typescript
+createLaundrySlip(items)         // POST /create-laundry-slips/
+updateLaundrySlip(txId, items)   // PUT /update-laundry-slip/
+getMySlips()                     // GET /get-slips/
+createComplaint(title, desc)     // POST /complaint/
+```
+
+### `leave.ts`
+```typescript
+getLeaveInfo()                           // GET /leave/get-info/
+getLeaveRequests(page, limit, status)    // GET /leave/get-requests/
+createLeaveRequest(data)                 // POST /leave/create-request/
+updateLeaveRequest(txId, dates)          // PATCH /leave/update-request/
+deleteLeave(txId)                        // DELETE /leave/delete/:id
+```
+
+### `mess.ts`
+```typescript
+getMenu(hostelId)          // GET /mess/get-menu/:hostel/
+giveFeedback(rating, desc) // POST /mess/give-feedback/
+getFeedbacks()             // GET /mess/get-feedbacks/
+```
+
+### `group.ts`
+```typescript
+createGroup()              // POST /halloc/group/create/
+getGroupMembers()          // GET /halloc/group/view/
+leaveGroup()               // POST /halloc/group/leave/
+getMyToken()               // GET /halloc/group/token/
+searchStudent(id)          // POST /halloc/group/search-student/
+```
+
+### `invitation.ts`
+```typescript
+sendInvitation(token)       // POST /halloc/group/invitation/send/
+getSentInvitations()        // GET /halloc/group/invitation/view/sent/
+getReceivedInvitations()    // GET /halloc/group/invitation/view/received/
+acceptInvitation(id)        // POST /halloc/group/invitation/accept/
+rejectInvitation(id)        // POST /halloc/group/invitation/reject/
+withdrawInvitation(id)      // POST /halloc/group/invitation/withdraw/
+```
+
+### `preference.ts`
+```typescript
+createPreference(groupId, hostels)  // POST /halloc/pref/create/
+getPreferences()                    // GET /halloc/pref/get/
+deletePreferences(groupId)          // POST /halloc/pref/delete/
+getChoices()                        // GET /halloc/pref/choices/
+retain()                            // POST /halloc/pref/retain/
+getStatus()                         // GET /halloc/pref/status/
+getAllotedHostel()                   // GET /halloc/pref/alloted-hostel-levels/
+```
+
+### `profile.ts`
+```typescript
+getProfile()                   // GET /user/
+getHostelDetails(hostelId)     // GET /hostel/:id/
+```
+
+---
+
+## Architecture Notes
+
+### Auth Flow
+1. User logs in via `/auth/login` — access + refresh tokens stored in `localStorage`.
+2. Axios **request interceptor** (in `api.ts`) automatically attaches `Authorization: Bearer <token>` to every request.
+3. Axios **response interceptor** handles 401 by attempting refresh; if refresh fails, redirects to login.
+
+### 3D Hostel Viewer
+Located at `src/components/allocation/hostels/`. Built with:
+- `three` — 3D engine
+- `@react-three/fiber` — React renderer
+- `@react-three/drei` — Orbit controls, GLTF loader
+- GLB models stored in `public/r3f/`
+
+### State Management
+- All server state managed by **TanStack Query** (queries + mutations).
+- Local UI state via **React `useState`** / **React Context** (`UserContext`).

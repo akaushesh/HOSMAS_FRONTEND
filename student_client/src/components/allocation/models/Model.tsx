@@ -67,13 +67,13 @@ export default function Model({ hostel }: ModelProps): React.JSX.Element {
         <Environment preset="sunset" />
         {/* Presets: apartment, city, dawn, forest, lobby, night, park, studio, sunset, warehouse */}
 
-        {hostel === 'hostel-o' && (<OHostel position={[10, -10, 0]} onLoad={handleModelLoad} />)}
-        {hostel === 'hostel-b' && (<BHostel position={[0, -10, 0]} onLoad={handleModelLoad} />)}
-        {hostel === 'hostel-a' && (<AHostel position={[0, -10, 0]} onLoad={handleModelLoad} />)}
-        {hostel === 'hostel-c' && (<CHostel position={[0, -10, 0]} onLoad={handleModelLoad} />)}
-        {hostel === 'hostel-d' && (<DHostel position={[0, -10, 0]} onLoad={handleModelLoad} />)}
-        {hostel === 'hostel-j' && (<JHostel position={[0, -10, 0]} onLoad={handleModelLoad} />)}
-        {hostel === 'hostel-q' && (<QHostel position={[0, -10, 0]} onLoad={handleModelLoad} />)}
+        {hostel === 'vyom-hall' && (<OHostel position={[10, -10, 0]} onLoad={handleModelLoad} />)}
+        {hostel === 'amritam-hall' && (<BHostel position={[0, -10, 0]} onLoad={handleModelLoad} />)}
+        {hostel === 'agira-hall' && (<AHostel position={[0, -10, 0]} onLoad={handleModelLoad} />)}
+        {hostel === 'prithvi-hall' && (<CHostel position={[0, -10, 0]} onLoad={handleModelLoad} />)}
+        {hostel === 'neeram-hall' && (<DHostel position={[0, -10, 0]} onLoad={handleModelLoad} />)}
+        {hostel === 'tejas-hall' && (<JHostel position={[0, -10, 0]} onLoad={handleModelLoad} />)}
+        {hostel === 'vahni-hall' && (<QHostel position={[0, -10, 0]} onLoad={handleModelLoad} />)}
       </Canvas>
     </div>
   );

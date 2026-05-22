@@ -1,90 +1,168 @@
-## [Devias Kit - React](https://material-kit-react.devias.io/)
+# HOSMAS — Subadmin Client
 
-![license](https://img.shields.io/badge/license-MIT-blue.svg)
+Dashboard for **Supervisors** (hostel caretakers) and **Sub-admins** to manage hostel operations — cleaning worker assignment, laundry tracking, leave approvals, and mess management.
 
-[![Devias Kit - React](https://github.com/devias-io/material-kit-react/blob/main/public/assets/thumbnail.png)](https://material-kit-react.devias.io/)
+- **Framework**: Next.js 14 (App Router) + TypeScript  
+- **UI**: Material-UI (MUI) v5  
+- **State**: TanStack Query v5  
+- **HTTP**: Axios  
+- **Default port**: `3001`
 
-> Free React Admin Dashboard made with [MUI's](https://mui.com) components, [React](https://reactjs.org) and of course [Next.js](https://github.com/vercel/next.js) to boost your app development process!
+---
 
-## Pages 
+## Table of Contents
 
-- [Dashboard](https://material-kit-react.devias.io)
-- [Customers](https://material-kit-react.devias.io/dashboard/customers)
-- [Integrations](https://material-kit-react.devias.io/dashboard/integrations)
-- [Settings](https://material-kit-react.devias.io/dashboard/settings)
-- [Account](https://material-kit-react.devias.io/dashboard/account)
-- [Sign In](https://material-kit-react.devias.io/auth/sign-in)
-- [Sign Up](https://material-kit-react.devias.io/auth/sign-up)
-- [Reset Password](https://material-kit-react.devias.io/auth/reset-password)
+1. [Setup](#setup)
+2. [Environment Variables](#environment-variables)
+3. [Service Endpoints](#service-endpoints-api-map)
+4. [Feature Pages](#feature-pages)
+5. [Services Layer](#services-layer)
+6. [Architecture Notes](#architecture-notes)
 
-## Free Figma Community File
+---
 
-- [Duplicate File](https://www.figma.com/file/b3L1Np4RYiicZAOMopHNkm/Devias-Dashboard-Design-Library-Kit)
+## Setup
 
-## Upgrade to PRO Version
-
-We also have a pro version of this product which bundles even more pages and components if you want
-to save more time and design efforts :)
-
-| Free Version (this one)  | [Devias Kit Pro](https://mui.com/store/items/devias-kit-pro/)                |
-| ------------------------ | :--------------------------------------------------------------------------- |
-| **8** Pages              | **80+** Pages                                                                |
-| ✔ Custom Authentication  | ✔ Authentication with **Amplify**, **Auth0**, **Firebase** and **Supabase**  |
-| -                        | ✔ Vite Version                                                               |
-| -                        | ✔ Dark Mode Support                                                          |
-| -                        | ✔ Complete Users Flows                                                       |
-| -                        | ✔ Premium Technical Support                                                  |
-
-## Quick start
-
-- Clone the repo: `git clone https://github.com/devias-io/material-kit-react.git`
-- Make sure your Node.js and npm versions are up to date
-- Install dependencies: `npm install` or `yarn`
-- Start the server: `npm run dev` or `yarn dev`
-- Open browser: `http://localhost:3000`
-
-## File Structure
-
-Within the download you'll find the following directories and files:
-
-```
-┌── .editorconfig
-├── .eslintrc.js
-├── .gitignore
-├── CHANGELOG.md
-├── LICENSE.md
-├── next-env.d.ts
-├── next.config.js
-├── package.json
-├── README.md
-├── tsconfig.json
-├── public
-└── src
-	├── components
-	├── contexts
-	├── hooks
-	├── lib
-	├── styles
-	├── types
-	└── app
-		├── layout.tsx
-		├── page.tsx
-		├── auth
-		└── dashboard
+```bash
+cd Hosmas/subadmin_client
+npm install
+npm run dev          # http://localhost:3001
 ```
 
-## Resources
+---
 
-- More freebies like this one: https://devias.io
+## Environment Variables
 
-## Reporting Issues:
+Create `.env.local`:
 
-- [Github Issues Page](https://github.com/devias-io/material-kit-react/issues)
+```env
+NEXT_PUBLIC_CENTRAL_URL=http://localhost:3376/
+NEXT_PUBLIC_ALLOCATION_URL=http://localhost:6543/
+NEXT_PUBLIC_CLEANING_URL=http://localhost:3378/
+NEXT_PUBLIC_LAUNDRY_URL=http://localhost:3388/
+NEXT_PUBLIC_LEAVE_URL=http://localhost:6699/
+NEXT_PUBLIC_MESS_URL=http://localhost:6555/
+```
 
-## License
+> **Production URLs** (commented out in `src/services/api.ts`):  
+> `https://central.hosmas.ccstiet.com/`, etc.
 
-- Licensed under [MIT](https://github.com/devias-io/material-kit-react/blob/main/LICENSE.md)
+---
 
-## Contact Us
+## Service Endpoints (API Map)
 
-- Email Us: support@deviasio.zendesk.com
+All API calls are made via Axios instances defined in `src/services/api.ts`.
+
+| Axios Instance | Base URL | Used for |
+|---|---|---|
+| `authApi` | `CENTRAL_URL` | Login, token refresh |
+| `centralApi` | `CENTRAL_URL` | User profile |
+| `cleaningApi` | `CLEANING_URL` | Cleaning request management |
+| `laundryApi` | `LAUNDRY_URL` | Laundry slip management |
+| `leaveApi` | `LEAVE_URL` | Leave approval/rejection |
+| `messApi` | `MESS_URL` | Menu management, ratings |
+
+---
+
+## Feature Pages
+
+| Route | Service(s) | Description |
+|---|---|---|
+| `/auth/login` | Central Repo | JWT login |
+| `/dashboard` | All | Summary stats and quick actions |
+| `/cleaning` | Cleaning | View all requests, assign workers, track status |
+| `/cleaning/workers` | Cleaning | Worker management (add, attendance) |
+| `/laundry` | Laundry | View slips, checkout, deliver, search by laundry number |
+| `/leave` | Leave | View/approve/reject leave applications, search/filter |
+| `/leave/settings` | Leave | Configure auto-approve for hostel |
+| `/mess` | Mess | View ratings, manage menu items |
+| `/profile` | Central Repo | View own supervisor profile |
+
+---
+
+## Services Layer
+
+Each file in `src/services/` maps to one backend service:
+
+### `auth.ts`
+```typescript
+login(email, password)       // POST /user/login/
+logout()                     // clears localStorage
+getCurrentUser()             // GET /user/
+refreshToken()               // POST /token/refresh/
+```
+
+### `cleaning.ts`
+```typescript
+getCleaningRequests(status?)          // GET /getCleaningRequests/?status=
+getCleaningRequest(id)                // GET /getCleaningRequests/:id/
+assignSingleRequest(id, workerId, slotId)  // POST /assign-request/:id/
+assignFloors()                         // GET /assign-floors-to-workers/
+assignRequests()                       // GET /assign-requests-to-workers/
+getWorkers(hostelId)                   // GET /hostels/:hostelId/workers/
+createWorker(name, phone, photo)       // POST /createWorker/
+markAttendance(workers)                // POST /workers/mark-attendance/
+getSlots()                             // GET /getSlots/
+createSlot(name)                       // POST /createSlot/
+```
+
+### `laundry.ts`
+```typescript
+getLaundryDetails(hostelId)          // GET /collected/:hostelId/
+getStudentSlips(laundryNumber)       // GET /get-student-slips/:id/
+findSlipByTxId(txId, action)         // POST /get-slip/
+checkout(txId, items)                // PATCH /checkout/
+deliver(txId)                        // PATCH /deliver/:id/
+isHostelActive(hostelId)             // GET /hostel-active/:hostelId/
+```
+
+### `leave.ts`
+```typescript
+getLeaveInfo()                                 // GET /leave/get-info/
+getLeaveRequests(page, limit, status)          // GET /leave/get-requests/
+setLeaveStatus(txId, status)                   // PATCH /leave/set-status/
+deleteLeave(txId)                              // DELETE /leave/delete/:id
+setAutoApprove(autoApprove)                    // POST /leave/set-auto-approve/
+searchLeaves(query, dates, status, page, limit)// POST /leave/search/
+```
+
+### `mess.ts`
+```typescript
+getRatings()                   // GET /mess/get-ratings/ (all ratings)
+getMenuItems()                 // GET /mess/get-menu-items/
+setMenu(data)                  // POST /mess/set-menu/
+getMenu(hostelId)              // GET /mess/get-menu/:hostel/
+```
+
+### `group.ts`
+```typescript
+getGroupMembers()   // GET /halloc/group/view/  (view group if student is part of)
+```
+
+### `profile.ts`
+```typescript
+getProfile()        // GET /user/
+```
+
+---
+
+## Architecture Notes
+
+### Auth Flow
+1. Supervisor logs in via `/auth/login`.
+2. Axios request interceptor attaches `Authorization: Bearer <token>` to all requests.
+3. 401 responses trigger token refresh; failed refresh redirects to `/auth/login`.
+4. The `/user/` endpoint returns `role: "supervisor"` with a nested `supervisor` object containing `hostel` details — this is used throughout the app to scope data to the right hostel automatically.
+
+### Role-Based UI
+- The sidebar and available pages are conditionally rendered based on the `role` field in the user profile.
+- Supervisors only see data for **their hostel** — the backend enforces this at the API level via JWT claims.
+
+### Real-time (Cleaning)
+- The Subadmin client does **not** use WebSocket — only the Cleaner Client (worker-facing) does.
+- Cleaning request status is polled via TanStack Query's `refetchInterval`.
+
+### QR Code Scanning
+- The subadmin client includes a QR scanner for laundry slip verification.
+- When scanning a drop-off QR: calls `POST /get-slip/` with `action: "drop"` → then `PATCH /checkout/`.
+- When scanning a delivery QR: calls `POST /get-slip/` with `action: "pick"` → then `PATCH /deliver/:id/`.

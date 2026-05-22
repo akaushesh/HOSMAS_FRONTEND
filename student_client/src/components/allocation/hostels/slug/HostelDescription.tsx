@@ -44,11 +44,12 @@ export default function HostelDescription({ hostel }: PropsType): React.JSX.Elem
             {hostel?.name}
           </Typography>
         
-          <Button variant="contained" sx={{borderRadius:1,width:"fit-content",minWidth:"0px"}} onClick={()=>{setModelOpen(true)}}  size='small'>
-
-            <LocationCityIcon sx={{fontSize:20, mr:{xs:0,md:1}}} />
-            <Typography  sx={{display:{xs:"none",md:"block"}}}>View 3D Model</Typography>
+          {['vyom-hall', 'amritam-hall', 'agira-hall', 'prithvi-hall', 'neeram-hall', 'tejas-hall', 'vahni-hall'].includes(hostel?.path || '') && (
+            <Button variant="contained" sx={{borderRadius:1,width:"fit-content",minWidth:"0px"}} onClick={()=>{setModelOpen(true)}}  size='small'>
+              <LocationCityIcon sx={{fontSize:20, mr:{xs:0,md:1}}} />
+              <Typography  sx={{display:{xs:"none",md:"block"}}}>View 3D Model</Typography>
             </Button>
+          )}
           </Stack>
           <Collapse  collapsedSize={100}>
             {hostel?.description.split('<br/>').map((desc, idx) => (

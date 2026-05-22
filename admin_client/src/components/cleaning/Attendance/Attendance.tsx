@@ -52,7 +52,7 @@ export default function Attendance(): React.JSX.Element {
           ? {
               ...cleaner,
               attendance: cleaner.attendance
-                ? { ...cleaner.attendance, is_present: cleaner.attendance.is_present }
+                ? { ...cleaner.attendance, is_present: !cleaner.attendance.is_present }
                 : { is_present: true, levels: [] },
             }
           : cleaner
@@ -130,7 +130,6 @@ export default function Attendance(): React.JSX.Element {
               <Checkbox
                 sx={{ background: 'white', borderRadius: 0.6, p: 0, touchAction: 'none', pointerEvents: 'none' }}
                 checked={el.attendance?.is_present || false}
-                disabled={attendanceMarked}
               />
 
               <Typography
@@ -161,7 +160,7 @@ export default function Attendance(): React.JSX.Element {
           color="primary"
           onClick={markAttendance}
           loading={loading}
-          disabled={attendanceMarked || loading}
+          disabled={loading}
         >
           Save
         </LoadingButton>
