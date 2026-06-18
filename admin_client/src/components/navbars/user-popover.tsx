@@ -1,7 +1,7 @@
 import * as React from 'react';
 import RouterLink from 'next/link';
 import { useRouter } from 'next/navigation';
-import type { ProfileResponse } from '@/services/profile';
+import type { SupervisorProfileResponse } from '@/services/profile';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import ListItemIcon from '@mui/material/ListItemIcon';
@@ -32,7 +32,7 @@ export function UserPopover({ anchorEl, onClose, open }: UserPopoverProps): Reac
   const router = useRouter();
 
   const { data: profile, isLoading } = useProfile();
-  const userProfile = profile as AxiosResponse<ProfileResponse>;
+  const userProfile = profile as AxiosResponse<SupervisorProfileResponse>;
 
   const handleSignOut = React.useCallback(async (): Promise<void> => {
     try {
@@ -63,9 +63,9 @@ export function UserPopover({ anchorEl, onClose, open }: UserPopoverProps): Reac
       slotProps={{ paper: { sx: { width: '240px' } } }}
     >
       <Box sx={{ p: '16px 20px ' }}>
-        <Typography variant="subtitle1">{userProfile?.data?.name}</Typography>
+        <Typography variant="subtitle1">{userProfile?.data?.supervisor?.name}</Typography>
         <Typography color="text.secondary" variant="body2">
-          {userProfile?.data?.user?.email}
+          {userProfile?.data?.supervisor?.email}
         </Typography>
       </Box>
       <Divider />

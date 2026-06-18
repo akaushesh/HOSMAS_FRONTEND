@@ -69,7 +69,7 @@ export interface SupervisorProfileResponse {
   supervisor: Supervisor;
 }
 
-interface ResetPasswordData {
+export interface ChangePasswordData {
   password: string;
 }
 
@@ -99,7 +99,7 @@ export const getProfile = async (): Promise<AxiosResponse<SupervisorProfileRespo
   return res;
 };
 
-export const changePassword = async (values: ResetPasswordData): Promise<AxiosResponse<OkResponse>> => {
+export const changePassword = async (values: ChangePasswordData): Promise<AxiosResponse<OkResponse>> => {
   const token = (await getToken()).data;
 
   if (token === null || token === undefined) {

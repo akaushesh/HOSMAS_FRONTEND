@@ -16,7 +16,6 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
-import { Box } from '@mui/system';
 import { useQueryClient } from '@tanstack/react-query';
 import type { AxiosError, AxiosResponse } from 'axios';
 
@@ -97,18 +96,17 @@ export default function GroupDetails(): React.JSX.Element {
     logger.debug(newLeaderRollno);
   };
 
-  // ── Empty state: no group yet ──
   if (!isLoading && !leader) {
     return (
-      <TableContainer component={Paper}>
-        <Box
-          sx={{
+      <Paper>
+        <div
+          style={{
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
             padding: '3rem 2rem',
-            gap: 2,
+            gap: '1rem',
           }}
         >
           <GroupsIcon sx={{ fontSize: '4rem', color: 'text.secondary' }} />
@@ -131,8 +129,8 @@ export default function GroupDetails(): React.JSX.Element {
           >
             {isCreatingGroup ? 'Creating…' : 'Create Group'}
           </Button>
-        </Box>
-      </TableContainer>
+        </div>
+      </Paper>
     );
   }
 

@@ -95,7 +95,7 @@ export function Requests({ handleAssignCleaner,selectedCleaner }: RequestsProps)
 
 
 
-function SpecialButton({ slots,isDisabled,handleAssign ,id,assigned}: { slots: { from: string; to: string }[]; isDisabled:boolean;handleAssign:(slot:number,assign:boolean,id:string)=>void; id:string;assigned:string;}): React.JSX.Element {
+function SpecialButton({ slots,isDisabled,handleAssign ,id,assigned}: { slots: { from: string; to: string }[]; isDisabled:boolean;handleAssign:(slot:number,assign:boolean,id:string)=>void; id:string;assigned?:string;}): React.JSX.Element {
   const timings = [9, 10, 11, 12, 1, 2, 3, 4, 5];
   const timingsPrint = ["9AM", "10AM", "11AM", "12PM", "1PM", "2PM", "3PM", "4PM", "5PM"];
 

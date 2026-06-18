@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import type { ProfileResponse } from '@/services/profile';
+import type { SupervisorProfileResponse } from '@/services/profile';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardHeader from '@mui/material/CardHeader';
@@ -16,7 +16,7 @@ import { useProfile } from '@/hooks/query/use-profile';
 
 export function AccountDetailsForm(): React.JSX.Element {
   const { data } = useProfile();
-  const profile = data as AxiosResponse<ProfileResponse>;
+  const profile = data as AxiosResponse<SupervisorProfileResponse>;
   const supervisor = profile?.data?.supervisor;
 
   return (

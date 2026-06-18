@@ -23,7 +23,7 @@ export function HostelAllotmentOverview({ sx }: GroupOverviewProps): React.JSX.E
   const { data: profile } = useProfile();
   const { data: preferenceStatus } = usePreferenceStatus();
 
-  const userProfile = profile as AxiosResponse<ProfileResponse>;
+  const userProfile = profile as unknown as AxiosResponse<ProfileResponse>;
   const userPreferenceStatus = preferenceStatus as AxiosResponse<PreferenceStatusResponse>;
 
   const hostelData = userProfile?.data?.alloted_hostel;

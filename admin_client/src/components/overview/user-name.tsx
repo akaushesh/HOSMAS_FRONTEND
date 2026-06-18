@@ -1,7 +1,7 @@
 'use client';
 
 import type * as React from 'react';
-import type { ProfileResponse } from '@/services/profile';
+import type { SupervisorProfileResponse } from '@/services/profile';
 import { Typography } from '@mui/material';
 import type { AxiosResponse } from 'axios';
 
@@ -9,7 +9,7 @@ import { useProfile } from '@/hooks/query/use-profile';
 
 export function UserName(): React.JSX.Element {
   const { data: profile } = useProfile();
-  const userProfile = profile as AxiosResponse<ProfileResponse>;
+  const userProfile = profile as AxiosResponse<SupervisorProfileResponse>;
 
   return (
     <div>
@@ -20,7 +20,7 @@ export function UserName(): React.JSX.Element {
 
 export function HostelName(): React.JSX.Element {
   const { data: profile } = useProfile();
-  const userProfile = profile as AxiosResponse<ProfileResponse>;
+  const userProfile = profile as AxiosResponse<SupervisorProfileResponse>;
 
   return <>HOSTEL D</>;
 }

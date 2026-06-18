@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { jsPDF } from "jspdf";
-import "jspdf-autotable";
+import autoTable from "jspdf-autotable";
 
 interface cleanerData {
   id: number;
@@ -34,11 +34,8 @@ export default function Page({
   const workerId = id;
 
   const [data, setData] = React.useState<cleanerData[]>([]);
-  const [workerName, setWorkerName] = React.useState<string>("");
 
   React.useEffect(() => {
-    // Fetch worker name (mocked here; replace with actual API call)
-    setWorkerName(`Worker ${workerId}`);
 
     const ws = new WebSocket(
       `ws://localhost:3378/ws/workers/${workerId}/pending-requests/`
@@ -85,7 +82,7 @@ export default function Page({
     ]);
 
     doc.text("Cleaning Requests", 14, 10);
-    (doc as any).autoTable({
+    autoTable(doc, {
       head: [tableColumnHeaders],
       body: tableRows,
       startY: 20,

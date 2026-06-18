@@ -6,7 +6,7 @@ import type {
   ResetPasswordData,
   TokenResponse,
 } from '@/services/auth';
-import { changePassword, type OkResponse } from '@/services/profile';
+import { changePassword, type OkResponse, type ChangePasswordData } from '@/services/profile';
 import type { UseMutationResult } from '@tanstack/react-query';
 import type { AxiosError, AxiosResponse } from 'axios';
 
@@ -63,7 +63,7 @@ export const useChangePassword = ({
 }: ResolutionFunctions<OkResponse>): UseMutationResult<
   AxiosResponse<OkResponse>,
   AxiosError<ErrorResponse>,
-  ResetPasswordData
+  ChangePasswordData
 > => {
-  return useCustomMutation<ResetPasswordData, OkResponse>({ mutationFn: changePassword, onSuccess, onError });
+  return useCustomMutation<ChangePasswordData, OkResponse>({ mutationFn: changePassword, onSuccess, onError });
 };
