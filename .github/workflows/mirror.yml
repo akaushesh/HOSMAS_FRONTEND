@@ -1,0 +1,25 @@
+name: Mirror Repository
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Push to mirror
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git remote add mirror https://x-access-token:${{ secrets.MIRROR_TOKEN }}@github.com/akaushesh/HOSMAS_FRONTEND.git
+
+          git push mirror HEAD:main --force
