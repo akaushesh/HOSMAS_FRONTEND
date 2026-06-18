@@ -136,7 +136,7 @@ export function Requests({ handleAssignCleaner, selectedCleaner }: RequestsProps
       const { assignSingleRequest } = await import('@/services/cleaning');
       const assignments = cleaningRequests.filter(req => req.assignedId);
       for (const req of assignments) {
-        await assignSingleRequest(req.id, req.assignedId!, req.selectedSlot?.id ?? req.assignedSlotId);
+        await assignSingleRequest(req.id, req.assignedId!, req.selectedSlot?.id ?? req.assignedSlotId ?? undefined);
       }
       alert('Manual assignments successfully saved to backend!');
     } catch (err) {
@@ -177,7 +177,7 @@ export function Requests({ handleAssignCleaner, selectedCleaner }: RequestsProps
                   </Typography>
                   <Box zIndex={1}>
                     <SpecialButton handleAssign={handleAssign} isDisabled={isDisabled} id={request.id} slots={request.slots}
-                      assigned={request.assignedName}
+                      assigned={request.assignedName ?? ''}
                       assignedSlotId={request.assignedSlotId}
                     />
                   </Box>

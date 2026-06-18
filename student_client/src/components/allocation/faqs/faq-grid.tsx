@@ -17,12 +17,14 @@ const breakpoints = {
   900: 1,
 };
 
+const BoxAny = Box as any;
+
 export default function FAQGrid(): React.JSX.Element {
   const { data, isLoading } = useFaq();
   const faqs = data as AxiosResponse<FAQResponse>;
 
   return (
-    <Box>
+    <BoxAny>
       {isLoading ? (
         <Grid container marginTop="1rem" justifyContent="center">
           <CircularProgress />
@@ -38,7 +40,7 @@ export default function FAQGrid(): React.JSX.Element {
           ))}
         </Masonry>
       ) : (
-        <Box
+        <BoxAny
           sx={{
             position: 'absolute',
             top: '47%',
@@ -49,8 +51,9 @@ export default function FAQGrid(): React.JSX.Element {
           <Typography textAlign="center" variant="body2" color="grey">
             No FAQs yet!
           </Typography>
-        </Box>
+        </BoxAny>
       )}
-    </Box>
+
+    </BoxAny>
   );
 }

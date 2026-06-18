@@ -1,7 +1,7 @@
 import * as React from 'react';
 import RouterLink from 'next/link';
 import { useRouter } from 'next/navigation';
-import type { ProfileResponse } from '@/services/profile';
+import type { CentralProfileResponse } from '@/services/profile';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import ListItemIcon from '@mui/material/ListItemIcon';
@@ -26,13 +26,15 @@ export interface UserPopoverProps {
   open: boolean;
 }
 
+const BoxAny = Box as any;
+
 export function UserPopover({ anchorEl, onClose, open }: UserPopoverProps): React.JSX.Element {
   const { checkSession } = useUser();
 
   const router = useRouter();
 
   const { data: profile, isLoading } = useProfile();
-  const userProfile = profile as AxiosResponse<ProfileResponse>;
+  const userProfile = profile as AxiosResponse<CentralProfileResponse>;
 
   const handleSignOut = React.useCallback(async (): Promise<void> => {
     try {
@@ -60,14 +62,14 @@ export function UserPopover({ anchorEl, onClose, open }: UserPopoverProps): Reac
       anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
       onClose={onClose}
       open={open}
-      slotProps={{ paper: { sx: { width: '240px' } } }}
+      slotProps={{ paper: { sx: { width: '240px' } } } as any}
     >
-      <Box sx={{ p: '16px 20px ' }}>
-        <Typography variant="subtitle1">{userProfile?.data?.name}</Typography>
+      <BoxAny sx={{ p: '16px 20px ' }}>
+        <Typography variant="subtitle1">{userProfile?.data?.student?.name}</Typography>
         <Typography color="text.secondary" variant="body2">
-          {userProfile?.data?.user?.email}
+          {userProfile?.data?.student?.email}
         </Typography>
-      </Box>
+      </BoxAny>
       <Divider />
       <MenuList disablePadding sx={{ p: '8px', '& .MuiMenuItem-root': { borderRadius: 1 } }}>
         <MenuItem component={RouterLink} href={paths.settings} onClick={onClose}>

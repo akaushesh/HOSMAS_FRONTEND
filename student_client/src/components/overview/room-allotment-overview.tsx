@@ -11,14 +11,14 @@ import type { SxProps } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import type { AxiosResponse } from 'axios';
 
-import { useProfile2 } from '@/hooks/query/use-profile';
+import { useProfile } from '@/hooks/query/use-profile';
 
 export interface GroupOverviewProps {
   sx?: SxProps;
 }
 
 export function RoomAllotmentOverview({ sx }: GroupOverviewProps): React.JSX.Element {
-  const { data: profile } = useProfile2();
+  const { data: profile } = useProfile();
 
   const userProfile = profile as AxiosResponse<CentralProfileResponse>;
 

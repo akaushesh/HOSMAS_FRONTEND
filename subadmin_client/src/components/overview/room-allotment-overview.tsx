@@ -20,7 +20,7 @@ export interface GroupOverviewProps {
 export function RoomAllotmentOverview({ sx }: GroupOverviewProps): React.JSX.Element {
   const { data: profile } = useProfile();
 
-  const userProfile = profile as AxiosResponse<ProfileResponse>;
+  const userProfile = profile as unknown as AxiosResponse<ProfileResponse>;
 
   const roomData = userProfile?.data?.alloted_room;
 

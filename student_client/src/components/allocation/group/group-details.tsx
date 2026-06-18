@@ -4,7 +4,7 @@ import * as React from 'react';
 import type { ErrorResponse } from '@/services/auth';
 import type { GroupResponse } from '@/services/group';
 import type { SuccessResponse } from '@/services/invitation';
-import type { ProfileResponse } from '@/services/profile';
+import type { ProfileResponse, OkResponse } from '@/services/profile';
 import GroupsIcon from '@mui/icons-material/Groups';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { Button, CircularProgress, IconButton, Menu, MenuItem, TableFooter } from '@mui/material';
@@ -23,7 +23,7 @@ import type { AxiosError, AxiosResponse } from 'axios';
 import { logger } from '@/lib/default-logger';
 import { useCreateGroup, useTransferOwnership } from '@/hooks/mutation/use-group';
 import { useGroup } from '@/hooks/query/use-group';
-import { useProfile } from '@/hooks/query/use-profile';
+import { useProfile2 } from '@/hooks/query/use-profile';
 import CustomModal from '@/components/core/custom-modal';
 
 import LeaveConfirmation from './leave-confirmation';
@@ -43,7 +43,7 @@ export default function GroupDetails(): React.JSX.Element {
   const members = group?.data?.members;
   logger.debug('useGroup', groupDetails);
 
-  const { data: profile } = useProfile();
+  const { data: profile } = useProfile2();
   const user = profile as AxiosResponse<ProfileResponse>;
   const isLeader = user?.data?.rollno === leader?.rollno;
 
@@ -51,12 +51,12 @@ export default function GroupDetails(): React.JSX.Element {
 
   const [openLeaveModal, setOpenLeaveModal] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const [newLeaderRollno, setNewLeaderRollno] = React.useState<null | number>(null);
+  const [newLeaderRollno, setNewLeaderRollno] = React.useState<null | string>(null);
   const [createError, setCreateError] = React.useState<string>('');
 
   const queryClient = useQueryClient();
 
-  const onSuccess = async (res: AxiosResponse<SuccessResponse>): Promise<void> => {
+  const onSuccess = async (res: AxiosResponse<OkResponse>): Promise<void> => {
     logger.debug(res);
     await queryClient.invalidateQueries({ queryKey: ['getGroup'] });
   };
@@ -77,21 +77,23 @@ export default function GroupDetails(): React.JSX.Element {
       await queryClient.invalidateQueries({ queryKey: ['getMyToken'] });
     },
     onError: (error: AxiosError<ErrorResponse>) => {
-      setCreateError(error?.response?.data?.message ?? 'Failed to create group');
+      setCreateError(error?.response?.data?.detail ?? 'Failed to create group');
     },
   });
 
   const open = Boolean(anchorEl);
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>): void => {
     setAnchorEl(event.currentTarget);
-    setNewLeaderRollno(Number(event.currentTarget.id));
+    setNewLeaderRollno(event.currentTarget.id);
   };
   const handleClose = (): void => {
     setAnchorEl(null);
   };
 
   const onTransferOwnership = (): void => {
-    transferOwnership({ rollno: newLeaderRollno });
+    if (newLeaderRollno !== null) {
+      transferOwnership({ rollno: newLeaderRollno });
+    }
     logger.debug(newLeaderRollno);
   };
 

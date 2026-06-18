@@ -54,13 +54,14 @@ export default function DnDMobile({
 
   const getTaskPos = (id:number):number => tasks.findIndex((task) => task.id === id);
 
-  const handleDragEnd = (event: DndEvent): void  => {
+  const handleDragEnd = (event: any): void  => {
     const { active, over } = event;
+    if (!over) return;
 
     if (active.id === over.id) return;
 
-    const originalPos = getTaskPos(active.id);
-    const newPos = getTaskPos(over.id);
+    const originalPos = getTaskPos(active.id as number);
+    const newPos = getTaskPos(over.id as number);
     setD2(arrayMove(tasks, originalPos, newPos));
     setD1([]);
   };

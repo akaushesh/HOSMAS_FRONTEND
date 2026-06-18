@@ -10,10 +10,11 @@ import { useProfile } from '@/hooks/query/use-profile';
 export interface RequestProps {
   id: string;
   roomName: string;
-  slots: { from: string; to: string }[];
+  slots: { id?: number; from: string; to: string }[];
   assignedId?: string;
   assignedName?: string;
-  selectedSlot?: { from: string; to: string };
+  selectedSlot?: { id?: number; from: string; to: string };
+  assignedSlotId?: number | null;
 }
 
 export interface CleanerProps {

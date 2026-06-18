@@ -4,7 +4,7 @@ import type { Object3D,Material,Vector3 } from 'three';
 
 
 interface GLTFResult {
-  nodes: Record<string, Object3D>;
+  nodes: Record<string, any>;
   materials: Record<string, Material>;
 }
 

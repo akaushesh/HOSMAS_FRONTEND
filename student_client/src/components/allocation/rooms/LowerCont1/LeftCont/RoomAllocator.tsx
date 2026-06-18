@@ -11,7 +11,7 @@ import RoomSelector from './RoomSelector';
 interface RoomAllocatorProps {
   selectedRooms: SelectedRoomProps[];
   floor: string;
-  setSelectedRooms: (val: SelectedRoomProps[]) => void;
+  setSelectedRooms: React.Dispatch<React.SetStateAction<SelectedRoomProps[]>>;
   user: AxiosResponse<ProfileResponse>;
 }
 

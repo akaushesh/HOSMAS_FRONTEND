@@ -53,12 +53,13 @@ export default function DndMembers({ selectedRooms, user }: LowerCont2Props): Re
 
   const getPos = (rollNum: number): number => members.findIndex((member) => member.rollNum === rollNum);
 
-  const handleDragEnd = (event: DndEvent): void => {
+  const handleDragEnd = (event: any): void => {
     const { active, over } = event;
+    if (!over) return;
 
     if (active.id === over.id) return;
 
-    setMembers(arrayMove(members, getPos(active.id), getPos(over.id)));
+    setMembers(arrayMove(members, getPos(active.id as number), getPos(over.id as number)));
   };
 
   return (

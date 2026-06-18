@@ -13,7 +13,7 @@ interface LeaveConfirmationProps {
 
 export default function LeaveConfirmation({ onClose }: LeaveConfirmationProps): React.JSX.Element {
   const onAccept = (): void => {
-    leaveGroup({});
+    leaveGroup();
   };
   const onReject = (): void => {
     onClose();
@@ -28,11 +28,12 @@ export default function LeaveConfirmation({ onClose }: LeaveConfirmationProps): 
   };
 
   const { mutate: leaveGroup, isPending } = useLeaveGroup({ onError });
-
   const [error, setError] = React.useState('');
 
+const BoxAny = Box as any;
+
   return (
-    <Box padding="1rem">
+    <BoxAny padding="1rem">
       <Typography variant="h4" marginBottom="1rem">
         Confirmation
       </Typography>
@@ -65,6 +66,6 @@ export default function LeaveConfirmation({ onClose }: LeaveConfirmationProps): 
           </Button>
         </Grid>
       </Grid>
-    </Box>
+    </BoxAny>
   );
 }

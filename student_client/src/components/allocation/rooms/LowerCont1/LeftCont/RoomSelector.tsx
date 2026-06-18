@@ -11,7 +11,7 @@ interface RoomSelectorProps {
   selectedRooms: SelectedRoomProps[];
   user: AxiosResponse<ProfileResponse>;
   floor: string;
-  setSelectedRooms: (val: SelectedRoomProps[]) => void;
+  setSelectedRooms: React.Dispatch<React.SetStateAction<SelectedRoomProps[]>>;
 }
 
 interface ClickProps {

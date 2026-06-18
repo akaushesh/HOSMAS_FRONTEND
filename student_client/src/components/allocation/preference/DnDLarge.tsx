@@ -54,16 +54,16 @@ export default function DnDLarge({
     return data.findIndex((item: Card) => item.id === id);
   };
 
-  const handleDragEndNOver = (event: DndEvent): void => {
+  const handleDragEndNOver = (event: any): void => {
     const { active, over } = event;
     if (!over) return;
 
-    const activeId = active.id;
-    const overId = over.id;
+    const activeId = active.id as number;
+    const overId = over.id as number;
     if (activeId === overId) return;
 
-    const activeCollumn = active.data.current.sortable.containerId;
-    const overCollumn = over.data.current.sortable.containerId;
+    const activeCollumn = active.data?.current?.sortable?.containerId;
+    const overCollumn = over.data?.current?.sortable?.containerId;
 
     // Inside Same Column
     if (activeCollumn === overCollumn) {
@@ -85,24 +85,24 @@ export default function DnDLarge({
     }
   };
 
+  const DndContextAny = DndContext as any;
+
   return (
-    <Box sx={{ position: 'relative' }} width="70vw">
-      <DndContext
-        onDragEnd={(event: DndEvent) => {
+    <div style={{ position: 'relative', width: '70vw' }}>
+      <DndContextAny
+        onDragEnd={(event: any) => {
           handleDragEndNOver(event);
         }}
-        onDragOver={(event: DndEvent) => {
+        onDragOver={(event: any) => {
           handleDragEndNOver(event);
         }}
         sensors={sensors}
         collisionDetection={closestCorners}
         modifiers={[restrictToFirstScrollableAncestor]}
-        width="50%"
       >
-        <Box
-          sx={{
+        <div
+          style={{
             display: 'flex',
-            // display: { lg: 'none', xs: 'flex' },
             justifyContent: 'space-between',
             opacity: NotAllowed ? 0.45 : 1,
             pointerEvents: NotAllowed ? 'none' : 'initial',
@@ -167,8 +167,8 @@ export default function DnDLarge({
               </>
             )}
           </Paper>
-        </Box>
-      </DndContext>
-    </Box>
+        </div>
+      </DndContextAny>
+    </div>
   );
 }

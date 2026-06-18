@@ -85,7 +85,7 @@ export default function Page({
     ]);
 
     doc.text("Cleaning Requests", 14, 10);
-    doc.autoTable({
+    (doc as any).autoTable({
       head: [tableColumnHeaders],
       body: tableRows,
       startY: 20,

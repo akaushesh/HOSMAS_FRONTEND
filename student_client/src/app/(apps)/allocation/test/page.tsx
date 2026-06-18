@@ -11,7 +11,7 @@ export default function Page(): React.JSX.Element {
     <Stack spacing={3}>
       <div>
         <Typography variant="h4">Model Test</Typography>
-        <Model />
+        <Model hostel="Q" />
       </div>
     </Stack>
   );

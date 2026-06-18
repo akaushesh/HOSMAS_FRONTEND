@@ -10,6 +10,8 @@ interface PropsType {
   hostel?: Hostel | null;
 }
 
+const BoxAny = Box as any;
+
 export default function HostelDescription({ hostel }: PropsType): React.JSX.Element {
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [modelOpen, setModelOpen] = React.useState(false);
@@ -36,7 +38,7 @@ export default function HostelDescription({ hostel }: PropsType): React.JSX.Elem
       >
 
 
-        <Box sx={{ flex: 3, width: 1 }}>
+        <BoxAny sx={{ flex: 3, width: 1 }}>
 
           <Stack sx={{flexDirection:"row",alignItems:"center" ,gap:1}}  justifyContent="space-between" pr={2} mb={2}>
 
@@ -65,7 +67,7 @@ export default function HostelDescription({ hostel }: PropsType): React.JSX.Elem
           >
             ...view more
           </Typography>
-        </Box>
+        </BoxAny>
 
 
         <Divider
@@ -77,7 +79,7 @@ export default function HostelDescription({ hostel }: PropsType): React.JSX.Elem
           }}
         />
 
-        <Box sx={{  textAlign: 'center', display: { xs: 'none', sm: 'block' } }} >
+        <BoxAny sx={{  textAlign: 'center', display: { xs: 'none', sm: 'block' } }} >
           <img
             alt="hostelImg"
             height="150px"
@@ -88,18 +90,18 @@ export default function HostelDescription({ hostel }: PropsType): React.JSX.Elem
           <Typography variant="body2" fontSize="14px" lineHeight="1.1rem">
             {hostel?.warden}
           </Typography>
-        </Box>
+        </BoxAny>
       </Paper>
 
       {/* Dialog for Full Description */}
       <Dialog open={dialogOpen} onClose={handleDialogClose} maxWidth="md" fullWidth>
         <DialogTitle>
-          <Box display="flex" justifyContent="space-between" alignItems="center">
+          <BoxAny display="flex" justifyContent="space-between" alignItems="center">
             <Typography variant="h2">{hostel?.name}</Typography>
             <IconButton onClick={handleDialogClose}>
               <CloseIcon />
             </IconButton>
-          </Box>
+          </BoxAny>
         </DialogTitle>
 
         <DialogContent
@@ -107,7 +109,7 @@ export default function HostelDescription({ hostel }: PropsType): React.JSX.Elem
             p: 4,
           }}
         >
-          <Box
+          <BoxAny
           sx={{
             height: '55vh',
             pr:1,
@@ -120,19 +122,19 @@ export default function HostelDescription({ hostel }: PropsType): React.JSX.Elem
             </Typography>
           ))}
 
-          </Box>
+          </BoxAny>
         </DialogContent>
       </Dialog>
 
 
       <Dialog open={modelOpen} onClose={()=>{setModelOpen(false)}} maxWidth="md" fullWidth>
         <DialogTitle>
-          <Box display="flex" justifyContent="space-between" alignItems="center">
+          <BoxAny display="flex" justifyContent="space-between" alignItems="center">
             <Typography variant="h2">{hostel?.name}</Typography>
             <IconButton onClick={()=>{setModelOpen(false)}}>
               <CloseIcon />
             </IconButton>
-          </Box>
+          </BoxAny>
         </DialogTitle>
 
         <DialogContent

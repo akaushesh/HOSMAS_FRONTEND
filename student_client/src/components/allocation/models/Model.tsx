@@ -20,6 +20,7 @@ interface ModelProps {
 }
 
 export default function Model({ hostel }: ModelProps): React.JSX.Element {
+  const CanvasAny = Canvas as any;
   const [loading, setLoading] = React.useState(true);
 
   const handleModelLoad = ():void => {
@@ -29,8 +30,8 @@ export default function Model({ hostel }: ModelProps): React.JSX.Element {
   return (
     <div style={{ height: '75vh', position: 'relative' }}>
       {loading ? (
-        <Box
-          sx={{
+        <div
+          style={{
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
@@ -40,7 +41,6 @@ export default function Model({ hostel }: ModelProps): React.JSX.Element {
             left: 0,
             width: '100%',
             zIndex: 1, 
-            
           }}
         >
           <Skeleton
@@ -50,10 +50,10 @@ export default function Model({ hostel }: ModelProps): React.JSX.Element {
             height="100%"
             sx={{ borderRadius:2 }}
           />
-        </Box>
+        </div>
       ):null}
 
-      <Canvas>
+      <CanvasAny>
         <OrthographicCamera makeDefault position={[0, 0, 90]} zoom={15} />
 
         <OrbitControls
@@ -74,7 +74,7 @@ export default function Model({ hostel }: ModelProps): React.JSX.Element {
         {hostel === 'neeram-hall' && (<DHostel position={[0, -10, 0]} onLoad={handleModelLoad} />)}
         {hostel === 'tejas-hall' && (<JHostel position={[0, -10, 0]} onLoad={handleModelLoad} />)}
         {hostel === 'vahni-hall' && (<QHostel position={[0, -10, 0]} onLoad={handleModelLoad} />)}
-      </Canvas>
+      </CanvasAny>
     </div>
   );
 }

@@ -10,7 +10,7 @@ import type { ProfileResponse } from "@/services/profile";
 interface LowerCont1Props{
     selectedRooms: SelectedRoomProps[];
     floor: string;
-    setSelectedRooms: (val: SelectedRoomProps[]) => void;
+    setSelectedRooms: React.Dispatch<React.SetStateAction<SelectedRoomProps[]>>;
     setFloor:(val:string)=>void;
     user: AxiosResponse<ProfileResponse>;
 
