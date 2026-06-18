@@ -25,11 +25,6 @@ jobs:
         run: |
           git ls-remote https://x-access-token:${{ secrets.MIRROR_TOKEN }}@github.com/akaushesh/HOSMAS_FRONTEND.git
 
-      - name: Add mirror remote
-        run: |
-          git remote add mirror https://x-access-token:${{ secrets.MIRROR_TOKEN }}@github.com/akaushesh/HOSMAS_FRONTEND.git
-          git remote -v
-
       - name: Push to mirror
         run: |
-          git push mirror HEAD:main --force
+          git push https://x-access-token:${{ secrets.MIRROR_TOKEN }}@github.com/akaushesh/HOSMAS_FRONTEND.git HEAD:main --force
