@@ -1,25 +1,32 @@
 name: Mirror Repository
 
 on:
-  push:
-    branches:
-      - main
+push:
+branches:
+- main
+
+workflow_dispatch:
 
 jobs:
-  mirror:
-    runs-on: ubuntu-latest
+mirror:
+runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout source
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Push to mirror
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          git remote add mirror https://x-access-token:${{ secrets.MIRROR_TOKEN }}@github.com/akaushesh/HOSMAS_FRONTEND.git
-
-          git push mirror HEAD:main --force
+steps:
+  - name: Checkout source repository
+    uses: actions/checkout@v4
+    with:
+      fetch-depth: 0
+  - name: Configure Git
+    run: |
+      git config --global user.name "github-actions[bot]"
+      git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+  - name: Verify mirror repository access
+    run: |
+      git ls-remote https://x-access-token:${{ secrets.MIRROR_TOKEN }}@github.com/akaushesh/HOSMAS_FRONTEND.git
+  - name: Add mirror remote
+    run: |
+      git remote add mirror https://x-access-token:${{ secrets.MIRROR_TOKEN }}@github.com/akaushesh/HOSMAS_FRONTEND.git
+      git remote -v
+  - name: Push to mirror
+    run: |
+      git push mirror HEAD:main --force
