@@ -57,7 +57,7 @@ export default function Layout({ children }: LayoutProps): React.JSX.Element {
           <MainNav />
 
           <main>
-            <Container maxWidth="xl" sx={{ pt:5,pb: '64px' }}>
+            <Container maxWidth={false} sx={{ pt: 5, pb: '64px' }}>
               {children}
             </Container>
           </main>

@@ -39,3 +39,6 @@ __pycache__
 
 /student_client/node_modules
 node_modules/
+subadmin_client/subadmin_client.log
+.gitignore
+student_client/student_client.log
