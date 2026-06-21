@@ -1,4 +1,4 @@
-import { Buildings, CirclesThreePlus, CookingPot, DoorOpen, Hamburger, House, ListChecks, ListDashes, Plus, ShirtFolded, UserList } from '@phosphor-icons/react';
+import { Buildings, CalendarCheck, CirclesThreePlus, CookingPot, DoorOpen, Hamburger, House, ListChecks, ListDashes, Plus, ShirtFolded, UserList } from '@phosphor-icons/react';
 import type { Icon } from '@phosphor-icons/react/dist/lib/types';
 import { Broom } from '@phosphor-icons/react/dist/ssr';
 import { ChartPie as ChartPieIcon } from '@phosphor-icons/react/dist/ssr/ChartPie';
@@ -22,9 +22,10 @@ export const navIcons = {
   house: House,
   cookingPot: CookingPot,
   user: UserIcon,
-  hamburger:Hamburger,
+  hamburger: Hamburger,
   users: UsersIcon,
   ListChecks,
   userList: UserList,
   plus: Plus,
+  calendarCheck: CalendarCheck,
 } as Record<string, Icon>;
