@@ -17,6 +17,7 @@ export interface InputRoomProps{
 }
 
 export interface SelectedRoomProps{
+    id?: number;
     floor: string;
     attached: string;
     room: string;

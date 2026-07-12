@@ -5,7 +5,7 @@ import GroupAddOutlinedIcon from '@mui/icons-material/GroupAddOutlined';
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 import { LoadingButton } from '@mui/lab';
 import { Grid, IconButton, TextField, Typography } from '@mui/material';
-import { Box, Stack } from '@mui/system';
+import { Box, Stack } from '@mui/material';
 import { useQueryClient } from '@tanstack/react-query';
 import type { AxiosError, AxiosResponse } from 'axios';
 
@@ -55,7 +55,7 @@ export default function InviteMember({ onClose }: InviteMemberProps): React.JSX.
   };
 
   return (
-    <Box padding="1rem">
+    <Box sx={{ padding: '1rem' }}>
       <Typography variant="h4" marginBottom="1rem">
         Invite Member
       </Typography>

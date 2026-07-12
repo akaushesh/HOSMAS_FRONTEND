@@ -4,8 +4,8 @@ import { CSS } from '@dnd-kit/utilities';
 import { Box, Paper, Typography } from '@mui/material';
 
 interface CardProps {
-  rollNum: number;
-  id: number;
+  rollNum: string;
+  id: string;
   name: string;
 }
 
@@ -19,8 +19,8 @@ export default function Card({ id, name, rollNum }: CardProps): React.JSX.Elemen
   return (
     <Paper
       elevation={10}
+      style={{ '--Card-BorderColor': 'var(--mui-palette-secondary-main)' } as React.CSSProperties}
       sx={{
-        '--Card-BorderColor': 'var(--mui-palette-secondary-main)',
         width: 1,
         display: 'flex',
         alignItems: 'center',
@@ -29,10 +29,9 @@ export default function Card({ id, name, rollNum }: CardProps): React.JSX.Elemen
         p: 1,
         border: '1px dashed var(--Card-BorderColor)',
         touchAction: 'none',
+        ...style,
       }}
       ref={setNodeRef}
-      key={id}
-      style={style}
     >
       <Box
         sx={{

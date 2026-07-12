@@ -34,19 +34,19 @@ export const studentApi = axios.create({
 });
 
 export const invitationApi = axios.create({
-  baseURL: `${url}student/invitation/`,
+  baseURL: `${allocationUrl}halloc/group/invitation/`,
 });
 
 export const groupApi = axios.create({
-  baseURL: `${url}student/group/`,
+  baseURL: `${allocationUrl}halloc/group/`,
 });
 
 export const preferenceApi = axios.create({
-  baseURL: `${url}preferences/`,
+  baseURL: `${allocationUrl}halloc/pref/`,
 });
 
 export const roomApi = axios.create({
-  baseURL: `${url}preferences/alloted-hostel-levels/`,
+  baseURL: `${allocationUrl}halloc/pref/alloted-hostel-levels/`,
 });
 
 export const cleaningApi = axios.create({

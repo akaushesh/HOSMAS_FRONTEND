@@ -10,16 +10,17 @@ import RoomViewer from "./RightCont/RoomViewer";
 interface LowerCont2Props{
     selectedRooms: SelectedRoomProps[];
     user: AxiosResponse<ProfileResponse>;
+    onConfirm: () => Promise<void>;
 }
 
-export default function LowerCont2({selectedRooms,user}:LowerCont2Props):React.JSX.Element {
+export default function LowerCont2({selectedRooms,user,onConfirm}:LowerCont2Props):React.JSX.Element {
 
 
     return(
             
             <Box sx={{display:"flex",alignItems:"stretch",justifyContent:"center", minHeight:"60vh", mt:7}} gap="4%" width={1}>
                 <Box width="48%">
-                    <DndMembers selectedRooms={selectedRooms} user={user}/>
+                    <DndMembers selectedRooms={selectedRooms} user={user} onConfirm={onConfirm}/>
                 </Box>
                 <Box width="48%">
                     <RoomViewer selectedRooms={selectedRooms}/>

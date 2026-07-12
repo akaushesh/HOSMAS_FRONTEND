@@ -6,17 +6,19 @@ import { closestCorners, DndContext, KeyboardSensor, PointerSensor, useSensor, u
 import { restrictToParentElement, restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
-import { Box, Divider, Paper, Typography } from '@mui/material';
+import { Box, Divider, Paper, Typography, Button } from '@mui/material';
 import type { AxiosResponse } from 'axios';
 
 import type { SelectedRoomProps } from '@/hooks/mutation/use-room';
 import NavIcon from '@/components/core/icons';
 
 import Column from './components/Column';
+import { useGroup } from '@/hooks/query/use-group';
 
 interface LowerCont2Props {
   selectedRooms: SelectedRoomProps[];
   user: AxiosResponse<ProfileResponse>;
+  onConfirm: () => Promise<void>;
 }
 
 interface DndEvent {
@@ -28,21 +30,28 @@ interface SubDndEvent {
   data: { current: { sortable: { containerId: string } } };
 }
 
-interface MembersType {
-  rollNum: number;
-  id: number;
-  name: string;
-}
+export default function DndMembers({ selectedRooms, user, onConfirm }: LowerCont2Props): React.JSX.Element {
+  const { data: groupRes } = useGroup();
+  const groupData = groupRes?.data;
 
-export default function DndMembers({ selectedRooms, user }: LowerCont2Props): React.JSX.Element {
-  const [members, setMembers] = React.useState([
-    { rollNum: 102217023, id: 102217023, name: 'Pari' },
-    { rollNum: 102217024, id: 102217024, name: 'Parmar' },
-    { rollNum: 102217025, id: 102217025, name: 'Hush' },
-    { rollNum: 102217026, id: 102217026, name: 'Sanya' },
-    { rollNum: 102217027, id: 102217027, name: 'Rimjhim' },
-    { rollNum: 102217028, id: 102217028, name: 'Bedi' },
-  ]);
+  // Build member list: leader first, then members
+  const allMembers = React.useMemo(() => {
+    const list: { rollNum: string; id: string; name: string }[] = [];
+    if (groupData?.leader) {
+      list.push({ rollNum: groupData.leader.rollno, id: groupData.leader.rollno, name: groupData.leader.name });
+    }
+    for (const m of groupData?.members ?? []) {
+      list.push({ rollNum: m.rollno, id: m.rollno, name: m.name });
+    }
+    return list;
+  }, [groupData]);
+
+  const [members, setMembers] = React.useState(allMembers);
+
+  // Sync if group data loads after mount
+  React.useEffect(() => {
+    if (allMembers.length > 0) setMembers(allMembers);
+  }, [allMembers.length]);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -51,7 +60,7 @@ export default function DndMembers({ selectedRooms, user }: LowerCont2Props): Re
     })
   );
 
-  const getPos = (rollNum: number): number => members.findIndex((member) => member.rollNum === rollNum);
+  const getPos = (rollNum: string): number => members.findIndex((member) => member.rollNum === rollNum);
 
   const handleDragEnd = (event: any): void => {
     const { active, over } = event;
@@ -59,7 +68,7 @@ export default function DndMembers({ selectedRooms, user }: LowerCont2Props): Re
 
     if (active.id === over.id) return;
 
-    setMembers(arrayMove(members, getPos(active.id as number), getPos(over.id as number)));
+    setMembers(arrayMove(members, getPos(active.id as string), getPos(over.id as string)));
   };
 
   return (
@@ -124,6 +133,11 @@ export default function DndMembers({ selectedRooms, user }: LowerCont2Props): Re
             );
           })}
         </Box>
+      </Box>
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
+        <Button variant="contained" color="success" onClick={() => { void onConfirm(); }}>
+          Confirm &amp; Book Rooms
+        </Button>
       </Box>
     </Paper>
   );

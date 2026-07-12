@@ -5,8 +5,8 @@ import Card from './Card';
 
 
 interface MembersType {
-    rollNum: number;
-    id: number;
+    rollNum: string;
+    id: string;
     name: string;
   }
   

@@ -23,7 +23,8 @@ export function SideNav(): React.JSX.Element {
 
   return (
     <Box
-      sx={{
+      // @ts-expect-error -- TS2590: MUI Box CSS-variable union too wide for tsc; valid at runtime
+      style={{
         '--SideNav-background': 'var(--mui-palette-common-white)',
         '--SideNav-color': 'var(--mui-palette-common-white)',
         '--SideNav-logo-background': 'var(--mui-palette-primary-main)',
@@ -36,6 +37,8 @@ export function SideNav(): React.JSX.Element {
         '--NavSubItem-icon-color': 'var(--mui-palette-text-primaryChannel)',
         '--NavSubItem-icon-active-color': 'var(--mui-palette-primary-contrastText)',
         '--NavSubItem-icon-disabled-color': 'var(--mui-palette-neutral-600)',
+      } as React.CSSProperties}
+      sx={{
         bgcolor: 'var(--SideNav-background)',
         color: 'var(--SideNav-color)',
         display: { xs: 'none', lg: 'flex' },

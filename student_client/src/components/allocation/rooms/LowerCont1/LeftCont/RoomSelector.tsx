@@ -1,9 +1,8 @@
 import * as React from 'react';
-import { Box, Paper, Typography } from '@mui/material';
+import { Box, Paper, Typography, CircularProgress } from '@mui/material';
 
 import type { SelectedRoomProps } from '@/hooks/mutation/use-room';
-
-import { rooms1 } from './roomstemp';
+import { useAvailableRooms } from '@/hooks/query/use-room';
 import type { AxiosResponse } from 'axios';
 import type { ProfileResponse } from '@/services/profile';
 
@@ -15,16 +14,44 @@ interface RoomSelectorProps {
 }
 
 interface ClickProps {
+  id: number;
   attached: string;
   room: string;
   capacity: number;
   str: string;
 }
 
-export default function RoomSelector({ selectedRooms, floor,user, setSelectedRooms }: RoomSelectorProps): React.JSX.Element {
-  const handleSelect = ({ attached, room, capacity, str }: ClickProps): void => {
+export default function RoomSelector({ selectedRooms, floor, user, setSelectedRooms }: RoomSelectorProps): React.JSX.Element {
+  const { data: roomsRes, isLoading, error } = useAvailableRooms();
+  const roomsList = roomsRes?.data || [];
 
-    if(selectedRooms.length >= user?.data?.group?.size && str !== 'gr'){
+  const clusters = React.useMemo(() => {
+    // Sort rooms by name numerically
+    const sorted = [...roomsList].sort((a, b) => a.name.localeCompare(b.name));
+    const result = [];
+    const allottedType = user?.data?.alloted_hostel?.room_type || "2S";
+    const cap = parseInt(allottedType) || 2;
+
+    for (let i = 0; i < sorted.length; i += 2) {
+      const pair = [sorted[i]];
+      if (i + 1 < sorted.length) {
+        pair.push(sorted[i + 1]);
+      }
+      result.push({
+        clusterId: `cluster-${sorted[i].id}`,
+        attached: pair.length,
+        room: pair.map((r) => r.name),
+        roomIds: pair.map((r) => r.id),
+        availability: pair.map((r) => (r.available ? cap : 0)),
+        capacity: pair.map(() => cap),
+        ac: pair.map(() => allottedType.includes("AC")),
+      });
+    }
+    return result;
+  }, [roomsList, user]);
+
+  const handleSelect = ({ id, attached, room, capacity, str }: ClickProps): void => {
+    if (selectedRooms.length >= user?.data?.group?.size && str !== 'gr') {
       return;
     }
 
@@ -35,11 +62,34 @@ export default function RoomSelector({ selectedRooms, floor,user, setSelectedRoo
           ? [...prevSelectedRooms.slice(0, index), ...prevSelectedRooms.slice(index + 1)]
           : prevSelectedRooms;
       });
-
       return;
     }
-    setSelectedRooms([...selectedRooms, { floor, attached, room, capacity }]);
+    setSelectedRooms([...selectedRooms, { id, floor, attached, room, capacity }]);
   };
+
+  if (isLoading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '40vh' }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '40vh' }}>
+        <Typography color="error">Error loading available rooms.</Typography>
+      </Box>
+    );
+  }
+
+  if (clusters.length === 0) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '40vh' }}>
+        <Typography>No available rooms found for your allotted type.</Typography>
+      </Box>
+    );
+  }
 
   return (
     <Box
@@ -55,14 +105,13 @@ export default function RoomSelector({ selectedRooms, floor,user, setSelectedRoo
         overflowY: 'auto',
       }}
     >
-      {rooms1.map((cluster) => {
+      {clusters.map((cluster) => {
         return (
           <Box
             key={cluster.clusterId}
             sx={{
               display: 'flex',
               gap: 0,
-              // border: '1px dashed var(--Cluster-BorderColor) ',
               borderRadius: '8px',
               width: { xs: '100%', xl: '48%' },
               alignItems: 'center',
@@ -78,7 +127,6 @@ export default function RoomSelector({ selectedRooms, floor,user, setSelectedRoo
               
               const allDisabled = roomCapacity.every(value => value === 'dis');
 
-
               const initCond = cluster.attached > 1 && i !== 0;
               const endCond = cluster.attached > 1 && i !== cluster.room.length - 1;
 
@@ -88,8 +136,8 @@ export default function RoomSelector({ selectedRooms, floor,user, setSelectedRoo
                   sx={{
                     display: 'flex',
                     alignItems: 'stretch',
-                    opacity: allDisabled? 0.65 : 1,
-                    pointerEvents: allDisabled? 'none' : 'initial',
+                    opacity: allDisabled ? 0.65 : 1,
+                    pointerEvents: allDisabled ? 'none' : 'initial',
                     height: 1,
                     width: '50%',
                   }}
@@ -109,7 +157,6 @@ export default function RoomSelector({ selectedRooms, floor,user, setSelectedRoo
                       alignItems: 'center',
                       justifyContent: 'center',
                       border: '1px dashed var(--Room-BorderColor) ',
-                        
                       gap: '5px',
                       width: '92%',
                       height: 1,
@@ -131,15 +178,14 @@ export default function RoomSelector({ selectedRooms, floor,user, setSelectedRoo
                       }}
                     >
                       {roomCapacity.map((str, x) => {
-
-                        const disableCondition= str === 'dis' || (selectedRooms.length >= user?.data?.group?.size && str !== 'gr');
+                        const disableCondition = str === 'dis' || (selectedRooms.length >= user?.data?.group?.size && str !== 'gr');
 
                         return (
-                          // eslint-disable-next-line react/button-has-type -- button type is not necessary.
                           <button
                             key={x}
                             onClick={() => {
                               handleSelect({
+                                id: cluster.roomIds[i],
                                 attached: cluster.room[i + 1] || cluster.room[i - 1],
                                 room: el,
                                 capacity: cluster.capacity[i],
