@@ -4,7 +4,7 @@ import * as React from 'react';
 import type { ErrorResponse } from '@/services/auth';
 import type { InvitationStatusResponse } from '@/services/invitation';
 import { Chip, CircularProgress, Table, TableBody, TableCell, TableRow, Typography } from '@mui/material';
-import { Box } from '@mui/system';
+
 import type { AxiosError } from 'axios';
 
 import { logger } from '@/lib/default-logger';
@@ -37,7 +37,7 @@ export function SentInvitations(): React.JSX.Element {
   logger.debug('sent invitations', sentInvitations);
 
   return (
-    <Box sx={{ overflowX: 'auto' }}>
+    <div style={{ overflowX: 'auto' }}>
       <Table>
         {isLoading ? (
           <TableBody>
@@ -84,6 +84,6 @@ export function SentInvitations(): React.JSX.Element {
           </TableBody>
         )}
       </Table>
-    </Box>
+    </div>
   );
 }

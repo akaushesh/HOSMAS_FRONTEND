@@ -55,7 +55,7 @@ export default function InviteMember({ onClose }: InviteMemberProps): React.JSX.
   };
 
   return (
-    <Box sx={{ padding: '1rem' }}>
+    <div style={{ padding: '1rem' }}>
       <Typography variant="h4" marginBottom="1rem">
         Invite Member
       </Typography>
@@ -103,6 +103,6 @@ export default function InviteMember({ onClose }: InviteMemberProps): React.JSX.
           </form>
         </Grid>
       </Grid>
-    </Box>
+    </div>
   );
 }

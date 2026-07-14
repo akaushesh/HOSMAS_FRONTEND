@@ -15,7 +15,7 @@ import {
   TableRow,
   Typography,
 } from '@mui/material';
-import { Box } from '@mui/system';
+import { Box } from '@mui/material';
 import { useQueryClient } from '@tanstack/react-query';
 import type { AxiosError } from 'axios';
 
@@ -88,7 +88,7 @@ export function ReceivedInvitations(): React.JSX.Element {
   };
 
   return (
-    <Box sx={{ overflowX: 'auto' }}>
+    <div style={{ overflowX: 'auto' }}>
       <Table>
         {isLoading ? (
           <TableBody>
@@ -164,6 +164,6 @@ export function ReceivedInvitations(): React.JSX.Element {
           </TableBody>
         )}
       </Table>
-    </Box>
+    </div>
   );
 }

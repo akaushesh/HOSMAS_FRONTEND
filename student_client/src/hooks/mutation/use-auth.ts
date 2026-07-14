@@ -7,21 +7,22 @@ import type {
   TokenResponse,
 } from '@/services/auth';
 import { changePassword, type OkResponse } from '@/services/profile';
+import { useMutation } from '@tanstack/react-query';
 import type { UseMutationResult } from '@tanstack/react-query';
 import type { AxiosError, AxiosResponse } from 'axios';
-
-import { useCustomMutation } from './use-custom-mutation';
-import type { ResolutionFunctions } from './use-custom-mutation';
 
 export const useLogin = ({
   onSuccess,
   onError,
-}: ResolutionFunctions<TokenResponse>): UseMutationResult<
+}: {
+  onSuccess?: (res: AxiosResponse<TokenResponse>) => void;
+  onError?: (err: AxiosError<ErrorResponse>) => void;
+}): UseMutationResult<
   AxiosResponse<TokenResponse>,
   AxiosError<ErrorResponse>,
   LoginData
 > => {
-  return useCustomMutation<LoginData, TokenResponse>({
+  return useMutation<AxiosResponse<TokenResponse>, AxiosError<ErrorResponse>, LoginData>({
     mutationFn: login,
     onSuccess,
     onError,
@@ -31,12 +32,15 @@ export const useLogin = ({
 export const useInitiatePasswordReset = ({
   onSuccess,
   onError,
-}: ResolutionFunctions<OkResponse>): UseMutationResult<
+}: {
+  onSuccess?: (res: AxiosResponse<OkResponse>) => void;
+  onError?: (err: AxiosError<ErrorResponse>) => void;
+}): UseMutationResult<
   AxiosResponse<OkResponse>,
   AxiosError<ErrorResponse>,
   InitiatePasswordResetData
 > => {
-  return useCustomMutation<InitiatePasswordResetData, OkResponse>({
+  return useMutation<AxiosResponse<OkResponse>, AxiosError<ErrorResponse>, InitiatePasswordResetData>({
     mutationFn: initiatePasswordReset,
     onSuccess,
     onError,
@@ -46,24 +50,31 @@ export const useInitiatePasswordReset = ({
 export const useResetPassword = ({
   onSuccess,
   onError,
-}: ResolutionFunctions<OkResponse>): UseMutationResult<
+}: {
+  onSuccess?: (res: AxiosResponse<OkResponse>) => void;
+  onError?: (err: AxiosError<ErrorResponse>) => void;
+}): UseMutationResult<
   AxiosResponse<OkResponse>,
   AxiosError<ErrorResponse>,
   ResetPasswordData
 > => {
-  return useCustomMutation<ResetPasswordData, OkResponse>({
+  return useMutation<AxiosResponse<OkResponse>, AxiosError<ErrorResponse>, ResetPasswordData>({
     mutationFn: resetPassword,
     onSuccess,
     onError,
   });
 };
+
 export const useChangePassword = ({
   onSuccess,
   onError,
-}: ResolutionFunctions<OkResponse>): UseMutationResult<
+}: {
+  onSuccess?: (res: AxiosResponse<OkResponse>) => void;
+  onError?: (err: AxiosError<ErrorResponse>) => void;
+}): UseMutationResult<
   AxiosResponse<OkResponse>,
   AxiosError<ErrorResponse>,
   ResetPasswordData
 > => {
-  return useCustomMutation<ResetPasswordData, OkResponse>({ mutationFn: changePassword, onSuccess, onError });
+  return useMutation<AxiosResponse<OkResponse>, AxiosError<ErrorResponse>, ResetPasswordData>({ mutationFn: changePassword, onSuccess, onError });
 };

@@ -1,5 +1,0 @@
-import { Grid2 } from "@mui/material";
-
-export default function Hostel() {
-  return <Grid;
-}

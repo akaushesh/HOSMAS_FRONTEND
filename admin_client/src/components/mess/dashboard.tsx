@@ -3,7 +3,6 @@
 import * as React from 'react';
 import { Box, Button, MenuItem, Paper, Select, Stack, Typography } from '@mui/material';
 import Reviews from './review-card';
-import reviews from './temp';
 import { useRouter } from 'next/navigation';
 
 
@@ -15,7 +14,7 @@ export default function Dashboard(): React.JSX.Element {
   const totalStudents = 990;
 
   const router=useRouter();
-  const review4=reviews.slice(0,4);
+  const review4: { id: string; name: string; roll_num: number; rating: number; description: string; date: string; timing: string }[] = [];
 
   return (
     <Paper sx={{ minHeight: '65vh', width: '100%', mt: 4, p: {xs:2,md:4} }} elevation={10}>

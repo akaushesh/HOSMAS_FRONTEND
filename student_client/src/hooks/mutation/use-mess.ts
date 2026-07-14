@@ -1,20 +1,22 @@
 import { type ErrorResponse } from '@/services/auth';
 import { submitFeedback, type CreateFeedbackRequest, type FeedbackResponse } from '@/services/mess';
+import { useMutation } from '@tanstack/react-query';
 import { type UseMutationResult } from '@tanstack/react-query';
 import type { AxiosError, AxiosResponse } from 'axios';
-
-import { useCustomMutation, type ResolutionFunctions } from './use-custom-mutation';
 
 export const useSubmitFeedback = ({
   onSuccess,
   onError,
-}: ResolutionFunctions<FeedbackResponse> = {}): UseMutationResult<
+}: {
+  onSuccess?: (res: AxiosResponse<FeedbackResponse>) => void;
+  onError?: (err: AxiosError<ErrorResponse>) => void;
+} = {}): UseMutationResult<
   AxiosResponse<FeedbackResponse>,
   AxiosError<ErrorResponse>,
   CreateFeedbackRequest
 > => {
 
-  return useCustomMutation<CreateFeedbackRequest, FeedbackResponse>({
+  return useMutation<AxiosResponse<FeedbackResponse>, AxiosError<ErrorResponse>, CreateFeedbackRequest>({
     mutationFn: submitFeedback,
     onSuccess,
     onError,

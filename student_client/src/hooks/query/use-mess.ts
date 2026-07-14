@@ -2,14 +2,7 @@ import { getMenuItems, getMessMenu, getPreviousFeedbacks, type PreviousFeedbackR
 import { useQuery, type UseQueryResult } from '@tanstack/react-query';
 import type { AxiosResponse } from 'axios';
 
-interface UseMessMenuParams {
-  hostelId: number;
-  enabled?: boolean;
-}
-
-export const useMessMenu = ({
-  hostelId,
-}: UseMessMenuParams): UseQueryResult<AxiosResponse<MessMenu>> => {
+export const useMessMenu = ({ hostelId }: { hostelId: number }): UseQueryResult<AxiosResponse<MessMenu>> => {
   return useQuery({
     queryFn: () => getMessMenu(hostelId),
     queryKey: ['messMenu', hostelId],

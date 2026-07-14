@@ -1,8 +1,7 @@
 import { type ErrorResponse } from '@/services/auth';
-import { type UseMutationResult } from '@tanstack/react-query';
+import { useMutation, type UseMutationResult } from '@tanstack/react-query';
 import type { AxiosError, AxiosResponse } from 'axios';
 
-import { type ResolutionFunctions, useCustomMutation } from './use-custom-mutation';
 import {
   createSession,
   uploadGateScan,
@@ -22,12 +21,12 @@ import {
 export const useCreateSession = ({
   onSuccess,
   onError,
-}: ResolutionFunctions<AttendanceSession> = {}): UseMutationResult<
+}: { onSuccess?: (res: AxiosResponse<AttendanceSession>) => void; onError?: (err: AxiosError<ErrorResponse>) => void } = {}): UseMutationResult<
   AxiosResponse<AttendanceSession>,
   AxiosError<ErrorResponse>,
   string
 > => {
-  return useCustomMutation<string, AttendanceSession>({
+  return useMutation<AxiosResponse<AttendanceSession>, AxiosError<ErrorResponse>, string>({
     mutationFn: createSession,
     onSuccess,
     onError,
@@ -42,12 +41,12 @@ interface UploadGateScanArgs {
 export const useUploadGateScan = ({
   onSuccess,
   onError,
-}: ResolutionFunctions<void> = {}): UseMutationResult<
+}: { onSuccess?: (res: AxiosResponse<void>) => void; onError?: (err: AxiosError<ErrorResponse>) => void } = {}): UseMutationResult<
   AxiosResponse<void>,
   AxiosError<ErrorResponse>,
   UploadGateScanArgs
 > => {
-  return useCustomMutation<UploadGateScanArgs, void>({
+  return useMutation<AxiosResponse<void>, AxiosError<ErrorResponse>, UploadGateScanArgs>({
     mutationFn: ({ sessionId, file }) => uploadGateScan(sessionId, file),
     onSuccess,
     onError,
@@ -57,12 +56,12 @@ export const useUploadGateScan = ({
 export const useUploadFingerprint = ({
   onSuccess,
   onError,
-}: ResolutionFunctions<void> = {}): UseMutationResult<
+}: { onSuccess?: (res: AxiosResponse<void>) => void; onError?: (err: AxiosError<ErrorResponse>) => void } = {}): UseMutationResult<
   AxiosResponse<void>,
   AxiosError<ErrorResponse>,
   UploadGateScanArgs
 > => {
-  return useCustomMutation<UploadGateScanArgs, void>({
+  return useMutation<AxiosResponse<void>, AxiosError<ErrorResponse>, UploadGateScanArgs>({
     mutationFn: ({ sessionId, file }) => uploadFingerprint(sessionId, file),
     onSuccess,
     onError,
@@ -72,12 +71,12 @@ export const useUploadFingerprint = ({
 export const useComputeAttendance = ({
   onSuccess,
   onError,
-}: ResolutionFunctions<ComputeAttendanceResponse> = {}): UseMutationResult<
+}: { onSuccess?: (res: AxiosResponse<ComputeAttendanceResponse>) => void; onError?: (err: AxiosError<ErrorResponse>) => void } = {}): UseMutationResult<
   AxiosResponse<ComputeAttendanceResponse>,
   AxiosError<ErrorResponse>,
   number
 > => {
-  return useCustomMutation<number, ComputeAttendanceResponse>({
+  return useMutation<AxiosResponse<ComputeAttendanceResponse>, AxiosError<ErrorResponse>, number>({
     mutationFn: computeAttendance,
     onSuccess,
     onError,
@@ -92,12 +91,12 @@ interface SendMailArgs {
 export const useSendMail = ({
   onSuccess,
   onError,
-}: ResolutionFunctions<SendMailResponse> = {}): UseMutationResult<
+}: { onSuccess?: (res: AxiosResponse<SendMailResponse>) => void; onError?: (err: AxiosError<ErrorResponse>) => void } = {}): UseMutationResult<
   AxiosResponse<SendMailResponse>,
   AxiosError<ErrorResponse>,
   SendMailArgs
 > => {
-  return useCustomMutation<SendMailArgs, SendMailResponse>({
+  return useMutation<AxiosResponse<SendMailResponse>, AxiosError<ErrorResponse>, SendMailArgs>({
     mutationFn: ({ sessionId, resultIds }) => sendMail(sessionId, resultIds),
     onSuccess,
     onError,
@@ -112,12 +111,12 @@ interface UpdateResultStatusArgs {
 export const useUpdateResultStatus = ({
   onSuccess,
   onError,
-}: ResolutionFunctions<AttendanceResult> = {}): UseMutationResult<
+}: { onSuccess?: (res: AxiosResponse<AttendanceResult>) => void; onError?: (err: AxiosError<ErrorResponse>) => void } = {}): UseMutationResult<
   AxiosResponse<AttendanceResult>,
   AxiosError<ErrorResponse>,
   UpdateResultStatusArgs
 > => {
-  return useCustomMutation<UpdateResultStatusArgs, AttendanceResult>({
+  return useMutation<AxiosResponse<AttendanceResult>, AxiosError<ErrorResponse>, UpdateResultStatusArgs>({
     mutationFn: ({ resultId, status }) => updateResultStatus(resultId, status),
     onSuccess,
     onError,
@@ -132,12 +131,12 @@ interface BulkUpdateStatusArgs {
 export const useBulkUpdateStatus = ({
   onSuccess,
   onError,
-}: ResolutionFunctions<AttendanceResult[]> = {}): UseMutationResult<
+}: { onSuccess?: (res: AxiosResponse<AttendanceResult[]>) => void; onError?: (err: AxiosError<ErrorResponse>) => void } = {}): UseMutationResult<
   AxiosResponse<AttendanceResult[]>,
   AxiosError<ErrorResponse>,
   BulkUpdateStatusArgs
 > => {
-  return useCustomMutation<BulkUpdateStatusArgs, AttendanceResult[]>({
+  return useMutation<AxiosResponse<AttendanceResult[]>, AxiosError<ErrorResponse>, BulkUpdateStatusArgs>({
     mutationFn: ({ resultIds, status }) => bulkUpdateStatus(resultIds, status),
     onSuccess,
     onError,

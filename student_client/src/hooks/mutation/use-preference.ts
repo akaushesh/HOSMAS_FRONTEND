@@ -5,17 +5,19 @@ import {
   type CreatePreferenceResponse,
   type PreferenceOrder,
 } from '@/services/preference';
+import { useMutation } from '@tanstack/react-query';
 import type { UseMutationResult } from '@tanstack/react-query';
 import { type AxiosError, type AxiosResponse } from 'axios';
-
-import { useCustomMutation, type ResolutionFunctions } from './use-custom-mutation';
 
 export const useRetain = ({
   onSuccess,
   onError,
-}: ResolutionFunctions<SuccessResponse>): UseMutationResult<AxiosResponse<SuccessResponse>, AxiosError, void> => {
+}: {
+  onSuccess?: (res: AxiosResponse<SuccessResponse>) => void;
+  onError?: (err: AxiosError) => void;
+}): UseMutationResult<AxiosResponse<SuccessResponse>, AxiosError, void> => {
   // eslint-disable-next-line @typescript-eslint/no-invalid-void-type -- void is correct for no arguments
-  return useCustomMutation<void, SuccessResponse>({
+  return useMutation<AxiosResponse<SuccessResponse>, AxiosError, void>({
     mutationFn: setRetain,
     onSuccess,
     onError,
@@ -25,12 +27,15 @@ export const useRetain = ({
 export const useCreatePreference = ({
   onSuccess,
   onError,
-}: ResolutionFunctions<CreatePreferenceResponse>): UseMutationResult<
+}: {
+  onSuccess?: (res: AxiosResponse<CreatePreferenceResponse>) => void;
+  onError?: (err: AxiosError) => void;
+}): UseMutationResult<
   AxiosResponse<CreatePreferenceResponse>,
   AxiosError,
   PreferenceOrder
 > => {
-  return useCustomMutation<PreferenceOrder, CreatePreferenceResponse>({
+  return useMutation<AxiosResponse<CreatePreferenceResponse>, AxiosError, PreferenceOrder>({
     mutationFn: createPreference,
     onSuccess,
     onError,

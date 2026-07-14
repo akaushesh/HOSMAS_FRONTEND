@@ -1,19 +1,21 @@
 import { type ErrorResponse } from '@/services/auth';
 import { createLeave, type UpdateLeaveResponse, type CreateLeaveRequest, type CreateLeaveResponse, type UpdateLeaveRequest, updateLeave, type DeleteLeaveResponse,type DeleteLeaveParams, deleteLeave } from '@/services/leave';
+import { useMutation } from '@tanstack/react-query';
 import { type UseMutationResult } from '@tanstack/react-query';
 import type { AxiosError, AxiosResponse } from 'axios';
-
-import { useCustomMutation, type ResolutionFunctions } from './use-custom-mutation';
 
 export const useCreateLeaveSlip = ({
   onSuccess,
   onError,
-}: ResolutionFunctions<CreateLeaveResponse>): UseMutationResult<
+}: {
+  onSuccess?: (res: AxiosResponse<CreateLeaveResponse>) => void;
+  onError?: (err: AxiosError<ErrorResponse>) => void;
+}): UseMutationResult<
   AxiosResponse<CreateLeaveResponse>,
   AxiosError<ErrorResponse>,
   CreateLeaveRequest
 > => {
-  return useCustomMutation<CreateLeaveRequest, CreateLeaveResponse>({
+  return useMutation<AxiosResponse<CreateLeaveResponse>, AxiosError<ErrorResponse>, CreateLeaveRequest>({
     mutationFn: createLeave,
     onSuccess,
     onError,
@@ -23,12 +25,15 @@ export const useCreateLeaveSlip = ({
 export const useUpdateLeaveSlip = ({
   onSuccess,
   onError,
-}: ResolutionFunctions<UpdateLeaveResponse>): UseMutationResult<
+}: {
+  onSuccess?: (res: AxiosResponse<UpdateLeaveResponse>) => void;
+  onError?: (err: AxiosError<ErrorResponse>) => void;
+}): UseMutationResult<
   AxiosResponse<UpdateLeaveResponse>,
   AxiosError<ErrorResponse>,
   UpdateLeaveRequest
 > => {
-  return useCustomMutation<UpdateLeaveRequest, UpdateLeaveResponse>({
+  return useMutation<AxiosResponse<UpdateLeaveResponse>, AxiosError<ErrorResponse>, UpdateLeaveRequest>({
     mutationFn: updateLeave,
     onSuccess,
     onError,
@@ -38,12 +43,15 @@ export const useUpdateLeaveSlip = ({
 export const useDeleteLeaveSlip = ({
   onSuccess,
   onError,
-}: ResolutionFunctions<DeleteLeaveResponse>): UseMutationResult<
+}: {
+  onSuccess?: (res: AxiosResponse<DeleteLeaveResponse>) => void;
+  onError?: (err: AxiosError<ErrorResponse>) => void;
+}): UseMutationResult<
   AxiosResponse<DeleteLeaveResponse>,
   AxiosError<ErrorResponse>,
   DeleteLeaveParams
 > => {
-  return useCustomMutation<DeleteLeaveParams, DeleteLeaveResponse>({
+  return useMutation<AxiosResponse<DeleteLeaveResponse>, AxiosError<ErrorResponse>, DeleteLeaveParams>({
     mutationFn: deleteLeave,
     onSuccess,
     onError,

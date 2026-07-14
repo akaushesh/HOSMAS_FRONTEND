@@ -1,16 +1,19 @@
+import { type ErrorResponse } from '@/services/auth';
 import { acceptInvitation, deleteInvitation, sendInvitation, withdrawInvitation } from '@/services/invitation';
 import type { InvitationData, SuccessResponse, TokenData } from '@/services/invitation';
 import type { OkResponse } from '@/services/profile';
+import { useMutation } from '@tanstack/react-query';
 import type { UseMutationResult } from '@tanstack/react-query';
 import type { AxiosError, AxiosResponse } from 'axios';
-
-import { useCustomMutation, type ResolutionFunctions } from './use-custom-mutation';
 
 export const useSendInvitation = ({
   onSuccess,
   onError,
-}: ResolutionFunctions<SuccessResponse>): UseMutationResult<AxiosResponse<SuccessResponse>, AxiosError, TokenData> => {
-  return useCustomMutation<TokenData, SuccessResponse>({
+}: {
+  onSuccess?: (res: AxiosResponse<SuccessResponse>) => void;
+  onError?: (err: AxiosError<ErrorResponse>) => void;
+}): UseMutationResult<AxiosResponse<SuccessResponse>, AxiosError<ErrorResponse>, TokenData> => {
+  return useMutation<AxiosResponse<SuccessResponse>, AxiosError<ErrorResponse>, TokenData>({
     mutationFn: sendInvitation,
     onSuccess,
     onError,
@@ -20,12 +23,15 @@ export const useSendInvitation = ({
 export const useWithdrawInvitation = ({
   onSuccess,
   onError,
-}: ResolutionFunctions<SuccessResponse>): UseMutationResult<
+}: {
+  onSuccess?: (res: AxiosResponse<SuccessResponse>) => void;
+  onError?: (err: AxiosError<ErrorResponse>) => void;
+}): UseMutationResult<
   AxiosResponse<SuccessResponse>,
-  AxiosError,
+  AxiosError<ErrorResponse>,
   InvitationData
 > => {
-  return useCustomMutation<InvitationData, SuccessResponse>({
+  return useMutation<AxiosResponse<SuccessResponse>, AxiosError<ErrorResponse>, InvitationData>({
     mutationFn: withdrawInvitation,
     onSuccess,
     onError,
@@ -35,8 +41,11 @@ export const useWithdrawInvitation = ({
 export const useAcceptInvitation = ({
   onSuccess,
   onError,
-}: ResolutionFunctions<OkResponse>): UseMutationResult<AxiosResponse<OkResponse>, AxiosError, InvitationData> => {
-  return useCustomMutation<InvitationData, OkResponse>({
+}: {
+  onSuccess?: (res: AxiosResponse<OkResponse>) => void;
+  onError?: (err: AxiosError<ErrorResponse>) => void;
+}): UseMutationResult<AxiosResponse<OkResponse>, AxiosError<ErrorResponse>, InvitationData> => {
+  return useMutation<AxiosResponse<OkResponse>, AxiosError<ErrorResponse>, InvitationData>({
     mutationFn: acceptInvitation,
     onSuccess,
     onError,
@@ -46,8 +55,11 @@ export const useAcceptInvitation = ({
 export const useDeleteInvitation = ({
   onSuccess,
   onError,
-}: ResolutionFunctions<OkResponse>): UseMutationResult<AxiosResponse<OkResponse>, AxiosError, InvitationData> => {
-  return useCustomMutation<InvitationData, OkResponse>({
+}: {
+  onSuccess?: (res: AxiosResponse<OkResponse>) => void;
+  onError?: (err: AxiosError<ErrorResponse>) => void;
+}): UseMutationResult<AxiosResponse<OkResponse>, AxiosError<ErrorResponse>, InvitationData> => {
+  return useMutation<AxiosResponse<OkResponse>, AxiosError<ErrorResponse>, InvitationData>({
     mutationFn: deleteInvitation,
     onSuccess,
     onError,

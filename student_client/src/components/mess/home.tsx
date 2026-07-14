@@ -1,8 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Box, Button, CircularProgress, MenuItem, Paper, Select, type SelectChangeEvent } from '@mui/material';
-import { Stack } from '@mui/system';
+import { Box, Button, CircularProgress, MenuItem, Paper, Select, Stack, type SelectChangeEvent } from '@mui/material';
 
 // import Complaint from './complaint';
 import Feedback from './feedback';
@@ -111,7 +110,7 @@ export default function Home(): React.JSX.Element {
           <MenuItem value="Dinner">Dinner</MenuItem>
         </Select>)}
 
-        <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }} />
+        <div style={{ flexGrow: 1, display: 'flex' }} className="hide-xs" />
 
         {/* <Button
           variant={pageState === 2 ? 'contained' : 'outlined'}
@@ -181,9 +180,9 @@ export default function Home(): React.JSX.Element {
         </Select>
       </Stack>
        {isLoading ?(
-        <Box sx={{display:'flex',justifyContent:'center',alignItems:'center',height:'52vh'}}>
+        <div style={{display:'flex',justifyContent:'center',alignItems:'center',height:'52vh'}}>
           <CircularProgress/>
-          </Box>
+          </div>
        ):(
         <>
         {pageState === 0 && <MenuTable menuItems={menuItems} timing={messTiming} day={day} />}

@@ -4,7 +4,6 @@ import * as React from 'react';
 import { Box, Pagination, Paper, Stack, Typography } from '@mui/material';
 
 import Reviews from './review-card';
-import reviews from './temp';
 
 export default function Feedback(): React.JSX.Element {
 	const [page, setPage] = React.useState(1);
@@ -27,7 +26,7 @@ export default function Feedback(): React.JSX.Element {
         sx={{ background: 'var(--mui-palette-secondary-light)', p: 2, py: 3 }}
       >
         <Box height="43vh" width={1} sx={{ overflowY: 'auto', overflowX: 'hidden', pr: 1 }}>
-          <Reviews arr={reviews} />
+          <Reviews arr={[]} />
         </Box>
       </Stack>
         <Box sx={{ mt: 3, display: 'flex', alignItems: 'center', justifyContent: 'center', bottom: 0 }}>

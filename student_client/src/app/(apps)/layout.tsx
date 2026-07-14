@@ -26,11 +26,21 @@ export default function Layout({ children }: LayoutProps): React.JSX.Element {
             '--MobileNav-width': '320px',
             '--MobileNav-zIndex': 1100,
           },
+          '.layout-inner': {
+            display: 'flex',
+            flex: '1 1 auto',
+            flexDirection: 'column',
+            zIndex: 3,
+            paddingLeft: 0,
+            '@media (min-width: 1200px)': {
+              paddingLeft: 'var(--SideNav-width)',
+            },
+          },
         }}
       />
-      <Box
-        sx={{
-          bgcolor: 'var(--mui-palette-background-default)',
+      <div
+        style={{
+          backgroundColor: 'var(--mui-palette-background-default)',
           display: 'flex',
           flexDirection: 'column',
           position: 'relative',
@@ -46,14 +56,7 @@ export default function Layout({ children }: LayoutProps): React.JSX.Element {
         </Box> */}
 
         <SideNav />
-        <Box
-          sx={{
-            display: 'flex',
-            flex: '1 1 auto',
-            flexDirection: 'column',
-            pl: { lg: 'var(--SideNav-width)', zIndex: 3 },
-          }}
-        >
+        <div className="layout-inner">
           <MainNav />
 
           <main>
@@ -61,11 +64,11 @@ export default function Layout({ children }: LayoutProps): React.JSX.Element {
               {children}
             </Container>
           </main>
-        </Box>
+        </div>
 
         <BottomNav />
 
-      </Box>
+      </div>
     </AuthGuard>
   );
 }

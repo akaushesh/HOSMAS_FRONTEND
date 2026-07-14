@@ -6,20 +6,22 @@ import type {
   CreateCleaningRequestParams,
   CreateCleaningRequestResponse,
 } from '@/services/cleaning';
+import { useMutation } from '@tanstack/react-query';
 import type { UseMutationResult } from '@tanstack/react-query';
 import type { AxiosError, AxiosResponse } from 'axios';
-
-import { useCustomMutation, type ResolutionFunctions } from './use-custom-mutation';
 
 export const useMarkCleaningRequestComplete = ({
   onSuccess,
   onError,
-}: ResolutionFunctions<CleaningRequestCompleteResponse>): UseMutationResult<
+}: {
+  onSuccess?: (res: AxiosResponse<CleaningRequestCompleteResponse>) => void;
+  onError?: (err: AxiosError<ErrorResponse>) => void;
+}): UseMutationResult<
   AxiosResponse<CleaningRequestCompleteResponse>,
   AxiosError<ErrorResponse>,
   CleaningRequestCompleteData
 > => {
-  return useCustomMutation<CleaningRequestCompleteData, CleaningRequestCompleteResponse>({
+  return useMutation<AxiosResponse<CleaningRequestCompleteResponse>, AxiosError<ErrorResponse>, CleaningRequestCompleteData>({
     mutationFn: markCleaningRequestComplete,
     onSuccess,
     onError,
@@ -29,12 +31,15 @@ export const useMarkCleaningRequestComplete = ({
 export const useCreateCleaningRequest = ({
   onSuccess,
   onError,
-}: ResolutionFunctions<CreateCleaningRequestResponse>): UseMutationResult<
+}: {
+  onSuccess?: (res: AxiosResponse<CreateCleaningRequestResponse>) => void;
+  onError?: (err: AxiosError<ErrorResponse>) => void;
+}): UseMutationResult<
   AxiosResponse<CreateCleaningRequestResponse>,
   AxiosError<ErrorResponse>,
   CreateCleaningRequestParams
 > => {
-  return useCustomMutation<CreateCleaningRequestParams, CreateCleaningRequestResponse>({
+  return useMutation<AxiosResponse<CreateCleaningRequestResponse>, AxiosError<ErrorResponse>, CreateCleaningRequestParams>({
     mutationFn: createCleaningRequest,
     onSuccess,
     onError,

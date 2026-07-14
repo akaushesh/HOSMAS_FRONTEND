@@ -116,7 +116,7 @@ export const getProfile = async (): Promise<AxiosResponse<CentralProfileResponse
     throw new Error('You must be logged in to perform this action');
   }
 
-  const res = await tempApi.get('halloc/profile/', {
+  const res = await tempApi.get('halloc/group/profile/', {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -133,7 +133,7 @@ export const getProfile2 = async (): Promise<AxiosResponse<ProfileResponse>> => 
     throw new Error('You must be logged in to perform this action');
   }
 
-  const res = await tempApi.get('halloc/profile/', {
+  const res = await tempApi.get('halloc/group/profile/', {
     headers: {
       Authorization: `Bearer ${token}`,
     },

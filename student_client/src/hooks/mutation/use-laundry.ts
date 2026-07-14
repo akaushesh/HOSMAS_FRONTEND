@@ -6,10 +6,9 @@ import {
   type LaundrySlipResponse,
   type UpdateLaundryItems,
 } from '@/services/laundry';
+import { useMutation } from '@tanstack/react-query';
 import { type UseMutationResult } from '@tanstack/react-query';
 import type { AxiosError, AxiosResponse } from 'axios';
-
-import { useCustomMutation, type ResolutionFunctions } from './use-custom-mutation';
 
 
 export const laundryItems:Record<string,string>={
@@ -32,12 +31,15 @@ export const laundryItems:Record<string,string>={
 export const useCreateLaundrySlip = ({
   onSuccess,
   onError,
-}: ResolutionFunctions<LaundrySlipResponse>): UseMutationResult<
+}: {
+  onSuccess?: (res: AxiosResponse<LaundrySlipResponse>) => void;
+  onError?: (err: AxiosError<ErrorResponse>) => void;
+}): UseMutationResult<
   AxiosResponse<LaundrySlipResponse>,
   AxiosError<ErrorResponse>,
   LaundryItems
 > => {
-  return useCustomMutation<LaundryItems, LaundrySlipResponse>({
+  return useMutation<AxiosResponse<LaundrySlipResponse>, AxiosError<ErrorResponse>, LaundryItems>({
     mutationFn: createLaundrySlip,
     onSuccess,
     onError,
@@ -47,12 +49,15 @@ export const useCreateLaundrySlip = ({
 export const useUpdateLaundrySlip = ({
   onSuccess,
   onError,
-}: ResolutionFunctions<LaundrySlipResponse>): UseMutationResult<
+}: {
+  onSuccess?: (res: AxiosResponse<LaundrySlipResponse>) => void;
+  onError?: (err: AxiosError<ErrorResponse>) => void;
+}): UseMutationResult<
   AxiosResponse<LaundrySlipResponse>,
   AxiosError<ErrorResponse>,
   UpdateLaundryItems
 > => {
-  return useCustomMutation<UpdateLaundryItems, LaundrySlipResponse>({
+  return useMutation<AxiosResponse<LaundrySlipResponse>, AxiosError<ErrorResponse>, UpdateLaundryItems>({
     mutationFn: updateLaundrySlip,
     onSuccess,
     onError,
