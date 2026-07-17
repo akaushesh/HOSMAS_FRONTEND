@@ -2,7 +2,7 @@ import axios from "axios";
 
 export const url = 'https://central.hosmas.ccstiet.com/';
 export const centralUrl = 'https://central.hosmas.ccstiet.com/';
-export const allocationUrl = 'https://allocation.hosmas.ccstiet.com';
+export const allocationUrl = 'https://allocation.hosmas.ccstiet.com/';
 export const cleaningUrl = 'https://cleaning.hosmas.ccstiet.com/';
 export const laundryUrl = 'https://laundry.hosmas.ccstiet.com/';
 export const leaveUrl = 'https://leave.hosmas.ccstiet.com/';
