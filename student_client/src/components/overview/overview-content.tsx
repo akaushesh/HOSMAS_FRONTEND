@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { useProfile } from '@/hooks/query/use-profile';
-import type { SupervisorProfileResponse } from '@/services/profile';
+import type { CentralProfileResponse } from '@/services/profile';
 import type { AxiosResponse } from 'axios';
 import { WelcomeHeader } from './welcome-header';
 import { AllotmentIdCard } from './allotment-id-card';
@@ -10,8 +10,8 @@ import { Box, Stack, Skeleton } from '@mui/material';
 
 export function OverviewContent(): React.JSX.Element {
   const { data: profile, isLoading } = useProfile();
-  const userProfile = profile as AxiosResponse<SupervisorProfileResponse>;
-  const supervisor = userProfile?.data?.supervisor;
+  const userProfile = profile as AxiosResponse<CentralProfileResponse>;
+  const student = userProfile?.data?.student;
 
   if (isLoading) {
     return (
@@ -55,13 +55,10 @@ export function OverviewContent(): React.JSX.Element {
         }}
       >
         <AllotmentIdCard
-          name={supervisor?.name || 'N/A'}
-          /* Supervisor profile does not contain roll number or room fields since they are staff/admins.
-             We fallback to supervisor.id as rollNumber and "Office" as room.
-             Upgrade path: Add employee_id and room_number fields to the supervisor DB schema if needed. */
-          rollNumber={supervisor?.id?.toString() || 'N/A'}
-          hostel={supervisor?.hostel?.name || 'N/A'}
-          room="Office"
+          name={student?.name || 'N/A'}
+          rollNumber={student?.roll_number?.toString() || 'N/A'}
+          hostel={student?.room?.hostel?.name || 'N/A'}
+          room={student?.room?.name || 'N/A'}
         />
       </Box>
     </Stack>
