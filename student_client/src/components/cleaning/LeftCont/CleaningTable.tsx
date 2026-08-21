@@ -60,8 +60,8 @@ function RowCleaning({ task }: { task: CleaningRequest }): React.JSX.Element {
         },
       }}
     >
-      <TableCell align="center">{dayjs(task.date).format('DD MMM YYYY')}</TableCell>
-      <TableCell align="center">{dayjs(task.date).format('hh:mm A')}</TableCell>
+      <TableCell align="center">{task.date ? dayjs(task.date).format('DD MMM YYYY') : '—'}</TableCell>
+      <TableCell align="center">{task.date ? dayjs(task.date).format('hh:mm A') : '—'}</TableCell>
       <TableCell align="center">{task.worker_details?.name ?? '—'}</TableCell>
       <TableCell align="center">{task.status}</TableCell>
     </TableRow>

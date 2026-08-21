@@ -55,7 +55,9 @@ export default function LowerRightCont(): React.JSX.Element {
   const now = new Date();
   const currentTime = format(now, 'HH:mm:ss');
   const today = format(now, 'yyyy-MM-dd');
-  const nextDay = format(new Date(now.setDate(now.getDate() + 1)), 'yyyy-MM-dd');
+  const nextDayDate = new Date(now);
+  nextDayDate.setDate(nextDayDate.getDate() + 1);
+  const nextDay = format(nextDayDate, 'yyyy-MM-dd');
 
   const isAtLeastOneSlotSelected = (): boolean => {
     return selectedSlots.some((slot) => slot.id !== 0 && slot.time !== '' && slot.date !== '');
